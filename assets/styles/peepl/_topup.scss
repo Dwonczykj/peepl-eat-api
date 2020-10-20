@@ -1,0 +1,114 @@
+.peepl-topup {
+    text-align: center;
+
+    h2 {
+        font-size: 1em;
+    }
+
+    pre {
+        font-size: 2em;
+        background-color: $white;
+        border: $border-width solid $border-color;
+        border-radius: $border-radius;
+    }
+
+    code {
+        background-color: $white;
+        border: $border-width solid $border-color;
+        border-radius: 0.25rem;
+        padding: 0.25rem 0.5rem;
+        margin: 0 0.25rem;
+    }
+}
+
+.btn-sms {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    svg {
+        width: 27px;
+        height: 27px;
+        color: inherit;
+        margin-right: 0.5rem;
+    }
+}
+
+.peepl-topup__sms-details {
+    display: none;
+    margin-top: 1rem;
+
+    .form-control {
+        text-align: center;
+    }
+}
+
+.peepl-topup--sms {
+    h2,
+    pre,
+    .btn-sms,
+    .peepl-budget {
+        display: none;
+    }
+
+    .peepl-topup__sms-details {
+        display: block;
+    }
+}
+
+.js-sms-details {
+    .btn-sending-sms {
+        display: none;
+        cursor: auto;
+
+        .spinner-border {
+            vertical-align: 0;
+            margin-right: 0.3em;
+        }
+    }
+
+    .btn-sent-sms {
+        display: none;
+        cursor: auto;
+
+        svg {
+            width: 27px;
+            height: 27px;
+            color: inherit;
+            vertical-align: -7px;
+            margin-right: 4px;
+        }
+    }
+
+    &.sending {
+        .btn-send-sms,
+        .btn-sent-sms {
+            display: none;
+        }
+
+        .btn-sending-sms {
+            display: block;
+        }
+    }
+
+    &.sent {
+        .btn-send-sms,
+        .btn-sending-sms {
+            display: none;
+        }
+
+        .btn-sent-sms {
+            display: block;
+        }
+    }
+}
+
+.peepl-budget {
+    margin-top: 1.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid $border-color;
+
+    h2 {
+        font-weight: bold;
+    }
+}
