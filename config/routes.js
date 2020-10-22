@@ -19,10 +19,11 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
-  '/': { view: 'pages/homepage' },
-  '/barmenu': {view: 'pages/bar-menu'},
-  '/today': {view: 'pages/today'},
-  '/topup': {view: 'pages/topup'}
+  '/': { action: 'view-homepage' },
+  '/barmenu': {action: 'view-bar-menu'},
+  '/today': {action: 'view-today'},
+  '/topup': {action: 'view-topup'},
+  'POST /api/v1/bar/create-order': { action: 'bar/create-order' },
 
 
   /***************************************************************************

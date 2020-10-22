@@ -16,7 +16,8 @@ module.exports.policies = {
   * (`true` allows public access)                                            *
   *                                                                          *
   ***************************************************************************/
-
+    '*': ['has-wallet'],
+    'view-homepage': true
   // '*': true,
 
 };

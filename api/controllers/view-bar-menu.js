@@ -17,9 +17,9 @@ module.exports = {
 
 
   fn: async function () {
-
+    var products = await Product.find();
     // Respond with view.
-    return {};
+    return {products};
 
   }
 

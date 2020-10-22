@@ -1,106 +1,123 @@
-var destinationWallet = '0x47b2706a3af571142966d4eb73e1006ef84b4b74';
+parasails.registerPage('bar-menu', {
+  //  ╦╔╗╔╦╔╦╗╦╔═╗╦    ╔═╗╔╦╗╔═╗╔╦╗╔═╗
+  //  ║║║║║ ║ ║╠═╣║    ╚═╗ ║ ╠═╣ ║ ║╣
+  //  ╩╝╚╝╩ ╩ ╩╩ ╩╩═╝  ╚═╝ ╩ ╩ ╩ ╩ ╚═╝
+  data: {
+    destinationWallet: '0x47b2706a3af571142966d4eb73e1006ef84b4b74',
+    // products:{
+    //     1: {
+    //         id: 1,
+    //         name: 'Love Lane Lager',
+    //         description: 'One of the city’s best loved beers, made with Pilsner and Munich malts for a delicate, herbal brew. Love Lane’s brewery, about 100 metres from here, on the site of an old rubber factory, can produce over 3 million pints of this gorgeous amber nectar at a time.',
+    //         fullPrice: 5.00,
+    //         reducedPrice: 4.60
+    //     },
+    //     2: {
+    //         id: 2,
+    //         name: 'Pomegranate Gin Fizz',
+    //         description: 'This combination of pomegranate with Persian rose petals and Turkish apple creates a particularly aromatic and refreshing gin. Mix that with some sweetness, some lime, and some club soda – delicious!',
+    //         fullPrice: 7.50,
+    //         reducedPrice: 6.80
+    //     },
+    //     3: {
+    //         id: 3,
+    //         name: 'Gin & Tonic',
+    //         description: 'Choose from traditional dry gin, sophisticated pomegranate, or moody coffee & vanilla – all distilled around 80 metres away in the Love Lane Brewery and bottled by hand.',
+    //         fullPrice: 5.00,
+    //         reducedPrice: 4.50
+    //     },
+    //     4: {
+    //         id: 4,
+    //         name: 'Dark & Stormzy',
+    //         description: 'AKA dark rum and coke, with a splash of fresh lime. The fine rum at the heart of this drink is made by the Big Bog Brewing company, a real living wage employer based in Speke.',
+    //         fullPrice: 4.50,
+    //         reducedPrice: 4.10
+    //     },
+    //     5: {
+    //         id: 5,
+    //         name: 'Oolong Tea',
+    //         description: 'A Chinese speciality oolong tea, grown in the Fujian province. Calming, tasty and quite refreshing after, or before, a drink or two – it is a Monday after all.',
+    //         fullPrice: 3.00,
+    //         reducedPrice: 2.70
+    //     }, 
+    //     6: {
+    //         id: 6,
+    //         name: 'Elderflower Collins',
+    //         description: 'Refreshingly zingy. Love Lane dry gin, lemon, sugar and elderflower cordial. Not much history to this drink other than it came from a Google search and the BBC Good Food guide.',
+    //         fullPrice: 7.50,
+    //         reducedPrice: 6.80
+    //     }, 
+    //     7: {
+    //         id: 7,
+    //         name: 'Mineral Water',
+    //         description: 'All the classics.',
+    //         fullPrice: 2.00,
+    //         reducedPrice: 1.80
+    //     }, 
+    //     8: {
+    //         id: 8,
+    //         name: 'Proper Scouse Tap Water',
+    //         description: 'Liverpool’s finest, which it turns out actually comes from Lake Vymwy, in the Welsh hills. We thought it was the Mersey at first, but looking at the Mersey lately, we’re quite glad it’s not.',
+    //         fullPrice: 0.00,
+    //         reducedPrice: 0.00
+    //     }
+    //         },
+    quantities: {
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+        6: 0,
+        7: 0,
+        8: 0
+    },
+    // Is customer good or bad (i.e. did they travel by car)
+    isGood: false,
+  },
 
-var fullPrices = {
-    loveLaneLager: 5.00,
-    pomegranateGinFizz: 7.50,
-    ginAndTonic: 5.00,
-    darkAndStormzy: 4.50,
-    oolongTea: 3.00,
-    elderflowerCollins: 7.50,
-    mineralWater: 2.00,
-    properScouseTapWater: 0.00
-};
+  //  ╦  ╦╔═╗╔═╗╔═╗╦ ╦╔═╗╦  ╔═╗
+  //  ║  ║╠╣ ║╣ ║  ╚╦╝║  ║  ║╣
+  //  ╩═╝╩╚  ╚═╝╚═╝ ╩ ╚═╝╩═╝╚═╝
+  beforeMount: function() {
+    _.extend(this, SAILS_LOCALS);
+  },
+  mounted: async function() {
+  },
 
-var reducedPrices = {
-    loveLaneLager: 4.60,
-    pomegranateGinFizz: 6.80,
-    ginAndTonic: 4.50,
-    darkAndStormzy: 4.10,
-    oolongTea: 2.70,
-    elderflowerCollins: 6.80,
-    mineralWater: 1.80,
-    properScouseTapWater: 0.00
-};
-
-var quantities = {
-    loveLaneLager: 0,
-    pomegranateGinFizz: 0,
-    ginAndTonic: 0,
-    darkAndStormzy: 0,
-    oolongTea: 0,
-    elderflowerCollins: 0,
-    mineralWater: 0,
-    properScouseTapWater: 0
-};
-
-// Is customer good or bad (i.e. did they travel by car)
-var isGood = false;
-
-var total = 0;
-
-function setPrices (isGood) {
-    total = 0;
-    if (isGood) {
-        $('.price').each(function (index, element) {
-            $(this).text(reducedPrices[$(this).prop('id')].toLocaleString("en-GB", { style: "currency", currency: "GBP", minimumFractionDigits: 2 }));
-        });
-        for (var item in quantities) {
-            total += quantities[item] * reducedPrices[item];
+  computed: {
+    total: function() {
+        var workingTotal = 0;
+        for(var product in this.quantities) {
+            var productData = _.find(this.products, {id: product}).reducedPrice
+            workingTotal += (this.isGood) ? productData.reducedPrice * this.quantities[product] : productData.fullPrice * this.quantities[product];
         }
-    } else {
-        $('.price').each(function (index, element) {
-            $(this).text(fullPrices[$(this).prop('id')].toLocaleString("en-GB", { style: "currency", currency: "GBP", minimumFractionDigits: 2 }));
-        });
-        for (var item in quantities) {
-            total += quantities[item] * fullPrices[item];
-        }
+        return workingTotal;
     }
-    $('#total').text(total.toLocaleString("en-GB", { style: "currency", currency: "GBP", minimumFractionDigits: 2 }));
-}
+  },
 
-setPrices(false);
-
-jQuery(function ($) {
-    $('#travelMethod').change(function(e){
-        if(this.value == 'good') {
-            setPrices(true);
-        } else {
-            setPrices(false);
-        }
-    })
-
-    $('.quantity').change(function(e){
-        quantities[$(this).data('item')] = parseInt(this.value);
-
-        total = 0;
-        for(var item in quantities) {
-            if(isGood) {
-                total += quantities[item] * reducedPrices[item];
-            } else {
-                total += quantities[item] * fullPrices[item];
-            }
-        }
-
-        $('#total').text(total.toLocaleString("en-GB", { style: "currency", currency: "GBP", minimumFractionDigits: 2 }));
-    })
-    
-
-});
-
-var form = document.querySelector('#payment-form');
-
-window.addEventListener("flutterInAppWebViewPlatformReady", function (event) {
-    form.addEventListener('submit', function (e) {
+  //  ╦╔╗╔╔╦╗╔═╗╦═╗╔═╗╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
+  //  ║║║║ ║ ║╣ ╠╦╝╠═╣║   ║ ║║ ║║║║╚═╗
+  //  ╩╝╚╝ ╩ ╚═╝╩╚═╩ ╩╚═╝ ╩ ╩╚═╝╝╚╝╚═╝
+  methods: {
+      sendPayment: function(e) {
         e.preventDefault();
+
+        Cloud.createOrder(this.quantities)
+        .then(function(msg){
+            console.log(msg);
+        })
+
         var paymentDetails = {
             action: 'pay',
-            amount: total,
+            amount: this.total,
             currency: 'GBPx',
-            destination: destinationWallet,
+            destination: this.destinationWallet,
         };
-        window.flutter_inappwebview.callHandler('pay', paymentDetails).then(function (result) {
-            // get result from Flutter side. It will be the number 64.
-            console.log(result);
-        });
-    });
+        // window.flutter_inappwebview.callHandler('pay', paymentDetails).then(function (result) {
+        //     // get result from Flutter side. It will be the number 64.
+        //     console.log(result);
+        // });
+      }
+  }
 });

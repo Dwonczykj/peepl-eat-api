@@ -5,13 +5,14 @@
             Welcome to the Peepl in Abundance bar. We're happy to have you here!
         </p>
         <p>To start, please select whether you travelled here by public transport or car.</p>
-        <form id="payment-form">
+        <form id="payment-form" @submit="sendPayment">
             <div class="form-group">
                 <label for="travelMethod">Travel method</label>
-                <select class="form-control" id="travelMethod">
-                    <option value="bad">Car, Taxi</option>
-                    <option value="good">Public Transport (Bus, Train)</option>
-                    <option value="good">Walking, Jogging, Running</option>
+                <select v-model="isGood" class="form-control">
+                    <option disabled value="">Please select one</option>
+                    <option v-bind:value="false">Car or Taxi</option>
+                    <option v-bind:value="true">Public Transport</option>
+                    <option v-bind:value="true">Walking, Jogging or Running</option>
                 </select>
             </div>
             <table class="menu-table">
@@ -24,173 +25,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Love Lane Lager</td>
-                        <td>One of the city’s best loved beers, made with Pilsner and Munich malts for a delicate, herbal brew. Love Lane’s brewery,
-                        about 100 metres from here, on the site of an old rubber factory, can produce over 3 million pints of this gorgeous
-                        amber nectar at a time.</td>
-                        <td class="price" id="loveLaneLager"></td>
+                    <tr v-for="product in products">
+                        <td>{{product.name}}</td>
+                        <td>{{product.description}}</td>
+                        <td>{{(isGood) ? product.reducedPrice : product.fullPrice}}</td>
                         <td>
                             <div class="form-group">
-                                <select class="form-control quantity" data-item="loveLaneLager">
-                                    <option value="0">0</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
-                                    <option value="6">6</option>
-                                    <option value="7">7</option>
-                                    <option value="8">8</option>
-                                    <option value="9">9</option>
-                                    <option value="10">10</option>
-                                </select>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Pomegranite Gin Fizz</td>
-                        <td>This combination of pomegranate with Persian rose petals and Turkish apple creates a particularly aromatic and
-                        refreshing gin. Mix that with some sweetness, some lime, and some club soda – delicious!</td>
-                        <td class="price" id="pomegranateGinFizz"></td>
-                        <td>
-                            <div class="form-group">
-                                <select class="form-control quantity" data-item="pomegranateGinFizz">
-                                    <option value="0">0</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
-                                    <option value="6">6</option>
-                                    <option value="7">7</option>
-                                    <option value="8">8</option>
-                                    <option value="9">9</option>
-                                    <option value="10">10</option>
-                                </select>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Gin & Tonic</td>
-                        <td>Choose from traditional dry gin, sophisticated pomegranate, or moody coffee & vanilla – all distilled around 80 metres
-                        away in the Love Lane Brewery and bottled by hand.</td>
-                        <td class="price" id="ginAndTonic"></td>
-                        <td>
-                            <div class="form-group">
-                                <select class="form-control quantity" data-item="ginAndTonic">
-                                    <option value="0">0</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
-                                    <option value="6">6</option>
-                                    <option value="7">7</option>
-                                    <option value="8">8</option>
-                                    <option value="9">9</option>
-                                    <option value="10">10</option>
-                                </select>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Dark & Stormzy</td>
-                        <td>AKA dark rum and coke, with a splash of fresh lime. The fine rum at the heart of this drink is made by the Big Bog
-                        Brewing company, a real living wage employer based in Speke.</td>
-                        <td class="price" id="darkAndStormzy"></td>
-                        <td>
-                            <div class="form-group">
-                                <select class="form-control quantity" data-item="darkAndStormzy">
-                                    <option value="0">0</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
-                                    <option value="6">6</option>
-                                    <option value="7">7</option>
-                                    <option value="8">8</option>
-                                    <option value="9">9</option>
-                                    <option value="10">10</option>
-                                </select>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Oolong Tea</td>
-                        <td>A Chinese speciality oolong tea, grown in the Fujian province. Calming, tasty and quite refreshing after, or before, a
-                        drink or two – it is a Monday after all.</td>
-                        <td class="price" id="oolongTea"></td>
-                        <td>
-                            <div class="form-group">
-                                <select class="form-control quantity" data-item="oolongTea">
-                                    <option value="0">0</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
-                                    <option value="6">6</option>
-                                    <option value="7">7</option>
-                                    <option value="8">8</option>
-                                    <option value="9">9</option>
-                                    <option value="10">10</option>
-                                </select>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Elderflower Collins</td>
-                        <td>Refreshingly zingy. Love Lane dry gin, lemon, sugar and elderflower cordial. Not much history to this drink other than
-                        it came from a Google search and the BBC Good Food guide.</td>
-                        <td class="price" id="elderflowerCollins"></td>
-                        <td>
-                            <div class="form-group">
-                                <select class="form-control quantity" data-item="elderflowerCollins">
-                                    <option value="0">0</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
-                                    <option value="6">6</option>
-                                    <option value="7">7</option>
-                                    <option value="8">8</option>
-                                    <option value="9">9</option>
-                                    <option value="10">10</option>
-                                </select>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Mineral Water</td>
-                        <td>All the classics.</td>
-                        <td class="price" id="mineralWater"></td>
-                        <td><div class="form-group">
-                            <select class="form-control quantity" data-item="mineralWater">
-                                <option value="0">0</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                                <option value="6">6</option>
-                                <option value="7">7</option>
-                                <option value="8">8</option>
-                                <option value="9">9</option>
-                                <option value="10">10</option>
-                            </select>
-                        </div></td>
-                    </tr>
-                    <tr>
-                        <td>Proper Scouse Tap Water</td>
-                        <td>Liverpool’s finest, which it turns out actually comes from Lake Vymwy, in the Welsh hills. We thought it was the Mersey
-                        at first, but looking at the Mersey lately, we’re quite glad it’s not.</td>
-                        <td class="price" id="properScouseTapWater"></td>
-                        <td>
-                            <div class="form-group">
-                                <select class="form-control quantity" data-item="properScouseTapWater">
+                                <select v-model="quantities[product.id]" class="form-control quantity" data-item="loveLaneLager">
                                     <option value="0">0</option>
                                     <option value="1">1</option>
                                     <option value="2">2</option>
@@ -209,7 +50,7 @@
                 </tbody>
             </table>
             <br/>
-            <p>Your total is: <span id="total">£0</span></p>
+            <p>Your total is: <span id="total">£{{total}}</span></p>
             <button type="submit" class="btn btn-primary">Send payment</button>
         </form>
     </div>
