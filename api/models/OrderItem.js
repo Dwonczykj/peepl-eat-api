@@ -39,6 +39,10 @@ module.exports = {
     deliverySlot: {
       model: 'deliverymethodslot',
       description: 'The delivery slot chosen by the user for the item.'
+    },
+    optionValues: {
+      collection: 'orderitemoptionvalue',
+      via: 'orderItem'
     }
 
   },

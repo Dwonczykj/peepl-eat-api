@@ -1,0 +1,7 @@
+<div id="all-vendors" v-cloak>
+
+  <% for (var vendor in vendors) { %>
+    <a href="vendors/<%= vendors[vendor].id %>"><%= vendors[vendor].name %></a>
+  <% } %>
+</div>
+<%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>

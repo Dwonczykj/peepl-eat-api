@@ -22,6 +22,15 @@ module.exports = {
     //  ╔═╗╔═╗╔═╗╔═╗╔═╗╦╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
     //  ╠═╣╚═╗╚═╗║ ║║  ║╠═╣ ║ ║║ ║║║║╚═╗
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
+    option: {
+      model: 'productoption'
+    },
+    optionValue: {
+      model: 'productoptionvalue'
+    },
+    orderItem: {
+      model: 'orderitem'
+    }
 
   },
 

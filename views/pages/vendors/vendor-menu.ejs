@@ -1,0 +1,11 @@
+<div id="vendor-menu" v-cloak>
+
+  <h1><%= vendor.name %></h1>
+  <h2><%= vendor.description %></h2>
+  <hr/>
+  <% for (var product in vendor.products) { %>
+    <h1><%= vendor.products[product].name %></h1>
+    <a class="btn btn-primary">Add to cart</a>
+  <% } %>
+</div>
+<%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>

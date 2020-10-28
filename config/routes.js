@@ -23,6 +23,9 @@ module.exports.routes = {
   '/barmenu': {action: 'view-bar-menu'},
   '/today': {action: 'view-today'},
   '/topup': {action: 'view-topup'},
+  '/vendors': {action: 'vendors/view-all-vendors'},
+  '/vendors/:vendorid': { action: 'vendors/view-vendor-menu' },
+
   'POST /api/v1/bar/create-order': { action: 'bar/create-order' },
 
 
