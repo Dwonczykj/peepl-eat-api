@@ -1,5 +1,5 @@
 /**
- * Product.js
+ * DeliveryMethodSlot.js
  *
  * @description :: A model definition represents a database table/collection.
  * @docs        :: https://sailsjs.com/docs/concepts/models-and-orm/models
@@ -12,27 +12,19 @@ module.exports = {
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
     //  ╩  ╩╚═╩╩ ╩╩ ╩ ╩ ╚╝ ╚═╝╚═╝
-
-    name: {
+    startDateTime: {
       type: 'string',
-      required: true
+      required: true,
+      description: 'A date and time representing the start of the delivery slot.'
     },
-    description: {
+    endDateTime: {
       type: 'string',
-      required: false
+      required: true,
+      description: 'A date and time representing the start of the delivery slot.'
     },
-    basePrice: {
+    slotsRemaining: {
       type: 'number',
-      description: 'Base product price in pence. This can be modified by product options or delivery methods.',
-      required: true
-    },
-    image: {
-      type: 'string',
-      description: 'Full path to the product image.'
-    },
-    isAvailable: {
-      type: 'boolean',
-      description: 'Boolean to represent whether the product is available or not.'
+      description: 'The number of these slots that are still available.'
     },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
@@ -43,21 +35,11 @@ module.exports = {
     //  ╔═╗╔═╗╔═╗╔═╗╔═╗╦╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
     //  ╠═╣╚═╗╚═╗║ ║║  ║╠═╣ ║ ║║ ║║║║╚═╗
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
-    vendor: {
-      model: 'vendor',
-      description: 'The seller of the product.'
-    },
-    options: {
-      collection: 'productoption',
-      via: 'product',
-      description: 'A collection of options that apply to the product (i.e. colour).'
-    },
-    deliveryMethods: {
-      collection: 'deliverymethod',
-      via: 'products',
-      description: 'The delivery methods applicable to this product.'
+    deliveryMethod: {
+      model: 'deliverymethod',
+      required: true,
+      description: 'The delivery method that this slot applies to.'
     }
-
   },
 
 };

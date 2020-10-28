@@ -1,5 +1,5 @@
 /**
- * Product.js
+ * Vendor.js
  *
  * @description :: A model definition represents a database table/collection.
  * @docs        :: https://sailsjs.com/docs/concepts/models-and-orm/models
@@ -12,27 +12,31 @@ module.exports = {
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
     //  ╩  ╩╚═╩╩ ╩╩ ╩ ╩ ╚╝ ╚═╝╚═╝
-
     name: {
       type: 'string',
+      description: 'The name of the vendor.',
       required: true
+    },
+    type: {
+      type: 'string',
+      description: 'The type of vendor.',
+      // isIn: ['restaurant', 'shop'],
+      required: false
     },
     description: {
       type: 'string',
+      description: 'A brief description of the vendor.',
       required: false
-    },
-    basePrice: {
-      type: 'number',
-      description: 'Base product price in pence. This can be modified by product options or delivery methods.',
-      required: true
     },
     image: {
       type: 'string',
-      description: 'Full path to the product image.'
+      description: 'Fully-qualified link to the image for the product.',
+      required: false
     },
-    isAvailable: {
-      type: 'boolean',
-      description: 'Boolean to represent whether the product is available or not.'
+    walletId: {
+      type: 'string',
+      description: 'The blockchain wallet address for the vendor. Used to distribute payments from customers.',
+      required: true
     },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
@@ -43,21 +47,10 @@ module.exports = {
     //  ╔═╗╔═╗╔═╗╔═╗╔═╗╦╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
     //  ╠═╣╚═╗╚═╗║ ║║  ║╠═╣ ║ ║║ ║║║║╚═╗
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
-    vendor: {
-      model: 'vendor',
-      description: 'The seller of the product.'
-    },
-    options: {
-      collection: 'productoption',
-      via: 'product',
-      description: 'A collection of options that apply to the product (i.e. colour).'
-    },
-    deliveryMethods: {
-      collection: 'deliverymethod',
-      via: 'products',
-      description: 'The delivery methods applicable to this product.'
+    products: {
+      collection: 'product',
+      via: 'vendor'
     }
-
   },
 
 };

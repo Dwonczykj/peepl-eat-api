@@ -1,7 +1,7 @@
 /**
- * User.js
+ * OrderItemOptionValue.js
  *
- * @description :: A model definition.  Represents a database table/collection/etc.
+ * @description :: A model definition represents a database table/collection.
  * @docs        :: https://sailsjs.com/docs/concepts/models-and-orm/models
  */
 
@@ -12,34 +12,8 @@ module.exports = {
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
     //  ╩  ╩╚═╩╩ ╩╩ ╩ ╩ ╚╝ ╚═╝╚═╝
-    walletId: {
-      type: 'string',
-      required: true,
-      unique: true
-    },
-    name: {
-      type: 'string'
-    },
-    email: {
-      type: 'string',
-      isEmail: true,
-      // unique: true,
-    },
-    newsletterOptInDate: {
-      type: 'number',
-    },
-    addressLineOne: {
-      type: 'string'
-    },
-    addressLineTwo: {
-      type: 'string'
-    },
-    town: {
-      type: 'string'
-    },
-    postcode: {
-      type: 'string',
-    },
+
+
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
     //  ╚═╝╩ ╩╚═╝╚═╝═╩╝╚═╝
@@ -48,11 +22,8 @@ module.exports = {
     //  ╔═╗╔═╗╔═╗╔═╗╔═╗╦╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
     //  ╠═╣╚═╗╚═╗║ ║║  ║╠═╣ ║ ║║ ║║║║╚═╗
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
-    orders: {
-      collection: 'order',
-      via: 'customer'
-    }
 
   },
 
 };
+

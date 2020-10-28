@@ -1,5 +1,5 @@
 /**
- * Product.js
+ * OptionValue.js
  *
  * @description :: A model definition represents a database table/collection.
  * @docs        :: https://sailsjs.com/docs/concepts/models-and-orm/models
@@ -12,28 +12,26 @@ module.exports = {
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
     //  ╩  ╩╚═╩╩ ╩╩ ╩ ╩ ╚╝ ╚═╝╚═╝
-
     name: {
       type: 'string',
+      description: 'The name of the option value (e.g. Blue)',
       required: true
     },
     description: {
       type: 'string',
+      description: 'The description of the option value (e.g. This is a great sky blue shade!)',
       required: false
     },
-    basePrice: {
+    priceModifier: {
       type: 'number',
-      description: 'Base product price in pence. This can be modified by product options or delivery methods.',
-      required: true
+      description: 'The amount of pence to add or subtract from the product total for this option.',
+      required: false
     },
-    image: {
-      type: 'string',
-      description: 'Full path to the product image.'
-    },
-    isAvailable: {
+    available: {
       type: 'boolean',
-      description: 'Boolean to represent whether the product is available or not.'
+      description: 'Represents whether or not the option value is available.',
     },
+
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
@@ -43,21 +41,11 @@ module.exports = {
     //  ╔═╗╔═╗╔═╗╔═╗╔═╗╦╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
     //  ╠═╣╚═╗╚═╗║ ║║  ║╠═╣ ║ ║║ ║║║║╚═╗
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
-    vendor: {
-      model: 'vendor',
-      description: 'The seller of the product.'
-    },
     options: {
       collection: 'productoption',
-      via: 'product',
-      description: 'A collection of options that apply to the product (i.e. colour).'
-    },
-    deliveryMethods: {
-      collection: 'deliverymethod',
-      via: 'products',
-      description: 'The delivery methods applicable to this product.'
+      via: 'values',
+      description: 'The options to which this value can apply.'
     }
-
   },
 
 };

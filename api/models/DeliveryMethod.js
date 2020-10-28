@@ -1,5 +1,5 @@
 /**
- * Product.js
+ * DeliveryMethod.js
  *
  * @description :: A model definition represents a database table/collection.
  * @docs        :: https://sailsjs.com/docs/concepts/models-and-orm/models
@@ -12,28 +12,24 @@ module.exports = {
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
     //  ╩  ╩╚═╩╩ ╩╩ ╩ ╩ ╚╝ ╚═╝╚═╝
-
     name: {
       type: 'string',
+      description: 'The name of the delivery method.',
       required: true
     },
     description: {
       type: 'string',
-      required: false
+      description: 'A brief description of the shipping method.',
     },
-    basePrice: {
+    priceModifier: {
       type: 'number',
-      description: 'Base product price in pence. This can be modified by product options or delivery methods.',
-      required: true
+      description: 'A positive or negative integer representing the amount of pence to adjust the base price by.'
     },
-    image: {
+    postCodeRestrictionRegex: {
       type: 'string',
-      description: 'Full path to the product image.'
+      description: 'A regular expression specifying which postcodes are eligible for this delivery method.'
     },
-    isAvailable: {
-      type: 'boolean',
-      description: 'Boolean to represent whether the product is available or not.'
-    },
+
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
@@ -43,21 +39,15 @@ module.exports = {
     //  ╔═╗╔═╗╔═╗╔═╗╔═╗╦╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
     //  ╠═╣╚═╗╚═╗║ ║║  ║╠═╣ ║ ║║ ║║║║╚═╗
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
-    vendor: {
-      model: 'vendor',
-      description: 'The seller of the product.'
+    products: {
+      collection: 'product',
+      via: 'deliveryMethods'
     },
-    options: {
-      collection: 'productoption',
-      via: 'product',
-      description: 'A collection of options that apply to the product (i.e. colour).'
-    },
-    deliveryMethods: {
-      collection: 'deliverymethod',
-      via: 'products',
-      description: 'The delivery methods applicable to this product.'
+    deliveryMethodSlots: {
+      collection: 'deliverymethodslot',
+      via: 'deliveryMethod'
     }
-
+    
   },
 
 };
