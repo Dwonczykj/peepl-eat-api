@@ -37,7 +37,7 @@ module.exports = {
       description: 'The delivery method used to deliver the item.'
     },
     deliverySlot: {
-      model: 'deliveryslot',
+      model: 'deliverymethodslot',
       description: 'The delivery slot chosen by the user for the item.'
     }
 

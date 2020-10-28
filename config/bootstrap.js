@@ -33,8 +33,6 @@ module.exports.bootstrap = async function() {
     return;
   } //•
 
-
-
   // By convention, this is a good place to set up fake data during development.
   //
   // For example:
@@ -51,47 +49,57 @@ module.exports.bootstrap = async function() {
   // ]);
   // ```
 
-  await Product.createEach([{
-      name: 'Love Lane Lager',
-      description: 'One of the city’s best loved beers, made with Pilsner and Munich malts for a delicate, herbal brew. Love Lane’s brewery, about 100 metres from here, on the site of an old rubber factory, can produce over 3 million pints of this gorgeous amber nectar at a time.',
-      fullPrice: 5.00,
-      reducedPrice: 4.60
+  var testVendor = await Vendor.create({
+    name: 'Baltic Social',
+    type: 'restaurant',
+    description: 'A great place to eat!',
+    walletId: 'testtesttesttest'
+  }).fetch();
+
+  var testProduct = await Product.createEach([{
+      name: 'Punk Afternoon Tea',
+      description: 'A classic!',
+      basePrice: 2495,
+      isAvailable: true,
+      vendor: testVendor.id
   }, {
-      name: 'Pomegranate Gin Fizz',
-      description: 'This combination of pomegranate with Persian rose petals and Turkish apple creates a particularly aromatic and refreshing gin. Mix that with some sweetness, some lime, and some club soda – delicious!',
-      fullPrice: 7.50,
-      reducedPrice: 6.80
+      name: 'Vegan Afternoon Tea',
+      description: 'A vegan classic!',
+      basePrice: 2495,
+      isAvailable: true,
+      vendor: testVendor.id
+  }]).fetch();
+
+  var testProductOption = await ProductOption.create({
+    name: 'With gravy?',
+    product: testProduct[0].id
+  }).fetch();
+
+  var testProductOptionValues = await ProductOptionValue.createEach([{
+    name: 'Yes',
+    priceModifier: 100,
+    isAvailable: true,
+    options: [testProductOption.id]
   }, {
-      name: 'Gin & Tonic',
-      description: 'Choose from traditional dry gin, sophisticated pomegranate, or moody coffee & vanilla – all distilled around 80 metres away in the Love Lane Brewery and bottled by hand.',
-      fullPrice: 5.00,
-      reducedPrice: 4.50
-  }, {
-      name: 'Dark & Stormzy',
-      description: 'AKA dark rum and coke, with a splash of fresh lime. The fine rum at the heart of this drink is made by the Big Bog Brewing company, a real living wage employer based in Speke.',
-      fullPrice: 4.50,
-      reducedPrice: 4.10
-  }, {
-      name: 'Oolong Tea',
-      description: 'A Chinese speciality oolong tea, grown in the Fujian province. Calming, tasty and quite refreshing after, or before, a drink or two – it is a Monday after all.',
-      fullPrice: 3.00,
-      reducedPrice: 2.70
-  }, {
-      name: 'Elderflower Collins',
-      description: 'Refreshingly zingy. Love Lane dry gin, lemon, sugar and elderflower cordial. Not much history to this drink other than it came from a Google search and the BBC Good Food guide.',
-      fullPrice: 7.50,
-      reducedPrice: 6.80
-  }, {
-      name: 'Mineral Water',
-      description: 'All the classics.',
-      fullPrice: 2.00,
-      reducedPrice: 1.80
-  }, {
-      name: 'Proper Scouse Tap Water',
-      description: 'Liverpool’s finest, which it turns out actually comes from Lake Vymwy, in the Welsh hills. We thought it was the Mersey at first, but looking at the Mersey lately, we’re quite glad it’s not.',
-      fullPrice: 0.00,
-      reducedPrice: 0.00
+    name: 'No',
+    priceModifier: 0,
+    isAvailable: true,
+    options: [testProductOption.id]
   }]);
+
+  var testDeliveryMethod = await DeliveryMethod.create({
+    name: 'Local Courier',
+    description: 'Delivered fresh by one of our reliable local couriers!',
+    priceModifier: 200,
+    products: [testProduct[0].id]
+  }).fetch();
+
+  var testDeliveryMethodSlots = await DeliveryMethodSlot.create({
+    startTime: 1605430800,
+    endTime: 1605434400,
+    slotsRemaining: 30,
+    deliveryMethod: testDeliveryMethod.id
+  });
 
    // Save new bootstrap version
   await sails.helpers.fs.writeJson.with({

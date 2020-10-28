@@ -27,7 +27,7 @@ module.exports = {
       description: 'The amount of pence to add or subtract from the product total for this option.',
       required: false
     },
-    available: {
+    isAvailable: {
       type: 'boolean',
       description: 'Represents whether or not the option value is available.',
     },

@@ -45,7 +45,8 @@ module.exports = {
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
     vendor: {
       model: 'vendor',
-      description: 'The seller of the product.'
+      description: 'The seller of the product.',
+      required: true
     },
     options: {
       collection: 'productoption',

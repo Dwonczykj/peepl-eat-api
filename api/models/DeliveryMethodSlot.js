@@ -12,15 +12,15 @@ module.exports = {
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
     //  ╩  ╩╚═╩╩ ╩╩ ╩ ╩ ╚╝ ╚═╝╚═╝
-    startDateTime: {
-      type: 'string',
+    startTime: {
+      type: 'number',
       required: true,
-      description: 'A date and time representing the start of the delivery slot.'
+      description: 'A unixtime representing the start of the delivery slot.'
     },
-    endDateTime: {
-      type: 'string',
+    endTime: {
+      type: 'number',
       required: true,
-      description: 'A date and time representing the start of the delivery slot.'
+      description: 'A unixtime representing the end of the delivery slot.'
     },
     slotsRemaining: {
       type: 'number',
