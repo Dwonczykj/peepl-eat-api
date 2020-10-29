@@ -4,11 +4,12 @@ parasails.registerPage('vendor-menu', {
   //  ╩╝╚╝╩ ╩ ╩╩ ╩╩═╝  ╚═╝ ╩ ╩ ╩ ╩ ╚═╝
   data: {
     addToCartModalActive: false,
+    checkoutModalActive: false,
     selectedProduct: {},
     isLoading: false,
     productOptions: undefined,
     selectedOptionValues: [],
-    total: 0,
+    temporaryOptionValues: {},
     cart: []
   },
 
@@ -43,10 +44,28 @@ parasails.registerPage('vendor-menu', {
       });
     },
     addProductToCart: function() {
-      var itemDetails = this.selectedProduct;
+      var itemDetails = _.cloneDeep(this.selectedProduct);
+      itemDetails.options =_.cloneDeep(this.selectedOptionValues);
+      itemDetails.total = _.cloneDeep(this.currentProductTotal);
+      this.cart.push(itemDetails);
+      this.selectedProduct = {};
+      this.addToCartModalActive = false;
+      this.productOptions = undefined;
+      this.selectedOptionValues = [];
+      this.temporaryOptionValues = {};
+      console.log(this.cart);
     },
-    changeOptionValue: function(msg) {
-      console.log(msg);
+    changeOptionValue: function(event) {
+      var optionId = event.target.id.slice(6);
+      var valueId = event.target.options[event.target.options.selectedIndex].value;
+
+      var option = _.find(this.productOptions, function(o) { return o.id === parseInt(optionId) });
+      var value = _.find(option.values, function(o) { return o.id === parseInt(valueId); });
+
+      Vue.set(this.temporaryOptionValues, optionId, {
+        valueId,
+        priceModifier: value.priceModifier
+      });
     }
   },
   filters: {
@@ -61,9 +80,17 @@ parasails.registerPage('vendor-menu', {
     currentProductTotal: function() {
       var workingTotal = 0;
       workingTotal += this.selectedProduct.basePrice;
-      for (value in this.selectedOptionValues) {
-        workingTotal += value.priceModifier;
+      for (var value in this.temporaryOptionValues) {
+        workingTotal += this.temporaryOptionValues[value].priceModifier;
       }
+      return workingTotal;
+    },
+    cartTotal: function() {
+      var workingTotal = 0;
+      for (var item in this.cart) {
+        workingTotal += this.cart[item].total;
+      }
+      console.log(workingTotal);
       return workingTotal;
     }
   }

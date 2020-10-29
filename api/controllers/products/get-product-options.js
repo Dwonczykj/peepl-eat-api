@@ -25,8 +25,6 @@ module.exports = {
     var options = await ProductOption.find({product: inputs.productId})
     .populate('values');
 
-    console.log(options);
-
     // All done.
     return options;
 

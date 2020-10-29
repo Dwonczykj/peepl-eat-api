@@ -75,16 +75,21 @@ module.exports.bootstrap = async function() {
     product: testProduct[0].id
   }).fetch();
 
+  var testProductOptionTwo = await ProductOption.create({
+    name: 'With custard?',
+    product: testProduct[0].id
+  }).fetch();
+
   var testProductOptionValues = await ProductOptionValue.createEach([{
     name: 'Yes',
     priceModifier: 100,
     isAvailable: true,
-    options: [testProductOption.id]
+    options: [testProductOption.id, testProductOptionTwo.id]
   }, {
     name: 'No',
     priceModifier: 0,
     isAvailable: true,
-    options: [testProductOption.id]
+    options: [testProductOption.id, testProductOptionTwo.id]
   }]);
 
   var testDeliveryMethod = await DeliveryMethod.create({
