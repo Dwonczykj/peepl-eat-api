@@ -13,7 +13,7 @@
 Cloud.setup({
 
   /* eslint-disable */
-  methods: {"createOrder":{"verb":"POST","url":"/api/v1/bar/create-order","args":["products"]}}
+  methods: {"getProductOptions":{"verb":"GET","url":"/api/v1/products/get-product-options/:productId","args":["productId"]},"createOrder":{"verb":"POST","url":"/api/v1/bar/create-order","args":["products"]}}
   /* eslint-enable */
 
 });

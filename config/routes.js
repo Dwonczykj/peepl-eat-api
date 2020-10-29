@@ -26,6 +26,7 @@ module.exports.routes = {
   '/vendors': {action: 'vendors/view-all-vendors'},
   '/vendors/:vendorid': { action: 'vendors/view-vendor-menu' },
 
+  'GET /api/v1/products/get-product-options/:productId': { action: 'products/get-product-options' },
   'POST /api/v1/bar/create-order': { action: 'bar/create-order' },
 
 
