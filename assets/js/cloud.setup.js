@@ -13,7 +13,7 @@
 Cloud.setup({
 
   /* eslint-disable */
-  methods: {"getProductOptions":{"verb":"GET","url":"/api/v1/products/get-product-options/:productId","args":["productId"]},"createOrder":{"verb":"POST","url":"/api/v1/bar/create-order","args":["products"]}}
+  methods: {"getProductOptions":{"verb":"GET","url":"/api/v1/products/get-product-options/:productId","args":["productId"]},"getProductDeliveryMethods":{"verb":"POST","url":"/api/v1/products/get-product-delivery-methods","args":["productids"]},"createOrder":{"verb":"POST","url":"/api/v1/bar/create-order","args":["products"]}}
   /* eslint-enable */
 
 });

@@ -20,7 +20,6 @@ parasails.registerPage('vendor-menu', {
     _.extend(this, SAILS_LOCALS);
   },
   mounted: async function() {
-    //…
   },
 
   //  ╦╔╗╔╔╦╗╔═╗╦═╗╔═╗╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
@@ -53,7 +52,6 @@ parasails.registerPage('vendor-menu', {
       this.productOptions = undefined;
       this.selectedOptionValues = [];
       this.temporaryOptionValues = {};
-      console.log(this.cart);
     },
     changeOptionValue: function(event) {
       var optionId = event.target.id.slice(6);
@@ -66,6 +64,22 @@ parasails.registerPage('vendor-menu', {
         valueId,
         priceModifier: value.priceModifier
       });
+    },
+    openCheckoutModal: function() {
+      this.isLoading = true;
+      this.checkoutModalActive = true;
+
+      var productids = _.pluck(this.cart, 'id');
+
+      console.log(productids);
+
+      Cloud.getProductDeliveryMethods(productids)
+      .then(function(deliveryMethods){
+        console.log(deliveryMethods);
+      })
+
+      console.log(this.cart);
+      this.isLoading = false;
     }
   },
   filters: {
@@ -90,7 +104,6 @@ parasails.registerPage('vendor-menu', {
       for (var item in this.cart) {
         workingTotal += this.cart[item].total;
       }
-      console.log(workingTotal);
       return workingTotal;
     }
   }
