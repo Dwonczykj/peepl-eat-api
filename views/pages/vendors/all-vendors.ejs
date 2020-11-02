@@ -1,7 +1,24 @@
 <div id="all-vendors" v-cloak>
 
-  <% for (var vendor in vendors) { %>
-    <a href="vendors/<%= vendors[vendor].id %>"><%= vendors[vendor].name %></a>
-  <% } %>
+<div class="container">
+  <div class="row">
+
+    <% for (var vendor in vendors) { %>
+      <div class="col-12 col-md-6">
+        <div class="card my-3 shadow">
+          <img src="https://via.placeholder.com/600x200" class="card-img-top" width="600" height="200" alt="">
+          <div class="card-body">
+            <a href="vendors/<%= vendors[vendor].id %>" class="stretched-link">
+              <h2 class="card-title h5"><%= vendors[vendor].name %></h2>
+              <p class="card-subtitle"><%= vendors[vendor].description %></p>
+            </a>
+          </div>
+        </div>
+      </div>
+    <% } %>
+
+  </div>
+</div>
+
 </div>
 <%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>
