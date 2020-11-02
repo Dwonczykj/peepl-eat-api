@@ -1,24 +1,20 @@
 <div id="vendor-menu" v-cloak>
-  <h2>{{vendor.name}}</h1>
-  <h3>{{vendor.description}}</h2>
-  <hr/>
-  <div class="card mb-3" v-for="product in vendor.products" style="max-width: 300px;">
-    <img class="card-img-top" src="https://via.placeholder.com/300x150" alt="Card image cap">
-    <div class="card-body">
-      <h5 class="card-title">{{product.name}}</h5>
-      <p class="card-text">{{product.description}}</p>
-      <a href="#" @click="clickAddToCart(product.id)" class="btn btn-primary">Add to cart</a>
-    </div>
+<div class="container">
+
+  <div class="vendor-menu__header my-3">
+    <h1 class="h3">{{vendor.name}}</h1>
   </div>
-  <div class="card mb-3" style="max-width: 300px;">
-    <img class="card-img-top">
-    <div class="card-body">
-      <h5 class="card-title">Cart</h5>
-      <div v-for="item in cart">
-        <p>{{item.name}} ({{item.total | convertToPounds}})</p>
+
+  <div class="row">
+    <div class="col-12 col-md-6" v-for="product in vendor.products">
+      <div class="card my-3">
+        <img class="card-img-top" src="https://via.placeholder.com/300x150" alt="Card image cap">
+        <div class="card-body">
+          <h2 class="card-title h5">{{product.name}}</h2>
+          <p class="card-text">{{product.description}}</p>
+          <a href="#" @click="clickAddToCart(product.id)" class="btn btn-peepl">Add to cart</a>
+        </div>
       </div>
-      <h6>Total: {{cartTotal | convertToPounds}}</h6>
-      <a href="#" @click="openCheckoutModal" class="btn btn-primary">Checkout</a>
     </div>
   </div>
 
@@ -96,5 +92,21 @@
       </div>
     </div>
   </modal>
+
+</div>
+
+<div class="fixed-bottom p-3 bg-white shadow border-top" v-if="cartTotal">
+  <div class="container">
+    <div class="d-flex align-items-center">
+      <div class="mr-auto">
+        <h2 class="h6 mb-1">{{ cart.length }} {{ (cart.length == 1) ? 'item' : 'items' }}</h2>
+        <p class="mb-0" style="font-size: 0.875rem">Total: {{cartTotal | convertToPounds}}</p>
+      </div>
+      <a href="#" @click="openCheckoutModal" class="btn btn-peepl">Checkout</a>
+    </div>
+  </div>
+</div>
+<div v-if="cartTotal" style="padding-top: 5rem;"></div>
+
 </div>
 <%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>
