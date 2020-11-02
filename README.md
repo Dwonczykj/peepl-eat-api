@@ -3,6 +3,27 @@
 a [Sails v1](https://sailsjs.com) application
 
 
+### Running locally
+
+The [Sails docs](https://sailsjs.com/get-started) recommend you install sails.js globally:
+
+    npm install -g sails
+    npm install
+    sails lift
+
+But if you don’t want to install sails.js globally, you can skip that step, and use the shortcut script we define in our `package.json`:
+
+    npm install
+    npm run lift
+
+We’ve also set up a shortcut that handles [any arguments you want to send to sails](https://sailsjs.com/documentation/reference/command-line-interface), you just need to include a `--`, eg:
+
+    npm run sails -- inspect
+    npm run sails -- console
+
+The web frontend will be visible at <http://localhost:1337>.
+
+
 ### Links
 
 + [Sails framework documentation](https://sailsjs.com/get-started)
