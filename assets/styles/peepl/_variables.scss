@@ -25,6 +25,12 @@ $body-bg: $color-fuse-app-header;
 
 // Grid containers
 
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px
+);
+
 // Grid columns
 
 // Components
@@ -46,6 +52,10 @@ $btn-border-width: 0;
 $btn-border-radius: 10em;
 $btn-border-radius-lg: $btn-border-radius;
 $btn-border-radius-sm: $btn-border-radius;
+
+$btn-padding-x: 1rem;
+$btn-padding-x-sm: 0.75rem;
+$btn-padding-x-lg: 1.25rem;
 
 // Forms
 
