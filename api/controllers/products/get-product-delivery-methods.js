@@ -25,20 +25,15 @@ module.exports = {
 
     var products = await Product.find(inputs.productids).populate('deliveryMethods.deliveryMethodSlots');
 
-     for(var product in products) {
-        for (var product2 in products) {
-          var productsSharingDeliveryOptions = [];
-          if ((products[product].id != products[product2].id) && (JSON.stringify(_.pluck(products[product].deliveryMethods, 'id')) == JSON.stringify(_.pluck(products[product2].deliveryMethods, 'id')))) {
-            productsSharingDeliveryOptions.push(products[product2].id);
-            // console.log(products[product2]);
-          }
-        }
-      }
+    for(var product in products) {
+      var deliveryMethodIds = JSON.stringify(_.pluck(products[product].deliveryMethods, 'id'));
+      products[product].deliveryMethodIds = deliveryMethodIds;
+      output[deliveryMethodIds] = {products: [], deliveryMethods: products[product].deliveryMethods};
+    }
 
-    _.map(products, function(object) {
-      output[object.id] = object.deliveryMethods;
-      // return _.pick(object, ['id', 'deliveryMethods']);
-    });
+    for(var product in products) {
+      output[products[product].deliveryMethodIds].products.push(products[product]);
+    }
 
     // All done.
     return output;

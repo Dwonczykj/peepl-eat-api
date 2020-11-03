@@ -10,7 +10,9 @@ parasails.registerPage('vendor-menu', {
     productOptions: undefined,
     selectedOptionValues: [],
     temporaryOptionValues: {},
-    cart: []
+    cart: [],
+    deliveryMethods: {},
+    selectedDeliveryOptions: {}
   },
 
   //  ╦  ╦╔═╗╔═╗╔═╗╦ ╦╔═╗╦  ╔═╗
@@ -69,12 +71,22 @@ parasails.registerPage('vendor-menu', {
       });
     },
     changeDeliveryMethod: function (event) {
-      var cartIndex = event.target.id.slice(14);
+      var deliveryMethodIndex = event.target.id.slice(14);
       var deliveryMethodId = event.target.options[event.target.options.selectedIndex].value;
-      var deliveryMethod =  _.find(this.cart[cartIndex].deliveryMethods, function(o) { return o.id === parseInt(deliveryMethodId); });
+      var deliveryMethod =  _.find(this.deliveryMethods[deliveryMethodIndex].deliveryMethods, function(o) { return o.id === parseInt(deliveryMethodId); });
 
-      this.cart[cartIndex].deliveryMethod.id = deliveryMethodId;
-      this.cart[cartIndex].deliveryMethod.priceModifier = deliveryMethod.priceModifier;
+      var that = this;
+
+      for(var product in this.deliveryMethods[deliveryMethodIndex].products) {
+        this.cart = _.map(this.cart, function(item) {
+          if (item.id === that.deliveryMethods[deliveryMethodIndex].products[product].id) {
+            item.deliveryMethod = deliveryMethod;
+          }
+          return item;
+        });
+      }
+
+      Vue.set(this.deliveryMethods[deliveryMethodIndex], 'selected', deliveryMethod);
     },
     updatedPostCode: function () {
       for(var item in this.cart) {
@@ -88,10 +100,23 @@ parasails.registerPage('vendor-menu', {
       var that = this;
 
       var productids = _.pluck(this.cart, 'id');
+      var productQuantities = {};
+
+      productids.forEach(function(val){
+        productQuantities[val] = (productQuantities[val] || 0 ) + 1;
+      })
 
       Cloud.getProductDeliveryMethods(productids)
-      .then(function(deliveryMethods){
-        that.deliveryMethods = deliveryMethods;
+      .then(function(output){
+        for (var deliveryMethods in output) {
+          output[deliveryMethods].selected = {};
+          for(var product in output[deliveryMethods].products) {
+            output[deliveryMethods].products[product].quantity = productQuantities[output[deliveryMethods].products[product].id];
+          }
+        }
+
+        Vue.set(that, 'deliveryMethods', output);
+        that.deliveryMethods = output;
       })
 
       this.isLoading = false;
@@ -124,9 +149,9 @@ parasails.registerPage('vendor-menu', {
     deliveryTotal: function() {
       var workingTotal = 0;
       
-      for (var item in this.cart) {
-        if (this.cart[item].deliveryMethod.priceModifier){
-          workingTotal += this.cart[item].deliveryMethod.priceModifier;
+      for (var methods in this.deliveryMethods) {
+        if(this.deliveryMethods[methods] && this.deliveryMethods[methods].selected) {
+          workingTotal += this.deliveryMethods[methods].selected.priceModifier;
         }
       }
 

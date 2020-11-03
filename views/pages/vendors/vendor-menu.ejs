@@ -1,150 +1,129 @@
 <div id="vendor-menu" v-cloak>
-<div class="container">
-
-  <div class="vendor-menu__header my-3">
-    <h1 class="h3">{{vendor.name}}</h1>
-  </div>
-
-  <div class="row">
-    <div class="col-12 col-md-6" v-for="product in vendor.products">
-      <div class="card my-3">
-        <img class="card-img-top" src="https://via.placeholder.com/300x150" alt="Card image cap">
-        <div class="card-body">
-          <h2 class="card-title h5">{{product.name}}</h2>
-          <p class="card-text">{{product.description}}</p>
-          <a href="#" @click="clickAddToCart(product.id)" class="btn btn-peepl stretched-link">Add to cart</a>
-        </div>
-      </div>
-      <h6><b>Total:</b> {{cartTotal | convertToPounds}}</h6>
-      <a href="#" v-if="cartTotal > 0" @click="openCheckoutModal" class="btn btn-primary">Checkout</a>
+  <div class="container">
+    <div class="vendor-menu__header my-3">
+      <h1 class="h3">{{vendor.name}}</h1>
     </div>
-  </div>
-
-   <modal v-if="addToCartModalActive" v-cloak @close="addToCartModalActive = false">
-    <div v-if="isLoading" class="modal-content">
-
-      <div class="modal-body">
-        <div class="d-flex justify-content-center">
-          <div class="spinner-border" role="status">
-            <span class="sr-only">Loading…</span>
+    <div class="row">
+      <div class="col-12 col-md-6" v-for="product in vendor.products">
+        <div class="card my-3">
+          <img class="card-img-top" src="https://via.placeholder.com/300x150" alt="Card image cap">
+          <div class="card-body">
+            <h2 class="card-title h5">{{product.name}}</h2>
+            <p class="card-text">{{product.description}}</p>
+            <a href="#" @click="clickAddToCart(product.id)" class="btn btn-peepl stretched-link">Add to cart</a>
           </div>
         </div>
+        <!-- <h6><b>Total:</b> {{cartTotal | convertToPounds}}</h6>
+        <a href="#" v-if="cartTotal > 0" @click="openCheckoutModal" class="btn btn-primary">Checkout</a> -->
       </div>
-
     </div>
-    <div v-else class="modal-content">
 
-      <div class="modal-body">
-        <h3>{{selectedProduct.name}}</h3>
-        <p>{{selectedProduct.description}}</p>
-        <form>
-          <div v-for="option in productOptions">
-            <div class="form-group">
-              <label :for="'select' + option.id">{{option.name}}</label>
-              <select v-model="selectedOptionValues[option.id]" @change="changeOptionValue" class="form-control form-control-sm" :id="'select' + option.id">
-                <option disabled value="">Select an option...</option>
-                <option v-for="value in option.values" :value="value.id">{{value.name}}</option>
-              </select>
+    <modal v-if="addToCartModalActive" v-cloak @close="addToCartModalActive = false">
+      <div v-if="isLoading" class="modal-content">
+        <div class="modal-body">
+          <div class="d-flex justify-content-center">
+            <div class="spinner-border" role="status">
+              <span class="sr-only">Loading…</span>
             </div>
           </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <p class="mr-auto"><strong>{{currentProductTotal | convertToPounds}}</strong></p>
-        <button class="btn btn-outline-secondary" @click="addToCartModalActive=false">Cancel</button>
-        <button class="btn btn-peepl" @click="addProductToCart">Add to cart</button>
-      </div>
-
-    </div>
-  </modal>
-
-  <modal v-if="checkoutModalActive" v-cloak @close="checkoutModalActive = false" :width="640">
-    <div v-if="isLoading" class="modal-content">
-
-      <div class="modal-body">
-        <div class="d-flex justify-content-center">
-          <div class="spinner-border" role="status">
-            <span class="sr-only">Loading…</span>
-          </div>
         </div>
-        <div v-else class="modal-content">
-          <div class="modal-header">
-            <h5 class="card-title">Checkout</h5>
-          </div>
-          <div class="modal-body">
-            <form>
-               <div class="form-group">
-                <label for="nameInput">Your Name</label>
-                <input type="text" class="form-control" id="nameInput" aria-describedby="nameHelp" placeholder="Your name">
-              </div>
+      </div>
+      <div v-else class="modal-content">
+        <div class="modal-body">
+          <h3>{{selectedProduct.name}}</h3>
+          <p>{{selectedProduct.description}}</p>
+          <form>
+            <div v-for="option in productOptions">
               <div class="form-group">
-                <label for="addressLineOneInput">Address Line One</label>
-                <input type="text" class="form-control" id="addressLineOneInput" placeholder="123 Sesame Street">
-              </div>
-              <div class="form-group">
-                <label for="addressLineTwoInput">Address Line Two</label>
-                <input type="text" class="form-control" id="addressLineTwoInput" placeholder="">
-              </div>
-              <div class="form-group">
-                <label for="postcodeInput">Post code</label>
-                <input type="text" class="form-control" id="postcodeInput" placeholder="L12 3AB" @change="updatedPostCode">
-              </div>
-            </form>
-            <h5>Items</h5>
-            <div v-for="(item, index) in cart">
-              <p>{{item.name}} ({{item.total | convertToPounds}})</p>
-              <div class="form-group">
-                <label :for="'deliveryMethod' + index">Delivery Method</label>
-                <select v-model="item.deliveryMethod.id" @change="changeDeliveryMethod" class="form-control" :id="'deliveryMethod' + index">
-                  <option disabled value="">Select a delivery method...</option>
-                  <option v-for="deliveryMethod in item.deliveryMethods" :value="deliveryMethod.id">{{deliveryMethod.name}}</option>
+                <label :for="'select' + option.id">{{option.name}}</label>
+                <select v-model="selectedOptionValues[option.id]" @change="changeOptionValue" class="form-control form-control-sm" :id="'select' + option.id">
+                  <option disabled value="">Select an option...</option>
+                  <option v-for="value in option.values" :value="value.id">{{value.name}}</option>
                 </select>
               </div>
             </div>
-            <h6><b>Total:</b> {{cartTotal | convertToPounds}}</h6>
-            <h6><b>Delivery:</b> {{deliveryTotal | convertToPounds}}</h6>
-          </div>
-          <div class="form-group">
-            <label for="addressLineOneInput">Address <span class="sr-only">Line One</span></label>
-            <input type="text" class="form-control" id="addressLineOneInput">
-          </div>
-          <div class="form-group mt-n2">
-            <label for="addressLineTwoInput" class="sr-only">Address Line Two</label>
-            <input type="text" class="form-control" id="addressLineTwoInput">
-          </div>
-          <div class="form-group">
-            <label for="postcodeInput">Postcode</label>
-            <input type="text" class="form-control" id="postcodeInput" style="text-transform: uppercase; max-width: 10em">
-          </div>
-        </form>
-        <h5>Items</h5>
-        <div v-for="item in cart">
-          <p>{{item.name}} ({{item.total | convertToPounds}})</p>
+          </form>
         </div>
-        <h6><b>Total:</b> {{cartTotal | convertToPounds}}</h6>
+        <div class="modal-footer">
+          <p class="mr-auto"><strong>{{currentProductTotal | convertToPounds}}</strong></p>
+          <button class="btn btn-outline-secondary" @click="addToCartModalActive=false">Cancel</button>
+          <button class="btn btn-peepl" @click="addProductToCart">Add to cart</button>
+        </div>
       </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline-secondary" @click="checkoutModalActive=false">Cancel</button>
-        <button class="btn btn-peepl" @click="addProductToCart">Checkout</button>
+    </modal>
+
+    <modal v-if="checkoutModalActive" v-cloak @close="checkoutModalActive = false" :width="640">
+      <div v-if="isLoading" class="modal-content">
+        <div class="modal-body">
+          <div class="d-flex justify-content-center">
+            <div class="spinner-border" role="status">
+              <span class="sr-only">Loading…</span>
+            </div>
+          </div>
+        </div>
       </div>
+      <div v-else class="modal-content">
+        <div class="modal-header">
+          <h5 class="card-title">Checkout</h5>
+        </div>
+        <div class="modal-body">
 
-    </div>
-  </modal>
+          <form>
+            <div class="form-group">
+              <label for="nameInput">Your Name</label>
+              <input type="text" class="form-control" id="nameInput" aria-describedby="nameHelp" placeholder="Your name">
+            </div>
+            <div class="form-group">
+              <label for="addressLineOneInput">Address <span class="sr-only">Line One</span></label>
+              <input type="text" class="form-control" id="addressLineOneInput">
+            </div>
+            <div class="form-group mt-n2">
+              <label for="addressLineTwoInput" class="sr-only">Address Line Two</label>
+              <input type="text" class="form-control" id="addressLineTwoInput">
+            </div>
+            <div class="form-group">
+              <label for="postcodeInput">Postcode</label>
+              <input type="text" class="form-control" id="postcodeInput" style="text-transform: uppercase; max-width: 10em">
+            </div>
+          </form>
 
-</div>
+          <h5>Delivery Options</h5>
+          <div v-for="(option, index) in deliveryMethods">
+            <div v-for="product in option.products">
+              <p>{{product.name}} x{{product.quantity}}</p>
+            </div>
+            <div class="form-group">
+              <label :for="'deliveryMethod' + index">Delivery Method</label>
+              <select @change="changeDeliveryMethod" class="form-control" :id="'deliveryMethod' + index">
+                <option disabled selected value="">Select a delivery method...</option>
+                <option v-for="deliveryMethod in option.deliveryMethods" :value="deliveryMethod.id">{{deliveryMethod.name}}</option>
+              </select>
+            </div>
+          </div>
 
-<div class="fixed-bottom py-3 bg-white shadow border-top" v-if="cartTotal">
-  <div class="container">
-    <div class="d-flex align-items-center">
-      <div class="mr-auto">
-        <h2 class="h6 mb-1">{{ cart.length }} {{ (cart.length == 1) ? 'item' : 'items' }}</h2>
-        <p class="mb-0" style="font-size: 0.875rem">Total: {{cartTotal | convertToPounds}}</p>
+          <h6><b>Total:</b> {{cartTotal | convertToPounds}}</h6>
+          <h6><b>Delivery:</b> {{deliveryTotal | convertToPounds}}</h6>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-outline-secondary" @click="checkoutModalActive=false">Cancel</button>
+          <button class="btn btn-peepl" disabled @click="addProductToCart">Checkout</button>
+        </div>
+
       </div>
-      <a href="#" @click="openCheckoutModal" class="btn btn-peepl">Checkout</a>
+    </modal>
+  </div>
+
+  <div class="fixed-bottom py-3 bg-white shadow border-top" v-if="cartTotal">
+    <div class="container">
+      <div class="d-flex align-items-center">
+        <div class="mr-auto">
+          <h2 class="h6 mb-1">{{ cart.length }} {{ (cart.length == 1) ? 'item' : 'items' }}</h2>
+          <p class="mb-0" style="font-size: 0.875rem">Total: {{cartTotal | convertToPounds}}</p>
+        </div>
+        <a href="#" @click="openCheckoutModal" class="btn btn-peepl">Checkout</a>
+      </div>
     </div>
   </div>
-</div>
-<div v-if="cartTotal" style="padding-top: 5rem;"></div>
-
 </div>
 <%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>
