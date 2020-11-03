@@ -12,43 +12,48 @@
         <div class="card-body">
           <h2 class="card-title h5">{{product.name}}</h2>
           <p class="card-text">{{product.description}}</p>
-          <a href="#" @click="clickAddToCart(product.id)" class="btn btn-peepl">Add to cart</a>
+          <a href="#" @click="clickAddToCart(product.id)" class="btn btn-peepl stretched-link">Add to cart</a>
         </div>
       </div>
     </div>
   </div>
 
-   <modal v-if="addToCartModalActive" v-cloak @close="addToCartModalActive = false" :width="640">
-    <div class="card">
-      <div class="card-body">
-        <div v-if="isLoading" class="d-flex justify-content-center">
-          <div class="spinner-border" role="status">
-            <span class="sr-only">Loading...</span>
-          </div>
-        </div>
-        <div v-else>
-          <h5 class="card-title">{{selectedProduct.name}}</p>
-          <p class="">{{selectedProduct.description}}</p>
-          <form>
-            <div v-for="option in productOptions">
-              <div class="form-group">
-                <label :for="'select' + option.id">{{option.name}}</label>
-                <select v-model="selectedOptionValues[option.id]" @change="changeOptionValue" class="form-control" :id="'select' + option.id">
-                  <option disabled value="">Select an option...</option>
-                  <option v-for="value in option.values" :value="value.id">{{value.name}}</option>
-                </select>
-              </div>
-            </div>
-          </form>
-          <p>{{currentProductTotal | convertToPounds}}</p>
-        </div>
-        <div class="columns">
-            <button class="btn btn-danger" @click="addToCartModalActive=false">Cancel</button>
-            <button class="btn btn-success" @click="addProductToCart">Add to cart</button>
+   <modal v-if="addToCartModalActive" v-cloak @close="addToCartModalActive = false">
+    <div v-if="isLoading" class="d-flex justify-content-center">
+
+      <div class="modal-body">
+        <div class="spinner-border" role="status">
+          <span class="sr-only">Loading…</span>
         </div>
       </div>
+
+    </div>
+    <div v-else>
+
+      <div class="modal-body">
+        <h3>{{selectedProduct.name}}</h3>
+        <p>{{selectedProduct.description}}</p>
+        <form>
+          <div v-for="option in productOptions">
+            <div class="form-group">
+              <label :for="'select' + option.id">{{option.name}}</label>
+              <select v-model="selectedOptionValues[option.id]" @change="changeOptionValue" class="form-control form-control-sm" :id="'select' + option.id">
+                <option disabled value="">Select an option...</option>
+                <option v-for="value in option.values" :value="value.id">{{value.name}}</option>
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <p class="mr-auto"><strong>{{currentProductTotal | convertToPounds}}</strong></p>
+        <button class="btn btn-outline-secondary" @click="addToCartModalActive=false">Cancel</button>
+        <button class="btn btn-peepl" @click="addProductToCart">Add to cart</button>
+      </div>
+
     </div>
   </modal>
+
   <modal v-if="checkoutModalActive" v-cloak @close="checkoutModalActive = false" :width="640">
     <div class="card">
       <div class="card-body">
@@ -95,7 +100,7 @@
 
 </div>
 
-<div class="fixed-bottom p-3 bg-white shadow border-top" v-if="cartTotal">
+<div class="fixed-bottom py-3 bg-white shadow border-top" v-if="cartTotal">
   <div class="container">
     <div class="d-flex align-items-center">
       <div class="mr-auto">
