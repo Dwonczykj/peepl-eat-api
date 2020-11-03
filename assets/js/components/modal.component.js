@@ -43,12 +43,9 @@ parasails.registerComponent('modal', {
   //  ╩ ╩ ╩ ╩ ╩╩═╝
   template: `
   <transition name="modal" v-on:leave="leave" v-bind:css="false">
-    <div class="modal fade" tabindex="-1" role="dialog">
-      <div class="petticoat"></div>
-      <div class="modal-dialog custom-width" role="document">
-        <div class="modal-content">
-          <slot></slot>
-        </div><!-- /.modal-content -->
+    <div class="modal bottom fade" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <slot></slot>
       </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
   </transition>
