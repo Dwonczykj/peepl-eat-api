@@ -17,8 +17,8 @@
       <div v-for="item in cart">
         <p>{{item.name}} ({{item.total | convertToPounds}})</p>
       </div>
-      <h6>Total: {{cartTotal | convertToPounds}}</h6>
-      <a href="#" @click="openCheckoutModal" class="btn btn-primary">Checkout</a>
+      <h6><b>Total:</b> {{cartTotal | convertToPounds}}</h6>
+      <a href="#" v-if="cartTotal > 0" @click="openCheckoutModal" class="btn btn-primary">Checkout</a>
     </div>
   </div>
 
@@ -79,19 +79,27 @@
               </div>
               <div class="form-group">
                 <label for="postcodeInput">Post code</label>
-                <input type="text" class="form-control" id="postcodeInput" placeholder="L12 3AB">
+                <input type="text" class="form-control" id="postcodeInput" placeholder="L12 3AB" @change="updatedPostCode">
               </div>
             </form>
             <h5>Items</h5>
-            <div v-for="item in cart">
+            <div v-for="(item, index) in cart">
               <p>{{item.name}} ({{item.total | convertToPounds}})</p>
+              <div class="form-group">
+                <label :for="'deliveryMethod' + index">Delivery Method</label>
+                <select v-model="item.deliveryMethod.id" @change="changeDeliveryMethod" class="form-control" :id="'deliveryMethod' + index">
+                  <option disabled value="">Select a delivery method...</option>
+                  <option v-for="deliveryMethod in item.deliveryMethods" :value="deliveryMethod.id">{{deliveryMethod.name}}</option>
+                </select>
+              </div>
             </div>
             <h6><b>Total:</b> {{cartTotal | convertToPounds}}</h6>
+            <h6><b>Delivery:</b> {{deliveryTotal | convertToPounds}}</h6>
           </div>
         </div>
         <div class="columns">
             <button class="btn btn-danger" @click="checkoutModalActive=false">Cancel</button>
-            <button class="btn btn-success" @click="addProductToCart">Checkout</button>
+            <button class="btn btn-success" @click="">Checkout</button>
         </div>
       </div>
     </div>

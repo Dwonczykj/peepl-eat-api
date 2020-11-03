@@ -44,8 +44,11 @@ parasails.registerPage('vendor-menu', {
     },
     addProductToCart: function() {
       var itemDetails = _.cloneDeep(this.selectedProduct);
+
       itemDetails.options =_.cloneDeep(this.selectedOptionValues);
       itemDetails.total = _.cloneDeep(this.currentProductTotal);
+      itemDetails.deliveryMethod = {};
+
       this.cart.push(itemDetails);
       this.selectedProduct = {};
       this.addToCartModalActive = false;
@@ -65,26 +68,38 @@ parasails.registerPage('vendor-menu', {
         priceModifier: value.priceModifier
       });
     },
+    changeDeliveryMethod: function (event) {
+      var cartIndex = event.target.id.slice(14);
+      var deliveryMethodId = event.target.options[event.target.options.selectedIndex].value;
+      var deliveryMethod =  _.find(this.cart[cartIndex].deliveryMethods, function(o) { return o.id === parseInt(deliveryMethodId); });
+
+      this.cart[cartIndex].deliveryMethod.id = deliveryMethodId;
+      this.cart[cartIndex].deliveryMethod.priceModifier = deliveryMethod.priceModifier;
+    },
+    updatedPostCode: function () {
+      for(var item in this.cart) {
+        Vue.set(this.cart[item], 'deliveryMethod', {});
+        Vue.set(this.cart[item], 'deliveryMethods', deliveryMethods[this.cart[item].id]);
+      }
+    },
     openCheckoutModal: function() {
       this.isLoading = true;
       this.checkoutModalActive = true;
+      var that = this;
 
       var productids = _.pluck(this.cart, 'id');
 
-      console.log(productids);
-
       Cloud.getProductDeliveryMethods(productids)
       .then(function(deliveryMethods){
-        console.log(deliveryMethods);
+        that.deliveryMethods = deliveryMethods;
       })
 
-      console.log(this.cart);
       this.isLoading = false;
     }
   },
   filters: {
     convertToPounds: function (value) {
-      if (!value) return ''
+      if (!value) return '£0'
       value = "£" + (value/100);
       value = value.toString()
       return value;
@@ -104,6 +119,17 @@ parasails.registerPage('vendor-menu', {
       for (var item in this.cart) {
         workingTotal += this.cart[item].total;
       }
+      return workingTotal;
+    },
+    deliveryTotal: function() {
+      var workingTotal = 0;
+      
+      for (var item in this.cart) {
+        if (this.cart[item].deliveryMethod.priceModifier){
+          workingTotal += this.cart[item].deliveryMethod.priceModifier;
+        }
+      }
+
       return workingTotal;
     }
   }
