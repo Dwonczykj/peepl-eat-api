@@ -71,19 +71,19 @@
           <form>
             <div class="form-group">
               <label for="nameInput">Your Name</label>
-              <input type="text" class="form-control" id="nameInput" aria-describedby="nameHelp" placeholder="Your name">
+              <input type="text" v-model="address.name" class="form-control" id="nameInput" aria-describedby="nameHelp" placeholder="Your name">
             </div>
             <div class="form-group">
               <label for="addressLineOneInput">Address <span class="sr-only">Line One</span></label>
-              <input type="text" class="form-control" id="addressLineOneInput">
+              <input type="text" v-model="address.lineOne" class="form-control" id="addressLineOneInput">
             </div>
             <div class="form-group mt-n2">
               <label for="addressLineTwoInput" class="sr-only">Address Line Two</label>
-              <input type="text" class="form-control" id="addressLineTwoInput">
+              <input type="text" v-model="address.lineTwo" class="form-control" id="addressLineTwoInput">
             </div>
             <div class="form-group">
               <label for="postcodeInput">Postcode</label>
-              <input type="text" class="form-control" id="postcodeInput" style="text-transform: uppercase; max-width: 10em">
+              <input type="text" v-model="address.postCode" class="form-control" id="postcodeInput" style="text-transform: uppercase; max-width: 10em">
             </div>
           </form>
 
@@ -99,6 +99,13 @@
                 <option v-for="deliveryMethod in option.deliveryMethods" :value="deliveryMethod.id">{{deliveryMethod.name}}</option>
               </select>
             </div>
+            <div v-if="option.selected" class="form-group">
+              <label :for="'deliverySlot' + index">Delivery Slot</label>
+              <select @change="changeDeliverySlot" class="form-control"  :id="'deliverySlot' + index">
+                <option disabled selected value="">Select a delivery slot...</option>
+                <option v-for="deliveryMethodSlot in option.selected.deliveryMethodSlots" :value="deliveryMethodSlot.id">{{deliveryMethodSlot.startTime | deliverySlotFilter}} - {{deliveryMethodSlot.endTime | deliverySlotFilter}} ({{deliveryMethodSlot.slotsRemaining}} left)</option>
+              </select>
+            </div>
           </div>
 
           <h6><b>Total:</b> {{cartTotal | convertToPounds}}</h6>
@@ -107,7 +114,7 @@
 
         <div class="modal-footer">
           <button class="btn btn-outline-secondary" @click="checkoutModalActive=false">Cancel</button>
-          <button class="btn btn-peepl" disabled @click="addProductToCart">Checkout</button>
+          <button class="btn btn-peepl" @click="finishCheckout">Checkout</button>
         </div>
 
       </div>

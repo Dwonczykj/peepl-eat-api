@@ -18,13 +18,13 @@ module.exports = {
       required: true
     },
     orderedDateTime: {
-      type: 'string',
-      description: 'The date and time when the order was placed.',
+      type: 'number',
+      description: 'The unixtime when the order was placed.',
       required: true
     },
     paidDateTime: {
       type: 'string',
-      description: 'The date and time when the order payment was confirmed (if at all).',
+      description: 'The unixtime when the order payment was confirmed (if at all).',
       required: false
     },
     deliveryAddressLineOne: {
@@ -39,6 +39,9 @@ module.exports = {
       type: 'string',
       description: 'The post code of the delivery address.'
     },
+    customerWallet: {
+      type: 'string'
+    },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
@@ -48,9 +51,13 @@ module.exports = {
     //  ╔═╗╔═╗╔═╗╔═╗╔═╗╦╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
     //  ╠═╣╚═╗╚═╗║ ║║  ║╠═╣ ║ ║║ ║║║║╚═╗
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
-    customer: {
-      model: 'user',
-      required: true
+    // customer: {
+    //   model: 'user',
+    //   required: true
+    // },
+    items: {
+      collection: 'orderitem',
+      via: 'order'
     }
 
   },

@@ -23,13 +23,15 @@ module.exports = {
     //  ╠═╣╚═╗╚═╗║ ║║  ║╠═╣ ║ ║║ ║║║║╚═╗
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
     option: {
-      model: 'productoption'
+      model: 'productoption',
+      required: true
     },
     optionValue: {
-      model: 'productoptionvalue'
+      model: 'productoptionvalue',
+      required: true
     },
     orderItem: {
-      model: 'orderitem'
+      model: 'orderitem',
     }
 
   },

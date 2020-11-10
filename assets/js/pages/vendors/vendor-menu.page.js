@@ -12,7 +12,12 @@ parasails.registerPage('vendor-menu', {
     temporaryOptionValues: {},
     cart: [],
     deliveryMethods: {},
-    selectedDeliveryOptions: {}
+    address:{
+      name: '',
+      lineOne: '',
+      lineTwo: '',
+      postCode: ''
+    }
   },
 
   //  ╦  ╦╔═╗╔═╗╔═╗╦ ╦╔═╗╦  ╔═╗
@@ -38,6 +43,7 @@ parasails.registerPage('vendor-menu', {
       Cloud.getProductOptions(productid)
       .then(function(options){
         for(var option in options) {
+          that.selectedOptionValues= {};
           that.selectedOptionValues[options[option].id] = "";
         }
         that.productOptions = options;
@@ -54,7 +60,7 @@ parasails.registerPage('vendor-menu', {
       this.cart.push(itemDetails);
       this.selectedProduct = {};
       this.addToCartModalActive = false;
-      this.productOptions = undefined;
+      this.productOptions = {};
       this.selectedOptionValues = [];
       this.temporaryOptionValues = {};
     },
@@ -88,6 +94,32 @@ parasails.registerPage('vendor-menu', {
 
       Vue.set(this.deliveryMethods[deliveryMethodIndex], 'selected', deliveryMethod);
     },
+    changeDeliverySlot: function(event) {
+      var deliveryMethodIndex = event.target.id.slice(12);
+      var deliverySlotId = event.target.options[event.target.options.selectedIndex].value;
+      var deliverySlot =  _.find(this.deliveryMethods[deliveryMethodIndex].selected.deliveryMethodSlots, function(o) { return o.id === parseInt(deliverySlotId); });
+
+      var that = this;
+
+      for(var product in this.deliveryMethods[deliveryMethodIndex].products) {
+        this.cart = _.map(this.cart, function(item) {
+          if (item.id === that.deliveryMethods[deliveryMethodIndex].products[product].id) {
+            item.deliverySlot = deliverySlot;
+          }
+          return item;
+        });
+      }
+
+      Vue.set(this.deliveryMethods[deliveryMethodIndex], 'selectedSlot', deliverySlot);
+    },
+    finishCheckout: function() {
+      console.log("Submitted order.");
+
+      Cloud.createOrder(this.cart, this.address, this.cartTotal + this.deliveryTotal)
+      .then(function(status){
+        console.log(status);
+      })
+    },
     updatedPostCode: function () {
       for(var item in this.cart) {
         Vue.set(this.cart[item], 'deliveryMethod', {});
@@ -109,7 +141,7 @@ parasails.registerPage('vendor-menu', {
       Cloud.getProductDeliveryMethods(productids)
       .then(function(output){
         for (var deliveryMethods in output) {
-          output[deliveryMethods].selected = {};
+          // output[deliveryMethods].selected = {};
           for(var product in output[deliveryMethods].products) {
             output[deliveryMethods].products[product].quantity = productQuantities[output[deliveryMethods].products[product].id];
           }
@@ -125,8 +157,13 @@ parasails.registerPage('vendor-menu', {
   filters: {
     convertToPounds: function (value) {
       if (!value) return '£0'
-      value = "£" + (value/100);
+      value = "£" + (value/100).toFixed(2);
       value = value.toString()
+      return value;
+    },
+    deliverySlotFilter: function (value) {
+      if (!value) return '';
+      value = moment.unix(value).calendar();
       return value;
     }
   },
@@ -148,13 +185,11 @@ parasails.registerPage('vendor-menu', {
     },
     deliveryTotal: function() {
       var workingTotal = 0;
-      
       for (var methods in this.deliveryMethods) {
         if(this.deliveryMethods[methods] && this.deliveryMethods[methods].selected) {
           workingTotal += this.deliveryMethods[methods].selected.priceModifier;
         }
       }
-
       return workingTotal;
     }
   }

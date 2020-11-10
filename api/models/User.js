@@ -48,10 +48,10 @@ module.exports = {
     //  ╔═╗╔═╗╔═╗╔═╗╔═╗╦╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
     //  ╠═╣╚═╗╚═╗║ ║║  ║╠═╣ ║ ║║ ║║║║╚═╗
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
-    orders: {
-      collection: 'order',
-      via: 'customer'
-    }
+    // orders: {
+    //   collection: 'order',
+    //   via: 'customer'
+    // }
 
   },
 
