@@ -17,7 +17,11 @@ parasails.registerPage('vendor-menu', {
       lineOne: '',
       lineTwo: '',
       postCode: ''
-    }
+    },
+    syncing: false,
+    cloudError: '',
+    formErrors: {
+    },
   },
 
   //  ╦  ╦╔═╗╔═╗╔═╗╦ ╦╔═╗╦  ╔═╗
@@ -112,13 +116,28 @@ parasails.registerPage('vendor-menu', {
 
       Vue.set(this.deliveryMethods[deliveryMethodIndex], 'selectedSlot', deliverySlot);
     },
-    finishCheckout: function() {
-      console.log("Submitted order.");
+    handleParsingForm: function() {
+      this.syncing = true;
 
-      Cloud.createOrder(this.cart, this.address, this.cartTotal + this.deliveryTotal)
-      .then(function(status){
-        console.log(status);
-      })
+      return {items: this.cart, address: this.address, total: this.cartTotal + this.deliveryTotal};
+    },
+    submittedForm: function(result) {
+      console.log(result);
+
+      this.syncing == false;
+      var paymentDetails = {
+          action: 'pay',
+          amount: this.cartTotal + this.deliveryTotal,
+          currency: 'GBPx',
+          destination: this.vendor.walletId,
+      };
+      
+      window.flutter_inappwebview.callHandler('pay', paymentDetails)
+      .then(function (paymentResult) {
+        // get result from Flutter side. It will be the number 64.
+        Cloud.paymentSubmitted()
+        .with({orderId: result.id,})
+      });
     },
     updatedPostCode: function () {
       for(var item in this.cart) {
@@ -128,7 +147,7 @@ parasails.registerPage('vendor-menu', {
     },
     openCheckoutModal: function() {
       this.isLoading = true;
-      this.checkoutModalActive = true;
+      this.checkoutModalActive = true; 
       var that = this;
 
       var productids = _.pluck(this.cart, 'id');

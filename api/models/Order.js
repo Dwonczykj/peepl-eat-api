@@ -29,15 +29,18 @@ module.exports = {
     },
     deliveryAddressLineOne: {
       type: 'string',
-      description: 'The first line of the delivery address.'
+      description: 'The first line of the delivery address.',
+      required: true
     },
     deliveryAddressLineTwo: {
       type: 'string',
-      description: 'The second line of the delivery address.'
+      description: 'The second line of the delivery address.',
+      // required: true
     },
     deliveryAddressPostCode: {
       type: 'string',
-      description: 'The post code of the delivery address.'
+      description: 'The post code of the delivery address.',
+      required: true
     },
     customerWallet: {
       type: 'string'

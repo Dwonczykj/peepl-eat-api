@@ -31,7 +31,7 @@ module.exports = {
   },
 
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
     for (var item in inputs.items) {
       for (var option in inputs.items[item].options) {
         if(inputs.items[item].options[option] != "") {
@@ -68,7 +68,7 @@ module.exports = {
     var products = await OrderItem.createEach(updatedItems);
 
     // All done.
-    return order.id;
+    return exits.success(order.id);
 
   }
 

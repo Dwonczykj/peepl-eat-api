@@ -66,16 +66,15 @@
         <div class="modal-header">
           <h5 class="card-title">Checkout</h5>
         </div>
-        <div class="modal-body">
-
-          <form>
+        <ajax-form action="createOrder" :syncing.sync="syncing" :cloud-error.sync="cloudError" @submitted="submittedForm()" :handle-parsing="handleParsingForm">
+          <div class="modal-body">
             <div class="form-group">
               <label for="nameInput">Your Name</label>
-              <input type="text" v-model="address.name" class="form-control" id="nameInput" aria-describedby="nameHelp" placeholder="Your name">
+              <input type="text" :class="{ 'is-invalid': formErrors.name }" v-model="address.name" class="form-control" id="nameInput" aria-describedby="nameHelp" required>
             </div>
             <div class="form-group">
               <label for="addressLineOneInput">Address <span class="sr-only">Line One</span></label>
-              <input type="text" v-model="address.lineOne" class="form-control" id="addressLineOneInput">
+              <input type="text" v-model="address.lineOne" class="form-control" id="addressLineOneInput" required>
             </div>
             <div class="form-group mt-n2">
               <label for="addressLineTwoInput" class="sr-only">Address Line Two</label>
@@ -83,40 +82,39 @@
             </div>
             <div class="form-group">
               <label for="postcodeInput">Postcode</label>
-              <input type="text" v-model="address.postCode" class="form-control" id="postcodeInput" style="text-transform: uppercase; max-width: 10em">
+              <input type="text" v-model="address.postCode" class="form-control" id="postcodeInput" style="text-transform: uppercase; max-width: 10em" required>
             </div>
-          </form>
 
-          <h5>Delivery Options</h5>
-          <div v-for="(option, index) in deliveryMethods">
-            <div v-for="product in option.products">
-              <p>{{product.name}} x{{product.quantity}}</p>
+            <h5>Delivery Options</h5>
+            <div v-for="(option, index) in deliveryMethods">
+              <div v-for="product in option.products">
+                <p>{{product.name}} x{{product.quantity}}</p>
+              </div>
+              <div class="form-group">
+                <label :for="'deliveryMethod' + index">Delivery Method</label>
+                <select @change="changeDeliveryMethod" class="form-control" :id="'deliveryMethod' + index" required>
+                  <option disabled selected value="">Select a delivery method...</option>
+                  <option v-for="deliveryMethod in option.deliveryMethods" :value="deliveryMethod.id">{{deliveryMethod.name}}</option>
+                </select>
+              </div>
+              <div v-if="option.selected" class="form-group">
+                <label :for="'deliverySlot' + index">Delivery Slot</label>
+                <select @change="changeDeliverySlot" class="form-control"  :id="'deliverySlot' + index" required>
+                  <option disabled selected value="">Select a delivery slot...</option>
+                  <option v-for="deliveryMethodSlot in option.selected.deliveryMethodSlots" :value="deliveryMethodSlot.id">{{deliveryMethodSlot.startTime | deliverySlotFilter}} - {{deliveryMethodSlot.endTime | deliverySlotFilter}} ({{deliveryMethodSlot.slotsRemaining}} left)</option>
+                </select>
+              </div>
             </div>
-            <div class="form-group">
-              <label :for="'deliveryMethod' + index">Delivery Method</label>
-              <select @change="changeDeliveryMethod" class="form-control" :id="'deliveryMethod' + index">
-                <option disabled selected value="">Select a delivery method...</option>
-                <option v-for="deliveryMethod in option.deliveryMethods" :value="deliveryMethod.id">{{deliveryMethod.name}}</option>
-              </select>
-            </div>
-            <div v-if="option.selected" class="form-group">
-              <label :for="'deliverySlot' + index">Delivery Slot</label>
-              <select @change="changeDeliverySlot" class="form-control"  :id="'deliverySlot' + index">
-                <option disabled selected value="">Select a delivery slot...</option>
-                <option v-for="deliveryMethodSlot in option.selected.deliveryMethodSlots" :value="deliveryMethodSlot.id">{{deliveryMethodSlot.startTime | deliverySlotFilter}} - {{deliveryMethodSlot.endTime | deliverySlotFilter}} ({{deliveryMethodSlot.slotsRemaining}} left)</option>
-              </select>
-            </div>
+
+            <h6><b>Total:</b> {{cartTotal | convertToPounds}}</h6>
+            <h6><b>Delivery:</b> {{deliveryTotal | convertToPounds}}</h6>
           </div>
 
-          <h6><b>Total:</b> {{cartTotal | convertToPounds}}</h6>
-          <h6><b>Delivery:</b> {{deliveryTotal | convertToPounds}}</h6>
-        </div>
-
-        <div class="modal-footer">
-          <button class="btn btn-outline-secondary" @click="checkoutModalActive=false">Cancel</button>
-          <button class="btn btn-peepl" @click="finishCheckout">Checkout</button>
-        </div>
-
+          <div class="modal-footer">
+            <a class="btn btn-outline-secondary" @click="checkoutModalActive=false">Cancel</a>
+            <ajax-button class="btn btn-peepl" type="submit" v-bind:class="{ 'is-loading': syncing }">Checkout</button>
+          </div>
+        </form>
       </div>
     </modal>
   </div>
