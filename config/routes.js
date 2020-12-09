@@ -31,6 +31,7 @@ module.exports.routes = {
   'POST /api/v1/products/get-product-delivery-methods': { action: 'products/get-product-delivery-methods' },
   'POST /api/v1/bar/create-order': { action: 'bar/create-order' },
   'POST /api/v1/orders/create-order': { action: 'orders/create-order' },
+  'POST /api/v1/orders/payment-submitted': { action: 'orders/payment-submitted' },
 
 
   /***************************************************************************

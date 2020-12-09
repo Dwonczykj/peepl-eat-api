@@ -12,6 +12,7 @@ parasails.registerPage('vendor-menu', {
     temporaryOptionValues: {},
     cart: [],
     deliveryMethods: {},
+    deliveryMethodsTemp: {},
     address:{
       name: '',
       lineOne: '',
@@ -122,27 +123,53 @@ parasails.registerPage('vendor-menu', {
       return {items: this.cart, address: this.address, total: this.cartTotal + this.deliveryTotal};
     },
     submittedForm: function(result) {
-      console.log(result);
-
-      this.syncing == false;
+      this.syncing == true;
       var paymentDetails = {
           action: 'pay',
           amount: this.cartTotal + this.deliveryTotal,
           currency: 'GBPx',
           destination: this.vendor.walletId,
       };
+
+      //console.log(result);
       
-      window.flutter_inappwebview.callHandler('pay', paymentDetails)
-      .then(function (paymentResult) {
-        // get result from Flutter side. It will be the number 64.
-        Cloud.paymentSubmitted()
-        .with({orderId: result.id,})
-      });
+      Cloud.paymentSubmitted()
+        .protocol('io.socket');
+
+      // window.flutter_inappwebview.callHandler('pay', paymentDetails)
+      // .then(function (paymentResult) {
+      //   Cloud.paymentSubmitted()
+      //   .with({orderId: result.id})
+      //   .protocol('io.socket');
+      // })
+      // .catch(function(err){
+
+      // })
     },
     updatedPostCode: function () {
-      for(var item in this.cart) {
-        Vue.set(this.cart[item], 'deliveryMethod', {});
-        Vue.set(this.cart[item], 'deliveryMethods', deliveryMethods[this.cart[item].id]);
+      // Vue.set(this.deliveryMethods[deliveryMethodIndex], 'selected', []);
+      // Vue.set(this.deliveryMethods[deliveryMethodIndex], 'selectedSlot', []);
+
+      for(var group in this.deliveryMethodsTemp){
+        var updatedDms = [];
+        for(var deliveryMethodIndex in this.deliveryMethodsTemp[group].deliveryMethods) {
+          var deliveryMethod = this.deliveryMethodsTemp[group].deliveryMethods[deliveryMethodIndex];
+          var isPostCodeValid = RegExp(deliveryMethod.postCodeRestrictionRegex).test(this.address.postCode);
+
+          console.log(this.address.postCode);
+
+          if (isPostCodeValid || deliveryMethod.postCodeRestrictionRegex == ""){
+            updatedDms.push(deliveryMethod);
+          }
+        }
+
+        var output = this.deliveryMethodsTemp[group];
+
+        output.deliveryMethods = updatedDms;
+        output.selected = null;
+        output.selectedSlot = null;
+
+        Vue.set(this.deliveryMethods, group, output);
       }
     },
     openCheckoutModal: function() {
@@ -160,14 +187,13 @@ parasails.registerPage('vendor-menu', {
       Cloud.getProductDeliveryMethods(productids)
       .then(function(output){
         for (var deliveryMethods in output) {
-          // output[deliveryMethods].selected = {};
           for(var product in output[deliveryMethods].products) {
             output[deliveryMethods].products[product].quantity = productQuantities[output[deliveryMethods].products[product].id];
           }
         }
 
-        Vue.set(that, 'deliveryMethods', output);
-        that.deliveryMethods = output;
+        Vue.set(that, 'deliveryMethodsTemp', output);
+        that.deliveryMethodsTemp = output;
       })
 
       this.isLoading = false;
