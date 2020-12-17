@@ -123,6 +123,8 @@ parasails.registerPage('vendor-menu', {
       return {items: this.cart, address: this.address, total: this.cartTotal + this.deliveryTotal};
     },
     submittedForm: function(result) {
+      console.log("Submitted form.");
+
       this.syncing == true;
       var paymentDetails = {
           action: 'pay',
@@ -131,25 +133,25 @@ parasails.registerPage('vendor-menu', {
           destination: this.vendor.walletId,
       };
 
-      //console.log(result);
-      
-      Cloud.paymentSubmitted()
-        .protocol('io.socket');
+      window.flutter_inappwebview.callHandler('pay', paymentDetails)
+      .then(function (paymentResult) {
+        Cloud.paymentSubmitted()
+        .protocol('io.socket')
+        .then(function(msg){
+          //Payment was successful.
+          window.location('/order/' + result.id);
+        })
+        .catch(function(err){
 
-      // window.flutter_inappwebview.callHandler('pay', paymentDetails)
-      // .then(function (paymentResult) {
-      //   Cloud.paymentSubmitted()
-      //   .with({orderId: result.id})
-      //   .protocol('io.socket');
-      // })
-      // .catch(function(err){
+        })
+      })
+      .catch(function(err){
 
-      // })
+      })
+
+
     },
     updatedPostCode: function () {
-      // Vue.set(this.deliveryMethods[deliveryMethodIndex], 'selected', []);
-      // Vue.set(this.deliveryMethods[deliveryMethodIndex], 'selectedSlot', []);
-
       for(var group in this.deliveryMethodsTemp){
         var updatedDms = [];
         for(var deliveryMethodIndex in this.deliveryMethodsTemp[group].deliveryMethods) {

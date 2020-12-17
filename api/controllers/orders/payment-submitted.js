@@ -26,15 +26,11 @@ module.exports = {
 
   fn: async function (inputs, exits) {
     var request = require('request');
-
-    console.log("Submitted");
     
     sails.sockets.join(this.req, inputs.orderId, function(err){
       if(err) {
         return exits.serverError();
       }
-
-      return exits.success();
     })
 
     var options = {
@@ -47,8 +43,8 @@ module.exports = {
     };
     request(options, function (error, response) { 
       if (error) return exits.serverError();
-      console.log(response);
-      return exits.success(response);
+      console.log(response.body.data.data);
+      return exits.success(response.body);
     });
 
   }
