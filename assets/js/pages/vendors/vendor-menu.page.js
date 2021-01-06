@@ -139,7 +139,7 @@ parasails.registerPage('vendor-menu', {
         .protocol('io.socket')
         .then(function(msg){
           //Payment was successful.
-          window.location('/order/' + result.id);
+          window.location('/order/' + paymentResult.id);
         })
         .catch(function(err){
 
