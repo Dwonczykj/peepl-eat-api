@@ -23,6 +23,8 @@ module.exports.routes = {
   '/barmenu': {action: 'view-bar-menu'},
   '/today': {action: 'view-today'},
   '/topup': {action: 'view-topup'},
+  '/bar-menu': {action: 'view-topup'},
+  '/help': {action: 'view-help'},
   '/vendors': {action: 'vendors/view-all-vendors'},
   '/vendors/:vendorid': { action: 'vendors/view-vendor-menu' },
   'GET /help': { action: 'view-help' },
