@@ -15,7 +15,7 @@ module.exports.bootstrap = async function() {
   var path = require('path');
 
   // This bootstrap version indicates what version of fake data we're dealing with here.
-  var HARD_CODED_DATA_VERSION = 1;
+  var HARD_CODED_DATA_VERSION = 2;
 
   // This path indicates where to store/look for the JSON file that tracks the "last run bootstrap info"
   // locally on this development computer (if we happen to be on a development computer).
@@ -31,64 +31,116 @@ module.exports.bootstrap = async function() {
     return;
   } //•
 
-  var testVendor = await Vendor.create({
-    name: 'Baltic Social',
+  var delifonseca = await Vendor.create({
+    name: 'Delifonseca',
     type: 'restaurant',
-    description: 'A great place to eat!',
+    description: 'Life\'s too short to have a bad meal. Delifonseca is here to help you enjoy the finer tastes in life.',
     walletId: 'testtesttesttest',
-    image: 'https://via.placeholder.com/600x200'
+    image: 'https://www.delifonseca.co.uk/wp-content/uploads/2016/08/Foodhall-Shot.jpg'
   }).fetch();
 
-  var testProduct = await Product.createEach([{
-      name: 'Punk Afternoon Tea',
-      description: 'A classic!',
-      basePrice: 2495,
+  var burnsNight = await Product.create({
+      name: 'Burns Night - Dine @ Home (For 1)',
+      description: 'Unfortunately, this year the 25th falls on a Monday. You won’t be able to join us, so we\'ve made our Dine@home Burns inspired instead.',
+      basePrice: 2200,
       isAvailable: true,
-      vendor: testVendor.id,
-      image: 'https://via.placeholder.com/300x150'
-  }, {
-      name: 'Vegan Afternoon Tea',
-      description: 'A vegan classic!',
-      basePrice: 2495,
-      isAvailable: true,
-      vendor: testVendor.id,
-      image: 'https://via.placeholder.com/300x150'
-  }]).fetch();
-
-  var testProductOption = await ProductOption.create({
-    name: 'With gravy?',
-    product: testProduct[0].id
+      vendor: delifonseca.id,
+      image: 'https://metro.co.uk/wp-content/uploads/2018/01/148505789.jpg?quality=90&strip=all'
   }).fetch();
 
-  var testProductOptionTwo = await ProductOption.create({
-    name: 'With custard?',
-    product: testProduct[0].id
+  var starterOption = await ProductOption.create({
+    name: 'Starter',
+    product: burnsNight.id
   }).fetch();
 
-  var testProductOptionValues = await ProductOptionValue.createEach([{
-    name: 'Yes',
-    priceModifier: 100,
-    isAvailable: true,
-    options: [testProductOption.id, testProductOptionTwo.id]
-  }, {
-    name: 'No',
+  var starterOptionValues = await ProductOptionValue.createEach([{
+    name: 'Traditional Cullen Skink – smoked haddock, potato and leek soup (GF)',
     priceModifier: 0,
     isAvailable: true,
-    options: [testProductOption.id, testProductOptionTwo.id]
+    options: [starterOption.id]
+  }, {
+    name: 'Rabbit ‘cock-a-leekie’ terrine. A chicken, rabbit and leek terrine served with whisky jelly and oatcakes',
+    priceModifier: 0,
+    isAvailable: true,
+    options: [starterOption.id]
+  }, {
+    name: 'Classic traditional haggis, neeps and tatties',
+    priceModifier: 0,
+    isAvailable: true,
+    options: [starterOption.id]
+  }, {
+    name: 'Martin’s classic vegetarian haggis, neeps and tatties (V)',
+    priceModifier: 0,
+    isAvailable: true,
+    options: [starterOption.id]
   }]);
 
-  var testDeliveryMethod = await DeliveryMethod.create({
+  var mainOption = await ProductOption.create({
+    name: 'Main',
+    product: burnsNight.id
+  }).fetch();
+
+  var mainOptionValues = await ProductOptionValue.createEach([{
+    name: 'Venison, beef and beer stew, whiskey dumplings and creamy mash',
+    priceModifier: 0,
+    isAvailable: true,
+    options: [mainOption.id]
+  }, {
+    name: 'Darne of Scottish salmon, kale, creamy mash and Loch Spelve mussel sauce (GF)',
+    priceModifier: 0,
+    isAvailable: true,
+    options: [mainOption.id]
+  }, {
+    name: 'Lanarkshire blue portobello mushroom top hat with rumbledethump croquettes and pearl onion pickle (V)',
+    priceModifier: 0,
+    isAvailable: true,
+    options: [mainOption.id]
+  }, {
+    name: 'Classic traditional haggis, neeps and tatties',
+    priceModifier: 0,
+    isAvailable: true,
+    options: [mainOption.id]
+  }, {
+    name: 'Martin’s classic vegetarian haggis, neeps and tatties (V)',
+    priceModifier: 0,
+    isAvailable: true,
+    options: [mainOption.id]
+  }]);
+
+  var dessertOption = await ProductOption.create({
+    name: 'Dessert',
+    product: burnsNight.id
+  }).fetch();
+
+  var dessertOptionValues = await ProductOptionValue.createEach([{
+    name: 'Traditional Cranachan (V)',
+    priceModifier: 0,
+    isAvailable: true,
+    options: [dessertOption.id]
+  }, {
+    name: 'Bitter chocolate tart with Drambuie fudge  (V/GF)',
+    priceModifier: 0,
+    isAvailable: true,
+    options: [dessertOption.id]
+  }, {
+    name: 'Ecclefechan Border Tart  (V)',
+    priceModifier: 0,
+    isAvailable: true,
+    options: [dessertOption.id]
+  }]);
+
+  var localDeliveryMethod = await DeliveryMethod.create({
     name: 'Local Courier',
     description: 'Delivered fresh by one of our reliable local couriers!',
     priceModifier: 200,
-    products: [testProduct[0].id, testProduct[1].id]
+    products: [burnsNight.id]
   }).fetch();
 
-  var testDeliveryMethodSlots = await DeliveryMethodSlot.create({
-    startTime: 1605430800,
-    endTime: 1605434400,
-    slotsRemaining: 30,
-    deliveryMethod: testDeliveryMethod.id
+  var localDeliveryMethodSlots = await DeliveryMethodSlot.create({
+    startTime: 1610456400,
+    endTime: 1578749400,
+    slotsRemaining: 3,
+    deliveryMethod: localDeliveryMethod.id
   });
 
    // Save new bootstrap version
