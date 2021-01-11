@@ -137,7 +137,8 @@ parasails.registerPage('vendor-menu', {
     },
     handleParsingForm: function() {
       this.syncing = true;
-
+      this.checkSufficientFunds();
+      
       return {items: this.cart, address: this.address, total: this.cartTotal + this.deliveryTotal};
     },
     submittedForm: function(result) {
@@ -196,7 +197,7 @@ parasails.registerPage('vendor-menu', {
         Vue.set(this.deliveryMethods, group, output);
       }
 
-      this.checkSufficientFunds();
+      //this.checkSufficientFunds();
     },
     checkSufficientFunds: function() {
       var contractAddress = '0x52d6d59cafc83d8c5569df0630db5715a96d124b';
@@ -208,8 +209,11 @@ parasails.registerPage('vendor-menu', {
         var numberOfTokens = parseInt(data.result)/(Math.pow(10,18));
         
         if ((numberOfTokens * 100) < that.finalTotal) {
+          var amountRequired = that.finalTotal - numberOfTokens;
+          var topupDetails = {amount: amountRequired};
+
           alert("You need to top-up before checking out!");
-          window.flutter_inappwebview.callHandler('topup');
+          window.flutter_inappwebview.callHandler('topup', topupDetails);
         }
         
       })
