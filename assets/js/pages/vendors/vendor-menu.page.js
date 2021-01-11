@@ -23,6 +23,8 @@ parasails.registerPage('vendor-menu', {
     cloudError: '',
     formErrors: {
     },
+    deliveryTotal: 0,
+    //readyToPay: false
   },
 
   //  ╦  ╦╔═╗╔═╗╔═╗╦ ╦╔═╗╦  ╔═╗
@@ -47,8 +49,8 @@ parasails.registerPage('vendor-menu', {
 
       Cloud.getProductOptions(productid)
       .then(function(options){
+        that.selectedOptionValues= {};
         for(var option in options) {
-          that.selectedOptionValues= {};
           that.selectedOptionValues[options[option].id] = "";
         }
         that.productOptions = options;
@@ -98,6 +100,19 @@ parasails.registerPage('vendor-menu', {
       }
 
       Vue.set(this.deliveryMethods[deliveryMethodIndex], 'selected', deliveryMethod);
+      this.calculateDeliveryTotal();
+    },
+    // Done like this rather than as a computed property because Vue's deep nested reactive values suck.
+    calculateDeliveryTotal: function(){
+      var workingTotal = 0;
+
+      for (var methods in this.deliveryMethods) {
+        if(this.deliveryMethods[methods] && this.deliveryMethods[methods].selected) {
+          workingTotal += this.deliveryMethods[methods].selected.priceModifier;
+        }
+      }
+
+      this.deliveryTotal = workingTotal;
     },
     changeDeliverySlot: function(event) {
       var deliveryMethodIndex = event.target.id.slice(12);
@@ -116,6 +131,7 @@ parasails.registerPage('vendor-menu', {
       }
 
       Vue.set(this.deliveryMethods[deliveryMethodIndex], 'selectedSlot', deliverySlot);
+      //this.readyToPay = true;
     },
     handleParsingForm: function() {
       this.syncing = true;
@@ -123,8 +139,6 @@ parasails.registerPage('vendor-menu', {
       return {items: this.cart, address: this.address, total: this.cartTotal + this.deliveryTotal};
     },
     submittedForm: function(result) {
-      console.log("Submitted form.");
-
       this.syncing == true;
       var paymentDetails = {
           action: 'pay',
@@ -135,11 +149,12 @@ parasails.registerPage('vendor-menu', {
 
       window.flutter_inappwebview.callHandler('pay', paymentDetails)
       .then(function (paymentResult) {
+        // TODO: add payment ID to order
         Cloud.paymentSubmitted()
         .protocol('io.socket')
         .then(function(msg){
-          //Payment was successful.
-          window.location('/order/' + paymentResult.id);
+          // Send them to order confirmation page
+          window.location('/order/' + result.id);
         })
         .catch(function(err){
 
@@ -158,18 +173,23 @@ parasails.registerPage('vendor-menu', {
           var deliveryMethod = this.deliveryMethodsTemp[group].deliveryMethods[deliveryMethodIndex];
           var isPostCodeValid = RegExp(deliveryMethod.postCodeRestrictionRegex).test(this.address.postCode);
 
-          console.log(this.address.postCode);
-
           if (isPostCodeValid || deliveryMethod.postCodeRestrictionRegex == ""){
             updatedDms.push(deliveryMethod);
           }
         }
 
-        var output = this.deliveryMethodsTemp[group];
+        var output = _.cloneDeep(this.deliveryMethodsTemp[group]);
 
         output.deliveryMethods = updatedDms;
         output.selected = null;
         output.selectedSlot = null;
+
+        //verbose
+        if(output.deliveryMethods.length < 1) {
+          output.noMethodsAvailable = true;
+        } else {
+          output.noMethodsAvailable = false;
+        }
 
         Vue.set(this.deliveryMethods, group, output);
       }
@@ -230,14 +250,33 @@ parasails.registerPage('vendor-menu', {
       }
       return workingTotal;
     },
-    deliveryTotal: function() {
-      var workingTotal = 0;
-      for (var methods in this.deliveryMethods) {
-        if(this.deliveryMethods[methods] && this.deliveryMethods[methods].selected) {
-          workingTotal += this.deliveryMethods[methods].selected.priceModifier;
+    finalTotal: function() {
+      return this.cartTotal + this.deliveryTotal;
+    },
+    readyToPay: function() {
+      if (this.address.postCode == "") {
+        return false;
+      }
+
+      for (var option in this.deliveryMethods) {
+        if (this.deliveryMethods[option].noMethodsAvailable){
+          return false;
         }
       }
-      return workingTotal;
+
+      return true;
     }
+    // deliveryTotal: function() {
+    //   var workingTotal = 0;
+
+    //   for (var methods in this.deliveryMethods) {
+    //     console.log("ran");
+    //     console.log(this.deliveryMethods[methods].selected);
+    //     if(this.deliveryMethods[methods] && this.deliveryMethods[methods].selected) {
+    //       workingTotal += this.deliveryMethods[methods].selected.priceModifier;
+    //     }
+    //   }
+    //   return workingTotal;
+    // }
   }
 });

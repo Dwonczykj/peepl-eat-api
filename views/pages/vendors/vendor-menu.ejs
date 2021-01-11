@@ -29,26 +29,27 @@
         </div>
       </div>
       <div v-else class="modal-content">
+        <form @submit.prevent="addProductToCart">
         <div class="modal-body">
           <h3>{{selectedProduct.name}}</h3>
           <p>{{selectedProduct.description}}</p>
-          <form>
+          
             <div v-for="option in productOptions">
               <div class="form-group">
                 <label :for="'select' + option.id">{{option.name}}</label>
-                <select v-model="selectedOptionValues[option.id]" @change="changeOptionValue" class="form-control form-control-sm" :id="'select' + option.id">
-                  <option disabled value="">Select an option...</option>
+                <select required v-model="selectedOptionValues[option.id]" @change="changeOptionValue" class="form-control form-control-sm" :id="'select' + option.id">
+                  <option disabled value="" selected="selected">Select an option...</option>
                   <option v-for="value in option.values" :value="value.id">{{value.name}}</option>
                 </select>
               </div>
             </div>
-          </form>
         </div>
         <div class="modal-footer">
           <p class="mr-auto"><strong>{{currentProductTotal | convertToPounds}}</strong></p>
-          <button class="btn btn-outline-secondary" @click="addToCartModalActive=false">Cancel</button>
-          <button class="btn btn-peepl" @click="addProductToCart">Add to cart</button>
+          <a class="btn btn-outline-secondary" @click="addToCartModalActive=false">Cancel</a>
+          <button class="btn btn-peepl">Add to cart</button>
         </div>
+        </form>
       </div>
     </modal>
 
@@ -92,10 +93,11 @@
               </div>
               <div class="form-group">
                 <label :for="'deliveryMethod' + index">Delivery Method</label>
-                <select @change="changeDeliveryMethod" class="form-control" :id="'deliveryMethod' + index" required>
+                <select v-if="option.deliveryMethods.length > 0" @change="changeDeliveryMethod" class="form-control" :id="'deliveryMethod' + index" required>
                   <option disabled selected value="">Select a delivery method...</option>
                   <option v-for="deliveryMethod in option.deliveryMethods" :value="deliveryMethod.id">{{deliveryMethod.name}}</option>
                 </select>
+                <p v-else class="text-danger">Unfortunately, we can't deliver this item to your location. Please try another postcode.</p>
               </div>
               <div v-if="option.selected" class="form-group">
                 <label :for="'deliverySlot' + index">Delivery Slot</label>
@@ -113,7 +115,7 @@
 
           <div class="modal-footer">
             <a class="btn btn-outline-secondary" @click="checkoutModalActive=false">Cancel</a>
-            <ajax-button class="btn btn-peepl" type="submit" v-bind:class="{ 'is-loading': syncing }">Checkout</button>
+            <ajax-button class="btn btn-peepl" :disabled="!readyToPay" type="submit" v-bind:class="{ 'is-loading': syncing }">Pay {{finalTotal | convertToPounds}}</ajax-button>
           </div>
         </form>
       </div>
