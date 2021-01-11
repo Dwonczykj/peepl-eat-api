@@ -9,15 +9,13 @@
  * https://sailsjs.com/config/bootstrap
  */
 
-// const Product = require("../api/models/Product");
-
 module.exports.bootstrap = async function() {
 
   // Import dependencies
   var path = require('path');
 
   // This bootstrap version indicates what version of fake data we're dealing with here.
-  var HARD_CODED_DATA_VERSION = 5;
+  var HARD_CODED_DATA_VERSION = 1;
 
   // This path indicates where to store/look for the JSON file that tracks the "last run bootstrap info"
   // locally on this development computer (if we happen to be on a development computer).
@@ -33,27 +31,12 @@ module.exports.bootstrap = async function() {
     return;
   } //•
 
-  // By convention, this is a good place to set up fake data during development.
-  //
-  // For example:
-  // ```
-  // // Set up fake development data (or if we already have some, avast)
-  // if (await User.count() > 0) {
-  //   return;
-  // }
-  //
-  // await User.createEach([
-  //   { emailAddress: 'ry@example.com', fullName: 'Ryan Dahl', },
-  //   { emailAddress: 'rachael@example.com', fullName: 'Rachael Shaw', },
-  //   // etc.
-  // ]);
-  // ```
-
   var testVendor = await Vendor.create({
     name: 'Baltic Social',
     type: 'restaurant',
     description: 'A great place to eat!',
-    walletId: 'testtesttesttest'
+    walletId: 'testtesttesttest',
+    image: 'https://via.placeholder.com/600x200'
   }).fetch();
 
   var testProduct = await Product.createEach([{
@@ -61,13 +44,15 @@ module.exports.bootstrap = async function() {
       description: 'A classic!',
       basePrice: 2495,
       isAvailable: true,
-      vendor: testVendor.id
+      vendor: testVendor.id,
+      image: 'https://via.placeholder.com/300x150'
   }, {
       name: 'Vegan Afternoon Tea',
       description: 'A vegan classic!',
       basePrice: 2495,
       isAvailable: true,
-      vendor: testVendor.id
+      vendor: testVendor.id,
+      image: 'https://via.placeholder.com/300x150'
   }]).fetch();
 
   var testProductOption = await ProductOption.create({

@@ -27,6 +27,22 @@ module.exports = {
       description: 'The unixtime when the order payment was confirmed (if at all).',
       required: false
     },
+    deliveryName: {
+      type: 'string',
+      description: 'The name for the delivery.',
+      required: true
+    },
+    deliveryEmail: {
+      type: 'string',
+      description: 'The email for the delivery.',
+      isEmail: true,
+      required: true
+    },
+    deliveryPhoneNumber: {
+      type: 'string',
+      description: 'The phone number for the delivery.',
+      required: true
+    },
     deliveryAddressLineOne: {
       type: 'string',
       description: 'The first line of the delivery address.',

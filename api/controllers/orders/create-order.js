@@ -48,6 +48,9 @@ module.exports = {
     var order = await Order.create({
       total: inputs.total,
       orderedDateTime: Date.now(),
+      deliveryName: inputs.address.name,
+      deliveryEmail: inputs.address.email,
+      deliveryPhoneNumber: inputs.address.phoneNumber,
       deliveryAddressLineOne: inputs.address.lineOne,
       deliveryAddressLineTwo: inputs.address.lineTwo,
       deliveryAddressPostCode: inputs.address.postCode,

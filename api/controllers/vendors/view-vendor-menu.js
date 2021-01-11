@@ -27,7 +27,7 @@ module.exports = {
     .populate('products');
 
     // Respond with view.
-    return {vendor};
+    return {vendor, wallet: this.req.session.walletId};
 
   }
 

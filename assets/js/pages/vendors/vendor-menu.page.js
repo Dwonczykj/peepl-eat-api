@@ -15,6 +15,8 @@ parasails.registerPage('vendor-menu', {
     deliveryMethodsTemp: {},
     address:{
       name: '',
+      email: '',
+      phoneNumber: '',
       lineOne: '',
       lineTwo: '',
       postCode: ''
@@ -193,9 +195,28 @@ parasails.registerPage('vendor-menu', {
 
         Vue.set(this.deliveryMethods, group, output);
       }
+
+      this.checkSufficientFunds();
+    },
+    checkSufficientFunds: function() {
+      var contractAddress = '0x52d6d59cafc83d8c5569df0630db5715a96d124b';
+      var userWallet = window.SAILS_LOCALS.wallet;
+
+      var that = this;
+
+      $.get("https://explorer.fuse.io/api?module=account&action=tokenbalance&contractaddress=" + contractAddress + "&address=" + userWallet, function(data){
+        var numberOfTokens = parseInt(data.result)/(Math.pow(10,18));
+        
+        if ((numberOfTokens * 100) < that.finalTotal) {
+          alert("You need to top-up before checking out!");
+          window.flutter_inappwebview.callHandler('topup');
+        }
+        
+      })
     },
     openCheckoutModal: function() {
       this.isLoading = true;
+      //this.updatedPostCode();
       this.checkoutModalActive = true; 
       var that = this;
 
