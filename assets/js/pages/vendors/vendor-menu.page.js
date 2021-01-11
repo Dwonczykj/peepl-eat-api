@@ -210,7 +210,7 @@ parasails.registerPage('vendor-menu', {
         
         if ((numberOfTokens * 100) < that.finalTotal) {
           var amountRequired = that.finalTotal - numberOfTokens;
-          var topupDetails = {amount: amountRequired};
+          var topupDetails = {amount: amountRequired.toString()};
 
           alert("You need to top-up before checking out!");
           window.flutter_inappwebview.callHandler('topup', topupDetails);
