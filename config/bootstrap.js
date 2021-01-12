@@ -15,7 +15,7 @@ module.exports.bootstrap = async function() {
   var path = require('path');
 
   // This bootstrap version indicates what version of fake data we're dealing with here.
-  var HARD_CODED_DATA_VERSION = 2;
+  var HARD_CODED_DATA_VERSION = 3;
 
   // This path indicates where to store/look for the JSON file that tracks the "last run bootstrap info"
   // locally on this development computer (if we happen to be on a development computer).
@@ -45,7 +45,7 @@ module.exports.bootstrap = async function() {
       basePrice: 2200,
       isAvailable: true,
       vendor: delifonseca.id,
-      image: 'https://metro.co.uk/wp-content/uploads/2018/01/148505789.jpg?quality=90&strip=all'
+      image: 'https://www.delifonseca.co.uk/wp-content/uploads/2016/08/IMG_9705-1024x683.jpg'
   }).fetch();
 
   var starterOption = await ProductOption.create({

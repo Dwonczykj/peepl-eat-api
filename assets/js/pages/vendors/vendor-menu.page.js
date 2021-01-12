@@ -208,7 +208,7 @@ parasails.registerPage('vendor-menu', {
       $.get("https://explorer.fuse.io/api?module=account&action=tokenbalance&contractaddress=" + contractAddress + "&address=" + userWallet, function(data){
         var numberOfTokens = parseInt(data.result)/(Math.pow(10,18));
         
-        if ((numberOfTokens * 100) < that.finalTotal) {
+        if ((numberOfTokens * 100) < that.finalTotal) { // GBPx to pence
           var amountRequired = that.finalTotal - numberOfTokens;
           var topupDetails = {amount: amountRequired.toString()};
 
