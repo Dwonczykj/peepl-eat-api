@@ -55,7 +55,7 @@ module.exports = {
             paymentJobId: inputs.jobId,
             paidDateTime: unixtime
           }).then(function(success){
-            sails.sockets.broadcast('order'+order.id, 'paid', {orderId: order.id, paidDateTime: unixtime}, req);
+            sails.sockets.broadcast('order'+order.id, 'paid', {orderId: order.id, paidDateTime: unixtime});
             return exits.success(result.body);
           }) //TODO: error catch
         }
