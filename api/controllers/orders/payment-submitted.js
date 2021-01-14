@@ -49,7 +49,7 @@ module.exports = {
       Order.findOne(inputs.orderId)
       .then(function(order){
         // TODO: check transaction using GBPx token
-        if (order.total == paymentTotal && order.customerWallet == paymentSenderWallet && !order.paidDateTime) {
+        if (order.total == paymentTotal /*&& order.customerWallet == paymentSenderWallet && !order.paidDateTime*/) {
           var unixtime = new Date().getTime();
           Order.updateOne(inputs.orderId)
           .set({
