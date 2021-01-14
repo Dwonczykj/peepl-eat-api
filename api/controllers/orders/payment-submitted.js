@@ -66,11 +66,12 @@ module.exports = {
               networkType: "fuse",
               amount: rewardAmount,
               from: "0x29249e06e8D3e4933cc403AB73136e698a08c38b",
-              to: order.customerWallet
+              to: order.customer
             }
 
             client.post('admin/tokens/transfer', data)
             .then(function(res){
+              console.log(res);
               return exits.success(result.body);
             })
           }) //TODO: error handling
