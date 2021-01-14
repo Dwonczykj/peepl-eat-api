@@ -30,13 +30,6 @@ module.exports = {
     var request = require('request-json');
     var client = request.createClient('https://studio.fuse.io/api/v2/jobs/');
 
-    
-    sails.sockets.join(this.req, inputs.orderId, function(err){
-      if(err) {
-        return exits.serverError();
-      }
-    });
-
     // var options = {
     //   'method': 'GET',
     //   'url': 'https://studio.fuse.io/api/v2/jobs/' + inputs.jobId,
