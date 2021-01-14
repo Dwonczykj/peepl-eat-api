@@ -169,7 +169,7 @@ parasails.registerPage('vendor-menu', {
 
 
       io.socket.on('paid', function (data){
-        window.location('/order/'+data.orderId);
+        window.location.replace('/order/'+data.orderId);
       });
 
 
