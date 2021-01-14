@@ -61,6 +61,9 @@ module.exports = {
     customerWallet: {
       type: 'string'
     },
+    paymentJobId: {
+      type: 'string'
+    }
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
