@@ -64,7 +64,7 @@ module.exports = {
             var data = {
               tokenAddress: "0xa2C7CdB72d177f6259cD12a9A06Fdfd9625419D4",
               networkType: "fuse",
-              amount: rewardAmount,
+              amount: rewardAmount.toString(),
               from: "0x29249e06e8D3e4933cc403AB73136e698a08c38b",
               to: order.customer
             }
