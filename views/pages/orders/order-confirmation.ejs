@@ -1,0 +1,7 @@
+<div id="order-confirmation" v-cloak>
+
+  <h1>Order #<%= order.id %></h1>
+  <p><%= order.total %></p>
+
+</div>
+<%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>
