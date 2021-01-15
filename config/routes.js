@@ -28,6 +28,7 @@ module.exports.routes = {
   '/vendors': {action: 'vendors/view-all-vendors'},
   '/vendors/:vendorid': { action: 'vendors/view-vendor-menu' },
   'GET /help': { action: 'view-help' },
+  'GET /orders/:orderId': { action: 'orders/view-order-confirmation' },
 
   'GET /api/v1/products/get-product-options/:productId': { action: 'products/get-product-options' },
   'POST /api/v1/products/get-product-delivery-methods': { action: 'products/get-product-delivery-methods' },

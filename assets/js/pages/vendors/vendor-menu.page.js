@@ -152,20 +152,25 @@ parasails.registerPage('vendor-menu', {
 
       window.flutter_inappwebview.callHandler('pay', paymentDetails)
       .then(function (paymentResult) {
-        // TODO: add payment ID to order
-        Cloud.paymentSubmitted()
-        .protocol('io.socket')
-        .then(function(msg){
-          // Send them to order confirmation page
-          window.location('/order/' + result.id);
-        })
-        .catch(function(err){
+        // // TODO: add payment ID to order
+        // Cloud.paymentSubmitted()
+        // .protocol('io.socket')
+        // .then(function(msg){
+        //   // Send them to order confirmation page
+        //   window.location('/order/' + result.id);
+        // })
+        // .catch(function(err){
 
-        })
+        // })
       })
       .catch(function(err){
 
-      })
+      });
+
+
+      io.socket.on('paid', function (data){
+        window.location.replace('/order/'+data.orderId);
+      });
 
 
     },

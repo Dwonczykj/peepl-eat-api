@@ -58,7 +58,10 @@ module.exports = {
       description: 'The post code of the delivery address.',
       required: true
     },
-    customerWallet: {
+    customer: {
+      type: 'string'
+    },
+    paymentJobId: {
       type: 'string'
     },
 

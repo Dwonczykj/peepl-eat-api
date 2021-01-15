@@ -69,6 +69,12 @@ module.exports = {
     });
 
     var products = await OrderItem.createEach(updatedItems);
+    
+    sails.sockets.join(this.req, 'order'+order.id, function(err){
+      if(err) {
+        return exits.serverError();
+      }
+    });
 
     // All done.
     return exits.success(order.id);
