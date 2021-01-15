@@ -221,10 +221,7 @@ parasails.registerPage('vendor-menu', {
         if ((numberOfTokens * 100) < that.finalTotal) { // GBPx to pence
           var amountRequired = that.finalTotal - numberOfTokens;
           var topupDetails = {amount: amountRequired.toString()};
-
-          alert(numberOfTokens * 100);
-
-          alert("You need to top-up before checking out!");
+          alert("You need to top up before checking out!");
           window.flutter_inappwebview.callHandler('topup', topupDetails);
         }
         
