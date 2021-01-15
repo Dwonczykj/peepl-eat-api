@@ -205,7 +205,7 @@ parasails.registerPage('vendor-menu', {
       //this.checkSufficientFunds();
     },
     checkSufficientFunds: function() {
-      var contractAddress = '0x52d6d59cafc83d8c5569df0630db5715a96d124b';
+      var contractAddress = '0x40AFCD9421577407ABB0d82E2fF25Fd2Ef4c68BD';
       var userWallet = window.SAILS_LOCALS.wallet;
 
       var that = this;
