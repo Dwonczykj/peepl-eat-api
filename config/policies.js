@@ -17,7 +17,9 @@ module.exports.policies = {
   *                                                                          *
   ***************************************************************************/
     '*': ['has-wallet'],
-    'view-homepage': true
+    'view-homepage': true,
+    'view-help': true,
+    'orders/payment-submitted': true
   // '*': true,
 
 };

@@ -12,12 +12,21 @@ parasails.registerPage('vendor-menu', {
     temporaryOptionValues: {},
     cart: [],
     deliveryMethods: {},
+    deliveryMethodsTemp: {},
     address:{
       name: '',
+      email: '',
+      phoneNumber: '',
       lineOne: '',
       lineTwo: '',
       postCode: ''
-    }
+    },
+    syncing: false,
+    cloudError: '',
+    formErrors: {
+    },
+    deliveryTotal: 0,
+    //readyToPay: false
   },
 
   //  ╦  ╦╔═╗╔═╗╔═╗╦ ╦╔═╗╦  ╔═╗
@@ -42,8 +51,8 @@ parasails.registerPage('vendor-menu', {
 
       Cloud.getProductOptions(productid)
       .then(function(options){
+        that.selectedOptionValues= {};
         for(var option in options) {
-          that.selectedOptionValues= {};
           that.selectedOptionValues[options[option].id] = "";
         }
         that.productOptions = options;
@@ -65,8 +74,8 @@ parasails.registerPage('vendor-menu', {
       this.temporaryOptionValues = {};
     },
     changeOptionValue: function(event) {
-      var optionId = event.target.id.slice(6);
-      var valueId = event.target.options[event.target.options.selectedIndex].value;
+      var optionId = event.target.name.slice(7);
+      var valueId = event.target.value;
 
       var option = _.find(this.productOptions, function(o) { return o.id === parseInt(optionId) });
       var value = _.find(option.values, function(o) { return o.id === parseInt(valueId); });
@@ -93,6 +102,19 @@ parasails.registerPage('vendor-menu', {
       }
 
       Vue.set(this.deliveryMethods[deliveryMethodIndex], 'selected', deliveryMethod);
+      this.calculateDeliveryTotal();
+    },
+    // Done like this rather than as a computed property because Vue's deep nested reactive values suck.
+    calculateDeliveryTotal: function(){
+      var workingTotal = 0;
+
+      for (var methods in this.deliveryMethods) {
+        if(this.deliveryMethods[methods] && this.deliveryMethods[methods].selected) {
+          workingTotal += this.deliveryMethods[methods].selected.priceModifier;
+        }
+      }
+
+      this.deliveryTotal = workingTotal;
     },
     changeDeliverySlot: function(event) {
       var deliveryMethodIndex = event.target.id.slice(12);
@@ -111,24 +133,100 @@ parasails.registerPage('vendor-menu', {
       }
 
       Vue.set(this.deliveryMethods[deliveryMethodIndex], 'selectedSlot', deliverySlot);
+      //this.readyToPay = true;
     },
-    finishCheckout: function() {
-      console.log("Submitted order.");
+    handleParsingForm: function() {
+      this.syncing = true;
+      this.checkSufficientFunds();
+      
+      return {items: this.cart, address: this.address, total: this.cartTotal + this.deliveryTotal};
+    },
+    submittedForm: function(result) {
+      this.syncing == true;
+      var paymentDetails = {
+          action: 'pay',
+          amount: this.cartTotal + this.deliveryTotal,
+          currency: 'GBPx',
+          destination: this.vendor.walletId,
+      };
 
-      Cloud.createOrder(this.cart, this.address, this.cartTotal + this.deliveryTotal)
-      .then(function(status){
-        console.log(status);
+      window.flutter_inappwebview.callHandler('pay', paymentDetails)
+      .then(function (paymentResult) {
+        // // TODO: add payment ID to order
+        // Cloud.paymentSubmitted()
+        // .protocol('io.socket')
+        // .then(function(msg){
+        //   // Send them to order confirmation page
+        //   window.location('/order/' + result.id);
+        // })
+        // .catch(function(err){
+
+        // })
       })
+      .catch(function(err){
+
+      });
+
+
+      io.socket.on('paid', function (data){
+        window.location.replace('/order/'+data.orderId);
+      });
+
+
     },
     updatedPostCode: function () {
-      for(var item in this.cart) {
-        Vue.set(this.cart[item], 'deliveryMethod', {});
-        Vue.set(this.cart[item], 'deliveryMethods', deliveryMethods[this.cart[item].id]);
+      for(var group in this.deliveryMethodsTemp){
+        var updatedDms = [];
+        for(var deliveryMethodIndex in this.deliveryMethodsTemp[group].deliveryMethods) {
+          var deliveryMethod = this.deliveryMethodsTemp[group].deliveryMethods[deliveryMethodIndex];
+          var isPostCodeValid = RegExp(deliveryMethod.postCodeRestrictionRegex).test(this.address.postCode);
+
+          if (isPostCodeValid || deliveryMethod.postCodeRestrictionRegex == ""){
+            updatedDms.push(deliveryMethod);
+          }
+        }
+
+        var output = _.cloneDeep(this.deliveryMethodsTemp[group]);
+
+        output.deliveryMethods = updatedDms;
+        output.selected = null;
+        output.selectedSlot = null;
+
+        //verbose
+        if(output.deliveryMethods.length < 1) {
+          output.noMethodsAvailable = true;
+        } else {
+          output.noMethodsAvailable = false;
+        }
+
+        Vue.set(this.deliveryMethods, group, output);
       }
+
+      //this.checkSufficientFunds();
+    },
+    checkSufficientFunds: function() {
+      var contractAddress = '0x52d6d59cafc83d8c5569df0630db5715a96d124b';
+      var userWallet = window.SAILS_LOCALS.wallet;
+
+      var that = this;
+
+      $.get("https://explorer.fuse.io/api?module=account&action=tokenbalance&contractaddress=" + contractAddress + "&address=" + userWallet, function(data){
+        var numberOfTokens = parseInt(data.result)/(Math.pow(10,18));
+        
+        if ((numberOfTokens * 100) < that.finalTotal) { // GBPx to pence
+          var amountRequired = that.finalTotal - numberOfTokens;
+          var topupDetails = {amount: amountRequired.toString()};
+
+          alert("You need to top-up before checking out!");
+          window.flutter_inappwebview.callHandler('topup', topupDetails);
+        }
+        
+      })
     },
     openCheckoutModal: function() {
       this.isLoading = true;
-      this.checkoutModalActive = true;
+      //this.updatedPostCode();
+      this.checkoutModalActive = true; 
       var that = this;
 
       var productids = _.pluck(this.cart, 'id');
@@ -141,14 +239,13 @@ parasails.registerPage('vendor-menu', {
       Cloud.getProductDeliveryMethods(productids)
       .then(function(output){
         for (var deliveryMethods in output) {
-          // output[deliveryMethods].selected = {};
           for(var product in output[deliveryMethods].products) {
             output[deliveryMethods].products[product].quantity = productQuantities[output[deliveryMethods].products[product].id];
           }
         }
 
-        Vue.set(that, 'deliveryMethods', output);
-        that.deliveryMethods = output;
+        Vue.set(that, 'deliveryMethodsTemp', output);
+        that.deliveryMethodsTemp = output;
       })
 
       this.isLoading = false;
@@ -183,14 +280,33 @@ parasails.registerPage('vendor-menu', {
       }
       return workingTotal;
     },
-    deliveryTotal: function() {
-      var workingTotal = 0;
-      for (var methods in this.deliveryMethods) {
-        if(this.deliveryMethods[methods] && this.deliveryMethods[methods].selected) {
-          workingTotal += this.deliveryMethods[methods].selected.priceModifier;
+    finalTotal: function() {
+      return this.cartTotal + this.deliveryTotal;
+    },
+    readyToPay: function() {
+      if (this.address.postCode == "") {
+        return false;
+      }
+
+      for (var option in this.deliveryMethods) {
+        if (this.deliveryMethods[option].noMethodsAvailable){
+          return false;
         }
       }
-      return workingTotal;
+
+      return true;
     }
+    // deliveryTotal: function() {
+    //   var workingTotal = 0;
+
+    //   for (var methods in this.deliveryMethods) {
+    //     console.log("ran");
+    //     console.log(this.deliveryMethods[methods].selected);
+    //     if(this.deliveryMethods[methods] && this.deliveryMethods[methods].selected) {
+    //       workingTotal += this.deliveryMethods[methods].selected.priceModifier;
+    //     }
+    //   }
+    //   return workingTotal;
+    // }
   }
 });

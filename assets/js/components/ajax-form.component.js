@@ -33,6 +33,7 @@ parasails.registerComponent('ajaxForm', {
     'formErrors',// « 2-way bound (:form-errors.sync="…")
     'formData',
     'formRules',
+    'protocol',
 
     'handleSubmitting',// « alternative for `action`
     'handleParsing',// « alternative for `formRules`+`formData`+`formErrors`
@@ -349,7 +350,10 @@ parasails.registerComponent('ajaxForm', {
         // (assuming cloudsdk has that information available)
         // Or better yet, just have `Cloud.*.with()` take care of that automatically.
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        var protocol = this.protocol || 'jQuery';
+
         result = await Cloud[this.action].with(argins)
+        .protocol(protocol)
         .tolerate((err)=>{
           rawErrorFromCloudSDK = err;
           failedWithCloudExit = err.exit || 'error';

@@ -31,7 +31,7 @@ module.exports = {
   },
 
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
     for (var item in inputs.items) {
       for (var option in inputs.items[item].options) {
         if(inputs.items[item].options[option] != "") {
@@ -48,6 +48,9 @@ module.exports = {
     var order = await Order.create({
       total: inputs.total,
       orderedDateTime: Date.now(),
+      deliveryName: inputs.address.name,
+      deliveryEmail: inputs.address.email,
+      deliveryPhoneNumber: inputs.address.phoneNumber,
       deliveryAddressLineOne: inputs.address.lineOne,
       deliveryAddressLineTwo: inputs.address.lineTwo,
       deliveryAddressPostCode: inputs.address.postCode,
@@ -66,9 +69,15 @@ module.exports = {
     });
 
     var products = await OrderItem.createEach(updatedItems);
+    
+    sails.sockets.join(this.req, 'order'+order.id, function(err){
+      if(err) {
+        return exits.serverError();
+      }
+    });
 
     // All done.
-    return order.id;
+    return exits.success(order.id);
 
   }
 

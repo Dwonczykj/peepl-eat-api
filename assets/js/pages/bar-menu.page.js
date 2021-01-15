@@ -56,10 +56,10 @@ parasails.registerPage('bar-menu', {
             currency: 'GBPx',
             destination: this.destinationWallet,
         };
-        // window.flutter_inappwebview.callHandler('pay', paymentDetails).then(function (result) {
-        //     // get result from Flutter side. It will be the number 64.
-        //     console.log(result);
-        // });
+        window.flutter_inappwebview.callHandler('pay', paymentDetails).then(function (result) {
+            // get result from Flutter side. It will be the number 64.
+            console.log(result);
+        });
       }
   }
 });

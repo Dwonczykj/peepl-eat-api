@@ -22,12 +22,16 @@ module.exports = {
   },
 
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
     var vendor = await Vendor.findOne(inputs.vendorid)
     .populate('products');
 
+    if(!vendor){
+      return exits.error();
+    }
+
     // Respond with view.
-    return {vendor};
+    return exits.success({vendor, wallet: this.req.session.walletId});
 
   }
 
