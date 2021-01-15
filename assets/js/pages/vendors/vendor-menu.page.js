@@ -74,8 +74,8 @@ parasails.registerPage('vendor-menu', {
       this.temporaryOptionValues = {};
     },
     changeOptionValue: function(event) {
-      var optionId = event.target.id.slice(6);
-      var valueId = event.target.options[event.target.options.selectedIndex].value;
+      var optionId = event.target.name.slice(7);
+      var valueId = event.target.value;
 
       var option = _.find(this.productOptions, function(o) { return o.id === parseInt(optionId) });
       var value = _.find(option.values, function(o) { return o.id === parseInt(valueId); });

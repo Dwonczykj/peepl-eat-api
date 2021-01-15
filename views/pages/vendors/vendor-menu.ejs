@@ -33,16 +33,15 @@
         <div class="modal-body">
           <h3>{{selectedProduct.name}}</h3>
           <p>{{selectedProduct.description}}</p>
-          
-            <div v-for="option in productOptions">
-              <div class="form-group">
-                <label :for="'select' + option.id">{{option.name}}</label>
-                <select required v-model="selectedOptionValues[option.id]" @change="changeOptionValue" class="form-control form-control-sm" :id="'select' + option.id">
-                  <option disabled value="" selected="selected">Select an option...</option>
-                  <option v-for="value in option.values" :value="value.id">{{value.name}}</option>
-                </select>
+          <div v-for="option in productOptions">
+            <fieldset class="form-group">
+              <legend class="h5">{{option.name}}</legend>
+              <div class="form-check" v-for="value in option.values">
+                <input class="form-check-input" type="radio" required :name="'option-' + option.id" :id="'option-' + option.id + '-' + value.id" :value="value.id" v-model="selectedOptionValues[option.id]" @change="changeOptionValue">
+                <label class="form-check-label" :for="'option-' + option.id + '-' + value.id">{{value.name}}</label>
               </div>
-            </div>
+            </fieldset>
+          </div>
         </div>
         <div class="modal-footer">
           <p class="mr-auto"><strong>{{currentProductTotal | convertToPounds}}</strong></p>
