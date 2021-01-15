@@ -123,7 +123,7 @@ module.exports.bootstrap = async function() {
     isAvailable: true,
     options: [dessertOption.id]
   }, {
-    name: 'Ecclefechan Border Tart  (V)',
+    name: 'Ecclefechan Border Tart (V)',
     priceModifier: 0,
     isAvailable: true,
     options: [dessertOption.id]
