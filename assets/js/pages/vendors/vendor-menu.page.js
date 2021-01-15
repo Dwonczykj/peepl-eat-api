@@ -211,11 +211,18 @@ parasails.registerPage('vendor-menu', {
       var that = this;
 
       $.get("https://explorer.fuse.io/api?module=account&action=tokenbalance&contractaddress=" + contractAddress + "&address=" + userWallet, function(data){
+        if(!data.result){
+          alert("Invalid wallet address");
+          return false;
+        }
+        
         var numberOfTokens = parseInt(data.result)/(Math.pow(10,18));
         
         if ((numberOfTokens * 100) < that.finalTotal) { // GBPx to pence
           var amountRequired = that.finalTotal - numberOfTokens;
           var topupDetails = {amount: amountRequired.toString()};
+
+          alert(numberOfTokens * 100);
 
           alert("You need to top-up before checking out!");
           window.flutter_inappwebview.callHandler('topup', topupDetails);
