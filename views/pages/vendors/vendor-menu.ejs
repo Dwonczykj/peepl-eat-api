@@ -64,7 +64,7 @@
       </div>
       <div v-else class="modal-content">
         <div class="modal-header">
-          <h5 class="card-title">Checkout</h5>
+          <h5 class="mb-0">Checkout</h5>
         </div>
         <ajax-form action="createOrder" protocol="io.socket" :syncing.sync="syncing" :cloud-error.sync="cloudError" @submitted="submittedForm" :handle-parsing="handleParsingForm">
           <div class="modal-body">
@@ -115,11 +115,17 @@
               </div>
             </div>
 
-            <h6><b>Total:</b> {{cartTotal | convertToPounds}}</h6>
-            <h6><b>Delivery:</b> {{deliveryTotal | convertToPounds}}</h6>
-            <h3 v-if="cloudError">There has been an error submitting your order. Please double check your inputs.</h3>
-          </div>
+          <h6 class="d-flex justify-content-between mt-3 mb-0">
+            <b>Total:</b>
+            {{cartTotal | convertToPounds}}
+          </h6>
+          <h6 class="d-flex justify-content-between mt-3 mb-0">
+            <b>Delivery:</b>
+            {{deliveryTotal | convertToPounds}}
+          </h6>
+        </div>
 
+        <h3 v-if="cloudError">There has been an error submitting your order. Please double check your inputs.</h3>
           <div class="modal-footer">
             <a class="btn btn-outline-secondary" @click="checkoutModalActive=false">Cancel</a>
             <ajax-button class="btn btn-peepl" :disabled="!readyToPay" type="submit" v-bind:class="{ 'is-loading': syncing }">Pay {{finalTotal | convertToPounds}}</ajax-button>
@@ -139,6 +145,10 @@
         <a href="#" @click="openCheckoutModal" class="btn btn-peepl">Checkout</a>
       </div>
     </div>
+  </div>
+
+  <div style="height: 5rem" v-if="cartTotal">
+    <!-- make space for fixed position cart banner -->
   </div>
 </div>
 <%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>
