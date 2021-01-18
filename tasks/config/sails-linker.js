@@ -1,5 +1,3 @@
-const { config } = require('grunt');
-
 /**
  * `tasks/config/sails-linker`
  *
@@ -59,7 +57,7 @@ module.exports = function(grunt) {
       options: {
         startTag: '<!--SCRIPTS-->',
         endTag: '<!--SCRIPTS END-->',
-        fileTmpl: '<script src="%s?v=' + sails.config.custom.buildNumber + '"></script>',
+        fileTmpl: '<script src="%s?v=' + 1 + '"></script>',
         appRoot: '.tmp/public'
       },
       files: {
