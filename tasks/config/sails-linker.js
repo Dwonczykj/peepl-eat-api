@@ -57,7 +57,7 @@ module.exports = function(grunt) {
       options: {
         startTag: '<!--SCRIPTS-->',
         endTag: '<!--SCRIPTS END-->',
-        fileTmpl: '<script src="%s?v=' + 3 + '"></script>',
+        fileTmpl: '<script src="%s?v=' + 4 + '"></script>',
         appRoot: '.tmp/public'
       },
       files: {
