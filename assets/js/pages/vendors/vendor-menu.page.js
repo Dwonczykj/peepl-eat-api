@@ -136,45 +136,32 @@ parasails.registerPage('vendor-menu', {
     },
     handleParsingForm: function() {
       this.syncing = true;
-      this.checkSufficientFunds();
+
+      if(this.checkSufficientFunds()){
+        return {items: this.cart, address: this.address, total: this.cartTotal + this.deliveryTotal};
+      }
       
-      return {items: this.cart, address: this.address, total: this.cartTotal + this.deliveryTotal};
+      return false;
     },
     submittedForm: function(result) {
-      alert("Submitted order!");
-
       this.syncing == true;
       var paymentDetails = {
-          action: 'pay',
-          amount: (this.cartTotal + this.deliveryTotal) / 1000,
-          currency: 'GBPX',
-          destination: this.vendor.walletId,
+        action: 'pay',
+        amount: (this.cartTotal + this.deliveryTotal) / 100, //Pence to pounds
+        currency: 'GBPX',
+        destination: this.vendor.walletId,
       };
 
       window.flutter_inappwebview.callHandler('pay', paymentDetails)
       .then(function (paymentResult) {
-        alert(paymentDetails.amount);
-        // // TODO: add payment ID to order
-        // Cloud.paymentSubmitted()
-        // .protocol('io.socket')
-        // .then(function(msg){
-        //   // Send them to order confirmation page
-        //   window.location('/order/' + result.id);
-        // })
-        // .catch(function(err){
-
-        // })
       })
       .catch(function(err){
-
+        console.log(err);
       });
-
 
       io.socket.on('paid', function (data){
-        window.location.replace('/order/'+data.orderId);
+        window.location.replace('/order/' + data.orderId);
       });
-
-
     },
     updatedPostCode: function () {
       for(var group in this.deliveryMethodsTemp){
@@ -203,8 +190,6 @@ parasails.registerPage('vendor-menu', {
 
         Vue.set(this.deliveryMethods, group, output);
       }
-
-      //this.checkSufficientFunds();
     },
     checkSufficientFunds: function() {
       var contractAddress = '0x40AFCD9421577407ABB0d82E2fF25Fd2Ef4c68BD';
@@ -212,7 +197,7 @@ parasails.registerPage('vendor-menu', {
 
       var that = this;
 
-      $.get("https://explorer.fuse.io/api?module=account&action=tokenbalance&contractaddress=" + contractAddress + "&address=" + userWallet, function(data){
+      return $.get("https://explorer.fuse.io/api?module=account&action=tokenbalance&contractaddress=" + contractAddress + "&address=" + userWallet, function(data){
         if(!data.result){
           alert("Invalid wallet address");
           return false;
@@ -223,10 +208,12 @@ parasails.registerPage('vendor-menu', {
         if ((numberOfTokens * 100) < that.finalTotal) { // GBPx to pence
           var amountRequired = that.finalTotal - numberOfTokens;
           var topupDetails = {amount: amountRequired.toString()};
-          alert("You need to top up before checking out!");
+          // alert("You need to top up before checking out!");
           window.flutter_inappwebview.callHandler('topup', topupDetails);
+          return false;
+        } else {
+          return true;
         }
-        
       })
     },
     openCheckoutModal: function() {
