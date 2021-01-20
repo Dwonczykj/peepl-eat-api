@@ -153,7 +153,7 @@ parasails.registerPage('vendor-menu', {
 
       window.flutter_inappwebview.callHandler('pay', paymentDetails)
       .then(function (paymentResult) {
-        alert(paymentResult);
+        alert(paymentDetails);
         // // TODO: add payment ID to order
         // Cloud.paymentSubmitted()
         // .protocol('io.socket')
