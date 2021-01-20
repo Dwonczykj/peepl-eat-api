@@ -146,8 +146,8 @@ parasails.registerPage('vendor-menu', {
       this.syncing == true;
       var paymentDetails = {
           action: 'pay',
-          amount: this.cartTotal + this.deliveryTotal,
-          currency: 'GBPx',
+          amount: (this.cartTotal + this.deliveryTotal) / 1000,
+          currency: 'GBPX',
           destination: this.vendor.walletId,
       };
 
