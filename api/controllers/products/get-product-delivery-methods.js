@@ -23,7 +23,12 @@ module.exports = {
   fn: async function (inputs) {
     var output = {};
 
-    var products = await Product.find(inputs.productids).populate('deliveryMethods.deliveryMethodSlots');
+    var products = await Product.find(inputs.productids).populate('deliveryMethods.deliveryMethodSlots', {
+      where:{
+        slotsRemaining: { '>': 0 },
+        startTime: { '>': Math.floor(Date.now() / 1000)}
+      }
+    });
 
     for(var product in products) {
       var deliveryMethodIds = JSON.stringify(_.pluck(products[product].deliveryMethods, 'id'));
