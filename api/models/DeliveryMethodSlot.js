@@ -24,7 +24,8 @@ module.exports = {
     },
     slotsRemaining: {
       type: 'number',
-      description: 'The number of these slots that are still available.'
+      description: 'The number of these slots that are still available.',
+      allowNull: true
     },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
