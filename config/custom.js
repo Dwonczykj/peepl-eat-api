@@ -20,5 +20,6 @@ module.exports.custom = {
   // …
   amazonSesAccessKeyId: "",
   amazonSesAccessKeySecret: "",
+  amazonSesRegion: "eu-west-1"
 
 };

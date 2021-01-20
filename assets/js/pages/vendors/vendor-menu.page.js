@@ -133,7 +133,6 @@ parasails.registerPage('vendor-menu', {
       }
 
       Vue.set(this.deliveryMethods[deliveryMethodIndex], 'selectedSlot', deliverySlot);
-      //this.readyToPay = true;
     },
     handleParsingForm: function() {
       this.syncing = true;
@@ -152,6 +151,7 @@ parasails.registerPage('vendor-menu', {
 
       window.flutter_inappwebview.callHandler('pay', paymentDetails)
       .then(function (paymentResult) {
+        console.log(paymentResult);
         // // TODO: add payment ID to order
         // Cloud.paymentSubmitted()
         // .protocol('io.socket')
