@@ -141,6 +141,8 @@ parasails.registerPage('vendor-menu', {
       return {items: this.cart, address: this.address, total: this.cartTotal + this.deliveryTotal};
     },
     submittedForm: function(result) {
+      alert("Submitted order!");
+
       this.syncing == true;
       var paymentDetails = {
           action: 'pay',
@@ -151,7 +153,7 @@ parasails.registerPage('vendor-menu', {
 
       window.flutter_inappwebview.callHandler('pay', paymentDetails)
       .then(function (paymentResult) {
-        console.log(paymentResult);
+        alert(paymentResult);
         // // TODO: add payment ID to order
         // Cloud.paymentSubmitted()
         // .protocol('io.socket')
