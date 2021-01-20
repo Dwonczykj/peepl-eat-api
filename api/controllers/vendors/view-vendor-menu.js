@@ -1,8 +1,6 @@
 module.exports = {
 
-
   friendlyName: 'View vendor menu',
-
 
   description: 'Display "Vendor menu" page.',
 
@@ -25,13 +23,15 @@ module.exports = {
   fn: async function (inputs, exits) {
     var vendor = await Vendor.findOne(inputs.vendorid)
     .populate('products');
+    
+    var user = await User.findOne({walletId: this.req.session.walletId});
 
     if(!vendor){
       return exits.error();
     }
 
     // Respond with view.
-    return exits.success({vendor, wallet: this.req.session.walletId});
+    return exits.success({vendor, user, wallet: this.req.session.walletId});
 
   }
 

@@ -108,10 +108,11 @@
               </div>
               <div v-if="option.selected" class="form-group">
                 <label :for="'deliverySlot' + index">Delivery Slot</label>
-                <select @change="changeDeliverySlot" class="form-control"  :id="'deliverySlot' + index" required>
+                <select v-if="option.selected.deliveryMethodSlots" @change="changeDeliverySlot" class="form-control"  :id="'deliverySlot' + index" required>
                   <option disabled selected value="">Select a delivery slot...</option>
                   <option v-for="deliveryMethodSlot in option.selected.deliveryMethodSlots" :value="deliveryMethodSlot.id">{{deliveryMethodSlot.startTime | deliverySlotFilter}} - {{deliveryMethodSlot.endTime | deliverySlotFilter}} ({{deliveryMethodSlot.slotsRemaining}} left)</option>
                 </select>
+                <p v-else class="text-danger">Unfortunately, there are no slots available. Please try a different delivery option.</p>
               </div>
             </div>
 

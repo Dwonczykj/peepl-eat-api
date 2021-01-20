@@ -70,11 +70,35 @@ module.exports = {
 
     var products = await OrderItem.createEach(updatedItems);
     
-    sails.sockets.join(this.req, 'order'+order.id, function(err){
+    sails.sockets.join(this.req, 'order' + order.id, function(err){
       if(err) {
-        return exits.serverError();
+        return exits.error();
       }
     });
+
+    var user = await User.findOne({walletId: this.req.session.walletId});
+
+    if(!user){
+      await User.create({
+        walletId: this.req.session.walletId,
+        name: inputs.address.name,
+        email: inputs.address.email,
+        phoneNumber: inputs.address.phoneNumber,
+        addressLineOne: inputs.address.lineOne,
+        addressLineTwo: inputs.address.lineTwo,
+        postcode: inputs.address.postCode
+      });
+    } else {
+      await User.updateOne(user.id)
+      .set({
+        name: inputs.address.name,
+        email: inputs.address.email,
+        phoneNumber: inputs.address.phoneNumber,
+        addressLineOne: inputs.address.lineOne,
+        addressLineTwo: inputs.address.lineTwo,
+        postcode: inputs.address.postCode
+      });
+    }
 
     // All done.
     return exits.success(order.id);

@@ -34,6 +34,15 @@ parasails.registerPage('vendor-menu', {
   //  ╩═╝╩╚  ╚═╝╚═╝ ╩ ╚═╝╩═╝╚═╝
   beforeMount: function() {
     _.extend(this, SAILS_LOCALS);
+
+    if (this.user){
+      this.address.name = this.user.name;
+      this.address.email = this.user.email;
+      this.address.lineOne = this.user.addressLineOne;
+      this.address.lineTwo = this.user.addressLineTwo;
+      this.address.postCode = this.user.postcode;
+      this.address.phoneNumber = this.user.phoneNumber;
+    }
   },
   mounted: async function() {
   },
@@ -218,7 +227,6 @@ parasails.registerPage('vendor-menu', {
     },
     openCheckoutModal: function() {
       this.isLoading = true;
-      //this.updatedPostCode();
       this.checkoutModalActive = true; 
       var that = this;
 
@@ -239,8 +247,11 @@ parasails.registerPage('vendor-menu', {
 
         Vue.set(that, 'deliveryMethodsTemp', output);
         that.deliveryMethodsTemp = output;
-      })
 
+        if(that.address.postCode != ""){
+          that.updatedPostCode();
+        }
+      })
       this.isLoading = false;
     }
   },

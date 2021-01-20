@@ -40,6 +40,9 @@ module.exports = {
     postcode: {
       type: 'string',
     },
+    phoneNumber:{
+      type: 'string'
+    }
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
     //  ╚═╝╩ ╩╚═╝╚═╝═╩╝╚═╝
