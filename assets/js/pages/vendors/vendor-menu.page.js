@@ -157,12 +157,14 @@ parasails.registerPage('vendor-menu', {
       this.syncing = true;
       this.submitted = true;
 
+      //alert(result);
+
       var paymentDetails = {
         action: 'pay',
         amount: (this.cartTotal + this.deliveryTotal) / 100, //Pence to pounds
         currency: 'GBPX',
         destination: this.vendor.walletId,
-        orderId: result
+        orderId: result.toString()
       };
 
       window.flutter_inappwebview.callHandler('pay', paymentDetails)
