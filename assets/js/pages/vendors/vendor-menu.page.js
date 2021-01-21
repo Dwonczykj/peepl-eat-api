@@ -153,7 +153,8 @@ parasails.registerPage('vendor-menu', {
       return false;
     },
     submittedForm: function(result) {
-      this.syncing == true;
+      this.syncing = true;
+      this.readyToPay = false;
       var paymentDetails = {
         action: 'pay',
         amount: (this.cartTotal + this.deliveryTotal) / 100, //Pence to pounds
