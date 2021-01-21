@@ -1,7 +1,19 @@
 <div id="order-confirmation" v-cloak>
-
+  <p>Thanks for your order!</p>
   <h1>Order #<%= order.id %></h1>
-  <p><%= order.total %></p>
+  <h2>Products:</h2>
+  <% for (var item in order.items) { %>
+    <h3><%= order.items[item].product.name %></h3>
+  <% } %>
+  <h4>Total: £<%= order.total / 100 %></h4>
+
+  <h2>Address:</h2>
+  <p>Name: <%= order.deliveryName %></p>
+  <p>Email: <%= order.deliveryEmail %></p>
+  <p>Phone Number: <%= order.deliveryPhoneNumber %></p>
+  <p>Line One: <%= order.deliveryAddressLineOne %></p>
+  <p>Line Two: <%= order.deliveryAddressLineTwo %></p>
+  <p>Postcode: <%= order.deliveryAddressPostCode %></p>
 
 </div>
 <%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>

@@ -25,11 +25,8 @@ module.exports = {
   fn: async function (inputs, exits) {
 
     var order = await Order.findOne(inputs.orderId)
-    .populate('items.product&items.deliveryMethod&items.deliverySlot&items.optionValues.option&items.optionValues.optionValue')
+    .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue')
 
-
-    console.log(order);
-    
     // Respond with view.
     return exits.success({
       order

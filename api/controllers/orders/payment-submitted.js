@@ -1,12 +1,6 @@
 module.exports = {
-
-
   friendlyName: 'Payment submitted',
-
-
   description: '',
-
-
   inputs: {
     orderId: {
       type: 'number',
@@ -19,13 +13,8 @@ module.exports = {
       required: true
     }
   },
-
-
   exits: {
-
   },
-
-
   fn: async function (inputs, exits) {
     var request = require('request-json');
     var client = request.createClient('https://studio.fuse.io/api/v2/');

@@ -137,8 +137,8 @@ module.exports.bootstrap = async function() {
   }).fetch();
 
   var localDeliveryMethodSlots = await DeliveryMethodSlot.create({
-    startTime: 1610456400,
-    endTime: 1578749400,
+    startTime: 1710456400,
+    endTime: 1778749400,
     slotsRemaining: 3,
     deliveryMethod: localDeliveryMethod.id
   });
