@@ -147,6 +147,7 @@ parasails.registerPage('vendor-menu', {
       this.syncing = true;
 
       if(this.checkSufficientFunds()){
+        alert("Sufficient funds.");
         return {items: this.cart, address: this.address, total: this.cartTotal + this.deliveryTotal};
       }
       
@@ -217,7 +218,7 @@ parasails.registerPage('vendor-menu', {
         if ((numberOfTokens * 100) < that.finalTotal) { // GBPx to pence
           var amountRequired = that.finalTotal - numberOfTokens;
           var topupDetails = {amount: amountRequired.toString()};
-          // alert("You need to top up before checking out!");
+          alert("You need to top up before checking out!");
           window.flutter_inappwebview.callHandler('topup', topupDetails);
           return false;
         } else {

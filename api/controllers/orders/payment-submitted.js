@@ -16,6 +16,8 @@ module.exports = {
   exits: {
   },
   fn: async function (inputs, exits) {
+    console.log("Received payment.");
+    console.log(inputs);
     var request = require('request-json');
     var client = request.createClient('https://studio.fuse.io/api/v2/');
 
