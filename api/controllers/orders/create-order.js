@@ -32,6 +32,7 @@ module.exports = {
 
 
   fn: async function (inputs, exits) {
+    console.log("Order received");
     for (var item in inputs.items) {
       for (var option in inputs.items[item].options) {
         if(inputs.items[item].options[option] != "") {
@@ -56,6 +57,8 @@ module.exports = {
       deliveryAddressPostCode: inputs.address.postCode,
       customer: this.req.session.walletId
     }).fetch();
+
+    console.log(order);
 
     var updatedItems = _.map(inputs.items, function(object) {
       object.product = object.id;

@@ -147,7 +147,6 @@ parasails.registerPage('vendor-menu', {
       this.syncing = true;
 
       if(this.checkSufficientFunds()){
-        alert("Sufficient funds.");
         return {items: this.cart, address: this.address, total: this.cartTotal + this.deliveryTotal};
       }
       
