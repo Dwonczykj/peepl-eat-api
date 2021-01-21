@@ -33,14 +33,15 @@ module.exports = {
 
   fn: async function (inputs, exits) {
     console.log("Order received");
+
     for (var item in inputs.items) {
+      inputs.items[item].optionValues = [];
       for (var option in inputs.items[item].options) {
         if(inputs.items[item].options[option] != "") {
           var newOptionValuePair = await OrderItemOptionValue.create({
             option: option,
             optionValue: inputs.items[item].options[option],
           }).fetch();
-          inputs.items[item].optionValues = [];
           inputs.items[item].optionValues.push(newOptionValuePair.id);
         }
       }

@@ -39,36 +39,40 @@ module.exports = {
 
       Order.findOne(inputs.orderId)
       .then(function(order){
-        // TODO: check transaction using GBPx token
-        if (order.total == paymentTotal /*&& order.customerWallet == paymentSenderWallet && !order.paidDateTime*/) {
-          var unixtime = new Date().getTime();
-          Order.updateOne(inputs.orderId)
-          .set({
-            paymentJobId: inputs.jobId,
-            paidDateTime: unixtime
-          }).then(function(success){
-            sails.sockets.broadcast('order' + order.id, 'paid', {orderId: order.id, paidDateTime: unixtime});
-            //https://studio.fuse.io/api/v2/admin/tokens/transfer
+        if(!order){
+          return exits.Error();
+        }else {
+          // TODO: check transaction using GBPx token
+          if (order.total == paymentTotal /*&& order.customerWallet == paymentSenderWallet && !order.paidDateTime*/) {
+            var unixtime = new Date().getTime();
+            Order.updateOne(inputs.orderId)
+            .set({
+              paymentJobId: inputs.jobId,
+              paidDateTime: unixtime
+            }).then(function(success){
+              sails.sockets.broadcast('order' + order.id, 'paid', {orderId: order.id, paidDateTime: unixtime});
+              //https://studio.fuse.io/api/v2/admin/tokens/transfer
 
-            var rewardAmount = order.total * 10;
+              var rewardAmount = order.total * 10;
 
-            var data = {
-              tokenAddress: "0xa2C7CdB72d177f6259cD12a9A06Fdfd9625419D4",
-              networkType: "fuse",
-              amount: rewardAmount.toString(),
-              from: "0x29249e06e8D3e4933cc403AB73136e698a08c38b",
-              to: order.customer
-            }
+              var data = {
+                tokenAddress: "0xa2C7CdB72d177f6259cD12a9A06Fdfd9625419D4",
+                networkType: "fuse",
+                amount: rewardAmount.toString(),
+                from: "0x29249e06e8D3e4933cc403AB73136e698a08c38b",
+                to: order.customer
+              }
 
-            client.post('admin/tokens/transfer', data)
-            .then(function(res){
-              console.log(res);
-              return exits.success(result.body);
-            })
-          }) //TODO: error handling
-        }
-        else {
-          return exits.error();
+              client.post('admin/tokens/transfer', data)
+              .then(function(res){
+                console.log(res);
+                return exits.success(result.body);
+              })
+            }) //TODO: error handling
+          }
+          else {
+            return exits.error();
+          }
         }
       });
 
