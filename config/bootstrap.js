@@ -35,7 +35,7 @@ module.exports.bootstrap = async function() {
     name: 'Delifonseca',
     type: 'restaurant',
     description: 'Life\'s too short to have a bad meal. Delifonseca is here to help you enjoy the finer tastes in life.',
-    walletId: 'testtesttesttest',
+    walletId: '0xf039CD9391cB28a7e632D07821deeBc249a32410',
     image: 'https://www.delifonseca.co.uk/wp-content/uploads/2016/08/Foodhall-Shot.jpg'
   }).fetch();
 
