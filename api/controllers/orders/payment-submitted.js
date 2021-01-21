@@ -16,8 +16,6 @@ module.exports = {
   exits: {
   },
   fn: async function (inputs, exits) {
-    console.log("Received payment.");
-    console.log(inputs);
     var request = require('request-json');
     var client = request.createClient('https://studio.fuse.io/api/v2/');
 
@@ -34,15 +32,15 @@ module.exports = {
 
     client.get('jobs/' + inputs.jobId)
     .then(function(result){
-      var paymentTotal = result.body.data.data.amount/(10**16); // in pence
-      var paymentSenderWallet = result.body.data.data.wallet;
+      var paymentTotal = result.body.data.data.transactionBody.value/(10**16); // in pence
+      var paymentSenderWallet = result.body.data.data.transactionBody.from;
 
       Order.findOne(inputs.orderId)
       .then(function(order){
         if(!order){
           return exits.Error();
         }else {
-          // TODO: check transaction using GBPx token
+          // TODO: check transaction using GBPx token and check to address
           if (order.total == paymentTotal /*&& order.customerWallet == paymentSenderWallet && !order.paidDateTime*/) {
             var unixtime = new Date().getTime();
             Order.updateOne(inputs.orderId)
