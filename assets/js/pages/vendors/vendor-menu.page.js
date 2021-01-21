@@ -26,6 +26,7 @@ parasails.registerPage('vendor-menu', {
     formErrors: {
     },
     deliveryTotal: 0,
+    submitted: false
     //readyToPay: false
   },
 
@@ -154,7 +155,8 @@ parasails.registerPage('vendor-menu', {
     },
     submittedForm: function(result) {
       this.syncing = true;
-      this.readyToPay = false;
+      this.submitted = true;
+      
       var paymentDetails = {
         action: 'pay',
         amount: (this.cartTotal + this.deliveryTotal) / 100, //Pence to pounds
@@ -290,6 +292,10 @@ parasails.registerPage('vendor-menu', {
     },
     readyToPay: function() {
       if (this.address.postCode == "") {
+        return false;
+      }
+
+      if(this.submitted) {
         return false;
       }
 
