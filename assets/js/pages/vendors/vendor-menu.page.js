@@ -175,7 +175,7 @@ parasails.registerPage('vendor-menu', {
       });
 
       io.socket.on('paid', function (data){
-        window.location.href = '/order/' + data.orderId;
+        window.location.href = '/orders/' + data.orderId;
       });
     },
     updatedPostCode: function () {
