@@ -97,6 +97,18 @@ module.exports = {
                 // Notify client of successful transaction
                 sails.sockets.broadcast('order' + order.id, 'paid', {orderId: order.id, paidDateTime: unixtime});
 
+                Order.findOne(inputs.orderId)
+                .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue')
+                .then(async function(fullOrder){
+                  await sails.helpers.sendTemplateEmail.with({
+                    template: "email-order-confirmation",
+                    templateData: {order},
+                    to: order.deliveryEmail,
+                    subject: "Peepl Eat Order Confirmed - #" + order.id ,
+                    layout: false,
+                  });
+                });
+
                 // Issue PPL token reward
                 var rewardAmount = order.total; // 10 PPL tokens = £0.01, reward is 10% of spend
 

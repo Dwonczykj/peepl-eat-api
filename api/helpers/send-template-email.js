@@ -103,7 +103,7 @@ module.exports = {
     var util = require('util');
     var AWS = require('aws-sdk');
 
-    AWS.config.loadFromPath('../../config/aws.json');
+    AWS.config.loadFromPath('config/aws.json');
 
     if (!_.startsWith(path.basename(template), 'email-')) {
       sails.log.warn(
