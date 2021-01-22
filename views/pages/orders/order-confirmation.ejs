@@ -1,19 +1,35 @@
 <div id="order-confirmation" v-cloak>
-  <p>Thanks for your order!</p>
-  <h1>Order #<%= order.id %></h1>
-  <h2>Products:</h2>
-  <% for (var item in order.items) { %>
-    <h3><%= order.items[item].product.name %></h3>
-  <% } %>
-  <h4>Total: £<%= order.total / 100 %></h4>
+  <div class="container">
+    <picture>
+      <source srcset="/images/thankyou-f5f5f5.webp" type="image/webp">
+      <img src="/images/thankyou-f5f5f5.jpg" width="300" height="280" alt="Thank you for your order" class="d-block my-3 mx-auto">
+    </picture>
+    <h1 class="h4 text-center my-4">Thank you for your order!</h1>
 
-  <h2>Address:</h2>
-  <p>Name: <%= order.deliveryName %></p>
-  <p>Email: <%= order.deliveryEmail %></p>
-  <p>Phone Number: <%= order.deliveryPhoneNumber %></p>
-  <p>Line One: <%= order.deliveryAddressLineOne %></p>
-  <p>Line Two: <%= order.deliveryAddressLineTwo %></p>
-  <p>Postcode: <%= order.deliveryAddressPostCode %></p>
+    <div class="my-3 p-3 bg-white rounded">
+      <p class="text-muted m-0">Order #<%= order.id %></p>
+    <% for (var i in order.items) { %>
+      <h2 class="h5 border-top pt-3 mt-3 mb-0"><%= order.items[i].product.name %></h2>
+      <% if (order.items[i].optionValues && order.items[i].optionValues.length) { %>
+        <ol class="order-confirmation__option-values">
+          <% for (var j in order.items[i].optionValues) { %>
+            <li><%= order.items[i].optionValues[j].optionValue.name %></li>
+          <% } %>
+        </ol>
+      <% } %>
+    <% } %>
+      <h2 class="h5 border-top pt-3 mt-3 mb-0 d-flex">
+        <span class="mr-auto">Total</span>
+        <span>£<%= order.total / 100 %></span>
+      </h2>
+      <p class="mt-2 mb-0 d-flex text-success">
+        <span class="mr-auto">Reward</span>
+        <span>+ <%= order.total / 100 * 1000 %> PPL</span>
+      </h2>
+    </div>
 
+    <p class="text-muted my-4 text-center">We’ve emailed a copy of your order to <%= order.deliveryEmail %></p>
+
+  </div>
 </div>
 <%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>
