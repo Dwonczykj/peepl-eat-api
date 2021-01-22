@@ -10,7 +10,8 @@
  */
 
 module.exports.bootstrap = async function() {
-
+  _.extend(sails.hooks.http.app.locals, sails.config.http.locals);
+  
   // Import dependencies
   var path = require('path');
 

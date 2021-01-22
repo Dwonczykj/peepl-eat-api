@@ -11,6 +11,17 @@
 
 module.exports.http = {
 
+  locals:{
+    filters: {
+      toPounds: function(value){
+        if (!value) return '£0'
+        value = "£" + (value/100).toFixed(2);
+        value = value.toString()
+        return value;
+      }
+    }
+  }
+
   /****************************************************************************
   *                                                                           *
   * Sails/Express middleware to run for every HTTP request.                   *

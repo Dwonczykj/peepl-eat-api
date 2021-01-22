@@ -156,7 +156,7 @@
 <!--<![endif]-->
 <div align="center" class="img-container center fixedwidth" style="padding-right: 30px;padding-left: 30px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 30px;padding-left: 30px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:30px"> </div><a href="https://itsaboutpeepl.com/" style="outline:none" tabindex="-1" target="_blank"><img align="center" alt="Alternate text" border="0" class="center fixedwidth" src="https://app.itsaboutpeepl.com/images/email/Peepl-Eat-logo-white.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 150px; display: block;" title="Peepl Eat Logo" width="150"/></a>
+<div style="font-size:1px;line-height:30px"> </div><a href="https://itsaboutpeepl.com/eat" style="outline:none" tabindex="-1" target="_blank"><img align="center" alt="Peepl Eat Logo" border="0" class="center fixedwidth" src="https://app.itsaboutpeepl.com/images/email/Peepl-Eat-logo-white.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 150px; display: block;" title="Peepl Eat Logo" width="150"/></a>
 <div style="font-size:1px;line-height:30px"> </div>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
@@ -271,14 +271,7 @@
 <div style="color:#555555;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;line-height:1.5;padding-top:25px;padding-right:25px;padding-bottom:25px;padding-left:25px;">
 <div style="line-height: 1.5; font-size: 12px; text-align: center; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 18px;"><span style="font-size: 20px;"><span style="color: #000000;">
 	<% for (var i in order.items) { %>
-      <h5 class="h5 border-top pt-3 mt-3 mb-0"><%= order.items[i].product.name %></h5>
-      <% if (order.items[i].optionValues && order.items[i].optionValues.length) { %>
-        <ol class="order-confirmation__option-values">
-          <% for (var j in order.items[i].optionValues) { %>
-            <li><%= order.items[i].optionValues[j].optionValue.name %></li>
-          <% } %>
-        </ol>
-      <% } %>
+      <p><%= order.items[i].product.name %></p>
     <% } %>
 </span><br/></span></div>
 </div>
@@ -364,7 +357,7 @@
 <!--<![endif]-->
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 25px; padding-left: 25px; padding-top: 25px; padding-bottom: 25px; font-family: Arial, sans-serif"><![endif]-->
 <div style="color:#555555;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;line-height:1.5;padding-top:25px;padding-right:25px;padding-bottom:25px;padding-left:25px;">
-<div style="line-height: 1.5; font-size: 12px; text-align: center; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 18px;"><span style="font-size: 20px;"><span style="color: #000000;">£<%= order.total / 100 %></span></span><span style="font-size: 20px;"></span></div>
+<div style="line-height: 1.5; font-size: 12px; text-align: center; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 18px;"><span style="font-size: 20px;"><span style="color: #000000;">£<%=: toPounds(order.total) %></span></span><span style="font-size: 20px;"></span></div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
 <!--[if (!mso)&(!IE)]><!-->
@@ -406,7 +399,7 @@
 <!--<![endif]-->
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 25px; padding-left: 25px; padding-top: 25px; padding-bottom: 25px; font-family: Arial, sans-serif"><![endif]-->
 <div style="color:#555555;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;line-height:1.5;padding-top:25px;padding-right:25px;padding-bottom:25px;padding-left:25px;">
-<div style="line-height: 1.5; font-size: 12px; text-align: center; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 18px;"><span style="font-size: 20px;"><span style="color: #000000;"><%= order.total %> </span></span><span style="font-size: 20px;"><span style="color: #000000;">PPL/£TODO</span></span></div>
+<div style="line-height: 1.5; font-size: 12px; text-align: center; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 18px;"><span style="font-size: 20px;"><span style="color: #000000;"><%= order.total %> </span></span><span style="font-size: 20px;"><span style="color: #000000;">PPL / £<%=: toPounds(order.total / 10) %></span></span></div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
 <!--[if (!mso)&(!IE)]><!-->
@@ -551,7 +544,7 @@
 <!--<![endif]-->
 <div align="center" class="img-container center fixedwidth" style="padding-right: 25px;padding-left: 25px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 25px;padding-left: 25px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:25px"> </div><a href="https://itsaboutpeepl.com/" style="outline:none" tabindex="-1" target="_blank"><img align="center" alt="Alternate text" border="0" class="center fixedwidth" src="https://app.itsaboutpeepl.com/images/email/Peepl-Eat-logo-white.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 150px; display: block;" title="Alternate text" width="150"/></a>
+<div style="font-size:1px;line-height:25px"> </div><a href="https://itsaboutpeepl.com/eat" style="outline:none" tabindex="-1" target="_blank"><img align="center" alt="Peepl Eat Logo" border="0" class="center fixedwidth" src="https://app.itsaboutpeepl.com/images/email/Peepl-Eat-logo-white.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 150px; display: block;" title="Peepl Eat Logo" width="150"/></a>
 <div style="font-size:1px;line-height:25px"> </div>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
@@ -577,7 +570,7 @@
 <!--<![endif]-->
 <div align="center" class="img-container center autowidth" style="padding-right: 10px;padding-left: 10px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 10px;padding-left: 10px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:10px"> </div><a href="https://www.google.com/" style="outline:none" tabindex="-1" target="_blank"><img align="center" alt="Alternate text" border="0" class="center autowidth" src="https://app.itsaboutpeepl.com/images/email/800px-Download_on_the_App_Store_Badge.svg.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 250px; display: block;" title="Alternate text" width="250"/></a>
+<div style="font-size:1px;line-height:10px"> </div><a href="https://www.google.com/" style="outline:none" tabindex="-1" target="_blank"><img align="center" alt="App Store Badge" border="0" class="center autowidth" src="https://app.itsaboutpeepl.com/images/email/800px-Download_on_the_App_Store_Badge.svg.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 250px; display: block;" title="App Store Badge" width="250"/></a>
 <div style="font-size:1px;line-height:10px"> </div>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
@@ -595,7 +588,7 @@
 <!--<![endif]-->
 <div align="center" class="img-container center autowidth" style="padding-right: 10px;padding-left: 10px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 10px;padding-left: 10px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:10px"> </div><a href="https://www.google.com/" style="outline:none" tabindex="-1" target="_blank"><img align="center" alt="Alternate text" border="0" class="center autowidth" src="https://app.itsaboutpeepl.com/images/email/en_badge_web_generic.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 250px; display: block;" title="Alternate text" width="250"/></a>
+<div style="font-size:1px;line-height:10px"> </div><a href="https://www.google.com/" style="outline:none" tabindex="-1" target="_blank"><img align="center" alt="Google Play Badge" border="0" class="center autowidth" src="https://app.itsaboutpeepl.com/images/email/en_badge_web_generic.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 250px; display: block;" title="Google Play Badge" width="250"/></a>
 <div style="font-size:1px;line-height:10px"> </div>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
