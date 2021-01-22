@@ -357,7 +357,7 @@
 <!--<![endif]-->
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 25px; padding-left: 25px; padding-top: 25px; padding-bottom: 25px; font-family: Arial, sans-serif"><![endif]-->
 <div style="color:#555555;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;line-height:1.5;padding-top:25px;padding-right:25px;padding-bottom:25px;padding-left:25px;">
-<div style="line-height: 1.5; font-size: 12px; text-align: center; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 18px;"><span style="font-size: 20px;"><span style="color: #000000;">£<%= order.total / 10 %></span></span><span style="font-size: 20px;"></span></div>
+<div style="line-height: 1.5; font-size: 12px; text-align: center; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 18px;"><span style="font-size: 20px;"><span style="color: #000000;">£<%= (order.total / 100).toFixed(2) %></span></span><span style="font-size: 20px;"></span></div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
 <!--[if (!mso)&(!IE)]><!-->
@@ -399,7 +399,7 @@
 <!--<![endif]-->
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 25px; padding-left: 25px; padding-top: 25px; padding-bottom: 25px; font-family: Arial, sans-serif"><![endif]-->
 <div style="color:#555555;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;line-height:1.5;padding-top:25px;padding-right:25px;padding-bottom:25px;padding-left:25px;">
-<div style="line-height: 1.5; font-size: 12px; text-align: center; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 18px;"><span style="font-size: 20px;"><span style="color: #000000;"><%= order.total %> </span></span><span style="font-size: 20px;"><span style="color: #000000;">PPL / £<%= order.total / 10 %></span></span></div>
+<div style="line-height: 1.5; font-size: 12px; text-align: center; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 18px;"><span style="font-size: 20px;"><span style="color: #000000;"><%= order.total %> </span></span><span style="font-size: 20px;"><span style="color: #000000;">PPL / £<%= (order.total / 1000).toFixed(2) %></span></span></div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
 <!--[if (!mso)&(!IE)]><!-->
@@ -441,7 +441,7 @@
 <!--<![endif]-->
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 25px; padding-left: 25px; padding-top: 25px; padding-bottom: 25px; font-family: Arial, sans-serif"><![endif]-->
 <div style="color:#555555;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;line-height:1.5;padding-top:25px;padding-right:25px;padding-bottom:25px;padding-left:25px;">
-<div style="line-height: 1.5; font-size: 12px; text-align: center; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 18px;"><span style="font-size: 20px;"><span style="color: #000000;"><%= order.deliveryName %></span></span><br/><% if(order.deliverAddressLineTwo) { %><span style="font-size: 20px;"><span style="color: #000000;"><%= order.deliveryAddressLineOne %></span></span><% } %><br/><span style="font-size: 20px;"><span style="color: #000000;"><%= order.deliverAddressLineTwo %></span></span><br /><span style="font-size: 20px;"><span style="color: #000000;"><%= order.deliveryAddressPostCode %></span></span></div>
+<div style="line-height: 1.5; font-size: 12px; text-align: center; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 18px;"><span style="font-size: 20px;"><span style="color: #000000;"><%= order.deliveryName %></span></span><br/><span style="font-size: 20px;"><span style="color: #000000;"><%= order.deliveryAddressLineOne %></span></span><br/><% if(order.deliverAddressLineTwo) { %><span style="font-size: 20px;"><span style="color: #000000;"><%= order.deliveryAddressLineTwo %></span></span><% } %><br /><span style="font-size: 20px;"><span style="color: #000000;"><%= order.deliveryAddressPostCode %></span></span></div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
 <!--[if (!mso)&(!IE)]><!-->
