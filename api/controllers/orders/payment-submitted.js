@@ -20,9 +20,10 @@ module.exports = {
     var client = request.createClient('https://studio.fuse.io/api/v2/');
     client.headers['Authorization'] = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50QWRkcmVzcyI6IjB4NzU1QzY2MTcxNDkzMUIxQWM5MDRhOGVjYkRENzYxMDY4OUQ4MTJBYyIsImlzQ29tbXVuaXR5QWRtaW4iOnRydWUsImFwcE5hbWUiOiJSb29zdCIsImlhdCI6MTYwNTc5NzExNX0.ozqwhxFjTYUUoexnkBOY_TsW4sL_574gWZHqzHhD8Pk";
 
-    function makeQuery(){
+    function makeQuery(iteration){
       // TODO: Use setInterval or similar to repeat request every second until either success or failure (or timeout)
-      setTimeout(function(iteration = 0){
+      setTimeout(function(){
+        console.log("Checking transaction. #"+iteration);
         client.get('jobs/' + inputs.jobId)
         .then(function(result){
           var paymentInfo = result.body.data.data.transactionBody;
