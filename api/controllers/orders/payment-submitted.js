@@ -32,45 +32,86 @@ module.exports = {
 
     client.get('jobs/' + inputs.jobId)
     .then(function(result){
-      var paymentTotal = result.body.data.data.transactionBody.value/(10**16); // in pence
-      var paymentSenderWallet = result.body.data.data.transactionBody.from;
+      var paymentInfo = result.body.data.data.transactionBody;
+
+      var paymentTotal = paymentInfo.value/(10**16); // in pence
+      var paymentSenderWallet = paymentInfo.from;
+      var paymentRecipientWallet = paymentInfo.to;
+      var paymentTokenAddress = paymentInfo.tokenAddress;
+      var paymentStatus = paymentInfo.status;
+      var transactionType = paymentInfo.type;
 
       Order.findOne(inputs.orderId)
+      .populate('items.product.vendor')
       .then(function(order){
+        var error = "";
+
         if(!order){
-          return exits.Error();
+          return exits.serverError();
         }else {
-          // TODO: check transaction using GBPx token and check to address
-          if (order.total == paymentTotal /*&& order.customerWallet == paymentSenderWallet && !order.paidDateTime*/) {
-            var unixtime = new Date().getTime();
-            Order.updateOne(inputs.orderId)
-            .set({
-              paymentJobId: inputs.jobId,
-              paidDateTime: unixtime
-            }).then(function(success){
-              sails.sockets.broadcast('order' + order.id, 'paid', {orderId: order.id, paidDateTime: unixtime});
-              //https://studio.fuse.io/api/v2/admin/tokens/transfer
-
-              var rewardAmount = order.total * 10;
-
-              var data = {
-                tokenAddress: "0xa2C7CdB72d177f6259cD12a9A06Fdfd9625419D4",
-                networkType: "fuse",
-                amount: rewardAmount.toString(),
-                from: "0x29249e06e8D3e4933cc403AB73136e698a08c38b",
-                to: order.customer
-              }
-
-              client.post('admin/tokens/transfer', data)
-              .then(function(res){
-                console.log(res);
-                return exits.success(result.body);
-              })
-            }) //TODO: error handling
+          if(paymentRecipientWallet != order.items[0].product.vendor.walletId) {
+            error = "Recipient doesn't match!";
+            sails.sockets.broadcast('order' + order.id, 'error', {orderId: order.id, message: error});
+            return exits.serverError({message: error});
           }
-          else {
-            return exits.error();
+          if(paymentTokenAddress != "0x40AFCD9421577407ABB0d82E2fF25Fd2Ef4c68BD") {//GBPX token address
+            error = "Incorrect token sent.";
+            sails.sockets.broadcast('order' + order.id, 'error', {orderId: order.id, message: error});
+            return exits.serverError({message: error});
           }
+          if (paymentSenderWallet != order.customer){
+            error = "Transaction sender is not customer.";
+            sails.sockets.broadcast('order' + order.id, 'error', {orderId: order.id, message: error});
+            return exits.serverError({message: error});
+          }
+          if(paymentTotal != order.total){
+            error =  "Transaction amount doesn't match order total.";
+            sails.sockets.broadcast('order' + order.id, 'error', {orderId: order.id, message: error});
+            return exits.serverError({message: error});
+          }
+          if(paymentStatus != "confirmed"){
+            error = "Transaction failed. Check wallet balance.";
+            sails.sockets.broadcast('order' + order.id, 'error', {orderId: order.id, message: error});
+            return exits.serverError({message: error});
+          }
+          if (transactionType != "SEND"){
+            error = "Incorrect transaction type.";
+            sails.sockets.broadcast('order' + order.id, 'error', {orderId: order.id, message: error});
+            return exits.serverError({message: error});
+          }
+
+          var existingOrdersWithJobId = Order.findOne({paymentJobId: inputs.jobId});
+          if(existingOrdersWithJobId){
+            error = "Transaction has already been used for another order.";
+            sails.sockets.broadcast('order' + order.id, 'error', {orderId: order.id, message: error});
+            return exits.serverError({message: error});
+          }
+
+          var unixtime = new Date().getTime();
+          Order.updateOne(inputs.orderId)
+          .set({
+            paymentJobId: inputs.jobId,
+            paidDateTime: unixtime
+          }).then(function(success){
+            // Notify client of successful transaction
+            sails.sockets.broadcast('order' + order.id, 'paid', {orderId: order.id, paidDateTime: unixtime});
+
+            // Issue PPL token reward
+            var rewardAmount = order.total * 10; // 10 PPL tokens per £0.01
+
+            var data = {
+              tokenAddress: "0xa2C7CdB72d177f6259cD12a9A06Fdfd9625419D4",
+              networkType: "fuse",
+              amount: rewardAmount.toString(),
+              from: "0x29249e06e8D3e4933cc403AB73136e698a08c38b",
+              to: order.customer
+            }
+
+            client.post('admin/tokens/transfer', data)
+            .then(function(res){
+              return exits.success(result.body);
+            })
+          })
         }
       });
 

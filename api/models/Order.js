@@ -62,7 +62,8 @@ module.exports = {
       type: 'string'
     },
     paymentJobId: {
-      type: 'string'
+      type: 'string',
+      // unique: true
     },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗

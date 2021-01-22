@@ -167,16 +167,20 @@ parasails.registerPage('vendor-menu', {
         orderId: result.toString()
       };
 
-      window.flutter_inappwebview.callHandler('pay', paymentDetails)
-      .then(function (paymentResult) {
-      })
-      .catch(function(err){
-        console.log(err);
-      });
+      // window.flutter_inappwebview.callHandler('pay', paymentDetails)
+      // .then(function (paymentResult) {
+      // })
+      // .catch(function(err){
+      //   console.log(err);
+      // });
 
       io.socket.on('paid', function (data){
         window.location.href = '/orders/' + data.orderId;
       });
+
+      io.socket.on('error', function(data){
+        alert(data.message);
+      })
     },
     updatedPostCode: function () {
       for(var group in this.deliveryMethodsTemp){
