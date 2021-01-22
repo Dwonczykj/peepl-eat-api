@@ -9,7 +9,7 @@
           <img class="card-img-top" :src="product.image" alt="Card image cap">
           <div class="card-body">
             <h2 class="card-title h5">{{product.name}}</h2>
-            <p class="card-text">{{product.description}}</p>
+            <p class="card-text" v-html="product.description"></p>
             <a href="#" @click="clickAddToCart(product.id)" class="btn btn-peepl stretched-link">Add to cart</a>
           </div>
         </div>

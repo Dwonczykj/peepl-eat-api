@@ -24,6 +24,7 @@ module.exports = {
 
   fn: async function (inputs, exits) {
 
+    // Handle missing orders
     var order = await Order.findOne(inputs.orderId)
     .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue')
 
