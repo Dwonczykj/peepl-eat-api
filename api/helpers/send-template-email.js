@@ -208,7 +208,6 @@ module.exports = {
         var deferred = new AWS.SES().sendEmail(messageData).promise();
 
         deferred.then(function(data){
-            console.log(data);
         }).catch(function(err){
                 sails.log.error(
                 'Background instruction failed:  Could not deliver email:\n'+
