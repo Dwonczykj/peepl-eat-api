@@ -73,6 +73,7 @@ module.exports = {
             }
 
             var existingOrdersWithJobId = Order.findOne({paymentJobId: inputs.jobId});
+            console.log(existingOrdersWithJobId);
             if(existingOrdersWithJobId){
               error = "Transaction has already been used for another order.";
               sails.sockets.broadcast('order' + order.id, 'error', {orderId: order.id, message: error});
