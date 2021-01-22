@@ -28,6 +28,10 @@ module.exports = {
     var order = await Order.findOne(inputs.orderId)
     .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue')
 
+    if(!order || !order.paidDateTime){
+      return exits.error();
+    }
+
     // Respond with view.
     return exits.success({
       order
