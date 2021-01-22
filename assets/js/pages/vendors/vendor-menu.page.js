@@ -147,11 +147,64 @@ parasails.registerPage('vendor-menu', {
     handleParsingForm: function() {
       this.syncing = true;
 
-      if(this.checkSufficientFunds()){
+      var isSufficientFunds = this.checkSufficientFunds();
+
+      if(isSufficientFunds){
+        console.log(isSufficientFunds);
         return {items: this.cart, address: this.address, total: this.cartTotal + this.deliveryTotal};
       }
       
       return false;
+    },
+    checkSufficientFunds: function() {
+      var contractAddress = '0x40AFCD9421577407ABB0d82E2fF25Fd2Ef4c68BD';
+      var userWallet = window.SAILS_LOCALS.wallet;
+      var data = null;
+
+      $.ajax({
+        url: "https://explorer.fuse.io/api?module=account&action=tokenbalance&contractaddress=" + contractAddress + "&address=" + userWallet,
+        type: 'get',
+        async: false,
+        success: function(res) {
+          data = res;
+        } 
+      });
+
+      if(!data) {
+        alert("Invalid wallet address");
+        return false;
+      }
+
+      var numberOfTokens = parseInt(data.result)/(Math.pow(10,18));
+      
+      if ((numberOfTokens * 100) < this.finalTotal) { // GBPx to pence
+        var amountRequired = this.finalTotal - numberOfTokens;
+        var topupDetails = {amount: amountRequired.toString()};
+        alert("You need to top up before checking out!");
+        window.flutter_inappwebview.callHandler('topup', topupDetails);
+        return false;
+      } else {
+        return true;
+      }
+
+      // $.get("https://explorer.fuse.io/api?module=account&action=tokenbalance&contractaddress=" + contractAddress + "&address=" + userWallet, function(data){
+      //   if(!data.result){
+      //     alert("Invalid wallet address");
+      //     return false;
+      //   }
+        
+      //   var numberOfTokens = parseInt(data.result)/(Math.pow(10,18));
+        
+      //   if ((numberOfTokens * 100) < that.finalTotal) { // GBPx to pence
+      //     var amountRequired = that.finalTotal - numberOfTokens;
+      //     var topupDetails = {amount: amountRequired.toString()};
+      //     //alert("You need to top up before checking out!");
+      //     window.flutter_inappwebview.callHandler('topup', topupDetails);
+      //     return false;
+      //   } else {
+      //     return true;
+      //   }
+      // })
     },
     submittedForm: function(result) {
       this.syncing = true;
@@ -207,31 +260,6 @@ parasails.registerPage('vendor-menu', {
 
         Vue.set(this.deliveryMethods, group, output);
       }
-    },
-    checkSufficientFunds: function() {
-      var contractAddress = '0x40AFCD9421577407ABB0d82E2fF25Fd2Ef4c68BD';
-      var userWallet = window.SAILS_LOCALS.wallet;
-
-      var that = this;
-
-      return $.get("https://explorer.fuse.io/api?module=account&action=tokenbalance&contractaddress=" + contractAddress + "&address=" + userWallet, function(data){
-        if(!data.result){
-          alert("Invalid wallet address");
-          return false;
-        }
-        
-        var numberOfTokens = parseInt(data.result)/(Math.pow(10,18));
-        
-        if ((numberOfTokens * 100) < that.finalTotal) { // GBPx to pence
-          var amountRequired = that.finalTotal - numberOfTokens;
-          var topupDetails = {amount: amountRequired.toString()};
-          alert("You need to top up before checking out!");
-          window.flutter_inappwebview.callHandler('topup', topupDetails);
-          return false;
-        } else {
-          return true;
-        }
-      })
     },
     openCheckoutModal: function() {
       this.isLoading = true;
