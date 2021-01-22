@@ -32,7 +32,7 @@
         <form @submit.prevent="addProductToCart">
         <div class="modal-body">
           <h3>{{selectedProduct.name}}</h3>
-          <p>{{selectedProduct.description}}</p>
+          <p v-html="selectedProduct.description"></p>
           <div v-for="option in productOptions">
             <fieldset class="form-group">
               <legend class="h5">{{option.name}}</legend>
