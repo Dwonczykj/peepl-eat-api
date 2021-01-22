@@ -157,8 +157,6 @@ parasails.registerPage('vendor-menu', {
       this.syncing = true;
       this.submitted = true;
 
-      //alert(result);
-
       var paymentDetails = {
         action: 'pay',
         amount: (this.cartTotal + this.deliveryTotal) / 100, //Pence to pounds
@@ -167,12 +165,12 @@ parasails.registerPage('vendor-menu', {
         orderId: result.toString()
       };
 
-      // window.flutter_inappwebview.callHandler('pay', paymentDetails)
-      // .then(function (paymentResult) {
-      // })
-      // .catch(function(err){
-      //   console.log(err);
-      // });
+      window.flutter_inappwebview.callHandler('pay', paymentDetails)
+      .then(function (paymentResult) {
+      })
+      .catch(function(err){
+        console.log(err);
+      });
 
       io.socket.on('paid', function (data){
         window.location.href = '/orders/' + data.orderId;
