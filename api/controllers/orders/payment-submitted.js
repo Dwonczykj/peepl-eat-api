@@ -23,7 +23,7 @@ module.exports = {
     function makeQuery(iteration = 0){
       // TODO: Use setInterval or similar to repeat request every second until either success or failure (or timeout)
       setTimeout(function(){
-        console.log("Checking transaction. #"+iteration);
+        console.log("Checking transaction. #" + iteration);
         client.get('jobs/' + inputs.jobId)
         .then(function(result){
           var paymentInfo = result.body.data.data.transactionBody;
@@ -40,7 +40,7 @@ module.exports = {
           }
 
           if(paymentStatus == "pending"){
-            return makeQuery(iteration++);
+            return makeQuery(iteration+1);
           }
 
           Order.findOne(inputs.orderId)
