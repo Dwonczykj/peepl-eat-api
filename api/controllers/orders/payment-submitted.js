@@ -35,7 +35,7 @@ module.exports = {
 
         Order.findOne(inputs.orderId)
         .populate('items.product.vendor')
-        .then(function(order){
+        .then(async function(order){
           var error = "";
 
           if(!order){
@@ -72,8 +72,7 @@ module.exports = {
               return exits.error({message: error});
             }
 
-            var existingOrdersWithJobId = Order.findOne({paymentJobId: inputs.jobId});
-            console.log(existingOrdersWithJobId);
+            var existingOrdersWithJobId = await Order.findOne({paymentJobId: inputs.jobId});
             if(existingOrdersWithJobId){
               error = "Transaction has already been used for another order.";
               sails.sockets.broadcast('order' + order.id, 'error', {orderId: order.id, message: error});
