@@ -24,7 +24,25 @@ module.exports = {
     var order = await Order.findOne(inputs.orderId)
     .populate("items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue");
 
-    console.log(order);
+    var workingTotal = 0;
+
+    var seenDeliveryMethods = [];
+    for(var item in order.items) {
+      var productTotal = order.items[item].product.basePrice;
+
+      for(var optionValue in order.items[item].optionValues) {
+        productTotal += order.items[item].optionValues[optionValue].optionValue.priceModifier;
+      }
+
+      if(!_.contains(seenDeliveryMethods, order.items[item].deliveryMethod.id)) { // If not seen this delivery method already.
+        seenDeliveryMethods.push(order.items[item].deliveryMethod.id);
+        workingTotal += order.items[item].deliveryMethod.priceModifier;
+      }
+
+      workingTotal += productTotal;
+    }
+
+    return workingTotal;
   }
 
 

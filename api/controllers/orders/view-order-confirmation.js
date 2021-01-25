@@ -32,8 +32,6 @@ module.exports = {
       return exits.error();
     }
 
-    await sails.helpers.calculateOrderTotal.with({orderId: inputs.orderId});
-
     // Respond with view.
     return exits.success({
       order
