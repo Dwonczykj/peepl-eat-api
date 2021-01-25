@@ -23,7 +23,7 @@ module.exports = {
     function makeQuery(iteration = 0){
       // TODO: Use setInterval or similar to repeat request every second until either success or failure (or timeout)
       setTimeout(function(){
-        console.log("Checking transaction. #" + iteration);
+        console.log("Checking transaction id: " + inputs.jobId + " Attempt#: " + iteration);
         client.get('jobs/' + inputs.jobId)
         .then(function(result){
           var paymentInfo = result.body.data.data.transactionBody;
