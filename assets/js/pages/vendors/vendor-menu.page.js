@@ -262,6 +262,7 @@ parasails.registerPage('vendor-menu', {
         }
 
         Vue.set(this.deliveryMethods, group, output);
+        // this.changeDeliveryMethod();
       }
     },
     openCheckoutModal: function() {

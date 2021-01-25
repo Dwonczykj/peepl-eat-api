@@ -122,9 +122,8 @@
             <b>Delivery:</b>
             {{deliveryTotal | convertToPounds}}
           </h6>
+          <h6 class="text-danger" v-if="cloudError">{{cloudError}}</h6>
         </div>
-
-        <h3 v-if="cloudError">There has been an error submitting your order. Please double check your inputs.</h3>
           <div class="modal-footer">
             <a class="btn btn-outline-secondary" @click="checkoutModalActive=false">Cancel</a>
             <ajax-button class="btn btn-peepl" :disabled="!readyToPay" type="submit" v-bind:class="{ 'is-loading': syncing }">Pay {{finalTotal | convertToPounds}}</ajax-button>
