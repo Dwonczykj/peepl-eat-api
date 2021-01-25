@@ -324,7 +324,7 @@ parasails.registerPage('vendor-menu', {
       return workingTotal;
     },
     finalTotal: function() {
-      return this.cartTotal + this.deliveryTotal - 100;
+      return this.cartTotal + this.deliveryTotal;
     },
     readyToPay: function() {
       if (this.address.postCode == "") {
