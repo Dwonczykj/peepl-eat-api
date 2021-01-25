@@ -35,7 +35,7 @@ module.exports = {
           var paymentStatus = paymentInfo.status;
           var transactionType = paymentInfo.type;
 
-          if(iteration >= 9){
+          if(iteration >= 29){
             return;
           }
 
@@ -98,6 +98,7 @@ module.exports = {
                 // Notify client of successful transaction
                 sails.sockets.broadcast('order' + order.id, 'paid', {orderId: order.id, paidDateTime: unixtime});
 
+                // TODO: remove redundant query
                 Order.findOne(inputs.orderId)
                 .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue')
                 .then(async function(fullOrder){

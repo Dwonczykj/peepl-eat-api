@@ -4,7 +4,7 @@ module.exports = {
   friendlyName: 'Create order',
 
 
-  description: '',
+  description: 'This action is responsible for the creation of new orders.',
 
 
   inputs: {
@@ -32,6 +32,7 @@ module.exports = {
 
 
   fn: async function (inputs, exits) {
+
     for (var item in inputs.items) {
       inputs.items[item].optionValues = [];
       for (var option in inputs.items[item].options) {
@@ -77,7 +78,8 @@ module.exports = {
     });
 
     var user = await User.findOne({walletId: this.req.session.walletId});
-
+    
+    // Create or update user record by walletId
     if(!user){
       await User.create({
         walletId: this.req.session.walletId,

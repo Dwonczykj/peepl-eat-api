@@ -132,6 +132,18 @@
         </form>
       </div>
     </modal>
+    <modal v-if="submitted" v-cloak>
+      <div class="modal-content">
+        <div class="modal-body">
+          <div class="mt-3 d-flex justify-content-center">
+            <div class="spinner-border" role="status">
+              <span class="sr-only">Loading…</span>
+            </div>
+          </div>
+          <p class="mt-3" style="text-align: center;">Your payment is being processed. Please don't close this page. This may take up to 30 seconds.</p>
+        </div>
+      </div>
+    </modal>
   </div>
 
   <div class="fixed-bottom py-3 bg-white shadow border-top" v-if="cartTotal">

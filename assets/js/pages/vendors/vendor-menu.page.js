@@ -209,6 +209,7 @@ parasails.registerPage('vendor-menu', {
     submittedForm: function(result) {
       this.syncing = true;
       this.submitted = true;
+      this.checkoutModalActive = false;
 
       var paymentDetails = {
         action: 'pay',
@@ -230,6 +231,8 @@ parasails.registerPage('vendor-menu', {
       });
 
       io.socket.on('error', function(data){
+        this.submitted = false;
+        this.syncing = false;
         alert(data.message);
       })
     },

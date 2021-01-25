@@ -10,7 +10,7 @@
  */
 
 module.exports.http = {
-
+  // Below code doesn't work within views, not sure why
   locals:{
     filters: {
       toPounds: function(value){
