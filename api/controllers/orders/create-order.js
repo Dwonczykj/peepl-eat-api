@@ -32,61 +32,58 @@ module.exports = {
 
 
   fn: async function (inputs, exits) {
-    await sails.getDatastore()
-    .transaction(async (db) => {
-      var order = await Order.create({
-        total: inputs.total,
-        orderedDateTime: Date.now(),
-        deliveryName: inputs.address.name,
-        deliveryEmail: inputs.address.email,
-        deliveryPhoneNumber: inputs.address.phoneNumber,
-        deliveryAddressLineOne: inputs.address.lineOne,
-        deliveryAddressLineTwo: inputs.address.lineTwo,
-        deliveryAddressPostCode: inputs.address.postCode,
-        customer: this.req.session.walletId
-      }).usingConnection(db).fetch();
-
-      for (var item in inputs.items) {
-        inputs.items[item].optionValues = [];
-        for (var option in inputs.items[item].options) {
-          if(inputs.items[item].options[option] != "") {
-            var newOptionValuePair = await OrderItemOptionValue.create({
-              option: option,
-              optionValue: inputs.items[item].options[option],
-            }).usingConnection(db).fetch();
-            inputs.items[item].optionValues.push(newOptionValuePair.id);
-          }
+    for (var item in inputs.items) {
+      inputs.items[item].optionValues = [];
+      for (var option in inputs.items[item].options) {
+        if(inputs.items[item].options[option] != "") {
+          var newOptionValuePair = await OrderItemOptionValue.create({
+            option: option,
+            optionValue: inputs.items[item].options[option],
+          }).fetch();
+          inputs.items[item].optionValues.push(newOptionValuePair.id);
         }
       }
+    }
 
-      var updatedItems = _.map(inputs.items, function(object) {
-        object.product = object.id;
-        object.order = order.id;
+    var order = await Order.create({
+      total: inputs.total,
+      orderedDateTime: Date.now(),
+      deliveryName: inputs.address.name,
+      deliveryEmail: inputs.address.email,
+      deliveryPhoneNumber: inputs.address.phoneNumber,
+      deliveryAddressLineOne: inputs.address.lineOne,
+      deliveryAddressLineTwo: inputs.address.lineTwo,
+      deliveryAddressPostCode: inputs.address.postCode,
+      customer: this.req.session.walletId
+    }).fetch();
 
-        // TODO: Reduce object from frontend so it contains IDs of associations only
-        object.deliveryMethod = object.deliveryMethod.id;
-        object.deliverySlot = object.deliverySlot.id;
+    var updatedItems = _.map(inputs.items, function(object) {
+      object.product = object.id;
+      object.order = order.id;
 
-        return _.pick(object, ['order', 'product', 'deliveryMethod', 'deliverySlot', 'optionValues']);
-      });
+      // TODO: Reduce object from frontend so it contains IDs of associations only
+      object.deliveryMethod = object.deliveryMethod.id;
+      object.deliverySlot = object.deliverySlot.id;
 
-      var products = await OrderItem.createEach(updatedItems).usingConnection(db);
-
-      // Calculate the order total on the backend
-      var calculatedOrderTotal = await sails.helpers.calculateOrderTotal.with({orderId: order.id});
-      if(order.total != calculatedOrderTotal) {
-        Order.updateOne(order.id)
-        .set({total: calculatedOrderTotal})
-        .usingConnection(db);
-      }
-      
-      sails.sockets.join(this.req, 'order' + order.id, function(err){
-        if(err) {
-          return exits.error();
-        }
-      });
-
+      return _.pick(object, ['order', 'product', 'deliveryMethod', 'deliverySlot', 'optionValues']);
     });
+
+    var products = await OrderItem.createEach(updatedItems);
+
+    // Calculate the order total on the backend
+    var calculatedOrderTotal = await sails.helpers.calculateOrderTotal.with({orderId: order.id});
+
+    if(order.total != calculatedOrderTotal) {
+      Order.updateOne(order.id)
+      .set({total: calculatedOrderTotal});
+    }
+    
+    sails.sockets.join(this.req, 'order' + order.id, function(err){
+      if(err) {
+        return exits.error();
+      }
+    });
+
     
     var user = await User.findOne({walletId: this.req.session.walletId});
     // Create or update user record by walletId
