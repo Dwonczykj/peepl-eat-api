@@ -23,7 +23,7 @@ module.exports = {
       required: true
     },
     paidDateTime: {
-      type: 'string',
+      type: 'number',
       description: 'The unixtime when the order payment was confirmed (if at all).',
       required: false
     },
