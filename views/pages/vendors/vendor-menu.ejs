@@ -1,6 +1,7 @@
 <div id="vendor-menu" v-cloak>
   <div class="container">
     <h1 class="h4 mt-3 mb-0">{{vendor.name}}</h1>
+
     <div class="row" style="margin-bottom: 80px;">
       <div class="col-12 col-md-6" v-for="product in vendor.products">
         <div class="card my-3">
@@ -8,11 +9,9 @@
           <div class="card-body">
             <h2 class="card-title h5">{{product.name}}</h2>
             <p class="card-text" v-html="product.description"></p>
-            <a href="#" @click="clickAddToCart(product.id)" class="btn btn-peepl stretched-link">Add to cart</a>
+            <a href="#" @click="clickAddToCart(product.id)" class="btn btn-peepl stretched-link">Order</a>
           </div>
         </div>
-        <!-- <h6><b>Total:</b> {{cartTotal | convertToPounds}}</h6>
-        <a href="#" v-if="cartTotal > 0" @click="openCheckoutModal" class="btn btn-primary">Checkout</a> -->
       </div>
     </div>
 
