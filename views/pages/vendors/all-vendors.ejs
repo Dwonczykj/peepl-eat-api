@@ -1,7 +1,9 @@
 <div id="all-vendors" v-cloak>
 
 <div class="container">
+  <% if(!hasOrders) { %>
   <a class="mt-2 btn btn-peepl" href="/orders">My orders</a>
+  <% } %>
   <div class="row">
     <% for (var vendor in vendors) { %>
       <div class="col-12 col-md-6">

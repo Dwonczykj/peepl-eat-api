@@ -18,8 +18,15 @@ module.exports = {
 
   fn: async function () {
     var vendors = await Vendor.find();
+    var orders = await Order.findOne({customer: this.req.session.walletId});
+    var hasOrders = false;
+
+    if(orders.length >= 1){
+      hasOrders = true;
+    }
+
     // Respond with view.
-    return {vendors};
+    return {vendors, hasOrders};
 
   }
 
