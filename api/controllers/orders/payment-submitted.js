@@ -88,7 +88,7 @@ module.exports = {
                 return exits.error({message: error});
               }
 
-              var unixtime = new Date().getTime();
+              var unixtime = Date.now();
               Order.updateOne(inputs.orderId)
               .set({
                 paymentJobId: inputs.jobId,
