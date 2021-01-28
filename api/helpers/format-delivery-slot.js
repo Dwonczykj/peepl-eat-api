@@ -11,12 +11,16 @@ module.exports = {
 
 
   inputs: {
-    deliverySlot: {
-      type: 'ref',
-      example: 1,
-      description: 'An onject with startTime and endTime properties',
-      required: true,
-    },
+    // deliverySlot: {
+    //   type: 'ref',
+    //   example: 1,
+    //   description: 'An onject with startTime and endTime properties',
+    //   required: true,
+    // },
+    value:{
+      type: 'number',
+      required: true
+    }
   },
 
 
@@ -28,11 +32,17 @@ module.exports = {
 
 
   fn: function (inputs, exits) {
-    var start = new Date( inputs.deliverySlot.startTime * 1000 );
-    var end = new Date( inputs.deliverySlot.endTime * 1000 );
+    var moment = require('moment');
 
-    var result = `${ start.toISOString() } ${ end.toISOString() }`;
-    return exits.success( result );
+    if (!inputs.value) return '';
+    inputs.value = moment.unix(inputs.value).calendar();
+    return exits.success(inputs.value);
+
+    // var start = new Date( inputs.deliverySlot.startTime * 1000 );
+    // var end = new Date( inputs.deliverySlot.endTime * 1000 );
+
+    // var result = `${ start.toISOString() } ${ end.toISOString() }`;
+    // return exits.success( result );
   }
 
 
