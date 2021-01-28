@@ -1,19 +1,54 @@
 // Color system
 
+$color-peepl-black: #000000;
+$color-peepl-dark-grey: #28303D;
+$color-peepl-taupe: #A09F9E;
 $color-peepl-red: #FC0C1A;
 $color-peepl-orange: #FC870C;
+$color-peepl-yellow: #FCCA0C;
+$color-peepl-green: #7EBD46;
+$color-peepl-teal: #46BDB1;
+$color-peepl-blue: #2B70DF;
+
+$color-peepl-white: #FFFFFF;
+$color-peepl-pale-grey: #F2F2F2;
 $color-peepl-cream: #F5F2EB;
+$color-peepl-pale-red: #F7E9EA;
+$color-peepl-pale-orange: #F9EEE3;
+$color-peepl-pale-yellow: #FFF8DD;
+$color-peepl-pale-green: #EBF6E2;
+$color-peepl-pale-teal: #E7F9F7;
+$color-peepl-pale-blue: #EDF3FC;
 
 $color-fuse-app-header: #f5f5f5;
 
-$red: #FC0C1A;
-$orange: #FC870C;
-
 $theme-colors: (
-  "peepl-red": $color-peepl-red,
-  "peepl-orange": $color-peepl-orange,
-  "peepl-cream": $color-peepl-cream,
+    "peepl-black": $color-peepl-black,
+    "peepl-dark-grey": $color-peepl-dark-grey,
+    "peepl-taupe": $color-peepl-taupe,
+    "peepl-red": $color-peepl-red,
+    "peepl-orange": $color-peepl-orange,
+    "peepl-yellow": $color-peepl-yellow,
+    "peepl-green": $color-peepl-green,
+    "peepl-teal": $color-peepl-teal,
+    "peepl-blue": $color-peepl-blue,
+    "peepl-white": $color-peepl-white,
+    "peepl-pale-grey": $color-peepl-pale-grey,
+    "peepl-cream": $color-peepl-cream,
+    "peepl-pale-red": $color-peepl-pale-red,
+    "peepl-pale-orange": $color-peepl-pale-orange,
+    "peepl-pale-yellow": $color-peepl-pale-yellow,
+    "peepl-pale-green": $color-peepl-pale-green,
+    "peepl-pale-teal": $color-peepl-pale-teal,
+    "peepl-pale-blue": $color-peepl-pale-blue,
 );
+
+$blue: $color-peepl-blue;
+$red: $color-peepl-red;
+$orange: $color-peepl-orange;
+$yellow: $color-peepl-yellow;
+$green: $color-peepl-green;
+$teal: $color-peepl-teal;
 
 // Options
 
