@@ -1,0 +1,47 @@
+$gradient-directions: (
+    'horizontal': 90deg,
+    'vertical': 180deg,
+    'diagonal': 135deg
+);
+
+@each $slug, $angle in $gradient-directions {
+    .bg-#{$slug}-gradient-blue-teal {
+        @include gradient-directional(
+            $color-peepl-blue,
+            $color-peepl-teal,
+            $angle
+        );
+    }
+
+    .bg-#{$slug}-gradient-teal-green {
+        @include gradient-directional(
+            $color-peepl-teal,
+            $color-peepl-green,
+            $angle
+        );
+    }
+
+    .bg-#{$slug}-gradient-green-yellow {
+        @include gradient-directional(
+            $color-peepl-green,
+            $color-peepl-yellow,
+            $angle
+        );
+    }
+
+    .bg-#{$slug}-gradient-yellow-orange {
+        @include gradient-directional(
+            $color-peepl-yellow,
+            $color-peepl-orange,
+            $angle
+        );
+    }
+
+    .bg-#{$slug}-gradient-orange-red {
+        @include gradient-directional(
+            $color-peepl-orange,
+            $color-peepl-red,
+            $angle
+        );
+    }
+}
