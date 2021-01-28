@@ -14,6 +14,8 @@
               <% } %>
             </ol>
           <% } %>
+          <h2 class="h6 border-top pt-3 mt-3 mb-0">Delivery: <%= orders[order].items[i].deliveryMethod.name %></h2>
+          <p><%= sails.helpers.formatDeliverySlot( orders[order].items[i].deliverySlot ) %></p>
         <% } %>
         <h2 class="h5 border-top pt-3 mt-3 mb-0 d-flex">
           <span class="mr-auto">Total</span>
