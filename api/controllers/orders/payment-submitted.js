@@ -34,8 +34,6 @@ module.exports = {
           var paymentStatus = paymentInfo.status;
           var transactionType = paymentInfo.type;
 
-          console.log(paymentInfo);
-
           if(iteration >= 29){
             return;
           }
@@ -57,7 +55,7 @@ module.exports = {
                 sails.sockets.broadcast('order' + order.id, 'error', {orderId: order.id, message: error});
                 return exits.error({message: error});
               }
-              if(paymentTokenAddress != "0x40AFCD9421577407ABB0d82E2fF25Fd2Ef4c68BD") {//GBPX token address
+              if(paymentTokenAddress.toUpperCase() != "0x40AFCD9421577407ABB0d82E2fF25Fd2Ef4c68BD".toUpperCase()) {//GBPX token address
                 error = "Incorrect token sent.";
                 sails.sockets.broadcast('order' + order.id, 'error', {orderId: order.id, message: error});
                 return exits.error({message: error});
