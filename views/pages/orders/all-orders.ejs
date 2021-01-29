@@ -17,8 +17,8 @@
               <% } %>
               <h2 class="h6 border-top pt-3 mt-3 mb-0"><b>Delivery:</b> <%= orders[order].items[i].deliveryMethod.name %></h2>
               <p><b>Name:</b> <%= orders[order].deliveryName %>
-              <br><b>Number:</b> <%= orders[order].deliveryEmail %>
-              <br><b>Email:</b> <%= orders[order].deliveryPhoneNumber %>
+              <br><b>Email:</b> <%= orders[order].deliveryEmail %>
+              <br><b>Number:</b> <a href="tel:<%= orders[order].deliveryPhoneNumber %>"><%= orders[order].deliveryPhoneNumber %></a>
               <br><b>Line One:</b> <%= orders[order].deliveryAddressLineOne %>
               <br><b>Line Two:</b> <%= orders[order].deliveryAddressLineTwo %>
               <br><b>Post Code:</b> <%= orders[order].deliveryAddressPostCode %>
