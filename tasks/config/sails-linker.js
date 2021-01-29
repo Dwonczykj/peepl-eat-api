@@ -136,7 +136,7 @@ module.exports = function(grunt) {
         '.tmp/public/index.html': ['.tmp/public/min/production.min.css'],
         'views/**/*.html': ['.tmp/public/min/production.min.css'],
         //'views/**/*.ejs': ['.tmp/public/min/production.min.css'],
-        'views/**/*.ejs': ['.tmp/public/hash/*.min.css']
+        'views/**/*.ejs': ['.tmp/public/hash/*.css']
       }
     },
 
