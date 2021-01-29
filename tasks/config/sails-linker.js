@@ -57,13 +57,14 @@ module.exports = function(grunt) {
       options: {
         startTag: '<!--SCRIPTS-->',
         endTag: '<!--SCRIPTS END-->',
-        fileTmpl: '<script src="%s?v="></script>',
+        fileTmpl: '<script src="%s"></script>',
         appRoot: '.tmp/public'
       },
       files: {
         '.tmp/public/**/*.html': ['.tmp/public/min/production.min.js'],
         'views/**/*.html': ['.tmp/public/min/production.min.js'],
-        'views/**/*.ejs': ['.tmp/public/min/production.min.js']
+        'views/**/*.ejs': ['.tmp/public/hash/*.js'],
+        //'views/**/*.ejs': ['.tmp/public/min/production.min.js']
       }
     },
 
