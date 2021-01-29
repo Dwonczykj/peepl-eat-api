@@ -34,6 +34,8 @@ module.exports = {
           var paymentStatus = paymentInfo.status;
           var transactionType = paymentInfo.type;
 
+          console.log(paymentInfo);
+
           if(iteration >= 29){
             return;
           }
