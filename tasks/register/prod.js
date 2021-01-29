@@ -19,6 +19,7 @@ module.exports = function(grunt) {
     'concat',
     'uglify',
     'cssmin',
+    'hash',
     'sails-linker:prodJs',
     'sails-linker:prodStyles',
   ]);
