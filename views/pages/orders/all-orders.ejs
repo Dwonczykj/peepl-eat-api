@@ -1,32 +1,40 @@
 <div id="all-orders" v-cloak>
   <div class="container">
     <h1 class="h4 text-center my-4">All orders</h1>
-
-    <% for (var order in orders) { %>
-      <div class="my-3 p-3 bg-white rounded">
-        <p class="text-muted m-0">Order #<%= orders[order].id %></p>
-        <% for (var i in orders[order].items) { %>
-          <h2 class="h5 border-top pt-3 mt-3 mb-0"><%= orders[order].items[i].product.name %></h2>
-          <% if (orders[order].items[i].optionValues && orders[order].items[i].optionValues.length) { %>
-            <ol class="order-confirmation__option-values">
-              <% for (var j in orders[order].items[i].optionValues) { %>
-                <li><%= orders[order].items[i].optionValues[j].optionValue.name %></li>
+    <div class="row">
+      <% for (var order in orders) { %>
+        <div class="col-md-6">
+          <div class="my-3 p-3 bg-white rounded">
+            <p class="text-muted m-0">Order #<%= orders[order].id %></p>
+            <% for (var i in orders[order].items) { %>
+              <h2 class="h5 border-top pt-3 mt-3 mb-0"><%= orders[order].items[i].product.name %></h2>
+              <% if (orders[order].items[i].optionValues && orders[order].items[i].optionValues.length) { %>
+                <ol class="order-confirmation__option-values">
+                  <% for (var j in orders[order].items[i].optionValues) { %>
+                    <li><%= orders[order].items[i].optionValues[j].optionValue.name %></li>
+                  <% } %>
+                </ol>
               <% } %>
-            </ol>
-          <% } %>
-          <h2 class="h6 border-top pt-3 mt-3 mb-0">Delivery: <%= orders[order].items[i].deliveryMethod.name %></h2>
-          <p><%= sails.helpers.formatDeliverySlot( orders[order].items[i].deliverySlot.startTime ) %> - <%= sails.helpers.formatDeliverySlot( orders[order].items[i].deliverySlot.endTime ) %></p>
-        <% } %>
-        <h2 class="h5 border-top pt-3 mt-3 mb-0 d-flex">
-          <span class="mr-auto">Total</span>
-          <span>£<%= orders[order].total / 100 %></span>
-        </h2>
-        <p class="mt-2 mb-0 d-flex text-success">
-          <span class="mr-auto">Reward</span>
-          <span>+ <%= orders[order].total / 100 * 100 %> PPL</span>
-        </h2>
-      </div>
-    <% } %>
+              <h2 class="h6 border-top pt-3 mt-3 mb-0"><b>Delivery:</b> <%= orders[order].items[i].deliveryMethod.name %></h2>
+              <p><b>Name:</b> <%= orders[order].deliveryName %>
+              <br><b>Number:</b> <%= orders[order].deliveryEmail %>
+              <br><b>Line One:</b> <%= orders[order].deliveryAddressLineOne %>
+              <br><b>Line Two:</b> <%= orders[order].deliveryAddressLineTwo %>
+              <br><b>Post Code:</b> <%= orders[order].deliveryAddressPostCode %>
+              <br><b>Slot:</b> <%= sails.helpers.formatDeliverySlot( orders[order].items[i].deliverySlot.startTime ) %> - <%= sails.helpers.formatDeliverySlot( orders[order].items[i].deliverySlot.endTime ) %></p>
+            <% } %>
+            <h2 class="h5 border-top pt-3 mt-3 mb-0 d-flex">
+              <span class="mr-auto">Total</span>
+              <span>£<%= orders[order].total / 100 %></span>
+            </h2>
+            <p class="mt-2 mb-0 d-flex text-success">
+              <span class="mr-auto">Reward</span>
+              <span>+ <%= orders[order].total / 100 * 100 %> PPL</span>
+            </h2>
+          </div>
+        </div>
+      <% } %>
+    </div>
   </div>
 </div>
 <%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>
