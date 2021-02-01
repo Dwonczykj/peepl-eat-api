@@ -9,7 +9,7 @@
           <div class="card-body">
             <h2 class="card-title h5">{{product.name}}</h2>
             <p class="card-text" v-html="product.description"></p>
-            <a href="#" @click="clickAddToCart(product.id)" class="btn btn-peepl stretched-link">Order</a>
+            <span @click="clickAddToCart(product.id)" class="btn btn-peepl stretched-link">Order</span>
           </div>
         </div>
       </div>
@@ -153,7 +153,7 @@
           <h2 class="h6 mb-1">{{ cart.length }} {{ (cart.length == 1) ? 'item' : 'items' }}</h2>
           <p class="mb-0" style="font-size: 0.875rem">Total: {{cartTotal | convertToPounds}}</p>
         </div>
-        <a href="#" @click="openCheckoutModal" class="btn btn-peepl">Checkout</a>
+        <span @click="openCheckoutModal" class="btn btn-peepl">Checkout</span>
       </div>
     </div>
   </div>

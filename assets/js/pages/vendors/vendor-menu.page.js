@@ -186,25 +186,6 @@ parasails.registerPage('vendor-menu', {
       } else {
         return true;
       }
-
-      // $.get("https://explorer.fuse.io/api?module=account&action=tokenbalance&contractaddress=" + contractAddress + "&address=" + userWallet, function(data){
-      //   if(!data.result){
-      //     alert("Invalid wallet address");
-      //     return false;
-      //   }
-        
-      //   var numberOfTokens = parseInt(data.result)/(Math.pow(10,18));
-        
-      //   if ((numberOfTokens * 100) < that.finalTotal) { // GBPx to pence
-      //     var amountRequired = that.finalTotal - numberOfTokens;
-      //     var topupDetails = {amount: amountRequired.toString()};
-      //     //alert("You need to top up before checking out!");
-      //     window.flutter_inappwebview.callHandler('topup', topupDetails);
-      //     return false;
-      //   } else {
-      //     return true;
-      //   }
-      // })
     },
     submittedForm: function(result) {
       this.syncing = true;
