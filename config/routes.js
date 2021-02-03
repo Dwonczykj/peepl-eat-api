@@ -20,21 +20,23 @@ module.exports.routes = {
   ***************************************************************************/
 
   '/': { action: 'view-homepage' },
-  '/barmenu': {action: 'view-bar-menu'},
-  '/today': {action: 'view-today'},
+
   '/topup': {action: 'view-topup'},
-  '/menu-bar': {action: 'view-topup'},
+
   '/help': {action: 'view-help'},
+
   '/vendors': {action: 'vendors/view-all-vendors'},
   '/vendors/:vendorid': { action: 'vendors/view-vendor-menu' },
+
   'GET /help': { action: 'view-help' },
+
   'GET /orders/:orderId': { action: 'orders/view-order-confirmation' },
   'GET /orders': { action: 'orders/view-my-orders' },
   'GET /orders/all': { action: 'orders/view-all-orders' },
 
   'GET /api/v1/products/get-product-options/:productId': { action: 'products/get-product-options' },
   'POST /api/v1/products/get-product-delivery-methods': { action: 'products/get-product-delivery-methods' },
-  'POST /api/v1/bar/create-order': { action: 'bar/create-order' },
+  
   'POST /api/v1/orders/create-order': { action: 'orders/create-order' },
   'POST /api/v1/orders/payment-submitted': { action: 'orders/payment-submitted' },
 
