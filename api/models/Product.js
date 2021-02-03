@@ -34,6 +34,10 @@ module.exports = {
       type: 'boolean',
       description: 'Boolean to represent whether the product is available or not.'
     },
+    priority: {
+      type: 'number',
+      description: 'Temporary way to store priority of products'
+    },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗

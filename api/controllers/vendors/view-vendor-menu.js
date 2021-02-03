@@ -22,7 +22,9 @@ module.exports = {
 
   fn: async function (inputs, exits) {
     var vendor = await Vendor.findOne(inputs.vendorid)
-    .populate('products');
+    .populate('products', {
+      sort: 'priority DESC'
+    });
     
     var user = await User.findOne({walletId: this.req.session.walletId});
 
