@@ -13,7 +13,7 @@
 Cloud.setup({
 
   /* eslint-disable */
-  methods: {"getProductOptions":{"verb":"GET","url":"/api/v1/products/get-product-options/:productId","args":["productId"]},"getProductDeliveryMethods":{"verb":"POST","url":"/api/v1/products/get-product-delivery-methods","args":["productids"]},"createOrder":{"verb":"POST","url":"/api/v1/orders/create-order","args":["items","address","total"]},"paymentSubmitted":{"verb":"POST","url":"/api/v1/orders/payment-submitted","args":["orderId","jobId"]}}
+  methods: {"getProductOptions":{"verb":"GET","url":"/api/v1/products/get-product-options/:productId","args":["productId"]},"getProductDeliveryMethods":{"verb":"POST","url":"/api/v1/products/get-product-delivery-methods","args":["productids"]},"createOrder":{"verb":"POST","url":"/api/v1/orders/create-order","args":["items","address","total"]},"paymentSubmitted":{"verb":"POST","url":"/api/v1/orders/payment-submitted","args":["orderId","jobId"]},"createVendor":{"verb":"POST","url":"/api/v1/admin/create-vendor","args":[]}}
   /* eslint-enable */
 
 });
