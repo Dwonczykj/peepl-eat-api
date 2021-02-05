@@ -71,6 +71,9 @@ var jsFilesToInject = [
   'dependencies/jquery.min.js',
   'dependencies/vue.js',
   'dependencies/vue-router.js',
+  'dependencies/popper.min.js',
+  'dependencies/bootstrap.min.js',
+  'dependencies/portal-vue.umd.min.js',
   'dependencies/**/*.js',
 
   // First amongst the app-level files, bring in cloud configuration

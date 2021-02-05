@@ -57,13 +57,13 @@ parasails.registerPage('vendor-menu', {
 
       this.addToCartModalActive = true;
       this.isLoading = true;
-      this.selectedProduct = _.find(this.vendor.products, function(o) { return o.id === productid; });
+      this.selectedProduct = _.find(this.vendor.products, (o) => { return o.id === productid; });
 
       Cloud.getProductOptions(productid)
-      .then(function(options){
+      .then((options) => {
         that.selectedOptionValues= {};
         for(var option in options) {
-          that.selectedOptionValues[options[option].id] = "";
+          that.selectedOptionValues[options[option].id] = '';
         }
         that.productOptions = options;
         that.isLoading = false;
@@ -87,8 +87,8 @@ parasails.registerPage('vendor-menu', {
       var optionId = event.target.name.slice(7);
       var valueId = event.target.value;
 
-      var option = _.find(this.productOptions, function(o) { return o.id === parseInt(optionId) });
-      var value = _.find(option.values, function(o) { return o.id === parseInt(valueId); });
+      var option = _.find(this.productOptions, (o) => { return o.id === parseInt(optionId); });
+      var value = _.find(option.values, (o) => { return o.id === parseInt(valueId); });
 
       Vue.set(this.temporaryOptionValues, optionId, {
         valueId,
@@ -98,12 +98,12 @@ parasails.registerPage('vendor-menu', {
     changeDeliveryMethod: function (event) {
       var deliveryMethodIndex = event.target.id.slice(14);
       var deliveryMethodId = event.target.options[event.target.options.selectedIndex].value;
-      var deliveryMethod =  _.find(this.deliveryMethods[deliveryMethodIndex].deliveryMethods, function(o) { return o.id === parseInt(deliveryMethodId); });
+      var deliveryMethod =  _.find(this.deliveryMethods[deliveryMethodIndex].deliveryMethods, (o) => { return o.id === parseInt(deliveryMethodId); });
 
       var that = this;
 
       for(var product in this.deliveryMethods[deliveryMethodIndex].products) {
-        this.cart = _.map(this.cart, function(item) {
+        this.cart = _.map(this.cart, (item) => {
           if (item.id === that.deliveryMethods[deliveryMethodIndex].products[product].id) {
             item.deliveryMethod = deliveryMethod;
           }
@@ -129,12 +129,12 @@ parasails.registerPage('vendor-menu', {
     changeDeliverySlot: function(event) {
       var deliveryMethodIndex = event.target.id.slice(12);
       var deliverySlotId = event.target.options[event.target.options.selectedIndex].value;
-      var deliverySlot =  _.find(this.deliveryMethods[deliveryMethodIndex].selected.deliveryMethodSlots, function(o) { return o.id === parseInt(deliverySlotId); });
+      var deliverySlot =  _.find(this.deliveryMethods[deliveryMethodIndex].selected.deliveryMethodSlots, (o) => { return o.id === parseInt(deliverySlotId); });
 
       var that = this;
 
       for(var product in this.deliveryMethods[deliveryMethodIndex].products) {
-        this.cart = _.map(this.cart, function(item) {
+        this.cart = _.map(this.cart, (item) => {
           if (item.id === that.deliveryMethods[deliveryMethodIndex].products[product].id) {
             item.deliverySlot = deliverySlot;
           }
@@ -153,7 +153,7 @@ parasails.registerPage('vendor-menu', {
         console.log(isSufficientFunds);
         return {items: this.cart, address: this.address, total: this.cartTotal + this.deliveryTotal};
       }
-      
+
       return false;
     },
     checkSufficientFunds: function() {
@@ -162,25 +162,25 @@ parasails.registerPage('vendor-menu', {
       var data = null;
 
       $.ajax({
-        url: "https://explorer.fuse.io/api?module=account&action=tokenbalance&contractaddress=" + contractAddress + "&address=" + userWallet,
+        url: 'https://explorer.fuse.io/api?module=account&action=tokenbalance&contractaddress=' + contractAddress + '&address=' + userWallet,
         type: 'get',
         async: false,
         success: function(res) {
           data = res;
-        } 
+        }
       });
 
       if(!data) {
-        alert("Invalid wallet address");
+        alert('Invalid wallet address');
         return false;
       }
 
       var numberOfTokens = parseInt(data.result)/(Math.pow(10,18));
-      
+
       if ((numberOfTokens * 100) < this.finalTotal) { // GBPx to pence
         var amountRequired = this.finalTotal - numberOfTokens;
         var topupDetails = {amount: amountRequired.toString()};
-        alert("You need to top up before checking out!");
+        alert('You need to top up before checking out!');
         window.flutter_inappwebview.callHandler('topup', topupDetails);
         return false;
       } else {
@@ -201,13 +201,13 @@ parasails.registerPage('vendor-menu', {
       };
 
       window.flutter_inappwebview.callHandler('pay', paymentDetails)
-      .then(function (paymentResult) {
+      .then(() => {
       })
-      .catch(function(err){
+      .catch((err) => {
         console.log(err);
       });
 
-      io.socket.on('paid', function (data){
+      io.socket.on('paid', (data) => {
         window.location.href = '/orders/' + data.orderId;
       });
 
@@ -215,7 +215,7 @@ parasails.registerPage('vendor-menu', {
         this.submitted = false;
         this.syncing = false;
         alert(data.message);
-      })
+      });
     },
     updatedPostCode: function () {
       for(var group in this.deliveryMethodsTemp){
@@ -224,7 +224,7 @@ parasails.registerPage('vendor-menu', {
           var deliveryMethod = this.deliveryMethodsTemp[group].deliveryMethods[deliveryMethodIndex];
           var isPostCodeValid = RegExp(deliveryMethod.postCodeRestrictionRegex).test(this.address.postCode);
 
-          if (isPostCodeValid || deliveryMethod.postCodeRestrictionRegex == ""){
+          if (isPostCodeValid || deliveryMethod.postCodeRestrictionRegex == ''){
             updatedDms.push(deliveryMethod);
           }
         }
@@ -248,18 +248,18 @@ parasails.registerPage('vendor-menu', {
     },
     openCheckoutModal: function() {
       this.isLoading = true;
-      this.checkoutModalActive = true; 
+      this.checkoutModalActive = true;
       var that = this;
 
       var productids = _.pluck(this.cart, 'id');
       var productQuantities = {};
 
-      productids.forEach(function(val){
+      productids.forEach((val) => {
         productQuantities[val] = (productQuantities[val] || 0 ) + 1;
-      })
+      });
 
       Cloud.getProductDeliveryMethods(productids)
-      .then(function(output){
+      .then((output) => {
         for (var deliveryMethods in output) {
           for(var product in output[deliveryMethods].products) {
             output[deliveryMethods].products[product].quantity = productQuantities[output[deliveryMethods].products[product].id];
@@ -269,22 +269,22 @@ parasails.registerPage('vendor-menu', {
         Vue.set(that, 'deliveryMethodsTemp', output);
         that.deliveryMethodsTemp = output;
 
-        if(that.address.postCode != ""){
+        if(that.address.postCode != ''){
           that.updatedPostCode();
         }
-      })
+      });
       this.isLoading = false;
     }
   },
   filters: {
     convertToPounds: function (value) {
-      if (!value) return '£0'
-      value = "£" + (value/100).toFixed(2);
-      value = value.toString()
+      if (!value) {return '£0';}
+      value = '£' + (value/100).toFixed(2);
+      value = value.toString();
       return value;
     },
     deliverySlotFilter: function (value) {
-      if (!value) return '';
+      if (!value) {return '';}
       value = moment.unix(value).calendar();
       return value;
     }
@@ -309,7 +309,7 @@ parasails.registerPage('vendor-menu', {
       return this.cartTotal + this.deliveryTotal;
     },
     readyToPay: function() {
-      if (this.address.postCode == "") {
+      if (this.address.postCode == '') {
         return false;
       }
 
@@ -325,17 +325,5 @@ parasails.registerPage('vendor-menu', {
 
       return true;
     }
-    // deliveryTotal: function() {
-    //   var workingTotal = 0;
-
-    //   for (var methods in this.deliveryMethods) {
-    //     console.log("ran");
-    //     console.log(this.deliveryMethods[methods].selected);
-    //     if(this.deliveryMethods[methods] && this.deliveryMethods[methods].selected) {
-    //       workingTotal += this.deliveryMethods[methods].selected.priceModifier;
-    //     }
-    //   }
-    //   return workingTotal;
-    // }
   }
 });
