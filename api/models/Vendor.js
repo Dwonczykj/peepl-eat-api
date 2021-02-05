@@ -38,6 +38,14 @@ module.exports = {
       description: 'The blockchain wallet address for the vendor. Used to distribute payments from customers.',
       required: true
     },
+    imageFd: {
+      type: 'string',
+      description: 'A description of where the featured image file can be found'
+    },
+    imageMime: {
+      type: 'string',
+      description: 'The mime type of the featured image'
+    },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗

@@ -27,6 +27,7 @@ module.exports.routes = {
 
   '/vendors': {action: 'vendors/view-all-vendors'},
   '/vendors/:vendorid': { action: 'vendors/view-vendor-menu' },
+  'GET /vendors/download-image/:vendorid': { action: 'vendors/download-image' },
 
   'GET /help': { action: 'view-help' },
 
@@ -36,10 +37,13 @@ module.exports.routes = {
 
   'GET /api/v1/products/get-product-options/:productId': { action: 'products/get-product-options' },
   'POST /api/v1/products/get-product-delivery-methods': { action: 'products/get-product-delivery-methods' },
-  
+
   'POST /api/v1/orders/create-order': { action: 'orders/create-order' },
   'POST /api/v1/orders/payment-submitted': { action: 'orders/payment-submitted' },
 
+  // ADMIN
+  'GET /admin/vendors': { action: 'admin/view-vendors' },
+  'POST /api/v1/admin/create-vendor': { action: 'admin/create-vendor' },
 
   /***************************************************************************
   *                                                                          *
