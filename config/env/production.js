@@ -392,7 +392,7 @@ module.exports = {
   },
 
   uploads: {
-    adapter: 'sails-hook-uploads'
+    adapter: 'skipper-disk'
   }
 
 
