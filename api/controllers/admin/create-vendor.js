@@ -39,7 +39,7 @@ module.exports = {
 
   fn: async function (inputs) {
     var imageInfo = await sails.uploadOne(inputs.image, {
-      maxBytes: 3000000
+      maxBytes: 30000000
     });
     // TODO: Handle missing image
 
