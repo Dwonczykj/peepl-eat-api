@@ -101,7 +101,7 @@
                   <option disabled selected value="">Select a delivery method...</option>
                   <option v-for="deliveryMethod in option.deliveryMethods" :value="deliveryMethod.id">{{deliveryMethod.name}}</option>
                 </select>
-                <p v-else class="text-danger">Unfortunately, we can't deliver this item to your location. Please try another postcode.</p>
+                <p v-else class="text-danger">Unfortunately we don't cover your area yet. Please check product description for postcodes covered!</p>
               </div>
               <div v-if="option.selected" class="form-group">
                 <label :for="'deliverySlot' + index">Delivery Slot</label>

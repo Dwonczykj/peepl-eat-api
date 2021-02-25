@@ -44,6 +44,8 @@ module.exports.routes = {
   // ADMIN
   'GET /admin/vendors': { action: 'admin/view-vendors' },
   'POST /api/v1/admin/create-vendor': { action: 'admin/create-vendor' },
+  'GET /admin/vendors/:vendorid': { action: 'admin/view-edit-vendor' },
+  'post /api/v1/admin/edit-vendor': { action: 'admin/edit-vendor' },
 
   /***************************************************************************
   *                                                                          *

@@ -1,0 +1,40 @@
+<div id="edit-vendor" v-cloak>
+  <div class="container">
+    <h1 class="h4 mt-3 mb-0">{{vendor.name}}</h1>
+    <div class="row">
+      <div class="col-md-6 offset-md-3">
+        <ajax-form :form-data="vendor" action="editVendor">
+          <div class="form-group">
+            <label for="vendorName">Vendor Name</label>
+            <input type="text" :class="{ 'is-invalid': formErrors.name }" v-model="vendor.name" class="form-control" id="vendorName" required>
+          </div>
+          <div class="form-group">
+            <label for="vendorDescription">Vendor Description</label>
+            <textarea type="text" class="form-control" rows="3" :class="{ 'is-invalid': formErrors.description }" v-model="vendor.description" id="vendorDescription" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="vendorWallet">Vendor Wallet Address</label>
+            <input type="text" :class="{ 'is-invalid': formErrors.walletId }" v-model="vendor.walletId" class="form-control" id="vendorWallet" required>
+          </div>
+          <div class="form-group">
+            <label for="vendorType">Vendor Type</label>
+            <select class="form-control" id="vendorType" v-model="vendor.type" required>
+              <option value="restaurant">Restaurant</option>
+              <option value="shop" disabled>Shop</option>
+            </select>
+          </div>
+          <p>Vendor Image</p>
+          <img :src="'/vendors/download-image/' + vendor.id" />
+          <div class="custom-file">
+            <input type="file" class="custom-file-input" accept="image/*" id="customFile" @change="changeVendorImageInput($event.target.files)">
+            <label class="custom-file-label" for="customFile">{{imageName}}</label>
+          </div>
+          <div class="form-group">
+            <ajax-button class="btn btn-peepl" type="submit" v-bind:class="{ 'is-loading': syncing }">Update vendor</ajax-button>            
+          </div>
+        </ajax-form>
+      </div>
+    </div>
+  </div>
+</div>
+<%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>
