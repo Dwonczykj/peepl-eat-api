@@ -24,7 +24,7 @@
 @import "bootstrap/card";
 // @import "bootstrap/breadcrumb";
 // @import "bootstrap/pagination";
-// @import "bootstrap/badge";
+@import "bootstrap/badge";
 // @import "bootstrap/jumbotron";
 @import "bootstrap/alert";
 // @import "bootstrap/progress";
@@ -43,3 +43,8 @@
 @import "bootstrap-side-modals/bootstrap-side-modals";
 
 @import "peepl/main";
+
+#countMessage {
+  margin-top: -20px;
+  margin-right: 5px;
+}

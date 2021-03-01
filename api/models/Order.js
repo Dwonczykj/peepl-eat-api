@@ -51,7 +51,6 @@ module.exports = {
     deliveryAddressLineTwo: {
       type: 'string',
       description: 'The second line of the delivery address.',
-      // required: true
     },
     deliveryAddressPostCode: {
       type: 'string',
@@ -59,8 +58,14 @@ module.exports = {
       required: true,
       regex: /^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})$/i
     },
+    deliveryAddressInstructions: {
+      type: 'string',
+      description: 'Details about how/where to deliver the order.',
+      maxLength: 200
+    },
     customer: {
-      type: 'string'
+      type: 'string',
+      description: 'The wallet address of the customer.'
     },
     paymentJobId: {
       type: 'string',

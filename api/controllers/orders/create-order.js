@@ -54,6 +54,7 @@ module.exports = {
       deliveryAddressLineOne: inputs.address.lineOne,
       deliveryAddressLineTwo: inputs.address.lineTwo,
       deliveryAddressPostCode: inputs.address.postCode,
+      deliveryAddressInstructions: inputs.address.deliveryInstructions,
       customer: this.req.session.walletId
     }).fetch();
 

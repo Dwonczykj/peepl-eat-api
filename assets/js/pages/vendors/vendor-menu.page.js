@@ -19,7 +19,8 @@ parasails.registerPage('vendor-menu', {
       phoneNumber: '',
       lineOne: '',
       lineTwo: '',
-      postCode: ''
+      postCode: '',
+      deliveryInstructions: '',
     },
     syncing: false,
     cloudError: '',
@@ -274,7 +275,7 @@ parasails.registerPage('vendor-menu', {
         }
       });
       this.isLoading = false;
-    }
+    },
   },
   filters: {
     convertToPounds: function (value) {
@@ -324,6 +325,9 @@ parasails.registerPage('vendor-menu', {
       }
 
       return true;
+    },
+    instructionCharactersRemaining: function() {
+      return 200 - this.address.deliveryInstructions.length;
     }
   }
 });
