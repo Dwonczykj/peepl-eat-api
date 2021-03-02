@@ -23,6 +23,9 @@ module.exports = {
   fn: async function (inputs, exits) {
     var vendor = await Vendor.findOne(inputs.vendorid)
     .populate('products', {
+      where: {
+        isAvailable: true
+      },
       sort: 'priority DESC'
     });
     
