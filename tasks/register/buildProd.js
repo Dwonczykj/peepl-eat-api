@@ -17,7 +17,7 @@ module.exports = function(grunt) {
     'compileAssets',
     'babel',         //« Remove this to skip transpilation in production (not recommended)
     'concat',
-    'uglify',
+    //'uglify',
     'cssmin',
     'hash',//« Cache-busting
     'copy:beforeLinkBuildProd',//« For prettier URLs after cache-busting
