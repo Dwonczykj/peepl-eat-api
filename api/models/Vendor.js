@@ -48,7 +48,8 @@ module.exports = {
     },
     deliveryRestrictionDetails: {
       type: 'string',
-      description: 'This is a free text description of the restaurant\'s restrictions, used temporarily.'
+      description: 'This is a free text description of the restaurant\'s restrictions, used temporarily.',
+      allowNull: true
     },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
