@@ -100,7 +100,7 @@ module.exports = {
 
                 // TODO: remove redundant query
                 Order.findOne(inputs.orderId)
-                .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue')
+                .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue&vendor')
                 .then(async (fullOrder) => {
                   await sails.helpers.sendTemplateEmail.with({
                     template: 'email-order-confirmation',
