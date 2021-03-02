@@ -26,7 +26,15 @@ module.exports = {
 
     // Handle missing orders
     var order = await Order.findOne(inputs.orderId)
-    .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue')
+    .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue&vendor');
+
+    await sails.helpers.sendTemplateEmail.with({
+      template: 'email-order-confirmation',
+      templateData: {order},
+      to: order.deliveryEmail,
+      subject: 'Peepl Eat Order Confirmed - #' + order.id ,
+      layout: false,
+    });
 
     if(!order || !order.paidDateTime){
       return exits.error();
