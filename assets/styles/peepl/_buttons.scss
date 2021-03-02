@@ -7,3 +7,9 @@
         @include gradient-x( darken($orange, 7.5%), darken($red, 7.5%) );
     }
 }
+
+
+#countMessage {
+    margin-top: -20px;
+    margin-right: 5px;
+  }
