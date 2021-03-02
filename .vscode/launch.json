@@ -12,7 +12,12 @@
                 "<node_internals>/**",
                 "assets/**"
             ],
-            "program": "${workspaceFolder}/app.js"
+            "program": "${workspaceFolder}/app.js",
+            "serverReadyAction": {
+                "pattern": "debug: Port        : ([0-9]+)",
+                "uriFormat": "http://localhost:%s",
+                "action": "openExternally"
+              }
         }
     ]
 }
