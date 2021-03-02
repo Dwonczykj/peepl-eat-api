@@ -46,6 +46,10 @@ module.exports = {
       type: 'string',
       description: 'The mime type of the featured image'
     },
+    deliveryRestrictionDetails: {
+      type: 'string',
+      description: 'This is a free text description of the restaurant\'s restrictions, used temporarily.'
+    },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
