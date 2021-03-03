@@ -18,10 +18,10 @@ module.exports = {
 
   fn: async function () {
     var vendors = await Vendor.find();
-    var order = await Order.findOne({customer: this.req.session.walletId, paidDateTime: {'>': 0}});
+    var orders = await Order.find({customer: this.req.session.walletId, paidDateTime: {'>': 0}});
     var hasOrders = false;
 
-    if(order){
+    if(orders.length > 0){
       hasOrders = true;
     }
 
