@@ -155,7 +155,7 @@ parasails.registerPage('vendor-menu', {
         return {items: this.cart, address: this.address, total: this.cartTotal + this.deliveryTotal};
       }
 
-      return false;
+      return {};
     },
     checkSufficientFunds: function() {
       var contractAddress = '0x40AFCD9421577407ABB0d82E2fF25Fd2Ef4c68BD';
@@ -179,9 +179,11 @@ parasails.registerPage('vendor-menu', {
       var numberOfTokens = parseInt(data.result)/(Math.pow(10,18));
 
       if ((numberOfTokens * 100) < this.finalTotal) { // GBPx to pence
-        var amountRequired = this.finalTotal - numberOfTokens;
+        var amountRequired = (this.finalTotal - numberOfTokens) / 100; // App code expects pence!
         var topupDetails = {amount: amountRequired.toString()};
+
         alert('You need to top up before checking out!');
+        
         window.flutter_inappwebview.callHandler('topup', topupDetails);
         return false;
       } else {
