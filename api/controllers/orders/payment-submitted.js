@@ -104,9 +104,9 @@ module.exports = {
                 .then(async (fullOrder) => {
                   await sails.helpers.sendTemplateEmail.with({
                     template: 'email-order-confirmation',
-                    templateData: {order},
-                    to: order.deliveryEmail,
-                    subject: 'Peepl Eat Order Confirmed - #' + order.id ,
+                    templateData: {fullOrder},
+                    to: fullOrder.deliveryEmail,
+                    subject: 'Peepl Eat Order Confirmed - #' + fullOrder.id ,
                     layout: false,
                   });
                 });
@@ -123,7 +123,7 @@ module.exports = {
                 };
 
                 client.post('admin/tokens/transfer', data)
-                .then((res) => {
+                .then((result) => {
                   return exits.success(result.body);
                 });
               });
