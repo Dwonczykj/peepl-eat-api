@@ -26,7 +26,7 @@ module.exports = {
 
     // Handle missing orders
     var order = await Order.findOne(inputs.orderId)
-    .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue');
+    .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue&vendor');
 
     if(!order || !order.paidDateTime){
       return exits.error();

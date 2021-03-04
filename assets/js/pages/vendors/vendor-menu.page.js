@@ -151,7 +151,6 @@ parasails.registerPage('vendor-menu', {
       var isSufficientFunds = this.checkSufficientFunds();
 
       if(isSufficientFunds){
-        console.log(isSufficientFunds);
         return {items: this.cart, address: this.address, total: this.cartTotal + this.deliveryTotal};
       }
 

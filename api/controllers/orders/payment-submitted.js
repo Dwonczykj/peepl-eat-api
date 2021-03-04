@@ -97,14 +97,14 @@ module.exports = {
               }).then((success) => {
                 // Notify client of successful transaction
                 sails.sockets.broadcast('order' + order.id, 'paid', {orderId: order.id, paidDateTime: unixtime});
-
+                
                 // TODO: remove redundant query
                 Order.findOne(inputs.orderId)
                 .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue&vendor')
                 .then(async (fullOrder) => {
                   await sails.helpers.sendTemplateEmail.with({
                     template: 'email-order-confirmation',
-                    templateData: {fullOrder},
+                    templateData: {order: fullOrder},
                     to: fullOrder.deliveryEmail,
                     subject: 'Peepl Eat Order Confirmed - #' + fullOrder.id ,
                     layout: false,
