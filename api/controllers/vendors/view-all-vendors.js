@@ -21,6 +21,8 @@ module.exports = {
     var orders = await Order.find({customer: this.req.session.walletId, paidDateTime: {'>': 0}});
     var hasOrders = false;
 
+    console.log(this.req.session.walletId);
+
     if(orders.length > 0){
       hasOrders = true;
     }
