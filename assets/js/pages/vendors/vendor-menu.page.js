@@ -27,8 +27,8 @@ parasails.registerPage('vendor-menu', {
     formErrors: {
     },
     deliveryTotal: 0,
-    submitted: false
-    //readyToPay: false
+    submitted: false,
+    processingTopup: false
   },
 
   //  ╦  ╦╔═╗╔═╗╔═╗╦ ╦╔═╗╦  ╔═╗
@@ -147,16 +147,37 @@ parasails.registerPage('vendor-menu', {
     },
     handleParsingForm: function() {
       this.syncing = true;
+      var tokensRequired = this.tokensNeeded();
 
-      var isSufficientFunds = this.checkSufficientFunds();
-
-      if(isSufficientFunds){
+      if(tokensRequired === 0){
         return {items: this.cart, address: this.address, total: this.cartTotal + this.deliveryTotal};
-      }
+      } else {
+        var topupDetails = { amount: tokensRequired.toString() };
+        this.processingTopup = true; // Show 'topup pending' modal
 
-      return {};
+        var that = this; // >:(
+
+        window.flutter_inappwebview.callHandler('topup', topupDetails)
+        .then((completed) => {
+          if(completed) {
+            // If user completed topup prompt
+            setInterval(() => {
+              tokensRequired = that.tokensNeeded();
+              if(tokensRequired === 0){ // If user now has enough GBPx to check out
+                that.syncing = false;
+                that.processingTopup = false;
+              }
+            }, 3000);
+          } else {
+            that.syncing = false;
+            that.processingTopup = false;
+          }
+        });
+
+        return;
+      }
     },
-    checkSufficientFunds: function() {
+    tokensNeeded: function() {
       var contractAddress = '0x40AFCD9421577407ABB0d82E2fF25Fd2Ef4c68BD';
       var userWallet = window.SAILS_LOCALS.wallet;
       var data = null;
@@ -172,21 +193,15 @@ parasails.registerPage('vendor-menu', {
 
       if(!data) {
         alert('Invalid wallet address');
-        return false;
       }
 
       var numberOfTokens = parseInt(data.result)/(Math.pow(10,18));
 
       if ((numberOfTokens * 100) < this.finalTotal) { // GBPx to pence
-        var amountRequired = (this.finalTotal - numberOfTokens) / 100; // App code expects pence!
-        var topupDetails = {amount: amountRequired.toString()};
-
-        alert('You need to top up before checking out!');
-        
-        window.flutter_inappwebview.callHandler('topup', topupDetails);
-        return false;
+        var amountRequired = (this.finalTotal - numberOfTokens * 100) / 100; // App code expects pence!
+        return amountRequired;
       } else {
-        return true;
+        return 0;
       }
     },
     submittedForm: function(result) {
@@ -316,6 +331,10 @@ parasails.registerPage('vendor-menu', {
       }
 
       if(this.submitted) {
+        return false;
+      }
+
+      if(this.syncing) {
         return false;
       }
 

@@ -64,7 +64,7 @@
         <div class="modal-header">
           <h5 class="mb-0">Checkout</h5>
         </div>
-        <ajax-form action="createOrder" protocol="io.socket" :syncing.sync="syncing" :cloud-error.sync="cloudError" @submitted="submittedForm" :handle-parsing="handleParsingForm">
+        <ajax-form ref="createOrder" action="createOrder" protocol="io.socket" :syncing.sync="syncing" :cloud-error.sync="cloudError" @submitted="submittedForm" :handle-parsing="handleParsingForm">
           <div class="modal-body">
             <div class="form-group">
               <label for="nameInput">Your Name</label>
@@ -132,7 +132,13 @@
         </div>
           <div class="modal-footer">
             <a class="btn btn-outline-secondary" @click="checkoutModalActive=false">Cancel</a>
-            <ajax-button class="btn btn-peepl" :disabled="!readyToPay" type="submit" v-bind:class="{ 'is-loading': syncing }">Pay {{finalTotal | convertToPounds}}</ajax-button>
+            <ajax-button class="btn btn-peepl" :disabled="!readyToPay" type="submit" v-bind:class="{ 'is-loading': syncing }">
+              <span v-if="syncing">
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Loading...
+              </span>
+              <span v-else>Pay {{finalTotal | convertToPounds}}</span>
+            </ajax-button>
           </div>
         </form>
       </div>
@@ -147,6 +153,20 @@
           </div>
           <h3 class="mt-3">Yum!</h3>
           <p class="mb-2">Give us a minute while we complete your payment and send your reward.</p>
+          <p>Don’t go anywhere.</p>
+        </div>
+      </div>
+    </modal>
+    <modal v-if="processingTopup" v-cloak>
+      <div class="modal-content">
+        <div class="modal-body text-center">
+          <div class="mt-3 d-flex justify-content-center">
+            <div class="spinner-border text-peepl-red" role="status">
+              <span class="sr-only">Waiting for deposit...</span>
+            </div>
+          </div>
+          <h3 class="mt-3">One sec!</h3>
+          <p class="mb-2">Give us a minute while we wait for your GBPx to be minted.</p>
           <p>Don’t go anywhere.</p>
         </div>
       </div>
