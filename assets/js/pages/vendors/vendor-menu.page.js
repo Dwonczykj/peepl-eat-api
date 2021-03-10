@@ -217,6 +217,7 @@ parasails.registerPage('vendor-menu', {
         orderId: result.toString()
       };
 
+      // TODO: Change this to send payment information to backend, rather than using webhook from app.
       window.flutter_inappwebview.callHandler('pay', paymentDetails)
       .then(() => {
       })
