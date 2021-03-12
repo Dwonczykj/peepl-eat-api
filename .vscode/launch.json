@@ -13,6 +13,7 @@
                 "assets/**"
             ],
             "program": "${workspaceFolder}/app.js",
+            // "preLaunchTask": "ngrok",
             "serverReadyAction": {
                 "pattern": "debug: Port        : ([0-9]+)",
                 "uriFormat": "http://localhost:%s",
