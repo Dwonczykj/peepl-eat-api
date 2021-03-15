@@ -172,7 +172,7 @@ parasails.registerPage('vendor-menu', {
         //   }
         // });
         alert('Please visit the top-up tab to top-up £' + tokensRequired);
-
+        this.syncing = false;
         return;
       }
     },
