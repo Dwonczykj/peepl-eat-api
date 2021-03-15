@@ -29,6 +29,11 @@ module.exports = {
       type: 'string',
       description: 'A regular expression specifying which postcodes are eligible for this delivery method.'
     },
+    methodType: {
+      type: 'string',
+      isIn: ['courier', 'collection'],
+      defaultsTo: 'courier'
+    },
 
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
@@ -47,7 +52,6 @@ module.exports = {
       collection: 'deliverymethodslot',
       via: 'deliveryMethod'
     }
-    
   },
 
 };

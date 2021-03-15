@@ -21,6 +21,7 @@ module.exports = {
       type: 'string',
       description: 'The type of vendor.',
       // isIn: ['restaurant', 'shop'],
+      defaultsTo: 'restaurant',
       required: false
     },
     description: {
@@ -50,6 +51,11 @@ module.exports = {
       type: 'string',
       description: 'This is a free text description of the restaurant\'s restrictions, used temporarily.',
       allowNull: true
+    },
+    status: {
+      type: 'string',
+      isIn: ['active', 'draft', 'inactive'],
+      defaultsTo: 'inactive'
     },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
