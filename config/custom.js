@@ -20,6 +20,7 @@ module.exports.custom = {
   // …
   amazonSesAccessKeyId: "",
   amazonSesAccessKeySecret: "",
-  amazonSesRegion: "eu-west-1"
+  amazonSesRegion: "eu-west-1",
+  mailchimpAPIKey: "53745999cd9909b57e46c059db39c947-us7",
 
 };

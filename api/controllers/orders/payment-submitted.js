@@ -109,6 +109,7 @@ module.exports = {
                     subject: 'Peepl Eat Order Confirmed - #' + fullOrder.id ,
                     layout: false,
                   });
+                  // TODO: Mailchimp add completed_order event - NOT created_order event!
                 });
 
                 // Issue PPL token reward

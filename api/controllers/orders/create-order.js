@@ -32,10 +32,19 @@ module.exports = {
 
 
   fn: async function (inputs, exits) {
+    // var mailchimp = require('@mailchimp/mailchimp_marketing');
+    // var md5 = require('md5');
+
+    // mailchimp.setConfig({
+    //   apiKey: sails.config.custom.mailchimpAPIKey,
+    //   server: 'us7'
+    // });
+
     for (var item in inputs.items) {
       inputs.items[item].optionValues = [];
+      // TODO: Refactor to batch SQL query
       for (var option in inputs.items[item].options) {
-        if(inputs.items[item].options[option] != "") {
+        if(inputs.items[item].options[option] != '') {
           var newOptionValuePair = await OrderItemOptionValue.create({
             option: option,
             optionValue: inputs.items[item].options[option],
@@ -58,7 +67,7 @@ module.exports = {
       customer: this.req.session.walletId
     }).fetch();
 
-    var updatedItems = _.map(inputs.items, function(object) {
+    var updatedItems = _.map(inputs.items, (object) => {
       object.product = object.id;
       object.order = order.id;
 
@@ -69,23 +78,58 @@ module.exports = {
       return _.pick(object, ['order', 'product', 'deliveryMethod', 'deliverySlot', 'optionValues']);
     });
 
-    var products = await OrderItem.createEach(updatedItems);
+    await OrderItem.createEach(updatedItems);
 
     // Calculate the order total on the backend
     var calculatedOrderTotal = await sails.helpers.calculateOrderTotal.with({orderId: order.id});
 
-    if(order.total != calculatedOrderTotal) {
+    if(order.total !== calculatedOrderTotal) {
       Order.updateOne(order.id)
       .set({total: calculatedOrderTotal});
     }
-    
-    sails.sockets.join(this.req, 'order' + order.id, function(err){
+
+    // Subscribe calling websocket to order room
+    sails.sockets.join(this.req, 'order' + order.id, (err) => {
       if(err) {
         return exits.error();
       }
     });
 
-    
+    // async function createOrderEventMC(orderId) {
+    //   Order.findOne(orderId)
+    //   .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue&vendor')
+    //   .then(async (fullOrder) => {
+    //     var listId = '551419';
+
+    //     const eventOptions = {
+    //       name: 'created_order',
+    //       properties: {
+    //         order: fullOrder
+    //       }
+    //     };
+
+    //     mailchimp.lists.addListMember(listId, {
+    //       email_address: fullOrder.deliveryEmail,
+    //       status: 'subscribed',
+    //       merge_fields: {
+    //         FNAME: fullOrder.deliveryName
+    //       }
+    //     })
+    //     .then((res) => {
+    //       console.log(res);
+    //     });
+
+    //     var res2 = await mailchimp.lists.createListMemberEvent(
+    //       listId,
+    //       md5(fullOrder.deliveryEmail.toLowerCase()),
+    //       eventOptions
+    //     );
+    //     console.log(res2);
+    //   });
+    // }
+
+    // createOrderEventMC(order.id);
+
     var user = await User.findOne({walletId: this.req.session.walletId});
     // Create or update user record by walletId
     if(!user){
@@ -114,6 +158,5 @@ module.exports = {
     return exits.success(order.id);
 
   }
-
 
 };
