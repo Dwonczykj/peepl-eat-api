@@ -57,6 +57,10 @@ module.exports = {
       isIn: ['active', 'draft', 'inactive'],
       defaultsTo: 'inactive'
     },
+    phoneNumber: {
+      type: 'string',
+      description: 'Phone number of the restaurant.'
+    },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
