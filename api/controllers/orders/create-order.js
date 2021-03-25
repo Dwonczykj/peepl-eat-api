@@ -32,13 +32,10 @@ module.exports = {
 
 
   fn: async function (inputs, exits) {
-    // var mailchimp = require('@mailchimp/mailchimp_marketing');
-    // var md5 = require('md5');
+    var mailchimp = require('@mailchimp/mailchimp_marketing');
+    var md5 = require('md5');
 
-    // mailchimp.setConfig({
-    //   apiKey: sails.config.custom.mailchimpAPIKey,
-    //   server: 'us7'
-    // });
+    // TODO: Refactor all of this code to run concurrently where possible
 
     for (var item in inputs.items) {
       inputs.items[item].optionValues = [];
@@ -95,40 +92,47 @@ module.exports = {
       }
     });
 
-    // async function createOrderEventMC(orderId) {
-    //   Order.findOne(orderId)
-    //   .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue&vendor')
-    //   .then(async (fullOrder) => {
-    //     var listId = '551419';
+    Order.findOne(order.id)
+    .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue&vendor')
+    .then(async (fullOrder) => {
 
-    //     const eventOptions = {
-    //       name: 'created_order',
-    //       properties: {
-    //         order: fullOrder
-    //       }
-    //     };
+      mailchimp.setConfig({
+        apiKey: sails.config.custom.mailchimpAPIKey,
+        server: 'us7'
+      });
 
-    //     mailchimp.lists.addListMember(listId, {
-    //       email_address: fullOrder.deliveryEmail,
-    //       status: 'subscribed',
-    //       merge_fields: {
-    //         FNAME: fullOrder.deliveryName
-    //       }
-    //     })
-    //     .then((res) => {
-    //       console.log(res);
-    //     });
+      var customerEmailMd5 = md5(inputs.address.email.toLowerCase());
+      var listId = 'e538a63177'; // Peepl Newsletter
 
-    //     var res2 = await mailchimp.lists.createListMemberEvent(
-    //       listId,
-    //       md5(fullOrder.deliveryEmail.toLowerCase()),
-    //       eventOptions
-    //     );
-    //     console.log(res2);
-    //   });
-    // }
+      const eventOptions = {
+        name: 'created_order',
+        properties: {
+          orderId: fullOrder.id.toString(),
+          total: calculatedOrderTotal.toString()
+        }
+      };
 
-    // createOrderEventMC(order.id);
+      mailchimp.lists.setListMember(listId, customerEmailMd5, {
+        email_address: inputs.address.email,
+        status_if_new: 'subscribed',
+        merge_fields: {
+          FNAME: inputs.address.name,
+          POSTCODE: inputs.address.postCode
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+      mailchimp.lists.createListMemberEvent(
+        listId,
+        customerEmailMd5,
+        eventOptions
+      )
+      .catch((err) => {
+        console.log(err);
+      });
+    });
 
     var user = await User.findOne({walletId: this.req.session.walletId});
     // Create or update user record by walletId
