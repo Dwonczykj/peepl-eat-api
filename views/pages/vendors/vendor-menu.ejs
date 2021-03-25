@@ -97,15 +97,13 @@
             </div>
 
 
-            <h5>Delivery Options</h5>
-            <div v-for="(option, index) in deliveryMethods">
-              <div v-for="product in option.products">
-                <p>{{product.name}} x{{product.quantity}}</p>
-              </div>
+            <h5 class="mt-4">Delivery Options</h5>
+            <div v-for="(option, index) in deliveryMethods" class="border rounded my-3 px-3 pt-3">
+              <h6 v-for="product in option.products" class="mb-3">{{product.name}} x{{product.quantity}}</h6>
               <div class="form-group">
                 <label :for="'deliveryMethod' + index">Delivery Method</label>
                 <select v-if="option.deliveryMethods.length > 0" @change="changeDeliveryMethod" class="form-control" :id="'deliveryMethod' + index" required>
-                  <option disabled selected value="">Select a delivery method...</option>
+                  <option disabled selected value="">Select a delivery method…</option>
                   <option v-for="deliveryMethod in option.deliveryMethods" :value="deliveryMethod.id">{{deliveryMethod.name}}</option>
                 </select>
                 <p v-else class="text-danger">Unfortunately we don't cover your area yet. Please check product description for postcodes covered!</p>
@@ -113,25 +111,45 @@
               <div v-if="option.selected" class="form-group">
                 <label :for="'deliverySlot' + index">Delivery Slot</label>
                 <select v-if="option.selected.deliveryMethodSlots" @change="changeDeliverySlot" class="form-control"  :id="'deliverySlot' + index" required>
-                  <option disabled selected value="">Select a delivery slot...</option>
+                  <option disabled selected value="">Select a delivery slot…</option>
                   <option v-for="deliveryMethodSlot in option.selected.deliveryMethodSlots" :value="deliveryMethodSlot.id">{{deliveryMethodSlot.startTime | deliverySlotFilter}} - {{deliveryMethodSlot.endTime | deliverySlotFilter}} ({{deliveryMethodSlot.slotsRemaining}} left)</option>
                 </select>
                 <p v-else class="text-danger">Unfortunately, there are no slots available. Please try a different delivery option.</p>
               </div>
             </div>
 
-          <h6 class="d-flex justify-content-between mt-3 mb-0">
-            <b>Total:</b>
-            {{cartTotal | convertToPounds}}
-          </h6>
-          <h6 class="d-flex justify-content-between mt-3 mb-0">
-            <b>Delivery:</b>
-            {{deliveryTotal | convertToPounds}}
-          </h6>
-          <h6 class="text-danger" v-if="cloudError">{{cloudError}}</h6>
-        </div>
+            <h5 class="mt-4">Payment</h5>
+            <p class="d-flex justify-content-between mt-3 mb-0">
+              <b>Your order:</b>
+              {{cartTotal | convertToPounds}}
+            </p>
+            <p class="d-flex justify-content-between mt-3 mb-0">
+              <b>Delivery:</b>
+              {{deliveryTotal | convertToPounds}}
+            </p>
+            <h6 class="d-flex justify-content-between mt-3 mb-0 border-top pt-3">
+              <b>Total:</b>
+              {{cartTotal + deliveryTotal | convertToPounds}}
+            </h6>
+
+            <h6 class="d-flex justify-content-between mt-4 mb-0">
+              <b>In your wallet:</b>
+              {{ walletTotal }}
+            </h6>
+
+            <div class="border rounded p-3 my-4" v-if="walletTotal < cartTotal + deliveryTotal">
+              <h5>You need to top up</h5>
+              <p>Peepl works like a wallet – you top up with your card, and then spend. This helps us keep costs low for your favourite restaurants.</p>
+              <p>You will need to top up at least <strong>{{ cartTotal + deliveryTotal - walletTotal | convertToPounds }}</strong> before you can check out.</p>
+              <!-- TODO: Button should lead to Top Up screen -->
+              <a href="#" class="btn btn-peepl btn-block">Top up</a>
+            </div>
+
+            <h6 class="text-danger" v-if="cloudError">{{cloudError}}</h6>
+          </div>
           <div class="modal-footer">
             <a class="btn btn-outline-secondary" @click="checkoutModalActive=false">Cancel</a>
+
             <ajax-button class="btn btn-peepl" :disabled="!readyToPay" type="submit" v-bind:class="{ 'is-loading': syncing }">
               <span v-if="syncing">
                 <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>

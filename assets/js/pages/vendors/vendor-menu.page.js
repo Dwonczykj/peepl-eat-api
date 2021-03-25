@@ -27,6 +27,7 @@ parasails.registerPage('vendor-menu', {
     formErrors: {
     },
     deliveryTotal: 0,
+    walletTotal: 0,
     submitted: false,
     processingTopup: false
   },
@@ -342,6 +343,10 @@ parasails.registerPage('vendor-menu', {
         if (this.deliveryMethods[option].noMethodsAvailable){
           return false;
         }
+      }
+
+      if (this.walletTotal < this.cartTotal + this.deliveryTotal) {
+        return false;
       }
 
       return true;

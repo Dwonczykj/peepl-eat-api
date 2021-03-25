@@ -6,6 +6,12 @@
         color: color-yiq( darken($red, 7.5%) );
         @include gradient-x( darken($orange, 7.5%), darken($red, 7.5%) );
     }
+
+    &[disabled] {
+        color: color-yiq($gray-600);
+        background: $gray-600;
+        cursor: not-allowed;
+    }
 }
 
 
