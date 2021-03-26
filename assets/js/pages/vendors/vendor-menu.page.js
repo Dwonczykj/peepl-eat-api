@@ -153,27 +153,27 @@ parasails.registerPage('vendor-menu', {
       if(tokensRequired === 0){
         return {items: this.cart, address: this.address, total: this.cartTotal + this.deliveryTotal};
       } else {
-        // var topupDetails = { amount: tokensRequired.toString() };
-        // this.processingTopup = true; // Show 'topup pending' modal
-        // var that = this; // >:(
-        // window.flutter_inappwebview.callHandler('topup', topupDetails)
-        // .then((completed) => {
-        //   if(completed) {
-        //     // If user completed topup prompt
-        //     setInterval(() => {
-        //       tokensRequired = that.tokensNeeded();
-        //       if(tokensRequired === 0){ // If user now has enough GBPx to check out
-        //         that.syncing = false;
-        //         that.processingTopup = false;
-        //       }
-        //     }, 3000);
-        //   } else {
-        //     that.syncing = false;
-        //     that.processingTopup = false;
-        //   }
-        // });
-        alert('Please visit the top-up tab to top-up £' + tokensRequired);
-        this.syncing = false;
+        var topupDetails = { amount: tokensRequired.toString() };
+        this.processingTopup = true; // Show 'topup pending' modal
+        var that = this; // >:(
+        window.flutter_inappwebview.callHandler('topup', topupDetails)
+        .then((completed) => {
+          if(completed) {
+            // If user completed topup prompt
+            setInterval(() => {
+              tokensRequired = that.tokensNeeded();
+              if(tokensRequired === 0){ // If user now has enough GBPx to check out
+                that.syncing = false;
+                that.processingTopup = false;
+              }
+            }, 3000);
+          } else {
+            that.syncing = false;
+            that.processingTopup = false;
+          }
+        });
+        // alert('Please visit the top-up tab to top-up £' + tokensRequired);
+        // this.syncing = false;
         return;
       }
     },

@@ -33,7 +33,6 @@ module.exports.routes = {
 
   'GET /orders/:orderId': { action: 'orders/view-order-confirmation' },
   'GET /orders': { action: 'orders/view-my-orders' },
-  'GET /orders/all': { action: 'orders/view-all-orders' },
 
   'GET /api/v1/products/get-product-options/:productId': { action: 'products/get-product-options' },
   'POST /api/v1/products/get-product-delivery-methods': { action: 'products/get-product-delivery-methods' },
@@ -46,6 +45,8 @@ module.exports.routes = {
   'POST /api/v1/admin/create-vendor': { action: 'admin/create-vendor' },
   'GET /admin/vendors/:vendorid': { action: 'admin/view-edit-vendor' },
   'post /api/v1/admin/edit-vendor': { action: 'admin/edit-vendor' },
+  'GET /admin/orders': { action: 'admin/view-all-orders' },
+  'POST /api/v1/admin/request-payout': { action: 'admin/request-payout' },
 
   /***************************************************************************
   *                                                                          *

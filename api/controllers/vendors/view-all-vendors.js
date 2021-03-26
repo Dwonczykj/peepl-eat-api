@@ -21,7 +21,11 @@ module.exports = {
     var orders = await Order.find({customer: this.req.session.walletId, paidDateTime: {'>': 0}});
     var hasOrders = false;
 
-    console.log(this.req.session.walletId);
+    var isVendor = await Vendor.findOne({walletId: this.req.session.walletId});
+
+    if(isVendor) {
+      return this.res.redirect('/admin/orders');
+    }
 
     if(orders.length > 0){
       hasOrders = true;

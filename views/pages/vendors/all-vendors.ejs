@@ -4,7 +4,7 @@
 
 <% if(hasOrders) { %>
 
-  <a class="py-3 mb-4 border-bottom d-flex align-items-center" href="/orders">
+  <a class="py-3 border-bottom d-flex align-items-center" href="/orders">
     <span class="mr-auto">My orders</span>
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
       <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
@@ -13,47 +13,63 @@
 
 <% } %>
 
-  <div class="p-3 my-4 position-relative rounded shadow text-white bg-diagonal-gradient-teal-green">
-    <p class="mb-1 text-uppercase font-weight-bold" style="opacity: 0.7;">Sundays</p>
-    <h1 class="font-weight-bold mb-5" style="line-height: 1;">
-      <a href="/vendors/4" class="stretched-link text-white">Sundays Are Roast Days</a>
-    </h1>
-    <p class="mb-0">Get that after roast joy, melting into your couch…this time, with no dishes!</p>
+
+  <div class="card-carousel">
+    <div class="card-carousel__inner">
+
+      <div class="card-carousel__item">
+        <div class="d-flex flex-column p-3 position-relative rounded shadow text-white bg-diagonal-gradient-orange-red">
+          <p class="mb-1 text-uppercase font-weight-bold" style="opacity: 0.7;">Fridays</p>
+          <h1 class="font-weight-bold mb-5" style="line-height: 1;">
+            <a href="/vendors/2" class="stretched-link text-white">Thank Peepl it’s&nbsp;Friday!</a>
+          </h1>
+          <p class="mb-0 mt-auto">Flavour explosions to get your weekend started right…</p>
+        </div>
+      </div>
+
+      <div class="card-carousel__item">
+        <div class="d-flex flex-column p-3 position-relative rounded shadow text-white bg-diagonal-gradient-green-yellow">
+          <p class="mb-1 text-uppercase font-weight-bold" style="opacity: 0.7;">Saturday brunch</p>
+          <h1 class="font-weight-bold mb-5" style="line-height: 1;">
+            <a href="/vendors/3" class="stretched-link text-white">Saturday Brunch&nbsp;Club</a>
+          </h1>
+          <p class="mb-0 mt-auto">Take it easy with this selection of local breakfast specialities…</p>
+        </div>
+      </div>
+
+      <!-- <div class="card-carousel__item">
+        <div class="d-flex flex-column p-3 position-relative rounded shadow text-white bg-diagonal-gradient-yellow-orange">
+          <p class="mb-1 text-uppercase font-weight-bold" style="opacity: 0.7;">Saturday afternoons</p>
+          <h1 class="font-weight-bold mb-0 mt-5" style="line-height: 1;">
+            <a href="/vendors/3" class="stretched-link text-white">The Tipsy Afternoon Tea&nbsp;Society</a>
+          </h1>
+        </div>
+      </div> -->
+
+      <div class="card-carousel__item">
+        <div class="d-flex flex-column p-3 position-relative rounded shadow text-white bg-diagonal-gradient-blue-teal">
+          <p class="mb-1 text-uppercase font-weight-bold" style="opacity: 0.7;">Saturday evenings</p>
+          <h1 class="font-weight-bold mb-5" style="line-height: 1;">
+            <a href="/vendors/1" class="stretched-link text-white">Saturday &amp; Chill</a>
+          </h1>
+          <p class="mb-0 mt-auto">Snuggle up with your partner/family/pets and enjoy a takeaway with a difference.</p>
+        </div>
+      </div>
+
+      <div class="card-carousel__item">
+        <div class="d-flex flex-column p-3 position-relative rounded shadow text-white bg-diagonal-gradient-teal-green">
+          <p class="mb-1 text-uppercase font-weight-bold" style="opacity: 0.7;">Sundays</p>
+          <h1 class="font-weight-bold mb-5" style="line-height: 1;">
+            <a href="/vendors/4" class="stretched-link text-white">Sundays Are Roast Days</a>
+          </h1>
+          <p class="mb-0 mt-auto">Get that after roast joy, melting into your couch… this time, with no dishes!</p>
+        </div>
+      </div>
+
+    </div>
   </div>
 
-  <div class="p-3 my-4 position-relative rounded shadow text-white bg-diagonal-gradient-orange-red">
-    <p class="mb-1 text-uppercase font-weight-bold" style="opacity: 0.7;">Fridays</p>
-    <h1 class="font-weight-bold mb-5" style="line-height: 1;">
-      <a href="/vendors/2" class="stretched-link text-white">Thank Peepl it’s&nbsp;Friday!</a>
-    </h1>
-    <p class="mb-0">Flavour explosions to get your weekend started right…</p>
-  </div>
-
-  <div class="p-3 my-4 position-relative rounded shadow text-white bg-diagonal-gradient-green-yellow">
-    <p class="mb-1 text-uppercase font-weight-bold" style="opacity: 0.7;">Saturday brunch</p>
-    <h1 class="font-weight-bold mb-5" style="line-height: 1;">
-      <a href="/vendors/3" class="stretched-link text-white">Saturday Brunch&nbsp;Club</a>
-    </h1>
-    <p class="mb-0">Take it easy with this selection of local breakfast specialities…</p>
-  </div>
-
-  <!-- <div class="p-3 my-4 position-relative rounded shadow text-white bg-diagonal-gradient-yellow-orange">
-    <p class="mb-1 text-uppercase font-weight-bold" style="opacity: 0.7;">Saturday afternoons</p>
-    <h1 class="font-weight-bold mb-0 mt-5" style="line-height: 1;">
-      <a href="/vendors/3" class="stretched-link text-white">The Tipsy Afternoon Tea&nbsp;Society</a>
-    </h1>
-  </div> -->
-
-  <div class="p-3 my-4 position-relative rounded shadow text-white bg-diagonal-gradient-blue-teal">
-    <p class="mb-1 text-uppercase font-weight-bold" style="opacity: 0.7;">Saturday evenings</p>
-    <h1 class="font-weight-bold mb-5" style="line-height: 1;">
-      <a href="/vendors/1" class="stretched-link text-white">Saturday &amp; Chill</a>
-    </h1>
-    <p class="mb-2">Snuggle up with your partner/family/pets* and a takeaway with a difference.</p>
-    <p class="mb-0"><small>* Delete as appropriate</small></p>
-  </div>
-
-  <h1 class="mt-5 mb-2 h4 text-muted">All restaurants</h1>
+  <h1 class="mt-4 mb-2 h4 text-muted">All restaurants</h1>
 
   <div class="row">
     <% for (var vendor in vendors) { %>

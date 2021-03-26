@@ -9,8 +9,7 @@
             "request": "launch",
             "name": "Launch Program",
             "skipFiles": [
-                "${workspaceFolder}/node_modules/**/*.js",
-                "<node_internals>/**",
+                "<node_internals>/**/*.js",
                 "assets/**"
             ],
             "program": "${workspaceFolder}/app.js",
@@ -19,7 +18,7 @@
                 "pattern": "debug: Port        : ([0-9]+)",
                 "uriFormat": "http://localhost:%s",
                 "action": "openExternally"
-              }
+            }
         }
     ]
 }
