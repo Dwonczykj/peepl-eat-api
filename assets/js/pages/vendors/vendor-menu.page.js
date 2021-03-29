@@ -48,6 +48,7 @@ parasails.registerPage('vendor-menu', {
     }
   },
   mounted: async function() {
+    this.walletTotal = this.getWalletTotal();
   },
 
   //  ╦╔╗╔╔╦╗╔═╗╦═╗╔═╗╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
@@ -175,7 +176,7 @@ parasails.registerPage('vendor-menu', {
         // return;
       }*/
     },
-    tokensNeeded: function() {
+    getWalletTotal: function() {
       var contractAddress = '0x40AFCD9421577407ABB0d82E2fF25Fd2Ef4c68BD';
       var userWallet = window.SAILS_LOCALS.wallet;
       var data = null;
@@ -193,14 +194,16 @@ parasails.registerPage('vendor-menu', {
         alert('Invalid wallet address');
       }
 
-      var numberOfTokens = parseInt(data.result)/(Math.pow(10,18));
+      var numberOfTokens = parseInt(data.result)/(Math.pow(10,16));
 
-      if ((numberOfTokens * 100) < this.finalTotal) { // GBPx to pence
+      return numberOfTokens; //In pence
+
+      /* if ((numberOfTokens * 100) < this.finalTotal) { // GBPx to pence
         var amountRequired = (this.finalTotal - numberOfTokens * 100) / 100; // App code expects pence!
         return amountRequired;
       } else {
         return 0;
-      }
+      } */
     },
     submittedForm: function(result) {
       this.syncing = true;
@@ -346,9 +349,9 @@ parasails.registerPage('vendor-menu', {
         }
       }
 
-      if (this.walletTotal < this.cartTotal + this.deliveryTotal) {
+      /* if (this.walletTotal < this.cartTotal + this.deliveryTotal) {
         return false;
-      }
+      } */
 
       return true;
     },

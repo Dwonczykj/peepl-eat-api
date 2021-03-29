@@ -134,7 +134,7 @@
 
             <h6 class="d-flex justify-content-between mt-4 mb-0">
               <b>In your wallet:</b>
-              {{ walletTotal }}
+              {{ walletTotal | convertToPounds }}
             </h6>
 
             <div class="border rounded p-3 my-4" v-if="walletTotal < cartTotal + deliveryTotal">
@@ -142,7 +142,7 @@
               <p>Peepl works like a wallet – you top up with your card, and then spend. This helps us keep costs low for your favourite restaurants.</p>
               <p>You will need to top up at least <strong>{{ cartTotal + deliveryTotal - walletTotal | convertToPounds }}</strong> before you can check out.</p>
               <!-- TODO: Button should lead to Top Up screen -->
-              <a href="#" class="btn btn-peepl btn-block">Top up</a>
+              <!-- <a href="#" class="btn btn-peepl btn-block">Top up</a> -->
             </div>
 
             <h6 class="text-danger" v-if="cloudError">{{cloudError}}</h6>
