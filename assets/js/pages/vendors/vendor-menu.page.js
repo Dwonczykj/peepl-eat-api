@@ -148,11 +148,11 @@ parasails.registerPage('vendor-menu', {
     },
     handleParsingForm: function() {
       this.syncing = true;
-      var tokensRequired = this.tokensNeeded();
+      // var tokensRequired = this.tokensNeeded();
 
-      if(tokensRequired === 0){
-        return {items: this.cart, address: this.address, total: this.cartTotal + this.deliveryTotal};
-      } else {
+      // if(tokensRequired === 0){
+      return {items: this.cart, address: this.address, total: this.cartTotal + this.deliveryTotal};
+      /* } else {
         var topupDetails = { amount: tokensRequired.toString() };
         this.processingTopup = true; // Show 'topup pending' modal
         var that = this; // >:(
@@ -172,10 +172,8 @@ parasails.registerPage('vendor-menu', {
             that.processingTopup = false;
           }
         });
-        // alert('Please visit the top-up tab to top-up £' + tokensRequired);
-        // this.syncing = false;
-        return;
-      }
+        // return;
+      }*/
     },
     tokensNeeded: function() {
       var contractAddress = '0x40AFCD9421577407ABB0d82E2fF25Fd2Ef4c68BD';
@@ -217,12 +215,15 @@ parasails.registerPage('vendor-menu', {
         orderId: result.toString()
       };
 
+      var that = this;
+
       // TODO: Change this to send payment information to backend, rather than using webhook from app.
       window.flutter_inappwebview.callHandler('pay', paymentDetails)
-      .then(() => {
-      })
-      .catch((err) => {
-        console.log(err);
+      .then(({err, msg}) => {
+        if (err){
+          that.submitted = false;
+          that.syncing = false;
+        }
       });
 
       io.socket.on('paid', (data) => {
