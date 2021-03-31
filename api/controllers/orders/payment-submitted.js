@@ -53,39 +53,39 @@ module.exports = {
             }else {
               if(paymentRecipientWallet != order.items[0].product.vendor.walletId) {
                 error = 'Recipient doesn\'t match!';
-                sails.sockets.broadcast('order' + order.id, 'error', {orderId: order.id, message: error});
+                sails.sockets.broadcast('order' + order.id, 'paymentError', {orderId: order.id, message: error});
                 return exits.error({message: error});
               }
               if(paymentTokenAddress.toUpperCase() != '0x40AFCD9421577407ABB0d82E2fF25Fd2Ef4c68BD'.toUpperCase()) {//GBPX token address
                 error = 'Incorrect token sent.';
-                sails.sockets.broadcast('order' + order.id, 'error', {orderId: order.id, message: error});
+                sails.sockets.broadcast('order' + order.id, 'paymentError', {orderId: order.id, message: error});
                 return exits.error({message: error});
               }
               if (paymentSenderWallet != order.customer){
                 error = 'Transaction sender is not customer.';
-                sails.sockets.broadcast('order' + order.id, 'error', {orderId: order.id, message: error});
+                sails.sockets.broadcast('order' + order.id, 'paymentError', {orderId: order.id, message: error});
                 return exits.error({message: error});
               }
               if(paymentTotal != order.total){
                 error =  'Transaction amount doesn\'t match order total.';
-                sails.sockets.broadcast('order' + order.id, 'error', {orderId: order.id, message: error});
+                sails.sockets.broadcast('order' + order.id, 'paymentError', {orderId: order.id, message: error});
                 return exits.error({message: error});
               }
               if(paymentStatus != 'confirmed'){
                 error = 'Transaction failed. Check wallet balance.';
-                sails.sockets.broadcast('order' + order.id, 'error', {orderId: order.id, message: error});
+                sails.sockets.broadcast('order' + order.id, 'paymentError', {orderId: order.id, message: error});
                 return exits.error({message: error});
               }
               if (transactionType != 'SEND'){
                 error = 'Incorrect transaction type.';
-                sails.sockets.broadcast('order' + order.id, 'error', {orderId: order.id, message: error});
+                sails.sockets.broadcast('order' + order.id, 'paymentError', {orderId: order.id, message: error});
                 return exits.error({message: error});
               }
 
               var existingOrdersWithJobId = await Order.findOne({paymentJobId: inputs.jobId});
               if(existingOrdersWithJobId){
                 error = 'Transaction has already been used for another order.';
-                sails.sockets.broadcast('order' + order.id, 'error', {orderId: order.id, message: error});
+                sails.sockets.broadcast('order' + order.id, 'paymentError', {orderId: order.id, message: error});
                 return exits.error({message: error});
               }
 

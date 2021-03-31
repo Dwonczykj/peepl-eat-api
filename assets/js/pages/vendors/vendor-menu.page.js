@@ -249,7 +249,7 @@ parasails.registerPage('vendor-menu', {
         window.location.href = '/orders/' + data.orderId;
       });
 
-      io.socket.on('error', function(data){
+      io.socket.on('paymentError', function(data){
         this.submitted = false;
         this.syncing = false;
         alert(data.message);
