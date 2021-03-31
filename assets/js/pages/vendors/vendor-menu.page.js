@@ -246,6 +246,8 @@ parasails.registerPage('vendor-menu', {
       window.flutter_inappwebview.callHandler('pay', paymentDetails);
 
       io.socket.on('paid', (data) => {
+        this.submitted = false;
+        this.syncing = false;
         window.location.href = '/orders/' + data.orderId;
       });
 
