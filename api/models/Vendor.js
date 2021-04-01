@@ -59,7 +59,8 @@ module.exports = {
     },
     phoneNumber: {
       type: 'string',
-      description: 'Phone number of the restaurant.'
+      description: 'Phone number of the restaurant.',
+      allowNull: true
     },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
