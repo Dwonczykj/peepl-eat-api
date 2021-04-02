@@ -24,7 +24,7 @@ module.exports = {
     var output = {};
 
     var products = await Product.find(inputs.productids)
-    .meta({enableExperimentalDeepTargets:true});
+    .meta({enableExperimentalDeepTargets:true})
     .populate('deliveryMethods.deliveryMethodSlots', [{},
       {
       where:{
