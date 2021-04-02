@@ -33,7 +33,7 @@ module.exports = {
         }
       }]);
 
-    console.log(products[0].deliveryMethods[0].deliveryMethodSlots);
+    console.log(products[0].deliveryMethods[1].deliveryMethodSlots);
 
     for(var product in products) {
       var deliveryMethodIds = JSON.stringify(_.pluck(products[product].deliveryMethods, 'id'));
