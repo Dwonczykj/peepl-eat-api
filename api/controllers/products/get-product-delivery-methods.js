@@ -27,11 +27,13 @@ module.exports = {
     .meta({enableExperimentalDeepTargets:true})
     .populate('deliveryMethods.deliveryMethodSlots', [{},
       {
-      where:{
-        slotsRemaining: { '>': 0 },
-        startTime: { '>': Math.floor(Date.now() / 1000)}
-      }
-    }]);
+        where: {
+          slotsRemaining: { '>': 0 },
+          startTime: { '>': Math.floor(Date.now() / 1000)}
+        }
+      }]);
+
+    console.log(products[0].deliveryMethods[0].deliveryMethodSlots);
 
     for(var product in products) {
       var deliveryMethodIds = JSON.stringify(_.pluck(products[product].deliveryMethods, 'id'));
