@@ -1,6 +1,6 @@
 # peepl-app-sails
 
-a [Sails v1](https://sailsjs.com) application
+The [Sails v1](https://sailsjs.com) application that powers the backend for the Peepl mobile app.
 
 
 ### Running locally
@@ -29,10 +29,6 @@ The web frontend will be visible at <http://localhost:1337>.
 + [Sails framework documentation](https://sailsjs.com/get-started)
 + [Version notes / upgrading](https://sailsjs.com/documentation/upgrading)
 + [Deployment tips](https://sailsjs.com/documentation/concepts/deployment)
-+ [Community support options](https://sailsjs.com/support)
-+ [Professional / enterprise options](https://sailsjs.com/enterprise)
-
-
 ### Version info
 
 This app was originally generated on Tue Oct 20 2020 09:54:07 GMT+0100 (British Summer Time) using Sails v1.4.0.
