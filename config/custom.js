@@ -18,9 +18,9 @@ module.exports.custom = {
   // sendgridSecret: 'SG.fake.3e0Bn0qSQVnwb1E4qNPz9JZP5vLZYqjh7sn8S93oSHU',
   // stripeSecret: 'sk_test_Zzd814nldl91104qor5911gjald',
   // …
-  amazonSesAccessKeyId: "",
-  amazonSesAccessKeySecret: "",
-  amazonSesRegion: "eu-west-1",
-  mailchimpAPIKey: "53745999cd9909b57e46c059db39c947",
+  amazonSesAccessKeyId: '',
+  amazonSesAccessKeySecret: '',
+  amazonSesRegion: 'eu-west-1',
+  mailchimpAPIKey: '53745999cd9909b57e46c059db39c947',
 
 };

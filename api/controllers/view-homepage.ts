@@ -1,11 +1,8 @@
 module.exports = {
 
-
   friendlyName: 'View homepage',
 
-
   description: 'Display homepage.',
-
 
   exits: {
 
@@ -15,13 +12,11 @@ module.exports = {
 
   },
 
-
   fn: async function () {
 
     // Respond with view.
     return {};
 
   }
-
 
 };

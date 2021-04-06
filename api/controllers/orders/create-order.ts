@@ -116,8 +116,11 @@ module.exports = {
       };
 
       mailchimp.lists.setListMember(listId, customerEmailMd5, {
+        // eslint-disable-next-line camelcase
         email_address: inputs.address.email,
+        // eslint-disable-next-line camelcase
         status_if_new: 'subscribed',
+        // eslint-disable-next-line camelcase
         merge_fields: {
           FNAME: inputs.address.name,
           POSTCODE: inputs.address.postCode

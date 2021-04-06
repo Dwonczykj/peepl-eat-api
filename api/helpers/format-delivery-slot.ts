@@ -1,14 +1,10 @@
 module.exports = {
 
-
   friendlyName: 'Format delivery slot',
-
 
   description: '',
 
-
   sync: true,
-
 
   inputs: {
     // deliverySlot: {
@@ -23,18 +19,16 @@ module.exports = {
     }
   },
 
-
   exits: {
     success: {
       description: 'All done.',
     },
   },
 
-
   fn: function (inputs, exits) {
     var moment = require('moment');
 
-    if (!inputs.value) return '';
+    if (!inputs.value) {return '';}
     inputs.value = moment.unix(inputs.value).calendar();
     return exits.success(inputs.value);
 
@@ -45,6 +39,4 @@ module.exports = {
     // return exits.success( result );
   }
 
-
 };
-

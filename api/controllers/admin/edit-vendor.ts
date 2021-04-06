@@ -1,11 +1,8 @@
 module.exports = {
 
-
   friendlyName: 'Edit vendor',
 
-
   description: '',
-
 
   inputs: {
     vendor: {
@@ -19,11 +16,9 @@ module.exports = {
     }
   },
 
-
   exits: {
 
   },
-
 
   fn: async function () {
 

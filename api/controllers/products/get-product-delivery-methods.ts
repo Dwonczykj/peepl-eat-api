@@ -37,8 +37,8 @@ module.exports = {
       output[deliveryMethodIds] = {products: [], deliveryMethods: products[product].deliveryMethods};
     }
 
-    for(var product in products) {
-      output[products[product].deliveryMethodIds].products.push(products[product]);
+    for(var productNew in products) {
+      output[products[productNew].deliveryMethodIds].products.push(products[productNew]);
     }
 
     // All done.

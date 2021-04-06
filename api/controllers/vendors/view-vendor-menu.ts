@@ -30,7 +30,7 @@ module.exports = {
       },
       sort: 'priority DESC'
     });
-    
+
     var user = await User.findOne({walletId: this.req.session.walletId});
 
     if(!vendor){
@@ -44,4 +44,3 @@ module.exports = {
 
 
 };
- 

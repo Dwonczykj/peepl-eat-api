@@ -95,7 +95,7 @@ module.exports = {
               .set({
                 paymentJobId: inputs.jobId,
                 paidDateTime: unixtime
-              }).then((success) => {
+              }).then(() => {
                 // Notify client of successful transaction
                 sails.sockets.broadcast('order' + order.id, 'paid', {orderId: order.id, paidDateTime: unixtime});
 

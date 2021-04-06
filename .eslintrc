@@ -101,7 +101,8 @@
     "quotes":                       ["warn", "single", {"avoidEscape":false, "allowTemplateLiterals":true}],
     "semi":                         ["warn", "always"],
     "semi-spacing":                 ["warn", {"before":false, "after":true}],
-    "semi-style":                   ["warn", "last"]
+    "semi-style":                   ["warn", "last"],
+    "no-multiple-empty-lines":      ["warn"]
   }
 
 }

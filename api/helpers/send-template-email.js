@@ -185,37 +185,37 @@ module.exports = {
       );
     } else {
       var subjectLinePrefix = sails.config.environment === 'production' ? '' : sails.config.environment === 'staging' ? '[FROM STAGING] ' : '[FROM LOCALHOST] ';
-        var messageData = {
-            Destination: {
-                CcAddresses: bcc,
-                ToAddresses: [to]
-            },
-            Message: {
-                Body: {
-                    Html:{
-                        Charset: "UTF-8",
-                        Data: htmlEmailContents
-                    }
-                },
-                Subject:{
-                    Charset: "UTF-8",
-                    Data: subjectLinePrefix+subject
-                }
-            },
-            Source: "Peepl Eat <support@itsaboutpeepl.com>",
-        };
+      var messageData = {
+        Destination: {
+          CcAddresses: bcc,
+          ToAddresses: [to]
+        },
+        Message: {
+          Body: {
+            Html:{
+              Charset: 'UTF-8',
+              Data: htmlEmailContents
+            }
+          },
+          Subject:{
+            Charset: 'UTF-8',
+            Data: subjectLinePrefix+subject
+          }
+        },
+        Source: 'Peepl Eat <support@itsaboutpeepl.com>',
+      };
 
-        var deferred = new AWS.SES().sendEmail(messageData).promise();
+      var deferred = new AWS.SES().sendEmail(messageData).promise();
 
-        deferred.then(function(data){
-        }).catch(function(err){
-                sails.log.error(
+      deferred.then(() => {
+      }).catch((err) => {
+        sails.log.error(
                 'Background instruction failed:  Could not deliver email:\n'+
                 util.inspect({template, templateData, to, toName, subject, from, fromName, layout, ensureAck, bcc, attachments},{depth:null})+'\n',
                 'Error details:\n'+
                 util.inspect(err)
-                );
-        });
+        );
+      });
     }//ﬁ
 
     // All done!

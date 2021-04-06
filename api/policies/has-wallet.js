@@ -9,7 +9,6 @@
  */
 module.exports = async function (req, res, proceed) {
   if (!req.session.walletId && !req.param('wallet')) {
-    console.log('User has no wallet ID.');
     return res.redirect('/');
   } else {
     req.session.walletId = req.param('wallet') || req.session.walletId;

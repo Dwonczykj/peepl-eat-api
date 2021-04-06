@@ -11,7 +11,7 @@
 
 module.exports.bootstrap = async function() {
   _.extend(sails.hooks.http.app.locals, sails.config.http.locals);
-  
+
   // Import dependencies
   var path = require('path');
 
@@ -41,12 +41,12 @@ module.exports.bootstrap = async function() {
   }).fetch();
 
   var burnsNight = await Product.create({
-      name: 'Burns Night - Dine @ Home (For 1)',
-      description: 'Unfortunately, this year the 25th falls on a Monday. You won’t be able to join us, so we\'ve made our Dine@home Burns inspired instead.',
-      basePrice: 2200,
-      isAvailable: true,
-      vendor: delifonseca.id,
-      image: 'https://www.delifonseca.co.uk/wp-content/uploads/2016/08/IMG_9705-1024x683.jpg'
+    name: 'Burns Night - Dine @ Home (For 1)',
+    description: 'Unfortunately, this year the 25th falls on a Monday. You won’t be able to join us, so we\'ve made our Dine@home Burns inspired instead.',
+    basePrice: 2200,
+    isAvailable: true,
+    vendor: delifonseca.id,
+    image: 'https://www.delifonseca.co.uk/wp-content/uploads/2016/08/IMG_9705-1024x683.jpg'
   }).fetch();
 
   var starterOption = await ProductOption.create({
@@ -54,7 +54,7 @@ module.exports.bootstrap = async function() {
     product: burnsNight.id
   }).fetch();
 
-  var starterOptionValues = await ProductOptionValue.createEach([{
+  await ProductOptionValue.createEach([{
     name: 'Traditional Cullen Skink – smoked haddock, potato and leek soup (GF)',
     priceModifier: 0,
     isAvailable: true,
@@ -81,7 +81,7 @@ module.exports.bootstrap = async function() {
     product: burnsNight.id
   }).fetch();
 
-  var mainOptionValues = await ProductOptionValue.createEach([{
+  await ProductOptionValue.createEach([{
     name: 'Venison, beef and beer stew, whiskey dumplings and creamy mash',
     priceModifier: 0,
     isAvailable: true,
@@ -113,7 +113,7 @@ module.exports.bootstrap = async function() {
     product: burnsNight.id
   }).fetch();
 
-  var dessertOptionValues = await ProductOptionValue.createEach([{
+  await ProductOptionValue.createEach([{
     name: 'Traditional Cranachan (V)',
     priceModifier: 0,
     isAvailable: true,
@@ -137,24 +137,24 @@ module.exports.bootstrap = async function() {
     products: [burnsNight.id]
   }).fetch();
 
-  var localDeliveryMethodSlots = await DeliveryMethodSlot.create({
+  await DeliveryMethodSlot.create({
     startTime: 1710456400,
     endTime: 1778749400,
     slotsRemaining: 3,
     deliveryMethod: localDeliveryMethod.id
   });
 
-   // Save new bootstrap version
+  // Save new bootstrap version
   await sails.helpers.fs.writeJson.with({
-      destination: bootstrapLastRunInfoPath,
-      json: {
-        lastRunVersion: HARD_CODED_DATA_VERSION,
-        lastRunAt: Date.now()
-      },
-      force: true
-    })
-    .tolerate((err) => {
-      sails.log.warn('For some reason, could not write bootstrap version .json file.  This could be a result of a problem with your configured paths, or, if you are in production, a limitation of your hosting provider related to `pwd`.  As a workaround, try updating app.js to explicitly pass in `appPath: __dirname` instead of relying on `chdir`.  Current sails.config.appPath: `' + sails.config.appPath + '`.  Full error details: ' + err.stack + '\n\n(Proceeding anyway this time...)');
-    });
+    destination: bootstrapLastRunInfoPath,
+    json: {
+      lastRunVersion: HARD_CODED_DATA_VERSION,
+      lastRunAt: Date.now()
+    },
+    force: true
+  })
+  .tolerate((err) => {
+    sails.log.warn('For some reason, could not write bootstrap version .json file.  This could be a result of a problem with your configured paths, or, if you are in production, a limitation of your hosting provider related to `pwd`.  As a workaround, try updating app.js to explicitly pass in `appPath: __dirname` instead of relying on `chdir`.  Current sails.config.appPath: `' + sails.config.appPath + '`.  Full error details: ' + err.stack + '\n\n(Proceeding anyway this time...)');
+  });
 
 };
