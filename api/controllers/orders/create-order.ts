@@ -1,3 +1,6 @@
+declare var User: any;
+declare var OrderItemOptionValue: any;
+declare var OrderItem: any;
 module.exports = {
 
 

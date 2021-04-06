@@ -40,7 +40,6 @@ module.exports.routes = {
   'GET /admin/vendors/:vendorid': { action: 'admin/view-edit-vendor' },
   'post /api/v1/admin/edit-vendor': { action: 'admin/edit-vendor' },
   'GET /admin/orders': { action: 'admin/view-all-orders' },
-  'POST /api/v1/admin/request-payout': { action: 'admin/request-payout' },
 
   /***************************************************************************
   *                                                                          *

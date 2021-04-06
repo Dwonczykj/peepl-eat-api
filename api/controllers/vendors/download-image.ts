@@ -22,7 +22,6 @@ module.exports = {
     var vendor = await Vendor.findOne(inputs.vendorid);
 
     this.res.type(vendor.imageMime);
-
     var downloading = await sails.startDownload(vendor.imageFd);
 
     // All done.

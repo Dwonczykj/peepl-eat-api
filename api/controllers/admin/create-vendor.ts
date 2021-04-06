@@ -54,9 +54,8 @@ module.exports = {
     // All done.
     return exits.success({
       id: newVendor.id
-    });
+    })
 
   }
-
 
 };

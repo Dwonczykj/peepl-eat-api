@@ -1,4 +1,5 @@
 declare var Order: any;
+declare var _: any;
 
 module.exports = {
 
