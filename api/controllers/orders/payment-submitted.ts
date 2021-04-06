@@ -1,3 +1,4 @@
+declare var Order: any;
 module.exports = {
   friendlyName: 'Payment submitted',
   description: 'Called by the frontend when the payment has been made.',

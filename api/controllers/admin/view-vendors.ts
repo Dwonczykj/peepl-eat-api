@@ -1,11 +1,9 @@
+declare var Vendor: any;
 module.exports = {
-
 
   friendlyName: 'View vendors',
 
-
   description: 'Display "Vendors" page.',
-
 
   exits: {
 
@@ -15,14 +13,12 @@ module.exports = {
 
   },
 
-
-  fn: async function () {
+  fn: async function (inputs, exits) {
     var vendors = await Vendor.find();
 
     // Respond with view.
-    return {vendors};
+    return exits.success({vendors});
 
   }
-
 
 };

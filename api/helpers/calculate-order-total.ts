@@ -1,3 +1,5 @@
+declare var Order: any;
+
 module.exports = {
 
   friendlyName: 'Calculate order total',
@@ -7,7 +9,7 @@ module.exports = {
   inputs: {
     orderId: {
       type: 'number',
-      description: "The ID of the order",
+      description: 'The ID of the order',
       required: true
     }
   },
@@ -22,7 +24,7 @@ module.exports = {
 
   fn: async function (inputs) {
     var order = await Order.findOne(inputs.orderId)
-    .populate("items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue");
+    .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue');
 
     var workingTotal = 0;
 
@@ -45,6 +47,4 @@ module.exports = {
     return workingTotal;
   }
 
-
 };
-

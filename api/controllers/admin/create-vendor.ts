@@ -1,8 +1,9 @@
+declare var sails: any;
+declare var Vendor: any;
+
 module.exports = {
 
-
   friendlyName: 'Create vendor',
-
 
   description: '',
 
@@ -31,13 +32,11 @@ module.exports = {
     }
   },
 
-
   exits: {
 
   },
 
-
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
     var imageInfo = await sails.uploadOne(inputs.image, {
       maxBytes: 30000000
     });
@@ -53,9 +52,9 @@ module.exports = {
     }).fetch();
 
     // All done.
-    return {
+    return exits.success({
       id: newVendor.id
-    };
+    });
 
   }
 

@@ -1,3 +1,5 @@
+declare var Vendor: any;
+declare var User: any;
 module.exports = {
 
   friendlyName: 'View vendor menu',

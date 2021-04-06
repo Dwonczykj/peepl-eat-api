@@ -1,11 +1,10 @@
+declare var Vendor: any;
+declare var sails: any;
 module.exports = {
-
 
   friendlyName: 'Download image',
 
-
   description: 'Download image file (returning a stream).',
-
 
   inputs: {
     vendorid: {
@@ -14,11 +13,9 @@ module.exports = {
     }
   },
 
-
   exits: {
 
   },
-
 
   fn: async function (inputs) {
 
@@ -32,6 +29,5 @@ module.exports = {
     return downloading;
 
   }
-
 
 };

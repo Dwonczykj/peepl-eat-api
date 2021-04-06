@@ -1,11 +1,10 @@
-module.exports = {
+declare var ProductOption: any;
 
+module.exports = {
 
   friendlyName: 'Get product options',
 
-
   description: 'Get the options for the product as well as the relevant options.',
-
 
   inputs: {
     productId: {
@@ -15,11 +14,9 @@ module.exports = {
     }
   },
 
-
   exits: {
 
   },
-
 
   fn: async function (inputs) {
     var options = await ProductOption.find({product: inputs.productId})
@@ -29,6 +26,5 @@ module.exports = {
     return options;
 
   }
-
 
 };

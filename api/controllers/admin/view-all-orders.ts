@@ -1,11 +1,9 @@
+declare var Order: any;
 module.exports = {
-
 
   friendlyName: 'View all orders',
 
-
   description: 'Display "All orders" page.',
-
 
   exits: {
 
@@ -15,8 +13,7 @@ module.exports = {
 
   },
 
-
-  fn: async function () {
+  fn: async function (inputs, exits) {
     // var isVendor = await Vendor.findOne({walletId: this.req.session.walletId});
     var isVendor = true;
     var orders;
@@ -30,9 +27,8 @@ module.exports = {
     }
 
     // Respond with view.
-    return {orders, isVendor};
+    return exits.success({orders, isVendor});
 
   }
-
 
 };

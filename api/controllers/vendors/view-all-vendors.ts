@@ -1,11 +1,11 @@
-module.exports = {
+declare var Vendor: any;
+declare var Order: any;
 
+module.exports = {
 
   friendlyName: 'View all vendors',
 
-
   description: 'Display "All vendors" page.',
-
 
   exits: {
 
@@ -15,8 +15,7 @@ module.exports = {
 
   },
 
-
-  fn: async function () {
+  fn: async function (inputs, exits) {
     var vendors = await Vendor.find();
     var orders = await Order.find({customer: this.req.session.walletId, paidDateTime: {'>': 0}});
     var hasOrders = false;
@@ -32,9 +31,6 @@ module.exports = {
     }
 
     // Respond with view.
-    return {vendors, hasOrders};
-
+    return exits.success({vendors, hasOrders});
   }
-
-
 };

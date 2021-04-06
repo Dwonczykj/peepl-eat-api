@@ -1,8 +1,7 @@
+declare var Order: any;
 module.exports = {
 
-
   friendlyName: 'View order confirmation',
-
 
   description: 'Display "Order confirmation" page.',
 
@@ -20,7 +19,6 @@ module.exports = {
     }
 
   },
-
 
   fn: async function (inputs, exits) {
 

@@ -1,3 +1,4 @@
+declare var Vendor: any;
 module.exports = {
 
 

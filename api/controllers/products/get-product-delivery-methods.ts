@@ -1,11 +1,9 @@
+declare var Product: any;
 module.exports = {
-
 
   friendlyName: 'Get product delivery methods',
 
-
   description: 'Get the delivery methods for an array of products.',
-
 
   inputs: {
     productids: {
@@ -14,11 +12,9 @@ module.exports = {
     }
   },
 
-
   exits: {
 
   },
-
 
   fn: async function (inputs) {
     var output = {};
@@ -49,6 +45,5 @@ module.exports = {
     return output;
 
   }
-
 
 };
