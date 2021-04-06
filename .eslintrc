@@ -21,7 +21,10 @@
   // you would visit `http://eslint.org/docs/rules/no-sequences`.  If you're unsure
   // or could use some advice, come by https://sailsjs.com/support.
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint"
+  ],
   "env": {
     "node": true
   },
@@ -50,6 +53,10 @@
     // …and any others (e.g. `"Organization": true`)
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   },
+
+  "extends": [
+    "eslint:recommended"
+  ],
 
   "rules": {
     "block-scoped-var":             ["error"],
