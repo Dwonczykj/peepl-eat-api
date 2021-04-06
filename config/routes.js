@@ -21,15 +21,9 @@ module.exports.routes = {
 
   '/': { action: 'view-homepage' },
 
-  '/topup': {action: 'view-topup'},
-
-  '/help': {action: 'view-help'},
-
   '/vendors': {action: 'vendors/view-all-vendors'},
   '/vendors/:vendorid': { action: 'vendors/view-vendor-menu' },
   'GET /vendors/download-image/:vendorid': { action: 'vendors/download-image' },
-
-  'GET /help': { action: 'view-help' },
 
   'GET /orders/:orderId': { action: 'orders/view-order-confirmation' },
   'GET /orders': { action: 'orders/view-my-orders' },
