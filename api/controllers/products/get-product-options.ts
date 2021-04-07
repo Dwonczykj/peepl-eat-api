@@ -18,12 +18,12 @@ module.exports = {
 
   },
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
     var options = await ProductOption.find({product: inputs.productId})
     .populate('values');
 
     // All done.
-    return options;
+    return exits.success(options);
 
   }
 
