@@ -16,7 +16,7 @@ module.exports = {
 
   },
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
     var output = {};
 
     var products = await Product.find(inputs.productids)
@@ -29,8 +29,6 @@ module.exports = {
         }
       }]);
 
-    console.log(products[0].deliveryMethods[1].deliveryMethodSlots);
-
     for(var product in products) {
       var deliveryMethodIds = JSON.stringify(_.pluck(products[product].deliveryMethods, 'id'));
       products[product].deliveryMethodIds = deliveryMethodIds;
@@ -42,7 +40,7 @@ module.exports = {
     }
 
     // All done.
-    return output;
+    return exits.success(output);
 
   }
 

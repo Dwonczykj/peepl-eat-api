@@ -16,7 +16,7 @@ module.exports.bootstrap = async function() {
   var path = require('path');
 
   // This bootstrap version indicates what version of fake data we're dealing with here.
-  var HARD_CODED_DATA_VERSION = 3;
+  var HARD_CODED_DATA_VERSION = 5;
 
   // This path indicates where to store/look for the JSON file that tracks the "last run bootstrap info"
   // locally on this development computer (if we happen to be on a development computer).
@@ -37,7 +37,8 @@ module.exports.bootstrap = async function() {
     type: 'restaurant',
     description: 'Life\'s too short to have a bad meal. Delifonseca is here to help you enjoy the finer tastes in life.',
     walletId: '0xf039CD9391cB28a7e632D07821deeBc249a32410',
-    image: 'https://www.delifonseca.co.uk/wp-content/uploads/2016/08/Foodhall-Shot.jpg'
+    imageFd: __dirname + '/../assets/images/vendors/spitroast.jpg',
+    imageMime: 'image/jpeg'
   }).fetch();
 
   var burnsNight = await Product.create({
@@ -134,12 +135,13 @@ module.exports.bootstrap = async function() {
     name: 'Local Courier',
     description: 'Delivered fresh by one of our reliable local couriers!',
     priceModifier: 200,
+    postCodeRestrictionRegex: '*',
     products: [burnsNight.id]
   }).fetch();
 
   await DeliveryMethodSlot.create({
-    startTime: 1710456400,
-    endTime: 1778749400,
+    startTime: 1649243393,
+    endTime: 1649246993,
     slotsRemaining: 3,
     deliveryMethod: localDeliveryMethod.id
   });

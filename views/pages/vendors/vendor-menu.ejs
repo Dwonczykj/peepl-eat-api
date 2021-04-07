@@ -72,7 +72,7 @@
             </div>
             <div class="form-group">
               <label for="emailInput">Email Address</label>
-              <input type="email" :class="{ 'is-invalid': formErrors.email }" v-model="address.email" class="form-control" id="emailInput" aria-describedby="emailHelp" required>
+              <input type="email" autocomplete="email" :class="{ 'is-invalid': formErrors.email }" v-model="address.email" class="form-control" id="emailInput" aria-describedby="emailHelp" required>
             </div>
             <div class="form-group">
               <label for="telephoneInput">Contact Number</label>

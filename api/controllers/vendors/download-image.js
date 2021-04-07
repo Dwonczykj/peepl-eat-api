@@ -1,5 +1,5 @@
-declare var Vendor: any;
-declare var sails: any;
+/* declare var Vendor: any;
+declare var sails: any; */
 module.exports = {
 
   friendlyName: 'Download image',
@@ -21,11 +21,15 @@ module.exports = {
 
     var vendor = await Vendor.findOne(inputs.vendorid);
 
-    this.res.type(vendor.imageMime);
-    var downloading = await sails.startDownload(vendor.imageFd);
+    if(vendor.imageFd) {
+      this.res.type(vendor.imageMime);
+      var downloading = await sails.startDownload(vendor.imageFd);
 
-    // All done.
-    return downloading;
+      // All done.
+      return downloading;
+    }
+
+    return;
 
   }
 
