@@ -1,69 +1,49 @@
-<div id="vendors" v-cloak>
-  <div class="container">
-    <span @click="createVendorModalActive = true" class="py-3 mb-4 border-bottom d-flex align-items-center" href="/orders">
-      <p class="btn btn-peepl">Add vendor</p>
-    </span>
-    <div class="row">
-      <% for (var vendor in vendors) { %>
-        <div class="col-12 col-md-6">
-          <div class="card my-3 shadow">
-            
-            <!-- <img v-if="vendors[vendor].image" src="<%= vendors[vendor].image %>" class="card-img-top" width="600" height="200" alt=""> -->
-            <img src="/vendors/download-image/<%= vendors[vendor].id %>" class="card-img-top" width="600" height="200" alt="">
+<div id="admin-vendors" class="admin" v-cloak>
 
-            <div class="card-body">
-              <a href="/admin/vendors/<%= vendors[vendor].id %>" class="stretched-link">
-                <h2 class="card-title h5"><%= vendors[vendor].name %></h2>
-                <p class="card-subtitle"><%= vendors[vendor].description %></p>
-              </a>
-            </div>
-          </div>
-        </div>
-      <% } %>
+  <%- partial('../../partials/admin-navbar.ejs') %>
+
+  <div class="container">
+    <h1 class="my-5">Vendors</h1>
+
+    <table class="table action-table">
+      <thead>
+        <tr>
+          <th scope="col"><span class="sr-only">Select</span></th>
+          <th scope="col">Name</th>
+          <th scope="col">Status</th>
+          <th scope="col"><span class="sr-only">Edit</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for (var vendor in vendors) { %>
+          <tr>
+            <td class="action-table__shrink">
+              <input type="checkbox" name="vendors">
+            <td>
+              <a href="/admin/vendors/<%= vendors[vendor].id %>"><%= vendors[vendor].name %></a>
+            </td>
+            <td>
+              <%= vendors[vendor].status %>
+            </td>
+            <td class="action-table__shrink">
+              <a href="/admin/vendors/<%= vendors[vendor].id %>">Edit</a>
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+
+    <div class="d-md-flex my-3 action-table-actions">
+      <select class="form-control mr-3" disabled>
+        <option>Mark as active</option>
+        <option>Mark as draft</option>
+        <option>Mark as inactive</option>
+        <option>Delete</option>
+      </select>
+      <button class="btn btn-secondary" disabled>Apply</button>
+      <a href="/admin/vendors/new" class="btn btn-peepl ml-auto">Add a new vendor</a>
     </div>
-    <modal v-if="createVendorModalActive" v-cloak>
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="mb-0">Add vendor</h5>
-        </div>
-        <div class="row">
-          <div class="col-md-4 offset-md-4">
-            <ajax-form action="createVendor" :form-data="newVendor" :syncing.sync="syncing" :cloud-error.sync="cloudError" @submitted="createVendorSubmitted">
-              <div class="modal-body">
-                <div class="form-group">
-                  <label for="vendorName">Vendor Name</label>
-                  <input type="text" :class="{ 'is-invalid': formErrors.name }" v-model="newVendor.name" class="form-control" id="vendorName" required>
-                </div>
-                <div class="form-group">
-                  <label for="vendorDescription">Vendor Description</label>
-                  <textarea type="text" class="form-control" rows="3" :class="{ 'is-invalid': formErrors.description }" v-model="newVendor.description" id="vendorDescription" required></textarea>
-                </div>
-                <div class="form-group">
-                  <label for="vendorWallet">Vendor Wallet Address</label>
-                  <input type="text" :class="{ 'is-invalid': formErrors.walletId }" v-model="newVendor.walletId" class="form-control" id="vendorWallet" required>
-                </div>
-                <div class="form-group">
-                  <label for="vendorType">Vendor Type</label>
-                  <select class="form-control" id="vendorType" v-model="newVendor.type" required>
-                    <option value="restaurant">Restaurant</option>
-                    <option value="shop" disabled>Shop</option>
-                  </select>
-                </div>
-                <p>Vendor Image</p>
-                <div class="custom-file">
-                  <input type="file" class="custom-file-input" accept="image/*" id="customFile" @change="changeVendorImageInput($event.target.files)">
-                  <label class="custom-file-label" for="customFile">{{imageName}}</label>
-                </div>
-              </div>
-              <div class="modal-footer">
-                <a class="btn btn-outline-secondary" @click="createVendorModalActive=false">Cancel</a>
-                <ajax-button class="btn btn-peepl" type="submit" v-bind:class="{ 'is-loading': syncing }">Create vendor</ajax-button>
-              </div>
-            </ajax-form>
-          </div>
-        </div>
-      </div>
-    </modal>
+
   </div>
 </div>
 <%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>

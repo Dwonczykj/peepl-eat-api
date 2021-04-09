@@ -1,0 +1,60 @@
+.admin {
+  background: $white;
+  padding-bottom: 4.5rem;
+
+  .navbar-brand {
+    font-weight: bold;
+  }
+
+  .navbar .nav-link {
+    color: $white;
+  }
+}
+
+.action-table {
+  td {
+    vertical-align: center;
+  }
+
+  a {
+    display: block;
+    margin: ( $table-cell-padding * -1 );
+    padding: $table-cell-padding;
+  }
+}
+
+.action-table__shrink {
+  width: 1px;
+  white-space: nowrap;
+}
+
+.action-card {
+  background: $light;
+
+  .action-card {
+    background: $white;
+
+    .action-card {
+      background: $light;
+    }
+  }
+}
+
+.action-card__summary {
+  display: flex;
+}
+
+.action-card__checkbox {
+  width: 2rem;
+}
+
+.action-card__content {
+  padding-left: 2rem;
+}
+
+.action-table-actions,
+.action-card-actions {
+  .form-control {
+    width: auto;
+  }
+}

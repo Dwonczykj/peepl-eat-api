@@ -1,0 +1,28 @@
+<div class="my-3 p-3 p-md-4 rounded action-card">
+  <details>
+    <summary class="action-card__summary">
+      <span class="action-card__checkbox">
+        <input type="checkbox">
+      </span>
+      {{ productOptionValue.name }}
+    </summary>
+    <div class="action-card__content">
+      <div class="form-group mt-3">
+        <label for="productOptionValueName1">Name</label>
+        <input type="text" class="form-control" id="productOptionValueName1" required>
+      </div>
+      <div class="form-group">
+        <label for="optionValueDescription1">Product Description</label>
+        <textarea class="form-control" id="optionValueDescription1" required></textarea>
+      </div>
+      <div class="form-group">
+        <label for="optionValuePrice1">Price modifier (in +/- pence)</label>
+        <input type="text" class="form-control" id="optionValuePrice1" required>
+      </div>
+      <div class="form-group form-check">
+        <input type="checkbox" class="form-check-input" id="optionValueAvailable1">
+        <label class="form-check-label" for="optionValueAvailable1">Is Available</label>
+      </div>
+    </div>
+  </details>
+</div>
