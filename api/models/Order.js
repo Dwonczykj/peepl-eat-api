@@ -71,6 +71,10 @@ module.exports = {
       type: 'string',
       // unique: true
     },
+    isArchived: {
+      type: 'boolean',
+      defaultsTo: false
+    },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗

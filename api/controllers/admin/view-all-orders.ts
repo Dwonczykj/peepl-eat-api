@@ -19,10 +19,10 @@ module.exports = {
     var orders;
 
     if(isVendor){
-      orders = await Order.find({paidDateTime: {'>': 0}})
+      orders = await Order.find({paidDateTime: {'>': 0}, isArchived: false})
       .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue');
     } else {
-      orders = await Order.find({paidDateTime: {'>': 0}})
+      orders = await Order.find({paidDateTime: {'>': 0}, isArchived: false})
       .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue');
     }
 
