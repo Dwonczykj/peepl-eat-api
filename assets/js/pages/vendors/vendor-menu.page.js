@@ -267,7 +267,6 @@ parasails.registerPage('vendor-menu', {
         output.selected = null;
         output.selectedSlot = null;
 
-        //verbose
         if(output.deliveryMethods.length < 1) {
           output.noMethodsAvailable = true;
         } else {
