@@ -218,13 +218,6 @@ parasails.registerPage('vendor-menu', {
       var numberOfTokens = parseInt(data.result)/(Math.pow(10,16));
 
       return numberOfTokens; //In pence
-
-      /* if ((numberOfTokens * 100) < this.finalTotal) { // GBPx to pence
-        var amountRequired = (this.finalTotal - numberOfTokens * 100) / 100; // App code expects pence!
-        return amountRequired;
-      } else {
-        return 0;
-      } */
     },
     submittedForm: function(result) {
       this.syncing = true;
