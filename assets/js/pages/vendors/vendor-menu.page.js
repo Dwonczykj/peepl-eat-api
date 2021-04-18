@@ -186,7 +186,6 @@ parasails.registerPage('vendor-menu', {
       window.flutter_inappwebview.callHandler('topup', topupDetails)
       .then((completed) => {
         if(completed) {
-          // If user completed topup prompt
           setInterval(() => {
             that.walletTotal = that.getWalletTotal();
             that.syncing = false;
