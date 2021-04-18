@@ -85,6 +85,9 @@ parasails.registerPage('vendor-menu', {
       this.productOptions = {};
       this.selectedOptionValues = [];
       this.temporaryOptionValues = {};
+
+      // eslint-disable-next-line no-undef
+      _paq.push(['trackEvent', 'eCommerce', 'Add to cart', itemDetails.name, itemDetails.basePrice]);
     },
     changeOptionValue: function(event) {
       var optionId = event.target.name.slice(7);
@@ -232,14 +235,14 @@ parasails.registerPage('vendor-menu', {
         orderId: result.toString()
       };
 
-      var that = this;
-
       // TODO: Change this to send payment information to backend, rather than using webhook from app.
       window.flutter_inappwebview.callHandler('pay', paymentDetails);
 
       io.socket.on('paid', (data) => {
         this.submitted = false;
         this.syncing = false;
+        // eslint-disable-next-line no-undef
+        _paq.push(['trackEvent', 'eCommerce', 'Completed order', data.orderId, this.cartTotal + this.deliveryTotal]);
         window.location.href = '/orders/' + data.orderId;
       });
 
