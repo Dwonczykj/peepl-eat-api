@@ -23,7 +23,8 @@ module.exports = {
 
 
   fn: async function ({vendorid}, exits) {
-    var vendor = await Vendor.findOne(vendorid);
+    var vendor = await Vendor.findOne(vendorid)
+    .populate('products&productOptions&productOptionValues');
 
     // Respond with view.
     return exits.success({vendor});

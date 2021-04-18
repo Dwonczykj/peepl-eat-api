@@ -4,7 +4,7 @@
       <span class="action-card__checkbox">
         <input type="checkbox">
       </span>
-      {{ product.name }}
+      {{ vendor.products[0].name }}
     </summary>
     <div class="action-card__content">
       <div class="form-group mt-3">
@@ -36,7 +36,7 @@
         <h3 class="h6 mt-4">Options</h3>
 
         <!-- TODO: loop through product options -->
-        <%- partial('../partials/admin-product-option.ejs') %>
+        <%- // partial('../partials/admin-product-option.ejs') %>
         <!-- TODO: end loop -->
 
         <div class="d-md-flex my-3 action-card-actions">
