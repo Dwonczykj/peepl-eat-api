@@ -36,6 +36,7 @@
     "Vue": true,
     "$": true,
     "moment": true,
+    "_paq": true,
     // Allow any window globals you're relying on here; e.g.
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     "SAILS_LOCALS": true,

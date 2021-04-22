@@ -19,7 +19,12 @@ module.exports = {
   fn: async function (inputs, exits) {
     var request = require('request-json');
     var client = request.createClient('https://studio.fuse.io/api/v2/');
+    const { IncomingWebhook } = require('@slack/webhook');
+
     client.headers['Authorization'] = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50QWRkcmVzcyI6IjB4NzU1QzY2MTcxNDkzMUIxQWM5MDRhOGVjYkRENzYxMDY4OUQ4MTJBYyIsImlzQ29tbXVuaXR5QWRtaW4iOnRydWUsImFwcE5hbWUiOiJSb29zdCIsImlhdCI6MTYwNTc5NzExNX0.ozqwhxFjTYUUoexnkBOY_TsW4sL_574gWZHqzHhD8Pk';
+    const url = 'https://hooks.slack.com/services/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';
+    const webhook = new IncomingWebhook(url);
+
 
     function makeQuery(iteration = 0){
       setTimeout(() => {
@@ -99,35 +104,42 @@ module.exports = {
                 // Notify client of successful transaction
                 sails.sockets.broadcast('order' + order.id, 'paid', {orderId: order.id, paidDateTime: unixtime});
 
-                // TODO: remove redundant query
-                Order.findOne(inputs.orderId)
-                .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue&vendor')
-                .then(async (fullOrder) => {
-                  await sails.helpers.sendTemplateEmail.with({
-                    template: 'email-order-confirmation-new',
-                    templateData: {order: fullOrder},
-                    to: fullOrder.deliveryEmail,
-                    subject: 'Peepl Eat Order Confirmed - #' + fullOrder.id ,
-                    layout: false,
-                  });
-                  // TODO: Mailchimp add completed_order event - NOT created_order event!
-                });
+                if(sails.config.environment === 'production'){
+                  (async () => {
+                    await webhook.send({
+                      text: `New order created #${order.id} for £${order.total / 100}! Check it out: https://app.itsaboutpeepl.com/orders/${order.id}`,
+                    });
 
-                // Issue PPL token reward
-                var rewardAmount = order.total; // 10 PPL tokens = £0.01, reward is 10% of spend
+                    // Issue PPL token reward
+                    var rewardAmount = order.total; // 10 PPL tokens = £0.01, reward is 10% of spend
 
-                var data = {
-                  tokenAddress: '0xa2C7CdB72d177f6259cD12a9A06Fdfd9625419D4',
-                  networkType: 'fuse',
-                  amount: rewardAmount.toString(),
-                  from: '0x29249e06e8D3e4933cc403AB73136e698a08c38b',
-                  to: order.customer
-                };
+                    var data = {
+                      tokenAddress: '0xa2C7CdB72d177f6259cD12a9A06Fdfd9625419D4',
+                      networkType: 'fuse',
+                      amount: rewardAmount.toString(),
+                      from: '0x29249e06e8D3e4933cc403AB73136e698a08c38b',
+                      to: order.customer
+                    };
 
-                client.post('admin/tokens/transfer', data)
-                .then((result) => {
-                  return exits.success(result.body);
-                });
+                    client.post('admin/tokens/transfer', data);
+
+                    // TODO: remove redundant query
+                    Order.findOne(inputs.orderId)
+                    .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue&vendor')
+                    .then(async (fullOrder) => {
+                      await sails.helpers.sendTemplateEmail.with({
+                        template: 'email-order-confirmation-new',
+                        templateData: {order: fullOrder},
+                        to: fullOrder.deliveryEmail,
+                        subject: 'Peepl Eat Order Confirmed - #' + fullOrder.id ,
+                        layout: false,
+                      });
+                      // TODO: Mailchimp add completed_order event - NOT created_order event!
+                    });
+                  })();
+                }
+
+                return exits.success(result.body);
               });
             }
           });
