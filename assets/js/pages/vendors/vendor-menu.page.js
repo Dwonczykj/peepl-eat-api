@@ -86,6 +86,16 @@ parasails.registerPage('vendor-menu', {
       this.selectedOptionValues = [];
       this.temporaryOptionValues = {};
 
+      // Product Array
+      // eslint-disable-next-line no-undef
+      _paq.push(['addEcommerceItem',
+        itemDetails.id, // (required) SKU: Product unique identifier
+        itemDetails.name, // (optional) Product name
+        this.vendor.name, // (optional) Product category. You can also specify an array of up to 5 categories eg. ["Books", "New releases", "Biography"]
+        itemDetails.basePrice / 100, // (Recommended) Product Price
+        1 // (Optional - Defaults to 1)
+      ]);
+
       // eslint-disable-next-line no-undef
       _paq.push(['trackEvent', 'eCommerce', 'Add to cart', itemDetails.name, itemDetails.basePrice]);
     },
@@ -152,32 +162,8 @@ parasails.registerPage('vendor-menu', {
     },
     handleParsingForm: function() {
       this.syncing = true;
-      // var tokensRequired = this.tokensNeeded();
 
-      // if(tokensRequired === 0){
       return {items: this.cart, address: this.address, total: this.cartTotal + this.deliveryTotal};
-      /* } else {
-        var topupDetails = { amount: tokensRequired.toString() };
-        this.processingTopup = true; // Show 'topup pending' modal
-        var that = this; // >:(
-        window.flutter_inappwebview.callHandler('topup', topupDetails)
-        .then((completed) => {
-          if(completed) {
-            // If user completed topup prompt
-            setInterval(() => {
-              tokensRequired = that.tokensNeeded();
-              if(tokensRequired === 0){ // If user now has enough GBPx to check out
-                that.syncing = false;
-                that.processingTopup = false;
-              }
-            }, 3000);
-          } else {
-            that.syncing = false;
-            that.processingTopup = false;
-          }
-        });
-        // return;
-      }*/
     },
     startTopUp: function() {
       var amountRequired = (this.cartTotal + this.deliveryTotal - this.walletTotal) / 100; // App handler expects pence!
@@ -245,6 +231,17 @@ parasails.registerPage('vendor-menu', {
         _paq.push(['trackEvent', 'eCommerce', 'Completed order', data.orderId, this.cartTotal + this.deliveryTotal]);
         window.location.href = '/orders/' + data.orderId;
       });
+
+      // Order Array - Parameters should be generated dynamically
+      // eslint-disable-next-line no-undef
+      _paq.push(['trackEcommerceOrder',
+        paymentDetails.orderId, // (Required) orderId
+        paymentDetails.amount, // (Required) revenue
+        this.cartTotal / 100, // (Optional) subTotal
+        // 1.5, // (optional) tax
+        this.deliveryTotal / 100, // (optional) shipping
+        // false // (optional) discount
+      ]);
 
       io.socket.on('paymentError', function(data){
         this.submitted = false;
