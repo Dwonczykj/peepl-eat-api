@@ -35,8 +35,8 @@ module.exports = {
 
 
   fn: async function (inputs, exits) {
-    var mailchimp = require('@mailchimp/mailchimp_marketing');
-    var md5 = require('md5');
+    /* var mailchimp = require('@mailchimp/mailchimp_marketing');
+    var md5 = require('md5'); */
 
     // TODO: Refactor all of this code to run concurrently where possible
 
@@ -99,7 +99,7 @@ module.exports = {
     .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue&vendor')
     .then(async (fullOrder) => {
 
-      mailchimp.setConfig({
+/*       mailchimp.setConfig({
         apiKey: sails.config.custom.mailchimpAPIKey,
         server: 'us7'
       });
@@ -137,7 +137,8 @@ module.exports = {
       )
       .catch((err) => {
         console.log(err);
-      });
+      }); */
+
     });
 
     var user = await User.findOne({walletId: this.req.session.walletId});
