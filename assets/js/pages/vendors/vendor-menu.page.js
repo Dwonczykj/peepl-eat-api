@@ -87,7 +87,6 @@ parasails.registerPage('vendor-menu', {
       this.temporaryOptionValues = {};
 
       // Product Array
-      // eslint-disable-next-line no-undef
       _paq.push(['addEcommerceItem',
         itemDetails.id, // (required) SKU: Product unique identifier
         itemDetails.name, // (optional) Product name
@@ -96,7 +95,6 @@ parasails.registerPage('vendor-menu', {
         1 // (Optional - Defaults to 1)
       ]);
 
-      // eslint-disable-next-line no-undef
       _paq.push(['trackEvent', 'eCommerce', 'Add to cart', itemDetails.name, itemDetails.basePrice]);
     },
     changeOptionValue: function(event) {
@@ -233,7 +231,6 @@ parasails.registerPage('vendor-menu', {
       });
 
       // Order Array - Parameters should be generated dynamically
-      // eslint-disable-next-line no-undef
       _paq.push(['trackEcommerceOrder',
         paymentDetails.orderId, // (Required) orderId
         paymentDetails.amount, // (Required) revenue
@@ -281,6 +278,8 @@ parasails.registerPage('vendor-menu', {
       this.isLoading = true;
       this.checkoutModalActive = true;
       var that = this;
+
+      this.walletTotal = this.getWalletTotal();
 
       var productids = _.pluck(this.cart, 'id');
       var productQuantities = {};
@@ -340,7 +339,7 @@ parasails.registerPage('vendor-menu', {
       return this.cartTotal + this.deliveryTotal;
     },
     readyToPay: function() {
-      if (this.address.postCode == '') {
+      if (this.address.postCode === '') {
         return false;
       }
 
