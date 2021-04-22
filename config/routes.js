@@ -30,6 +30,7 @@ module.exports.routes = {
 
   'GET /api/v1/products/get-product-options/:productId': { action: 'products/get-product-options' },
   'POST /api/v1/products/get-product-delivery-methods': { action: 'products/get-product-delivery-methods' },
+  'GET /api/v1/orders/subscribe-to-order/:orderId': { action: 'orders/subscribe-to-order', isSocket: true },
 
   'POST /api/v1/orders/create-order': { action: 'orders/create-order' },
   'POST /api/v1/orders/payment-submitted': { action: 'orders/payment-submitted' },

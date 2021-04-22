@@ -238,19 +238,10 @@ parasails.registerPage('vendor-menu', {
       // TODO: Change this to send payment information to backend, rather than using webhook from app.
       window.flutter_inappwebview.callHandler('pay', paymentDetails);
 
-      io.socket.on('paid', (data) => {
-        this.submitted = false;
-        this.syncing = false;
-        // eslint-disable-next-line no-undef
-        _paq.push(['trackEvent', 'eCommerce', 'Completed order', data.orderId, this.cartTotal + this.deliveryTotal]);
-        window.location.href = '/orders/' + data.orderId;
-      });
+      this.submitted = false;
+      this.syncing = false;
 
-      io.socket.on('paymentError', function(data){
-        this.submitted = false;
-        this.syncing = false;
-        alert(data.message);
-      });
+      window.location.href = '/orders/' + result;
     },
     updatedPostCode: function () {
       for(var group in this.deliveryMethodsTemp){
