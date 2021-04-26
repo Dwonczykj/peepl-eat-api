@@ -21,13 +21,14 @@ module.exports = {
 
     var products = await Product.find(inputs.productids)
     .meta({enableExperimentalDeepTargets:true})
-    .populate('deliveryMethods.deliveryMethodSlots', [{},
+    .populate('deliveryMethods.deliveryMethodSlots',
+    [
+      {},
       {
-        where: {
-          slotsRemaining: { '>': 0 },
-          startTime: { '>': Math.floor(Date.now() / 1000)}
-        }
-      }]);
+        slotsRemaining: { '>': 0 },
+        startTime: { '>': Math.floor(Date.now() / 1000)}
+      }
+    ]);
 
     for(var product in products) {
       var deliveryMethodIds = JSON.stringify(_.pluck(products[product].deliveryMethods, 'id'));
