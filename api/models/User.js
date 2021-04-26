@@ -42,7 +42,10 @@ module.exports = {
     },
     phoneNumber:{
       type: 'string'
-    }
+    },
+    marketingOptIn: {
+      type: 'boolean'
+    },
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
     //  ╚═╝╩ ╩╚═╝╚═╝═╩╝╚═╝

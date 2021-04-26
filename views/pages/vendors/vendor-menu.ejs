@@ -118,6 +118,12 @@
               </div>
             </div>
 
+            <div v-if="!alreadyOptedIn">
+              <h5 class="mt-4">Marketing opt-in</h5>
+              <input type="checkbox" id="checkbox" v-model="marketingOptIn">
+              <label for="checkbox">I would like to receive marketing communications from Peepl.</label>
+            </div>
+
             <h5 class="mt-4">Payment</h5>
             <p class="d-flex justify-content-between mt-3 mb-0">
               <b>Your order:</b>
@@ -141,7 +147,6 @@
               <h5>You need to top up</h5>
               <p>Peepl works like a wallet – you top up with your card, and then spend. This helps us keep costs low for your favourite restaurants.</p>
               <p>You will need to top up at least <strong>{{ cartTotal + deliveryTotal - walletTotal | convertToPounds }}</strong> before you can check out.</p>
-              <!-- TODO: Button should lead to Top Up screen -->
               <a href="#" @click="startTopUp" class="btn btn-peepl btn-block">Top up {{ cartTotal + deliveryTotal - walletTotal | convertToPounds }}</a>
             </div>
 

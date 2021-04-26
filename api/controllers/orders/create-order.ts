@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 declare var User: any;
 declare var OrderItemOptionValue: any;
 declare var OrderItem: any;
@@ -25,6 +26,9 @@ module.exports = {
       type: 'number',
       description: 'The total order value, including shipping. This will be calculated on the backend eventually.',
       required: true
+    },
+    marketingOptIn: {
+      type: 'boolean'
     }
   },
 
@@ -35,8 +39,8 @@ module.exports = {
 
 
   fn: async function (inputs, exits) {
-    /* var mailchimp = require('@mailchimp/mailchimp_marketing');
-    var md5 = require('md5'); */
+    var mailchimp = require('@mailchimp/mailchimp_marketing');
+    var md5 = require('md5');
 
     // TODO: Refactor all of this code to run concurrently where possible
 
@@ -95,53 +99,8 @@ module.exports = {
       }
     });
 
-    Order.findOne(order.id)
-    .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue&vendor')
-    .then(async (fullOrder) => {
-
-/*       mailchimp.setConfig({
-        apiKey: sails.config.custom.mailchimpAPIKey,
-        server: 'us7'
-      });
-
-      var customerEmailMd5 = md5(inputs.address.email.toLowerCase());
-      var listId = 'e538a63177'; // Peepl Newsletter
-
-      const eventOptions = {
-        name: 'created_order',
-        properties: {
-          orderId: fullOrder.id.toString(),
-          total: calculatedOrderTotal.toString()
-        }
-      };
-
-      mailchimp.lists.setListMember(listId, customerEmailMd5, {
-        // eslint-disable-next-line camelcase
-        email_address: inputs.address.email,
-        // eslint-disable-next-line camelcase
-        status_if_new: 'subscribed',
-        // eslint-disable-next-line camelcase
-        merge_fields: {
-          FNAME: inputs.address.name,
-          POSTCODE: inputs.address.postCode
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-      mailchimp.lists.createListMemberEvent(
-        listId,
-        customerEmailMd5,
-        eventOptions
-      )
-      .catch((err) => {
-        console.log(err);
-      }); */
-
-    });
-
     var user = await User.findOne({walletId: this.req.session.walletId});
+
     // Create or update user record by walletId
     if(!user){
       await User.create({
@@ -151,9 +110,11 @@ module.exports = {
         phoneNumber: inputs.address.phoneNumber,
         addressLineOne: inputs.address.lineOne,
         addressLineTwo: inputs.address.lineTwo,
-        postcode: inputs.address.postCode
+        postcode: inputs.address.postCode,
+        marketingOptIn: inputs.marketingOptIn
       });
     } else {
+      if(user.marketingOptIn) {inputs.marketingOptIn = true;} // Ignore missing opt-in if user already opted in
       await User.updateOne(user.id)
       .set({
         name: inputs.address.name,
@@ -161,7 +122,30 @@ module.exports = {
         phoneNumber: inputs.address.phoneNumber,
         addressLineOne: inputs.address.lineOne,
         addressLineTwo: inputs.address.lineTwo,
-        postcode: inputs.address.postCode
+        postcode: inputs.address.postCode,
+        marketingOptIn: inputs.marketingOptIn
+      });
+    }
+
+    if(inputs.marketingOptIn) {
+      mailchimp.setConfig({
+        apiKey: sails.config.custom.mailchimpAPIKey,
+        server: 'us7'
+      });
+
+      var customerEmailMd5 = md5(inputs.address.email.toLowerCase());
+      var listId = 'e538a63177'; // Peepl Newsletter
+
+      mailchimp.lists.setListMember(listId, customerEmailMd5, {
+        email_address: inputs.address.email,
+        status_if_new: 'subscribed',
+        merge_fields: {
+          FNAME: inputs.address.name,
+          POSTCODE: inputs.address.postCode
+        }
+      })
+      .catch((err) => {
+        console.log(err);
       });
     }
 

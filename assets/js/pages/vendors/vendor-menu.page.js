@@ -22,6 +22,7 @@ parasails.registerPage('vendor-menu', {
       postCode: '',
       deliveryInstructions: '',
     },
+    marketingOptIn: false,
     syncing: false,
     cloudError: '',
     formErrors: {
@@ -29,7 +30,8 @@ parasails.registerPage('vendor-menu', {
     deliveryTotal: 0,
     walletTotal: 0,
     submitted: false,
-    processingTopup: false
+    processingTopup: false,
+    alreadyOptedIn: false,
   },
 
   //  ╦  ╦╔═╗╔═╗╔═╗╦ ╦╔═╗╦  ╔═╗
@@ -45,6 +47,7 @@ parasails.registerPage('vendor-menu', {
       this.address.lineTwo = this.user.addressLineTwo;
       this.address.postCode = this.user.postcode;
       this.address.phoneNumber = this.user.phoneNumber;
+      this.alreadyOptedIn = this.user.marketingOptIn;
     }
   },
   mounted: async function() {
@@ -161,7 +164,7 @@ parasails.registerPage('vendor-menu', {
     handleParsingForm: function() {
       this.syncing = true;
 
-      return {items: this.cart, address: this.address, total: this.cartTotal + this.deliveryTotal};
+      return {items: this.cart, address: this.address, total: this.cartTotal + this.deliveryTotal, marketingOptIn: this.marketingOptIn};
     },
     startTopUp: function() {
       var amountRequired = (this.cartTotal + this.deliveryTotal - this.walletTotal) / 100; // App handler expects pence!
