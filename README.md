@@ -2,7 +2,6 @@
 
 The [Sails v1](https://sailsjs.com) application that powers the backend for the Peepl mobile app.
 
-
 ### Running locally
 
 The [Sails docs](https://sailsjs.com/get-started) recommend you install sails.js globally:
@@ -23,6 +22,14 @@ We’ve also set up a shortcut that handles [any arguments you want to send to s
 
 The web frontend will be visible at <http://localhost:1337>.
 
+### Production Dependencies
+
+Some of these are interchangeable (for example, by using a different storage adapter for [Waterline](https://waterlinejs.org/))
+
++ [Node.js](https://nodejs.org/en/)
++ [Nginx](https://nginx.org/)
++ [Redis](https://redis.io/)
++ [MySQL/MariaDB](https://mariadb.org/)
 
 ### Links
 
