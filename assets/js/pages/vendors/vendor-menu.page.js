@@ -232,7 +232,7 @@ parasails.registerPage('vendor-menu', {
         paymentDetails.orderId, // (Required) orderId
         paymentDetails.amount, // (Required) revenue
         this.cartTotal / 100, // (Optional) subTotal
-        // 1.5, // (optional) tax
+        0, // (optional) tax
         this.deliveryTotal / 100, // (optional) shipping
         // false // (optional) discount
       ]);
