@@ -135,7 +135,7 @@ module.exports.bootstrap = async function() {
     name: 'Local Courier',
     description: 'Delivered fresh by one of our reliable local couriers!',
     priceModifier: 200,
-    postCodeRestrictionRegex: '*',
+    postCodeRestrictionRegex: '.',
     products: [burnsNight.id]
   }).fetch();
 

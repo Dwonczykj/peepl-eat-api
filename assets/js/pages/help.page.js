@@ -23,6 +23,3 @@ parasails.registerPage('help', {
     //…
   }
 });
-
-
-console.log("test");

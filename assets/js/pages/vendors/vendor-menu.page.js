@@ -85,6 +85,17 @@ parasails.registerPage('vendor-menu', {
       this.productOptions = {};
       this.selectedOptionValues = [];
       this.temporaryOptionValues = {};
+
+      // Product Array
+      _paq.push(['addEcommerceItem',
+        itemDetails.id, // (required) SKU: Product unique identifier
+        itemDetails.name, // (optional) Product name
+        this.vendor.name, // (optional) Product category. You can also specify an array of up to 5 categories eg. ["Books", "New releases", "Biography"]
+        itemDetails.basePrice / 100, // (Recommended) Product Price
+        1 // (Optional - Defaults to 1)
+      ]);
+
+      _paq.push(['trackEvent', 'eCommerce', 'Add to cart', itemDetails.name, itemDetails.basePrice]);
     },
     changeOptionValue: function(event) {
       var optionId = event.target.name.slice(7);
@@ -149,32 +160,8 @@ parasails.registerPage('vendor-menu', {
     },
     handleParsingForm: function() {
       this.syncing = true;
-      // var tokensRequired = this.tokensNeeded();
 
-      // if(tokensRequired === 0){
       return {items: this.cart, address: this.address, total: this.cartTotal + this.deliveryTotal};
-      /* } else {
-        var topupDetails = { amount: tokensRequired.toString() };
-        this.processingTopup = true; // Show 'topup pending' modal
-        var that = this; // >:(
-        window.flutter_inappwebview.callHandler('topup', topupDetails)
-        .then((completed) => {
-          if(completed) {
-            // If user completed topup prompt
-            setInterval(() => {
-              tokensRequired = that.tokensNeeded();
-              if(tokensRequired === 0){ // If user now has enough GBPx to check out
-                that.syncing = false;
-                that.processingTopup = false;
-              }
-            }, 3000);
-          } else {
-            that.syncing = false;
-            that.processingTopup = false;
-          }
-        });
-        // return;
-      }*/
     },
     startTopUp: function() {
       var amountRequired = (this.cartTotal + this.deliveryTotal - this.walletTotal) / 100; // App handler expects pence!
@@ -186,7 +173,6 @@ parasails.registerPage('vendor-menu', {
       window.flutter_inappwebview.callHandler('topup', topupDetails)
       .then((completed) => {
         if(completed) {
-          // If user completed topup prompt
           setInterval(() => {
             that.walletTotal = that.getWalletTotal();
             that.syncing = false;
@@ -219,13 +205,6 @@ parasails.registerPage('vendor-menu', {
       var numberOfTokens = parseInt(data.result)/(Math.pow(10,16));
 
       return numberOfTokens; //In pence
-
-      /* if ((numberOfTokens * 100) < this.finalTotal) { // GBPx to pence
-        var amountRequired = (this.finalTotal - numberOfTokens * 100) / 100; // App code expects pence!
-        return amountRequired;
-      } else {
-        return 0;
-      } */
     },
     submittedForm: function(result) {
       this.syncing = true;
@@ -240,22 +219,23 @@ parasails.registerPage('vendor-menu', {
         orderId: result.toString()
       };
 
-      var that = this;
-
       // TODO: Change this to send payment information to backend, rather than using webhook from app.
       window.flutter_inappwebview.callHandler('pay', paymentDetails);
 
-      io.socket.on('paid', (data) => {
-        this.submitted = false;
-        this.syncing = false;
-        window.location.href = '/orders/' + data.orderId;
-      });
+      this.submitted = false;
+      this.syncing = false;
 
-      io.socket.on('paymentError', function(data){
-        this.submitted = false;
-        this.syncing = false;
-        alert(data.message);
-      });
+      window.location.href = '/orders/' + result;
+
+      // Order Array - Parameters should be generated dynamically
+      _paq.push(['trackEcommerceOrder',
+        paymentDetails.orderId, // (Required) orderId
+        paymentDetails.amount, // (Required) revenue
+        this.cartTotal / 100, // (Optional) subTotal
+        // 1.5, // (optional) tax
+        this.deliveryTotal / 100, // (optional) shipping
+        // false // (optional) discount
+      ]);
     },
     updatedPostCode: function () {
       for(var group in this.deliveryMethodsTemp){
@@ -275,7 +255,6 @@ parasails.registerPage('vendor-menu', {
         output.selected = null;
         output.selectedSlot = null;
 
-        //verbose
         if(output.deliveryMethods.length < 1) {
           output.noMethodsAvailable = true;
         } else {
@@ -290,6 +269,8 @@ parasails.registerPage('vendor-menu', {
       this.isLoading = true;
       this.checkoutModalActive = true;
       var that = this;
+
+      this.walletTotal = this.getWalletTotal();
 
       var productids = _.pluck(this.cart, 'id');
       var productQuantities = {};
@@ -349,7 +330,7 @@ parasails.registerPage('vendor-menu', {
       return this.cartTotal + this.deliveryTotal;
     },
     readyToPay: function() {
-      if (this.address.postCode == '') {
+      if (this.address.postCode === '') {
         return false;
       }
 
