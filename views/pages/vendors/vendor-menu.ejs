@@ -26,7 +26,7 @@
           </div>
         </div>
       </div>
-      <div v-else class="modal-content">
+      <div v-else class="modal-content add-to-cart-modal">
         <form @submit.prevent="addProductToCart">
         <div class="modal-body">
           <h3>{{selectedProduct.name}}</h3>
@@ -60,7 +60,7 @@
           </div>
         </div>
       </div>
-      <div v-else class="modal-content">
+      <div v-else class="modal-content checkout-modal">
         <div class="modal-header">
           <h5 class="mb-0">Checkout</h5>
         </div>
@@ -73,6 +73,11 @@
             <div class="form-group">
               <label for="emailInput">Email Address</label>
               <input type="email" autocomplete="email" :class="{ 'is-invalid': formErrors.email }" v-model="address.email" class="form-control" id="emailInput" aria-describedby="emailHelp" required>
+            </div>
+            <div v-if="!alreadyOptedIn" class="form-group form-check mt-3 mb-4 comms-opt-in">
+              <input type="checkbox" class="form-check-input" id="commsOptIn" v-model="marketingOptIn" aria-describedby="commsOptInInfo">
+              <label for="commsOptIn" class="form-check-label">Join our lovely mailing list</label>
+              <span id="commsOptInInfo">Stay in the loop with exciting updates from Peepl restaurants and partners across the city.</span>
             </div>
             <div class="form-group">
               <label for="telephoneInput">Contact Number</label>
@@ -116,12 +121,6 @@
                 </select>
                 <p v-else class="text-danger">Unfortunately, there are no slots available. Please try a different delivery option.</p>
               </div>
-            </div>
-
-            <div v-if="!alreadyOptedIn">
-              <h5 class="mt-4">Marketing opt-in</h5>
-              <input type="checkbox" id="checkbox" v-model="marketingOptIn">
-              <label for="checkbox" id="commsOptIn">Opt-in to our mailing list to stay in the loop with exciting updates from across the Liverpool region and Peepl community.</label>
             </div>
 
             <h5 class="mt-4">Payment</h5>
