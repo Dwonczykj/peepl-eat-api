@@ -11,7 +11,7 @@
               <% if (orders[order].items[i].optionValues && orders[order].items[i].optionValues.length) { %>
                 <ol class="order-confirmation__option-values">
                   <% for (var j in orders[order].items[i].optionValues) { %>
-                    <li><%= orders[order].items[i].optionValues[j].optionValue.name %></li>
+                    <li><b><%= orders[order].items[i].optionValues[j].option.name %></b>: <%= orders[order].items[i].optionValues[j].optionValue.name %></li>
                   <% } %>
                 </ol>
               <% } %>
