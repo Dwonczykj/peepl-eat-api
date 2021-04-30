@@ -29,11 +29,6 @@ module.exports = {
       description: 'A brief description of the vendor.',
       required: false
     },
-    image: {
-      type: 'string',
-      description: 'Fully-qualified link to the image for the product.',
-      required: false
-    },
     walletId: {
       type: 'string',
       description: 'The blockchain wallet address for the vendor. Used to distribute payments from customers.',
