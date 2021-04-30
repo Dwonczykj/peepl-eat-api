@@ -3,39 +3,61 @@
   <%- partial('../../partials/admin-navbar.ejs') %>
 
   <div class="container">
-    <h1 class="my-5">{{vendor.name}}</h1>
 
-    <ajax-form :form-data="vendor" action="editVendor">
+    <div class="mb-3">
+      <h1>{{vendor.name}}</h1>
+      <h2 class="small">{{vendor.description}}</h2>
+    </div>
+    
+    <ajax-form :form-data="vendor" :form-rules="formRules" :form-errors.sync="formErrors" @submitted="vendorSubmitted" :action="(vendor.id) ?  'editVendor' : 'createVendor'">
       <div class="form-group">
         <label for="vendorName">Vendor Name</label>
-        <input type="text" :class="{ 'is-invalid': formErrors.name }" v-model="vendor.name" class="form-control" id="vendorName" required>
+        <input type="text" :class="{ 'is-invalid': formErrors.name }" v-model="vendor.name" class="form-control" id="vendorName">
       </div>
       <div class="form-group">
         <label for="vendorDescription">Vendor Description</label>
-        <textarea type="text" class="form-control" rows="3" :class="{ 'is-invalid': formErrors.description }" v-model="vendor.description" id="vendorDescription" required></textarea>
+        <textarea type="text" class="form-control" rows="3" :class="{ 'is-invalid': formErrors.description }" v-model="vendor.description" id="vendorDescription" ></textarea>
       </div>
       <div class="form-group">
         <label for="vendorWallet">Vendor Wallet Address</label>
-        <input type="text" :class="{ 'is-invalid': formErrors.walletId }" v-model="vendor.walletId" class="form-control text-monospace" id="vendorWallet" required>
+        <input type="text" :class="{ 'is-invalid': formErrors.walletId }" v-model="vendor.walletId" class="form-control text-monospace" id="vendorWallet" >
+      </div>
+      <div class="form-group">
+        <label for="phoneNumber">Vendor Phone Number</label>
+        <input type="text" :class="{ 'is-invalid': formErrors.phoneNumber }" v-model="vendor.phoneNumber" class="form-control" id="phoneNumber" >
+      </div>
+      <div class="form-group">
+        <label for="vendorWallet">Delivery Restriction Details</label>
+        <input type="text" placeholder="Delivers to L1, L2, L3" :class="{ 'is-invalid': formErrors.walletId }" v-model="vendor.deliveryRestrictionDetails" class="form-control" id="vendorWallet" >
       </div>
       <div class="form-group">
         <label for="vendorType">Vendor Type</label>
-        <select class="form-control" id="vendorType" v-model="vendor.type" required>
+        <select class="form-control" id="vendorType" v-model="vendor.type" :disabled="vendor.id">
           <option value="restaurant">Restaurant</option>
           <option value="shop" disabled>Shop</option>
         </select>
       </div>
+      <div class="form-group">
+        <label for="status">Status</label>
+        <select class="form-control" id="status" v-model="vendor.status" >
+          <option value="draft">Draft</option>
+          <option value="inactive">Inactive</option>
+          <option value="active">Active</option>
+        </select>
+      </div>
 
       <fieldset>
-        <h2 class="h5 mt-5">Image</h2>
-        <img :src="'/vendors/download-image/' + vendor.id" />
+        <h2 class="h5 mt-3">Featured Image</h2>
+        <img v-if="vendor.id && !vendor.image" :src="'/vendors/download-image/' + vendor.id" />
         <div class="custom-file">
           <input type="file" class="custom-file-input" accept="image/*" id="customFile" @change="changeVendorImageInput($event.target.files)">
           <label class="custom-file-label" for="customFile">{{imageName}}</label>
         </div>
       </fieldset>
 
-      <fieldset>
+      <ajax-button class="btn btn-peepl mt-5" type="submit" v-bind:class="{ 'is-loading': syncing }">Save changes</ajax-button>
+
+      <fieldset v-if="vendor.id">
         <h2 class="h5 mt-5">Products</h2>
 
         <!-- TODO: sort by "priority" field -->
@@ -53,8 +75,6 @@
           <button class="btn btn-peepl btn-sm ml-auto">Add a new product</button>
         </div>
       </fieldset>
-
-      <ajax-button class="btn btn-peepl mt-5" type="submit" v-bind:class="{ 'is-loading': syncing }">Save changes</ajax-button>
     </ajax-form>
 
   </div>

@@ -58,3 +58,11 @@
     width: auto;
   }
 }
+
+.custom-file-label {
+  border-radius: 0;
+  margin-top: 10px;
+}
+.custom-file-label::after {
+  border-radius: 0;
+}
