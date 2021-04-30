@@ -1,4 +1,24 @@
 #vendor-menu .form-check-label {
-    margin-bottom: 0.5rem;
+  font-size: 0.875em;
+  margin-bottom: 0.5rem;
+}
+
+.form-check-input {
+  margin-top: 0.3rem; // compensate for taller label line-height
+}
+
+.add-to-cart-modal {
+  .form-check-label {
     font-size: 0.875em;
+    margin-bottom: 0.5rem;
+  }
+}
+
+.comms-opt-in {
+  span {
+    display: block;
+    font-size: 0.875em;
+    color: $gray-600;
+    margin-top: 0.2rem;
+  }
 }
