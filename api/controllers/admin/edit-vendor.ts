@@ -59,9 +59,7 @@ module.exports = {
       .intercept('E_EXCEEDS_UPLOAD_LIMIT', 'tooBig')
       .intercept((err) => new Error('The photo upload failed! ' + err.message));
 
-      if(!imageInfo) {
-        return exits.noFileAttached();
-      } else {
+      if(imageInfo) {
         inputs.imageFd = imageInfo.fd;
         inputs.imageMime = imageInfo.type;
       }
