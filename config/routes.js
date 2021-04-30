@@ -24,6 +24,7 @@ module.exports.routes = {
   '/vendors': {action: 'vendors/view-all-vendors'},
   '/vendors/:vendorid': { action: 'vendors/view-vendor-menu' },
   'GET /vendors/download-image/:vendorid': { action: 'vendors/download-image' },
+  'GET /products/download-image/:productId': { action: 'products/download-image' },
 
   'GET /orders/:orderId': { action: 'orders/view-order-confirmation' },
   'GET /orders': { action: 'orders/view-my-orders' },
@@ -41,8 +42,8 @@ module.exports.routes = {
   'POST /api/v1/admin/create-vendor': { action: 'admin/create-vendor' },
   'GET /admin/vendors/:vendorid': { action: 'admin/view-edit-vendor' },
   'post /api/v1/admin/edit-vendor': { action: 'admin/edit-vendor' },
-  'GET /admin/vendors/product': { action: 'admin/view-edit-product' },
-  'GET /admin/vendors/delivery-method': { action: 'admin/view-edit-delivery-method' },
+  'post /api/v1/admin/edit-product': { action: 'admin/edit-product' },
+  'post /api/v1/admin/create-product': { action: 'admin/create-product' },
   'GET /admin/orders': { action: 'admin/view-all-orders' },
 
   /***************************************************************************

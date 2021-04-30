@@ -56,26 +56,28 @@
       </fieldset>
 
       <ajax-button class="btn btn-peepl mt-5" type="submit" v-bind:class="{ 'is-loading': syncing }">Save changes</ajax-button>
-
-      <fieldset v-if="vendor.id">
-        <h2 class="h5 mt-5">Products</h2>
-
-        <!-- TODO: sort by "priority" field -->
-        <!-- TODO: loop through products -->
-          <%- // partial('../../partials/admin-product.ejs') %>
-        <!-- TODO: end loop -->
-
-        <div class="d-md-flex my-3 action-card-actions">
-          <select class="form-control form-control-sm mr-3" disabled>
-            <option>Set as available</option>
-            <option>Set as unavailable</option>
-            <option>Delete</option>
-          </select>
-          <button class="btn btn-secondary btn-sm" disabled>Apply</button>
-          <button class="btn btn-peepl btn-sm ml-auto">Add a new product</button>
-        </div>
-      </fieldset>
     </ajax-form>
+
+    <fieldset v-if="vendor.id">
+      <h2 class="h5 mt-5">Products</h2>
+
+      <edit-product v-for="product in vendor.products" :product="product" :vendorid="vendor.id">
+      </edit-product>
+      <!-- TODO: sort by "priority" field -->
+      <!-- TODO: loop through products -->
+        <%- //partial('../../partials/admin-product.ejs') %>
+      <!-- TODO: end loop -->
+
+      <div class="d-md-flex my-3 action-card-actions">
+        <select class="form-control form-control-sm mr-3" disabled>
+          <option>Set as available</option>
+          <option>Set as unavailable</option>
+          <option>Delete</option>
+        </select>
+        <button class="btn btn-secondary btn-sm" disabled>Apply</button>
+        <button class="btn btn-peepl btn-sm ml-auto" @click="clickAddProduct">Add a new product</button>
+      </div>
+    </fieldset>
 
   </div>
 </div>

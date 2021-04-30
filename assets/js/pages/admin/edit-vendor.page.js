@@ -46,7 +46,7 @@ parasails.registerPage('admin-edit-vendor', {
   },
   mounted: async function() {
     _.extend(this, SAILS_LOCALS);
-    this.vendor.image = "";
+    this.vendor.image = '';
   },
 
   //  ╦╔╗╔╔╦╗╔═╗╦═╗╔═╗╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
@@ -72,6 +72,17 @@ parasails.registerPage('admin-edit-vendor', {
     },
     vendorSubmitted: function({id}) {
       window.location.href = '/admin/vendors/' + id;
+    },
+    clickAddProduct: function(){
+      var newProduct = {
+        name: '[Draft]',
+        description: '',
+        basePrice: '',
+        isAvailable: false,
+        image: ''
+      };
+
+      this.vendor.products.push(newProduct);
     }
   },
 });
