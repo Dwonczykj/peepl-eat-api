@@ -20,6 +20,7 @@ module.exports = {
     },
     type: {
       type: 'string',
+      isIn: ['restaurant', 'shop'],
       required: true
     },
     image:{
@@ -29,18 +30,45 @@ module.exports = {
     walletId: {
       type: 'string',
       required: true
+    },
+    phoneNumber: {
+      type: 'string',
+    },
+    deliveryRestrictionDetails: {
+      type: 'string'
+    },
+    status: {
+      type: 'string',
+      isIn: ['draft', 'active', 'inactive']
     }
   },
 
   exits: {
-
+    success: {
+      outputDescription: 'The newly created `Vendor`s ID.',
+      outputExample: {}
+    },
+    noFileAttached: {
+      description: 'No file was attached.',
+      responseType: 'badRequest'
+    },
+    tooBig: {
+      description: 'The file is too big.',
+      responseType: 'badRequest'
+    },
   },
 
   fn: async function (inputs, exits) {
     var imageInfo = await sails.uploadOne(inputs.image, {
       maxBytes: 30000000
-    });
+    })
+    .intercept('E_EXCEEDS_UPLOAD_LIMIT', 'tooBig')
+    .intercept((err) => new Error('The photo upload failed! ' + err.message));
     // TODO: Handle missing image
+
+    if(!imageInfo) {
+      return exits.noFileAttached();
+    }
 
     var newVendor = await Vendor.create({
       imageFd: imageInfo.fd,
@@ -48,7 +76,8 @@ module.exports = {
       name: inputs.name,
       description: inputs.description,
       type: inputs.type,
-      walletId: inputs.walletId
+      walletId: inputs.walletId,
+      deliveryRestrictionDetails: inputs.deliveryRestrictionDetails
     }).fetch();
 
     // All done.
