@@ -31,7 +31,8 @@ module.exports = {
       allowNull: true
     },
     deliveryRestrictionDetails: {
-      type: 'string'
+      type: 'string',
+      allowNull: true
     },
     status: {
       type: 'string',

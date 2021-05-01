@@ -36,7 +36,7 @@
               <legend class="h5">{{option.name}}</legend>
               <div class="form-check" v-for="value in option.values">
                 <input class="form-check-input" type="radio" required :name="'option-' + option.id" :id="'option-' + option.id + '-' + value.id" :value="value.id" v-model="selectedOptionValues[option.id]" @change="changeOptionValue">
-                <label class="form-check-label" :for="'option-' + option.id + '-' + value.id">{{value.name}}</label>
+                <label class="form-check-label" :for="'option-' + option.id + '-' + value.id">{{value.name}} <span v-if="value.priceModifier">- {{value.priceModifier | convertToPounds}}</span></label>
               </div>
             </fieldset>
           </div>
