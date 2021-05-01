@@ -48,7 +48,8 @@ module.exports.bootstrap = async function() {
     basePrice: 2200,
     isAvailable: true,
     vendor: delifonseca.id,
-    image: 'https://www.delifonseca.co.uk/wp-content/uploads/2016/08/IMG_9705-1024x683.jpg'
+    imageFd: __dirname + '/../assets/images/products/1.jpeg',
+    imageMime: 'image/jpeg',
   }).fetch();
 
   var starterOption = await ProductOption.create({
