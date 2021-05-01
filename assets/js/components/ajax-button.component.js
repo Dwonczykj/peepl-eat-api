@@ -31,14 +31,13 @@ parasails.registerComponent('ajaxButton', {
   //  ╠═╣ ║ ║║║║
   //  ╩ ╩ ╩ ╩ ╩╩═╝
   template: `
-  <button @click="disabled ? null : click()" type="submit" :disabled="disabled" class="btn ajax-button" v-bind:class="{ 'disabled': disabled, 'syncing': syncing }">
+  <button @click="disabled || syncing ? null : click()" type="submit" :disabled="disabled" class="btn ajax-button" v-bind:class="{ 'disabled': disabled, 'syncing': syncing }">
     <span class="button-text" v-if="!syncing"><slot name="default">Submit</slot></span>
     <span class="button-loader clearfix" v-if="syncing">
       <slot name="syncing-state">
-        <div class="loading-dot dot1"></div>
-        <div class="loading-dot dot2"></div>
-        <div class="loading-dot dot3"></div>
-        <div class="loading-dot dot4"></div>
+        <div class="spinner-border" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
       </slot>
     </span>
   </button>

@@ -27,7 +27,7 @@ parasails.registerComponent('editProduct', {
       },
       formErrors: {
       },
-      imageName: ''
+      imageName: 'Choose image'
     };
   },
 
@@ -44,7 +44,7 @@ parasails.registerComponent('editProduct', {
         {{ product.name }}
       </summary>
       <div class="action-card__content">
-        <ajax-form :form-data="product" :form-rules="formRules" :form-errors.sync="formErrors" @submitted="createdProduct" :action="(product.id) ?  'editProduct' : 'createProduct'">
+        <ajax-form :form-data="product" :form-rules="formRules" :syncing.sync="syncing" :form-errors.sync="formErrors" @submitted="createdProduct" :action="(product.id) ?  'editProduct' : 'createProduct'">
           <div class="form-group mt-3">
             <label for="productName">Product Name</label>
             <input v-model="product.name" type="text" class="form-control" id="productName" required>
@@ -74,7 +74,7 @@ parasails.registerComponent('editProduct', {
             </div>
           </fieldset>
 
-          <ajax-button class="btn btn-peepl mt-5" type="submit" v-bind:class="{ 'is-loading': syncing }">Save changes</ajax-button>
+          <ajax-button class="btn btn-peepl mt-5" type="submit" :syncing="syncing" v-bind:class="{ 'is-loading': syncing }">Save changes</ajax-button>
         </ajax-form>
 
         <fieldset v-if="product.id">
@@ -117,8 +117,8 @@ parasails.registerComponent('editProduct', {
     click: async function(){
       this.$emit('click');
     },
-    createdProduct: function(){
-      alert("done");
+    createdProduct: function({id}){
+      Vue.set(this.product, 'id', id);
     },
     changeProductImageInput: function(files) {
       if (files.length !== 1 && !this.product.image) {

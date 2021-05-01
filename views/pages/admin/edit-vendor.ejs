@@ -9,7 +9,7 @@
       <h2 class="small">{{vendor.description}}</h2>
     </div>
     
-    <ajax-form :form-data="vendor" :form-rules="formRules" :form-errors.sync="formErrors" @submitted="vendorSubmitted" :action="(vendor.id) ?  'editVendor' : 'createVendor'">
+    <ajax-form :form-data="vendor" :syncing.sync="syncing" :form-rules="formRules" :form-errors.sync="formErrors" @submitted="vendorSubmitted" :action="(vendor.id) ?  'editVendor' : 'createVendor'">
       <div class="form-group">
         <label for="vendorName">Vendor Name</label>
         <input type="text" :class="{ 'is-invalid': formErrors.name }" v-model="vendor.name" class="form-control" id="vendorName">
@@ -55,7 +55,7 @@
         </div>
       </fieldset>
 
-      <ajax-button class="btn btn-peepl mt-5" type="submit" v-bind:class="{ 'is-loading': syncing }">Save changes</ajax-button>
+      <ajax-button class="btn btn-peepl mt-5" type="submit" :syncing="syncing" v-bind:class="{ 'is-loading': syncing }">Save changes</ajax-button>
     </ajax-form>
 
     <fieldset v-if="vendor.id">
