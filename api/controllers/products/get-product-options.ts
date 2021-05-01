@@ -20,7 +20,11 @@ module.exports = {
 
   fn: async function (inputs, exits) {
     var options = await ProductOption.find({product: inputs.productId})
-    .populate('values');
+    .populate('values', {
+      where: {
+        isAvailable: true
+      }
+    });
 
     // All done.
     return exits.success(options);

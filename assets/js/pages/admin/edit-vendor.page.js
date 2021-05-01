@@ -17,6 +17,7 @@ parasails.registerPage('admin-edit-vendor', {
       deliveryRestrictionDetails: '',
       status: 'draft',
     },
+    previewImageSrc: '',
     formRules: {
       name: {
         required: true
@@ -69,6 +70,17 @@ parasails.registerPage('admin-edit-vendor', {
       this.imageName = selectedFile.name; // Used to show user which image is selected
       this.vendor.image = selectedFile;
       this.formErrors.image = '';
+
+      // Set up the file preview for the UI:
+      var reader = new FileReader();
+      reader.onload = (event)=>{
+        this.previewImageSrc = event.target.result;
+
+        // Unbind this "onload" event.
+        delete reader.onload;
+      };
+      // Clear out any error messages about not providing an image.
+      reader.readAsDataURL(selectedFile);
     },
     vendorSubmitted: function({id}) {
       window.location.href = '/admin/vendors/' + id;

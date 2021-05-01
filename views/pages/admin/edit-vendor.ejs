@@ -48,14 +48,14 @@
 
       <fieldset>
         <h2 class="h5 mt-3">Featured Image</h2>
-        <img v-if="vendor.id && !vendor.image" :src="'/vendors/download-image/' + vendor.id" />
+        <img v-if="previewImageSrc || vendor.id" :src="(previewImageSrc) ? previewImageSrc : '/vendors/download-image/' + vendor.id" />
         <div class="custom-file">
           <input type="file" class="custom-file-input" accept="image/*" id="customFile" @change="changeVendorImageInput($event.target.files)">
           <label class="custom-file-label" for="customFile">{{imageName}}</label>
         </div>
       </fieldset>
 
-      <ajax-button class="btn btn-peepl mt-5" type="submit" :syncing="syncing" v-bind:class="{ 'is-loading': syncing }">Save changes</ajax-button>
+      <ajax-button class="btn btn-peepl mt-4" type="submit" :syncing="syncing" v-bind:class="{ 'is-loading': syncing }">Save changes</ajax-button>
     </ajax-form>
 
     <fieldset v-if="vendor.id">
@@ -63,10 +63,6 @@
 
       <edit-product v-for="product in vendor.products" :product="product" :vendorid="vendor.id">
       </edit-product>
-      <!-- TODO: sort by "priority" field -->
-      <!-- TODO: loop through products -->
-        <%- //partial('../../partials/admin-product.ejs') %>
-      <!-- TODO: end loop -->
 
       <div class="d-md-flex my-3 action-card-actions">
         <select class="form-control form-control-sm mr-3" disabled>

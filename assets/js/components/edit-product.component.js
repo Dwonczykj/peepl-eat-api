@@ -24,7 +24,11 @@ parasails.registerComponent('editProduct', {
     return {
       syncing: false,
       formRules: {
+        name: {
+          required: true
+        }
       },
+      previewImageSrc: '',
       formErrors: {
       },
       imageName: 'Choose image'
@@ -47,49 +51,48 @@ parasails.registerComponent('editProduct', {
         <ajax-form :form-data="product" :form-rules="formRules" :syncing.sync="syncing" :form-errors.sync="formErrors" @submitted="createdProduct" :action="(product.id) ?  'editProduct' : 'createProduct'">
           <div class="form-group mt-3">
             <label for="productName">Product Name</label>
-            <input v-model="product.name" type="text" class="form-control" id="productName" required>
+            <input :class="{ 'is-invalid': formErrors.name }" v-model="product.name" type="text" class="form-control" id="productName" required>
           </div>
           <div class="form-group">
             <label for="productDescription">Product Description</label>
-            <textarea v-model="product.description" class="form-control" id="productDescription" required></textarea>
+            <textarea :class="{ 'is-invalid': formErrors.description }" v-model="product.description" class="form-control" id="productDescription" required></textarea>
           </div>
           <div class="form-group">
             <label for="basePrice">Base Price (in pence)</label>
-            <input v-model="product.basePrice" type="text" class="form-control" id="basePrice" required>
+            <input :class="{ 'is-invalid': formErrors.basePrice }" v-model="product.basePrice" type="text" class="form-control" id="basePrice" required>
           </div>
           <div class="form-group">
             <label for="priority">Priority</label>
-            <input v-model="product.priority" type="number" class="form-control" id="priority" required>
+            <input :class="{ 'is-invalid': formErrors.priority }" v-model="product.priority" type="number" class="form-control" id="priority" required>
           </div>
           <div class="form-group form-check">
             <input v-model="product.isAvailable" type="checkbox" class="form-check-input" id="available">
-            <label class="form-check-label" for="available">Is Available</label>
+            <label :class="{ 'is-invalid': formErrors.isAvailable }" class="form-check-label" for="available">Is Available</label>
           </div>
           <fieldset>
             <h2 class="h5 mt-3">Featured Image</h2>
-            <img v-if="product.id && !product.image" :src="'/products/download-image/' + product.id" />
+            <img v-if="previewImageSrc || product.id" :src="(previewImageSrc) ? previewImageSrc : '/products/download-image/' + product.id" />
             <div class="custom-file">
-              <input type="file" class="custom-file-input" accept="image/*" id="customFile" @change="changeProductImageInput($event.target.files)">
+              <input :class="{ 'is-invalid': formErrors.image }" type="file" class="custom-file-input" accept="image/*" id="customFile" @change="changeProductImageInput($event.target.files)">
               <label class="custom-file-label" for="customFile">{{imageName}}</label>
             </div>
           </fieldset>
 
-          <ajax-button class="btn btn-peepl mt-5" type="submit" :syncing="syncing" v-bind:class="{ 'is-loading': syncing }">Save changes</ajax-button>
+          <ajax-button class="btn btn-peepl mt-4" type="submit" :syncing="syncing" v-bind:class="{ 'is-loading': syncing }">Save changes</ajax-button>
         </ajax-form>
 
         <fieldset v-if="product.id">
           <h3 class="h6 mt-4">Options</h3>
 
-          <!-- TODO: loop through product options
-          <%- // partial('../partials/admin-product-option.ejs') %>
-          TODO: end loop -->
+          <edit-product-option :productid="product.id" v-for="productOption in product.options" :productOption="productOption">
+          </edit-product-option>
 
           <div class="d-md-flex my-3 action-card-actions">
             <select class="form-control form-control-sm mr-3" disabled>
               <option>Delete</option>
             </select>
             <button class="btn btn-secondary btn-sm" disabled>Apply</button>
-            <button class="btn btn-peepl btn-sm ml-auto">Add a new option</button>
+            <button class="btn btn-peepl btn-sm ml-auto" @click="clickAddProductOption">Add a new option</button>
           </div>
         </fieldset>
       </div>
@@ -136,6 +139,25 @@ parasails.registerComponent('editProduct', {
       this.imageName = selectedFile.name; // Used to show user which image is selected
       this.product.image = selectedFile;
       this.formErrors.image = '';
+
+      // Set up the file preview for the UI:
+      var reader = new FileReader();
+      reader.onload = (event)=>{
+        this.previewImageSrc = event.target.result;
+
+        // Unbind this "onload" event.
+        delete reader.onload;
+      };
+      // Clear out any error messages about not providing an image.
+      reader.readAsDataURL(selectedFile);
     },
+    clickAddProductOption: function(){
+      var newProductOption = {
+        name: '[Draft Option]',
+        values: []
+      };
+
+      this.product.options.push(newProductOption);
+    }
   }
 });

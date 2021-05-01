@@ -44,6 +44,10 @@ module.exports.routes = {
   'post /api/v1/admin/edit-vendor': { action: 'admin/edit-vendor' },
   'post /api/v1/admin/edit-product': { action: 'admin/edit-product' },
   'post /api/v1/admin/create-product': { action: 'admin/create-product' },
+  'POST /api/v1/admin/create-product-option': { action: 'admin/create-product-option' },
+  'POST /api/v1/admin/edit-product-option': { action: 'admin/edit-product-option' },
+  'POST /api/v1/admin/create-product-option-value': { action: 'admin/create-product-option-value' },
+  'POST /api/v1/admin/edit-product-option-value': { action: 'admin/edit-product-option-value' },
   'GET /admin/orders': { action: 'admin/view-all-orders' },
 
   /***************************************************************************

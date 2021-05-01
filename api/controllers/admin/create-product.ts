@@ -75,7 +75,7 @@ module.exports = {
     }).fetch()
     .catch((err) => {
       console.log(err);
-    })
+    });
 
     // All done.
     return exits.success({
