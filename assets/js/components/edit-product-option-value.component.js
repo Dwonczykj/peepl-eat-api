@@ -55,6 +55,7 @@ parasails.registerComponent('editProductOptionValue', {
           <div class="form-group">
             <label for="optionValuePrice">Price modifier (in +/- pence)</label>
             <input type="text" v-model="productOptionValue.priceModifier" class="form-control" id="optionValuePrice" required>
+            <p class="mt-2 text-muted">{{productOptionValue.priceModifier | convertToPounds}}</p>
           </div>
           <div class="form-group form-check">
             <input v-model="productOptionValue.isAvailable" type="checkbox" class="form-check-input" id="optionValueAvailable">
@@ -77,6 +78,15 @@ parasails.registerComponent('editProductOptionValue', {
   },
   beforeDestroy: function() {
     //…
+  },
+
+  filters: {
+    convertToPounds: function (value) {
+      if (!value) {return '£0';}
+      value = '£' + (value/100).toFixed(2);
+      value = value.toString();
+      return value;
+    }
   },
 
   //  ╦╔╗╔╔╦╗╔═╗╦═╗╔═╗╔═╗╔╦╗╦╔═╗╔╗╔╔═╗

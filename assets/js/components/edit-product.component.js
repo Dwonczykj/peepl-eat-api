@@ -60,6 +60,7 @@ parasails.registerComponent('editProduct', {
           <div class="form-group">
             <label for="basePrice">Base Price (in pence)</label>
             <input :class="{ 'is-invalid': formErrors.basePrice }" v-model="product.basePrice" type="text" class="form-control" id="basePrice" required>
+            <p class="mt-2 text-muted">{{product.basePrice | convertToPounds}}</p>
           </div>
           <div class="form-group">
             <label for="priority">Priority</label>
@@ -111,6 +112,15 @@ parasails.registerComponent('editProduct', {
   },
   beforeDestroy: function() {
     //…
+  },
+
+  filters: {
+    convertToPounds: function (value) {
+      if (!value) {return '£0';}
+      value = '£' + (value/100).toFixed(2);
+      value = value.toString();
+      return value;
+    }
   },
 
   //  ╦╔╗╔╔╦╗╔═╗╦═╗╔═╗╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
