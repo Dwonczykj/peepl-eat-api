@@ -95,7 +95,7 @@ parasails.registerComponent('ajaxForm', {
     if (this.formRules) {
       var SUPPORTED_RULES = [
         'required', 'isEmail', 'isIn', 'is', 'minLength', 'maxLength',
-        'sameAs', 'isHalfwayDecentPassword', 'custom'
+        'sameAs', 'isHalfwayDecentPassword', 'custom', 'regex'
       ];
       for (let fieldName in this.formRules) {
         for (let ruleName in this.formRules[fieldName]) {
@@ -274,6 +274,11 @@ parasails.registerComponent('ajaxForm', {
                   fieldValue.length < 6
                 );
               }
+            } else if (ruleName === 'regex') {
+              // ® Must match the regex specified
+              violation = (
+                !ruleRhs.test(fieldValue)
+              );
             } else if (ruleName === 'custom' && _.isFunction(ruleRhs)) {
               // ® Provided function must return truthy when invoked with the value.
               try {

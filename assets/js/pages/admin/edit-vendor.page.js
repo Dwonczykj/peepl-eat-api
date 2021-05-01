@@ -31,9 +31,7 @@ parasails.registerPage('admin-edit-vendor', {
       walletId: {
         required: true,
         maxLength: 100,
-        custom: function(input){
-          return /^0x[a-fA-F0-9]{40}$/.test(input);
-        }
+        regex: /^0x[a-fA-F0-9]{40}$/
       },
       status: {
       },
