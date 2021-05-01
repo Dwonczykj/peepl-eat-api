@@ -49,8 +49,8 @@ parasails.registerComponent('editProductOptionValue', {
             <input type="text" v-model="productOptionValue.name" class="form-control" id="productOptionValueName" required>
           </div>
           <div class="form-group">
-            <label for="optionValueDescription">Product Description</label>
-            <textarea class="form-control" v-model="productOptionValue.description" id="optionValueDescription" required></textarea>
+            <label for="optionValueDescription">Option Description</label>
+            <textarea class="form-control" v-model="productOptionValue.description" id="optionValueDescription"></textarea>
           </div>
           <div class="form-group">
             <label for="optionValuePrice">Price modifier (in +/- pence)</label>
