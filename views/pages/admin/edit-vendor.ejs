@@ -9,7 +9,7 @@
       <h2 class="small">{{vendor.description}}</h2>
     </div>
     
-    <ajax-form :form-data="vendor" :syncing.sync="syncing" :form-rules="formRules" :form-errors.sync="formErrors" @submitted="vendorSubmitted" :action="(vendor.id) ?  'editVendor' : 'createVendor'">
+    <ajax-form :form-data="vendor" :syncing.sync="syncing" :form-rules="formRules" :form-errors.sync="formErrors" :cloud-error.sync="cloudError" @submitted="vendorSubmitted" :action="(vendor.id) ?  'editVendor' : 'createVendor'">
       <div class="form-group">
         <label for="vendorName">Vendor Name</label>
         <input type="text" :class="{ 'is-invalid': formErrors.name }" v-model="vendor.name" class="form-control" id="vendorName">
@@ -28,7 +28,7 @@
       </div>
       <div class="form-group">
         <label for="vendorWallet">Delivery Restriction Details</label>
-        <input type="text" placeholder="Delivers to L1, L2, L3" :class="{ 'is-invalid': formErrors.walletId }" v-model="vendor.deliveryRestrictionDetails" class="form-control" id="vendorWallet" >
+        <input type="text" placeholder="Delivers to L1, L2, L3" :class="{ 'is-invalid': formErrors.deliveryRestrictionDetails }" v-model="vendor.deliveryRestrictionDetails" class="form-control" id="vendorWallet" >
       </div>
       <div class="form-group">
         <label for="vendorType">Vendor Type</label>
@@ -56,6 +56,7 @@
       </fieldset>
 
       <ajax-button class="btn btn-peepl mt-4" type="submit" :syncing="syncing" v-bind:class="{ 'is-loading': syncing }">Save changes</ajax-button>
+      <p class="text-danger mt-2" v-if="cloudError">Error: There was a problem submitting your request, please try again.</p>
     </ajax-form>
 
     <fieldset v-if="vendor.id">

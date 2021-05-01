@@ -38,7 +38,8 @@ module.exports.bootstrap = async function() {
     description: 'Life\'s too short to have a bad meal. Delifonseca is here to help you enjoy the finer tastes in life.',
     walletId: '0xf039CD9391cB28a7e632D07821deeBc249a32410',
     imageFd: __dirname + '/../assets/images/vendors/spitroast.jpg',
-    imageMime: 'image/jpeg'
+    imageMime: 'image/jpeg',
+    status: 'active'
   }).fetch();
 
   var burnsNight = await Product.create({

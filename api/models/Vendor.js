@@ -32,7 +32,8 @@ module.exports = {
     walletId: {
       type: 'string',
       description: 'The blockchain wallet address for the vendor. Used to distribute payments from customers.',
-      required: true
+      required: true,
+      regex: /^0x[a-fA-F0-9]{40}$/
     },
     imageFd: {
       type: 'string',

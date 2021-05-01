@@ -24,7 +24,8 @@ module.exports = {
     },
     walletId: {
       type: 'string',
-      required: true
+      required: true,
+      regex: /^0x[a-fA-F0-9]{40}$/
     },
     phoneNumber: {
       type: 'string',
