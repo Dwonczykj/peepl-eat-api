@@ -16,6 +16,7 @@ parasails.registerPage('admin-edit-vendor', {
       walletId: '0x',
       deliveryRestrictionDetails: '',
       status: 'draft',
+      products: []
     },
     previewImageSrc: '',
     formRules: {
@@ -81,7 +82,8 @@ parasails.registerPage('admin-edit-vendor', {
       reader.readAsDataURL(selectedFile);
     },
     vendorSubmitted: function({id}) {
-      window.location.href = '/admin/vendors/' + id;
+      this.vendor.id = id;
+      window.history.pushState({}, '', '/admin/vendors/' + id);
     },
     clickAddProduct: function(){
       var newProduct = {
@@ -89,7 +91,8 @@ parasails.registerPage('admin-edit-vendor', {
         description: '',
         basePrice: '',
         isAvailable: false,
-        image: ''
+        image: '',
+        options: []
       };
 
       this.vendor.products.push(newProduct);
