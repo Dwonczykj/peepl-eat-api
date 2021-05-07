@@ -45,7 +45,7 @@ parasails.registerComponent('editProduct', {
         <span class="action-card__checkbox">
           <input type="checkbox">
         </span>
-        {{ product.name }}
+        <span :class="{'line-through': !product.isAvailable }">{{ product.name }}</span>
       </summary>
       <div class="action-card__content">
         <ajax-form :form-data="product" :form-rules="formRules" :syncing.sync="syncing" :form-errors.sync="formErrors" @submitted="createdProduct" :action="(product.id) ?  'editProduct' : 'createProduct'">
@@ -92,6 +92,7 @@ parasails.registerComponent('editProduct', {
             <select class="form-control form-control-sm mr-3" disabled>
               <option>Delete</option>
             </select>
+            <br/>
             <button class="btn btn-secondary btn-sm" disabled>Apply</button>
             <button class="btn btn-peepl btn-sm ml-auto" @click="clickAddProductOption">Add a new option</button>
           </div>

@@ -63,6 +63,7 @@ parasails.registerComponent('editProductOption', {
               <option>Set as unavailable</option>
               <option>Delete</option>
             </select>
+            <br/>
             <button class="btn btn-secondary btn-sm" disabled>Apply</button>
             <button @click="clickAddProductOptionValue" class="btn btn-peepl btn-sm ml-auto">Add a new value</button>
           </div>
