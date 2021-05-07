@@ -68,7 +68,8 @@ module.exports = {
     }
 
     var newVendor = await Vendor.updateOne(inputs.id).set(inputs)
-    .catch(() => {
+    .catch((err) => {
+      console.log(err);
       return exits.serverError();
     });
 
