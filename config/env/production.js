@@ -51,6 +51,8 @@ module.exports = {
     default: {
       adapter: 'sails-mysql',
       url: 'mysql://production:T5i4daM!&2b*gWLZBz5@localhost:3306/itsaboutpeepl',
+      charset: 'utf8mb4',
+      collation: 'utf8mb4_unicode_ci',
       //--------------------------------------------------------------------------
       //  /\   To avoid checking it in to version control, you might opt to set
       //  ||   sensitive credentials like `url` using an environment variable.
