@@ -127,8 +127,13 @@
     </script>
     <!-- End Matomo Code -->
     
-    <!--SCRIPTS-->
     <script src="/dependencies/sails.io.js"></script>
+    <script type="text/javascript">
+      // Automatically reconnect websocket connection.
+      io.sails.reconnection = true;
+    </script>
+
+    <!--SCRIPTS-->
     <script src="/dependencies/lodash.js"></script>
     <script src="/dependencies/jquery.min.js"></script>
     <script src="/dependencies/vue.js"></script>
