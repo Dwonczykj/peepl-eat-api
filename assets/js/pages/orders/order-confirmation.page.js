@@ -20,7 +20,6 @@ parasails.registerPage('order-confirmation', {
     // Order marked as paid
     io.socket.on('paid', (data) => {
       that.order.paidDateTime = data.paidDateTime;
-      // eslint-disable-next-line no-undef
       _paq.push(['trackEvent', 'eCommerce', 'Completed order', data.orderId, this.cartTotal + this.deliveryTotal]);
     });
 

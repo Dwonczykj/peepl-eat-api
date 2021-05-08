@@ -15,16 +15,14 @@ module.exports = {
     templateData: {
       description: 'A dictionary of data which will be accessible in the EJS template.',
       extendedDescription: 'Each key will be a local variable accessible in the template.  For instance, if you supply '+
-        'a dictionary with a \`friends\` key, and \`friends\` is an array like \`[{name:"Chandra"}, {name:"Mary"}]\`),'+
-        'then you will be able to access \`friends\` from the template:\n'+
-        '\`\`\`\n'+
+        'a dictionary with a friends key, and friends is an array like [{name:"Chandra"}, {name:"Mary"}]),'+
+        'then you will be able to access friends from the template:\n'+
         '<ul>\n'+
          '<% for (friend of friends){ %><li><%= friend.name %></li><% }); %>\n'+
         '</ul>\n'+
-        '\`\`\`'+
         '\n'+
-        'This is EJS, so use \`<%= %>\` to inject the HTML-escaped content of a variable, \`<%= %>\` to skip HTML-escaping '+
-        'and inject the data as-is, or \`<% %>\` to execute some JavaScript code such as an \`if\` statement or \`for\` loop.',
+        'This is EJS, so use <%= %> to inject the HTML-escaped content of a variable, <%= %> to skip HTML-escaping '+
+        'and inject the data as-is, or <% %> to execute some JavaScript code such as an if statement or for loop.',
       type: {},
       defaultsTo: {}
     },
@@ -172,7 +170,7 @@ module.exports = {
     if (dontActuallySend) {
       sails.log(
         'Skipped sending email, either because the "To" email address ended in "@example.com"\n'+
-        'or because the current \`sails.config.environment\` is set to "test".\n'+
+        'or because the current sails.config.environment is set to "test".\n'+
         '\n'+
         'But anyway, here is what WOULD have been sent:\n'+
         '-=-=-=-=-=-=-=-=-=-=-=-=-= Email log =-=-=-=-=-=-=-=-=-=-=-=-=-\n'+

@@ -286,6 +286,7 @@ parasails.registerComponent('ajaxForm', {
                   !ruleRhs(fieldValue)
                 );
               } catch (err) {
+                // eslint-disable-next-line no-console
                 console.warn(err);
                 violation = true;
               }
@@ -315,6 +316,7 @@ parasails.registerComponent('ajaxForm', {
           // (so that it's clear what's going on just in case validation
           // states/messages are not hooked up in the HTML template)
           if (this._environment !== 'production') {
+            // eslint-disable-next-line no-console
             console.warn(`<ajax-form> encountered ${Object.keys(formErrors).length} form error${Object.keys(formErrors).length !== 1 ? 's' : ''} when performing client-side validation of "form-data" versus "form-rules".  (Note: This warning is only here to assist with debugging-- it will not be displayed in production.  If you're unsure, check out https://sailsjs.com/support for more resources.)`, _.cloneDeep(formErrors));
           }//ﬁ
           return;

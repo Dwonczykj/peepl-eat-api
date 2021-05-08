@@ -188,6 +188,7 @@ parasails.registerPage('vendor-menu', {
       });
     },
     getWalletTotal: function() {
+      // TODO: Change this request to be async
       var contractAddress = '0x40AFCD9421577407ABB0d82E2fF25Fd2Ef4c68BD';
       var userWallet = window.SAILS_LOCALS.wallet;
       var data = null;
@@ -247,7 +248,7 @@ parasails.registerPage('vendor-menu', {
           var deliveryMethod = this.deliveryMethodsTemp[group].deliveryMethods[deliveryMethodIndex];
           var isPostCodeValid = RegExp(deliveryMethod.postCodeRestrictionRegex).test(this.address.postCode);
 
-          if (isPostCodeValid || deliveryMethod.postCodeRestrictionRegex == ''){
+          if (isPostCodeValid || deliveryMethod.postCodeRestrictionRegex === ''){
             updatedDms.push(deliveryMethod);
           }
         }
@@ -293,7 +294,7 @@ parasails.registerPage('vendor-menu', {
         Vue.set(that, 'deliveryMethodsTemp', output);
         that.deliveryMethodsTemp = output;
 
-        if(that.address.postCode != ''){
+        if(that.address.postCode !== ''){
           that.updatedPostCode();
         }
       });
