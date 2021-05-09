@@ -26,7 +26,8 @@ parasails.registerComponent('editProductOptionValue', {
       formRules: {
       },
       formErrors: {
-      }
+      },
+      cloudError: ''
     };
   },
 
@@ -40,10 +41,10 @@ parasails.registerComponent('editProductOptionValue', {
         <span class="action-card__checkbox">
           <input type="checkbox">
         </span>
-        {{ productOptionValue.name }}
+        <span :class="{'line-through': !productOptionValue.isAvailable }">{{ productOptionValue.name }}</span>
       </summary>
       <div class="action-card__content">
-        <ajax-form :form-data="productOptionValue" :form-rules="formRules" :syncing.sync="syncing" :form-errors.sync="formErrors" @submitted="createdProductOptionValue" :action="(productOptionValue.id) ?  'editProductOptionValue' : 'createProductOptionValue'">
+        <ajax-form :cloud-error.sync="cloudError" :form-data="productOptionValue" :form-rules="formRules" :syncing.sync="syncing" :form-errors.sync="formErrors" @submitted="createdProductOptionValue" :action="(productOptionValue.id) ?  'editProductOptionValue' : 'createProductOptionValue'">
           <div class="form-group mt-3">
             <label for="productOptionValueName">Name</label>
             <input type="text" v-model="productOptionValue.name" class="form-control" id="productOptionValueName" required>
@@ -62,6 +63,12 @@ parasails.registerComponent('editProductOptionValue', {
             <label class="form-check-label" for="optionValueAvailable">Is Available</label>
           </div>
           <ajax-button class="btn btn-peepl" type="submit" :syncing="syncing" v-bind:class="{ 'is-loading': syncing }">Save changes</ajax-button>
+          <div v-if="cloudError === 'notFound'" class="alert alert-danger mt-4" role="alert">
+            Option value not found.
+          </div>
+          <div v-else-if="cloudError" class="alert alert-danger mt-4" role="alert">
+            There has been an error updating the option value. Please try again.
+          </div>
         </ajax-form>
       </div>
     </details>

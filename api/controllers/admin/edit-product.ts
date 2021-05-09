@@ -13,15 +13,12 @@ module.exports = {
     },
     name: {
       type: 'string',
-      required: true
     },
     description: {
       type: 'string',
-      required: true
     },
     basePrice: {
       type: 'number',
-      required: true
     },
     image: {
       type: 'ref',
@@ -39,9 +36,9 @@ module.exports = {
       outputDescription: 'The newly updated `Vendor`.',
       outputExample: {}
     },
-    noFileAttached: {
-      description: 'No file was attached.',
-      responseType: 'badRequest'
+    notFound: {
+      description: 'There is no product with that ID!',
+      responseType: 'notFound'
     },
   },
 
@@ -63,6 +60,10 @@ module.exports = {
     delete inputs.image;
 
     var newProduct = await Product.updateOne(inputs.id).set(inputs);
+
+    if(!newProduct) {
+      return exits.notFound({message: 'There is no product with that ID!'});
+    }
 
     // All done.
     return exits.success({

@@ -31,6 +31,7 @@ parasails.registerComponent('editProduct', {
       previewImageSrc: '',
       formErrors: {
       },
+      cloudError: '',
       imageName: 'Choose image'
     };
   },
@@ -48,7 +49,7 @@ parasails.registerComponent('editProduct', {
         <span :class="{'line-through': !product.isAvailable }">{{ product.name }}</span>
       </summary>
       <div class="action-card__content">
-        <ajax-form :form-data="product" :form-rules="formRules" :syncing.sync="syncing" :form-errors.sync="formErrors" @submitted="createdProduct" :action="(product.id) ?  'editProduct' : 'createProduct'">
+        <ajax-form :cloud-error.sync="cloudError" :form-data="product" :form-rules="formRules" :syncing.sync="syncing" :form-errors.sync="formErrors" @submitted="createdProduct" :action="(product.id) ?  'editProduct' : 'createProduct'">
           <div class="form-group mt-3">
             <label for="productName">Product Name</label>
             <input :class="{ 'is-invalid': formErrors.name }" v-model="product.name" type="text" class="form-control" id="productName" required>
@@ -59,7 +60,7 @@ parasails.registerComponent('editProduct', {
           </div>
           <div class="form-group">
             <label for="basePrice">Base Price (in pence)</label>
-            <input :class="{ 'is-invalid': formErrors.basePrice }" v-model="product.basePrice" type="text" class="form-control" id="basePrice" required>
+            <input :class="{ 'is-invalid': formErrors.basePrice }" v-model="product.basePrice" type="number" class="form-control" id="basePrice" required>
             <p class="mt-2 text-muted">{{product.basePrice | convertToPounds}}</p>
           </div>
           <div class="form-group">
@@ -80,6 +81,12 @@ parasails.registerComponent('editProduct', {
           </fieldset>
 
           <ajax-button class="btn btn-peepl mt-4" type="submit" :syncing="syncing" v-bind:class="{ 'is-loading': syncing }">Save changes</ajax-button>
+          <div v-if="cloudError === 'notFound'" class="alert alert-danger mt-4" role="alert">
+            Product not found.
+          </div>
+          <div v-else-if="cloudError" class="alert alert-danger mt-4" role="alert">
+            There has been an error updating the product. Please try again.
+          </div>
         </ajax-form>
 
         <fieldset v-if="product.id">
