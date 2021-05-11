@@ -2,17 +2,12 @@
 
 <div class="container">
 
-<% if(hasOrders) { %>
-
-  <a class="py-3 border-bottom d-flex align-items-center" href="/orders">
+  <a v-if="hasOrders" class="py-3 border-bottom d-flex align-items-center" href="/orders">
     <span class="mr-auto">My orders</span>
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
       <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
     </svg>
   </a>
-
-<% } %>
-
 
   <div class="card-carousel">
     <div class="card-carousel__inner">
@@ -82,19 +77,17 @@
   <h1 class="mt-4 mb-2 h4 text-muted">All restaurants</h1>
 
   <div class="row">
-    <% for (var vendor in vendors) { %>
-      <div class="col-12 col-md-6">
+      <div v-for="vendor in vendors" class="col-12 col-md-6">
         <div class="card my-3 shadow">
-          <img src="/vendors/download-image/<%= vendors[vendor].id %>" class="card-img-top" width="600" height="200" alt="">
+          <img :src="'/vendors/download-image/' + vendor.id" class="card-img-top" width="600" height="200" alt="">
           <div class="card-body">
-            <a href="/vendors/<%= vendors[vendor].id %>" class="stretched-link">
-              <h2 class="card-title h5"><%= vendors[vendor].name %></h2>
-              <p class="card-subtitle"><%= vendors[vendor].description %></p>
+            <a :href="'/vendors/' + vendor.id" class="stretched-link">
+              <h2 class="card-title h5">{{vendor.name}}</h2>
+              <p class="card-subtitle">{{vendor.name}}</p>
             </a>
           </div>
         </div>
       </div>
-    <% } %>
   </div>
 
 </div>

@@ -15,21 +15,19 @@
         </tr>
       </thead>
       <tbody>
-        <% for (var vendor in vendors) { %>
-          <tr>
-            <td class="action-table__shrink">
-              <input type="checkbox" name="vendors">
-            <td>
-              <a href="/admin/vendors/<%= vendors[vendor].id %>"><%= vendors[vendor].name %></a>
-            </td>
-            <td>
-              <%= vendors[vendor].status %>
-            </td>
-            <td class="action-table__shrink">
-              <a href="/admin/vendors/<%= vendors[vendor].id %>">Edit</a>
-            </td>
-          </tr>
-        <% } %>
+        <tr v-for="vendor in vendors">
+          <td class="action-table__shrink">
+            <input type="checkbox" name="vendors">
+          <td>
+            <a :href="'/admin/vendors/' + vendor.id">{{vendor.name}}</a>
+          </td>
+          <td>
+            {{vendor.status}}
+          </td>
+          <td class="action-table__shrink">
+            <a :href="'/admin/vendors/' + vendor.id">Edit</a>
+          </td>
+        </tr>
       </tbody>
     </table>
 

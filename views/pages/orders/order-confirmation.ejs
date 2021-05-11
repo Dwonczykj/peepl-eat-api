@@ -19,30 +19,27 @@
     </div>
 
     <div class="my-3 p-3 bg-white rounded">
-      <p class="text-muted m-0">Order #<%= order.id %></p>
-    <% for (var i in order.items) { %>
-      <h2 class="h5 border-top pt-3 mt-3 mb-0"><%= order.items[i].product.name %></h2>
-      <% if (order.items[i].optionValues && order.items[i].optionValues.length) { %>
-        <ol class="order-confirmation__option-values">
-          <% for (var j in order.items[i].optionValues) { %>
-            <li><%= order.items[i].optionValues[j].optionValue.name %></li>
-          <% } %>
+      <p class="text-muted m-0">Order #{{order.id}}</p>
+      <div v-for="item in order.items">
+        <h2 class="h5 border-top pt-3 mt-3 mb-0">{{item.product.name}}</h2>
+        <ol v-if="item.optionValues && item.optionValues.length" class="order-confirmation__option-values">
+            <li v-for="optionValue in item.optionValues">{{optionValue.name}}</li>
         </ol>
-      <% } %>
-      <h2 class="h6 border-top pt-3 mt-3 mb-0">Delivery: <%= order.items[i].deliveryMethod.name %></h2>
-      <p><%= sails.helpers.formatDeliverySlot( order.items[i].deliverySlot.startTime ) %> - <%= sails.helpers.formatDeliverySlot( order.items[i].deliverySlot.endTime ) %></p>
-    <% } %>
+        <h2 class="h6 border-top pt-3 mt-3 mb-0">Delivery: {{item.deliveryMethod.name}}</h2>
+        <p>{{item.deliverySlot.startTime | formatDeliverySlot}} - {{item.deliverySlot.endTime | formatDeliverySlot}}</p>
+      </div>
+
       <h2 class="h5 border-top pt-3 mt-3 mb-0 d-flex">
         <span class="mr-auto">Total</span>
-        <span>£<%= order.total / 100 %></span>
+        <span>£{{order.total / 100}}</span>
       </h2>
       <p class="mt-2 mb-0 d-flex text-success">
         <span class="mr-auto">Reward</span>
-        <span>+ <%= order.total / 100 * 100 %> PPL</span>
+        <span>+ {{order.total}} PPL</span>
       </h2>
     </div>
 
-    <p class="text-muted my-4 text-center">We’ve emailed a copy of your order to <%= order.deliveryEmail %></p>
+    <p class="text-muted my-4 text-center">We’ve emailed a copy of your order to {{order.deliveryEmail}}</p>
 
   </div>
 </div>

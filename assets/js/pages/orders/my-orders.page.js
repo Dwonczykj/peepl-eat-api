@@ -3,7 +3,7 @@ parasails.registerPage('my-orders', {
   //  ║║║║║ ║ ║╠═╣║    ╚═╗ ║ ╠═╣ ║ ║╣
   //  ╩╝╚╝╩ ╩ ╩╩ ╩╩═╝  ╚═╝ ╩ ╩ ╩ ╩ ╚═╝
   data: {
-    //…
+    orders: []
   },
 
   //  ╦  ╦╔═╗╔═╗╔═╗╦ ╦╔═╗╦  ╔═╗
@@ -13,7 +13,7 @@ parasails.registerPage('my-orders', {
     //…
   },
   mounted: async function() {
-    //…
+    _.extend(this, SAILS_LOCALS);
   },
 
   //  ╦╔╗╔╔╦╗╔═╗╦═╗╔═╗╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
@@ -21,5 +21,12 @@ parasails.registerPage('my-orders', {
   //  ╩╝╚╝ ╩ ╚═╝╩╚═╩ ╩╚═╝ ╩ ╩╚═╝╝╚╝╚═╝
   methods: {
     //…
+  },
+  filters: {
+    formatDeliverySlot: function(unixtime) {
+      if (!unixtime) {return '';}
+      unixtime = moment.unix(unixtime).calendar();
+      return unixtime;
+    }
   }
 });
