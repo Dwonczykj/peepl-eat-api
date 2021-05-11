@@ -64,7 +64,7 @@
         <div class="modal-header">
           <h5 class="mb-0">Checkout</h5>
         </div>
-        <ajax-form ref="createOrder" action="createOrder" protocol="io.socket" :syncing.sync="syncing" :cloud-error.sync="cloudError" @submitted="submittedForm" :handle-parsing="handleParsingForm">
+        <ajax-form ref="createOrder" action="createOrder" :syncing.sync="syncing" :cloud-error.sync="cloudError" @submitted="submittedForm" :handle-parsing="handleParsingForm">
           <div class="modal-body">
             <div class="form-group">
               <label for="nameInput">Your Name</label>
