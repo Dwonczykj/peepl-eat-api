@@ -26,6 +26,8 @@ module.exports = {
 
 
   fn: async function ({discountCode}, exits) {
+    discountCode = discountCode.toUpperCase();
+
     var discount = await Discount.findOne({code: discountCode});
     var currentTime = new Date().getTime();
 
