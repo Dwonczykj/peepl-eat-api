@@ -2,6 +2,8 @@
 declare var User: any;
 declare var OrderItemOptionValue: any;
 declare var OrderItem: any;
+declare var Order: any;
+declare var Discount: any;
 module.exports = {
 
 
@@ -29,6 +31,10 @@ module.exports = {
     },
     marketingOptIn: {
       type: 'boolean'
+    },
+    discountCode: {
+      type: 'string',
+      required: false
     }
   },
 
@@ -48,7 +54,7 @@ module.exports = {
       inputs.items[item].optionValues = [];
       // TODO: Refactor to batch SQL query
       for (var option in inputs.items[item].options) {
-        if(inputs.items[item].options[option] != '') {
+        if(inputs.items[item].options[option] !== '') {
           var newOptionValuePair = await OrderItemOptionValue.create({
             option: option,
             optionValue: inputs.items[item].options[option],
@@ -58,18 +64,47 @@ module.exports = {
       }
     }
 
-    var order = await Order.create({
-      total: inputs.total,
-      orderedDateTime: Date.now(),
-      deliveryName: inputs.address.name,
-      deliveryEmail: inputs.address.email,
-      deliveryPhoneNumber: inputs.address.phoneNumber,
-      deliveryAddressLineOne: inputs.address.lineOne,
-      deliveryAddressLineTwo: inputs.address.lineTwo,
-      deliveryAddressPostCode: inputs.address.postCode,
-      deliveryAddressInstructions: inputs.address.deliveryInstructions,
-      customer: this.req.session.walletId
-    }).fetch();
+    var discount;
+    var order;
+
+    if(inputs.discountCode){
+      var discountDb = await Discount.findOne({code: inputs.discountCode});
+      var currentTime = new Date().getTime();
+
+      // Check validity
+      if(discountDb && discountDb.expiryDateTime >= currentTime && discountDb.timesUsed < discountDb.maxUses){
+        discount = discountDb;
+      }
+    }
+
+    if(discount) {
+      order = await Order.create({
+        total: inputs.total,
+        orderedDateTime: Date.now(),
+        deliveryName: inputs.address.name,
+        deliveryEmail: inputs.address.email,
+        deliveryPhoneNumber: inputs.address.phoneNumber,
+        deliveryAddressLineOne: inputs.address.lineOne,
+        deliveryAddressLineTwo: inputs.address.lineTwo,
+        deliveryAddressPostCode: inputs.address.postCode,
+        deliveryAddressInstructions: inputs.address.deliveryInstructions,
+        customer: this.req.session.walletId,
+        discount: discount.id
+      }).fetch();
+    } else {
+      order = await Order.create({
+        total: inputs.total,
+        orderedDateTime: Date.now(),
+        deliveryName: inputs.address.name,
+        deliveryEmail: inputs.address.email,
+        deliveryPhoneNumber: inputs.address.phoneNumber,
+        deliveryAddressLineOne: inputs.address.lineOne,
+        deliveryAddressLineTwo: inputs.address.lineTwo,
+        deliveryAddressPostCode: inputs.address.postCode,
+        deliveryAddressInstructions: inputs.address.deliveryInstructions,
+        customer: this.req.session.walletId,
+      }).fetch();
+    }
 
     var updatedItems = _.map(inputs.items, (object) => {
       object.product = object.id;
@@ -88,7 +123,7 @@ module.exports = {
     var calculatedOrderTotal = await sails.helpers.calculateOrderTotal.with({orderId: order.id});
 
     if(order.total !== calculatedOrderTotal) {
-      Order.updateOne(order.id)
+      await Order.updateOne(order.id)
       .set({total: calculatedOrderTotal});
     }
 

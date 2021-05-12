@@ -52,7 +52,7 @@ module.exports = {
         }
 
         var orderDetails = await Order.findOne(inputs.orderId)
-        .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue&vendor');
+        .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue&vendor&discount');
 
         var error = '';
 
@@ -97,7 +97,6 @@ module.exports = {
             sails.sockets.broadcast('order' + orderDetails.id, 'paymentError', {orderId: orderDetails.id, message: error});
             return exits.error({message: error});
           }
-
           // Transaction already been used (replay attack)
           var existingOrdersWithJobId = await Order.findOne({paymentJobId: inputs.jobId});
           if(existingOrdersWithJobId){
@@ -115,13 +114,17 @@ module.exports = {
             paidDateTime: unixtime
           });
 
+          if(orderDetails.discount) {
+            await Discount.updateOne(orderDetails.discount.id).set({timesUsed: orderDetails.discount.timesUsed + 1}); // TODO: Make this atomic
+          }
+
           // Notify subscribed sockets of order status
           sails.sockets.broadcast('order' + orderDetails.id, 'paid', {orderId: orderDetails.id, paidDateTime: unixtime});
 
           if(sails.config.environment === 'production'){
             // Send slack notification to orders channel
             await axios.post(sails.config.custom.slackOrdersWebhook, {
-              text: `[TEST] New order created #1 for £0! Check it out: https://app.itsaboutpeepl.com/orders/1`,
+              text: `New order created #${orderDetails.id} for £${orderDetails.total / 100}! Check it out: https://app.itsaboutpeepl.com/orders/${orderDetails.id}`,
             });
 
             // Issue PPL token reward

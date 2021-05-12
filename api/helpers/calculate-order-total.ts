@@ -1,4 +1,5 @@
 declare var Order: any;
+declare var Discount: any;
 declare var _: any;
 
 module.exports = {
@@ -25,7 +26,7 @@ module.exports = {
 
   fn: async function (inputs) {
     var order = await Order.findOne(inputs.orderId)
-    .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue');
+    .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue&discount');
 
     var workingTotal = 0;
 
@@ -43,6 +44,16 @@ module.exports = {
       }
 
       workingTotal += productTotal;
+    }
+
+    if(order.discount) {
+      var discount = await Discount.findOne(order.discount);
+
+      if(discount && discount.percentage) {
+        var multiplier = discount.percentage / 100;
+        var discountAmount = workingTotal * multiplier;
+        workingTotal = workingTotal - discountAmount;
+      }
     }
 
     return workingTotal;
