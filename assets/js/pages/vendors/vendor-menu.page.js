@@ -22,6 +22,8 @@ parasails.registerPage('vendor-menu', {
       postCode: '',
       deliveryInstructions: '',
     },
+    discountCode: '',
+    discount: {},
     marketingOptIn: false,
     syncing: false,
     cloudError: '',
@@ -164,7 +166,7 @@ parasails.registerPage('vendor-menu', {
     handleParsingForm: function() {
       this.syncing = true;
 
-      return {items: this.cart, address: this.address, total: this.cartTotal + this.deliveryTotal, marketingOptIn: this.marketingOptIn};
+      return {items: this.cart, address: this.address, total: this.cartTotal + this.deliveryTotal, marketingOptIn: this.marketingOptIn, discountCode: this.discount.code};
     },
     startTopUp: function() {
       var amountRequired = (this.cartTotal + this.deliveryTotal - this.walletTotal) / 100; // App handler expects pence!
@@ -217,7 +219,7 @@ parasails.registerPage('vendor-menu', {
 
       var paymentDetails = {
         action: 'pay',
-        amount: (this.cartTotal + this.deliveryTotal) / 100, //Pence to pounds
+        amount: (this.finalTotal) / 100, //Pence to pounds
         currency: 'GBPX',
         destination: this.vendor.walletId,
         orderId: result.toString()
@@ -300,6 +302,22 @@ parasails.registerPage('vendor-menu', {
       });
       this.isLoading = false;
     },
+    updatedDiscountCode: function() {
+      this.syncing = true;
+      this.discount = {};
+
+      var that = this;
+
+      Cloud.checkDiscountCode(this.discountCode)
+      .then(({discount}) => {
+        that.discount = discount;
+        that.syncing = false;
+      })
+      .catch(() => {
+        that.discount = {invalid: true};
+        that.syncing = false;
+      });
+    }
   },
   filters: {
     convertToPounds: function (value) {
@@ -330,8 +348,16 @@ parasails.registerPage('vendor-menu', {
       }
       return workingTotal;
     },
+    totalDiscount: function() {
+      if(this.discount.percentage){
+        var multiplier = this.discount.percentage / 100;
+        return 0 - (this.cartTotal + this.deliveryTotal) * multiplier;
+      } else {
+        return 0;
+      }
+    },
     finalTotal: function() {
-      return this.cartTotal + this.deliveryTotal;
+      return this.cartTotal + this.deliveryTotal + this.totalDiscount;
     },
     readyToPay: function() {
       if (this.address.postCode === '') {

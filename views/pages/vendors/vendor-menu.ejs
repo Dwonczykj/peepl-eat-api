@@ -100,7 +100,11 @@
               <textarea class="form-control" id="deliveryInstructions" v-model="address.deliveryInstructions" rows="3" maxlength="200" placeholder="Hard to find location, or special instructions for access? Let your rider know here."></textarea>
               <span class="float-right badge badge-secondary" id="countMessage">{{instructionCharactersRemaining}}</span>
             </div>
-
+            <div class="form-group">
+              <label for="discountInput">Discount Code</label>
+              <input type="text" maxlength="50" minlength="3" v-model.trim="discountCode" :class="{'is-valid': discount.percentage, 'is-invalid': discount.invalid}" class="form-control" id="discountInput" style="text-transform: uppercase; max-width: 10em" required>
+            </div>
+            <a href="#" @click="updatedDiscountCode" class="btn btn-peepl">Apply</a>
 
             <h5 class="mt-4">Delivery Options</h5>
             <div v-for="(option, index) in deliveryMethods" class="border rounded my-3 px-3 pt-3">
@@ -132,11 +136,15 @@
               <b>Delivery:</b>
               {{deliveryTotal | convertToPounds}}
             </p>
+            <p v-if="discount.percentage" class="d-flex justify-content-between mt-3 mb-0">
+              <b>Discount:</b>
+              {{totalDiscount | convertToPounds}}
+            </p>
+
             <h6 class="d-flex justify-content-between mt-3 mb-0 border-top pt-3">
               <b>Total:</b>
-              {{cartTotal + deliveryTotal | convertToPounds}}
+              {{finalTotal | convertToPounds}}
             </h6>
-
             <h6 class="d-flex justify-content-between mt-4 mb-0">
               <b>In your wallet:</b>
               {{ walletTotal | convertToPounds }}
