@@ -240,7 +240,7 @@ parasails.registerPage('vendor-menu', {
         this.cartTotal / 100, // (Optional) subTotal
         0, // (optional) tax
         this.deliveryTotal / 100, // (optional) shipping
-        // false // (optional) discount
+        this.totalDiscount // (optional) discount
       ]);
     },
     updatedPostCode: function () {
