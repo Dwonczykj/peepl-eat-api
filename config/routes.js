@@ -29,6 +29,9 @@ module.exports.routes = {
   'GET /orders/:orderId': { action: 'orders/view-order-confirmation' },
   'GET /orders': { action: 'orders/view-my-orders' },
 
+  // DISCOUNTS
+  'GET /api/v1/discounts/check-discount-code/:discountCode': { action: 'discounts/check-discount-code' },
+
   'GET /api/v1/products/get-product-options/:productId': { action: 'products/get-product-options' },
   'POST /api/v1/products/get-product-delivery-methods': { action: 'products/get-product-delivery-methods' },
   'GET /api/v1/orders/subscribe-to-order/:orderId': { action: 'orders/subscribe-to-order', isSocket: true },

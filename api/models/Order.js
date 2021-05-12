@@ -88,6 +88,9 @@ module.exports = {
     //   model: 'user',
     //   required: true
     // },
+    discount: {
+      model: 'discount'
+    },
     items: {
       collection: 'orderitem',
       via: 'order'
@@ -96,4 +99,3 @@ module.exports = {
   },
 
 };
-
