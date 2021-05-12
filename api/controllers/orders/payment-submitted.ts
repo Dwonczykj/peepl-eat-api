@@ -115,7 +115,8 @@ module.exports = {
           });
 
           if(orderDetails.discount) {
-            await Discount.updateOne(orderDetails.discount.id).set({timesUsed: orderDetails.discount.timesUsed + 1}); // TODO: Make this atomic
+            var discountDb = await Discount.findOne(orderDetails.discount);
+            await Discount.updateOne(orderDetails.discount).set({timesUsed: discountDb.timesUsed + 1}); // TODO: Make this atomic
           }
 
           // Notify subscribed sockets of order status
