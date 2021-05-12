@@ -38,7 +38,7 @@ module.exports = {
     },
     isEnabled: {
       type: 'boolean',
-      defaultsTo: true
+      defaultsTo: false
     }
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗

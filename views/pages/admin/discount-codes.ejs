@@ -7,10 +7,8 @@
     <div class="mb-3">
       <h1>Discount Codes</h1>
 
-      <fieldset>
-        <h2 class="h5 mt-5">Discounts</h2>
-  
-        <edit-discount v-for="discount in discountCodes" :discount="discount">
+      <fieldset>  
+        <edit-discount v-for="discount in discounts" :discount="discount">
         </edit-discount>
   
         <div class="d-md-flex my-3 action-card-actions">

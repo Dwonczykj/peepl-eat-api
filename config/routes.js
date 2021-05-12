@@ -55,6 +55,8 @@ module.exports.routes = {
   'POST /api/v1/admin/update-product-status': { action: 'admin/update-product-status' },
   'GET /admin/orders': { action: 'admin/view-all-orders' },
   'GET /admin/discount-codes': { action: 'admin/view-discount-codes' },
+  'POST /api/v1/admin/create-discount': { action: 'admin/create-discount' },
+  'POST /api/v1/admin/edit-discount': { action: 'admin/edit-discount' },
 
   /***************************************************************************
   *                                                                          *

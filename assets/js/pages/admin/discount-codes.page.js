@@ -25,11 +25,12 @@ parasails.registerPage('admin-discount-codes', {
         code: '',
         percentage: 0,
         expiryDateTime: 0,
+        timesUsed: 0,
         maxUses: 0,
         isEnabled: false
       };
 
-      this.discountCodes.push(newDiscount);
+      this.discounts.push(newDiscount);
     }
   }
 });

@@ -46,10 +46,10 @@ parasails.registerComponent('editDiscount', {
           <span class="action-card__checkbox">
             <input type="checkbox">
           </span>
-          <span :class="{'line-through': !discount.isEnabled }">{{ discount.code }}</span>
+          <span :class="{'line-through': !discount.isEnabled }">{{ discount.code | capitalise }}</span> <div class="text-muted ml-1">[Used {{discount.timesUsed}} times]</div>
         </summary>
         <div class="action-card__content">
-          <ajax-form :cloud-error.sync="cloudError" :form-data="discount" :form-rules="formRules" :syncing.sync="syncing" :form-errors.sync="formErrors" @submitted="createdDiscount" :action="(discount.id) ?  'editProduct' : 'createProduct'">
+          <ajax-form :cloud-error.sync="cloudError" :form-data="discount" :form-rules="formRules" :syncing.sync="syncing" :form-errors.sync="formErrors" @submitted="createdDiscount" :action="(discount.id) ?  'editDiscount' : 'createDiscount'">
             <div class="form-group mt-3">
               <label for="discountCode">Discount Code</label>
               <input :class="{ 'is-invalid': formErrors.code }" maxlength="50" minlength="3" style="text-transform: uppercase; max-width: 10em" v-model.trim="discount.code" type="text" class="form-control" id="discountCode" required>
@@ -59,8 +59,12 @@ parasails.registerComponent('editDiscount', {
               <input :class="{ 'is-invalid': formErrors.percentage }" v-model="discount.percentage" type="number" class="form-control" id="percentage" required>
             </div>
             <div class="form-group">
-              <label for="maxUses">Max Uses</label>
+              <label for="maxUses">Max Uses (or 0 for no limit)</label>
               <input :class="{ 'is-invalid': formErrors.maxUses }" v-model="discount.maxUses" type="number" class="form-control" id="maxUses" required>
+            </div>
+            <div class="form-group">
+              <label for="expiryDateTime">End Date Time (or 0 for no limit)</label>
+              <input :class="{ 'is-invalid': formErrors.expiryDateTime }" v-model="discount.expiryDateTime" type="number" class="form-control" id="expiryDateTime" required>
             </div>
             <div class="form-group form-check">
               <input v-model="discount.isEnabled" type="checkbox" class="form-check-input" id="enabled">
@@ -99,6 +103,11 @@ parasails.registerComponent('editDiscount', {
       value = '£' + (value/100).toFixed(2);
       value = value.toString();
       return value;
+    },
+    capitalise: function (value) {
+      if (!value) {return ''; }
+      value = value.toString();
+      return value.toUpperCase();
     }
   },
 

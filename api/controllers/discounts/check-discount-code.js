@@ -33,12 +33,16 @@ module.exports = {
       return exits.notFound();
     }
 
-    if(discount.expiryDateTime < currentTime){
+    if(discount.expiryDateTime && discount.expiryDateTime < currentTime){
       return exits.expiredCode({message: 'That code has expired'});
     }
 
-    if(discount.timesUsed >= discount.maxUses){
+    if(discount.maxUses && discount.timesUsed >= discount.maxUses){
       return exits.expiredCode({message: 'That code has been used too many times.'});
+    }
+
+    if(!discount.isEnabled) {
+      return exits.notFound();
     }
 
     // All done.
