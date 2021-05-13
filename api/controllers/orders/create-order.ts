@@ -72,7 +72,7 @@ module.exports = {
       var currentTime = new Date().getTime();
 
       // Check validity
-      if(discountDb && discountDb.expiryDateTime >= currentTime && discountDb.timesUsed < discountDb.maxUses){
+      if(discountDb && (discountDb.expiryDateTime === 0 || discountDb.expiryDateTime >= currentTime) && (discountDb.maxUses === 0 || discountDb.timesUsed < discountDb.maxUses)){
         discount = discountDb;
       }
     }

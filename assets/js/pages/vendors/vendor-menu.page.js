@@ -169,7 +169,7 @@ parasails.registerPage('vendor-menu', {
       return {items: this.cart, address: this.address, total: this.cartTotal + this.deliveryTotal, marketingOptIn: this.marketingOptIn, discountCode: this.discount.code};
     },
     startTopUp: function() {
-      var amountRequired = (this.cartTotal + this.deliveryTotal - this.walletTotal) / 100; // App handler expects pence!
+      var amountRequired = (this.finalTotal - this.walletTotal) / 100; // App handler expects pence!
       var topupDetails = { amount: amountRequired.toString() };
 
       this.processingTopup = true; // Show 'topup pending' modal
@@ -378,7 +378,7 @@ parasails.registerPage('vendor-menu', {
         }
       }
 
-      if (this.walletTotal < this.cartTotal + this.deliveryTotal) {
+      if (this.walletTotal < this.finalTotal) {
         return false;
       }
 
