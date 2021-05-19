@@ -53,7 +53,7 @@ parasails.registerPage('vendor-menu', {
     }
   },
   mounted: async function() {
-    this.walletTotal = this.getWalletTotal();
+    // this.walletTotal = this.getWalletTotal();
   },
 
   //  ╦╔╗╔╔╦╗╔═╗╦═╗╔═╗╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
@@ -178,8 +178,8 @@ parasails.registerPage('vendor-menu', {
       window.flutter_inappwebview.callHandler('topup', topupDetails)
       .then((completed) => {
         if(completed) {
-          setInterval(() => {
-            that.walletTotal = that.getWalletTotal();
+          setInterval(async () => {
+            that.walletTotal = await that.getWalletTotal();
             that.syncing = false;
             that.processingTopup = false;
           }, 3000);
@@ -189,19 +189,19 @@ parasails.registerPage('vendor-menu', {
         }
       });
     },
-    getWalletTotal: function() {
+    getWalletTotal: async function() {
       // TODO: Change this request to be async
       var contractAddress = '0x40AFCD9421577407ABB0d82E2fF25Fd2Ef4c68BD';
       var userWallet = window.SAILS_LOCALS.wallet;
-      var data = null;
+      // var data = null;
 
-      $.ajax({
+      var data = await $.ajax({
         url: 'https://explorer.fuse.io/api?module=account&action=tokenbalance&contractaddress=' + contractAddress + '&address=' + userWallet,
         type: 'get',
-        async: false,
-        success: function(res) {
+        async: true,
+        /* success: function(res) {
           data = res;
-        }
+        } */
       });
 
       if(!data) {
@@ -271,12 +271,12 @@ parasails.registerPage('vendor-menu', {
         // this.changeDeliveryMethod();
       }
     },
-    openCheckoutModal: function() {
+    openCheckoutModal: async function() {
       this.isLoading = true;
       this.checkoutModalActive = true;
       var that = this;
 
-      this.walletTotal = this.getWalletTotal();
+      this.walletTotal = await this.getWalletTotal();
 
       var productids = _.pluck(this.cart, 'id');
       var productQuantities = {};
