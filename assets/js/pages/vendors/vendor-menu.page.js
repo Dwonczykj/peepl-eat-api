@@ -170,6 +170,9 @@ parasails.registerPage('vendor-menu', {
     },
     startTopUp: function() {
       var amountRequired = (this.finalTotal - this.walletTotal) / 100; // App handler expects pence!
+      if(amountRequired < 0.3){
+        amountRequired = 0.3;
+      }
       var topupDetails = { amount: amountRequired.toString() };
 
       this.processingTopup = true; // Show 'topup pending' modal

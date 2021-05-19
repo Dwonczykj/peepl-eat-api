@@ -153,8 +153,8 @@
             <div class="border rounded p-3 my-4" v-if="walletTotal < finalTotal">
               <h5>You need to top up</h5>
               <p>Peepl works like a wallet – you top up with your card, and then spend. This helps us keep costs low for your favourite restaurants.</p>
-              <p>You will need to top up at least <strong>{{ finalTotal - walletTotal | convertToPounds }}</strong> before you can check out.</p>
-              <a href="#" @click="startTopUp" class="btn btn-peepl btn-block">Top up {{ finalTotal - walletTotal | convertToPounds }}</a>
+              <p>You will need to top up at least <strong>{{ (finalTotal - walletTotal) < 30 ? 30 : finalTotal - walletTotal | convertToPounds }}</strong> before you can check out.</p>
+              <a href="#" @click="startTopUp" class="btn btn-peepl btn-block">Top up {{ (finalTotal - walletTotal) < 30 ? 30 : finalTotal - walletTotal | convertToPounds }}</a>
             </div>
 
             <h6 class="text-danger" v-if="cloudError">{{cloudError}}</h6>
