@@ -106,8 +106,9 @@ module.exports = {
 
     // Send the delivery information to Coopcycle
     var response = await client.post('/api/deliveries', requestBody)
-    .catch(() => {
+    .catch((err) => {
       console.log('Error creating the delivery.');
+      console.log(err);
     });
 
     return {id: response.data.id};
