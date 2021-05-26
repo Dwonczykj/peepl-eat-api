@@ -75,6 +75,10 @@ module.exports = {
       type: 'boolean',
       defaultsTo: false
     },
+    deliveryId: {
+      type: 'string',
+      description: 'The ID to identify the delivery in the logistics system'
+    },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗

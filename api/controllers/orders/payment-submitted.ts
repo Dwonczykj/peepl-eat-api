@@ -123,6 +123,33 @@ module.exports = {
           sails.sockets.broadcast('order' + orderDetails.id, 'paid', {orderId: orderDetails.id, paidDateTime: unixtime});
 
           if(sails.config.environment === 'production'){
+            // TODO: Error handling
+            var logisticsDelivery = await sails.helpers.sendToLogistics.with({
+              pickupAddressLineOne: orderDetails.items[0].product.vendor.pickupAddressLineOne,
+              pickupAddressLineTwo: orderDetails.items[0].product.vendor.pickupAddressLineTwo,
+              pickupAddressCity: orderDetails.items[0].product.vendor.pickupAddressCity,
+              pickupAddressPostCode: orderDetails.items[0].product.vendor.pickupAddressPostCode,
+              deliveryContactName: orderDetails.deliveryName,
+              deliveryPhoneNumber: orderDetails.deliveryPhoneNumber,
+              deliveryAddressLineOne: orderDetails.deliveryAddressLineOne,
+              deliveryAddressLineTwo: orderDetails.deliveryAddressLineTwo,
+              deliveryAddressPostCode: orderDetails.deliveryAddressPostCode,
+              deliveryComments: orderDetails.deliveryAddressInstructions,
+              deliverAfter: orderDetails.items[0].deliverySlot.startTime,
+              deliverBefore: orderDetails.items[0].deliverySlot.endTime
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+
+            if(logisticsDelivery){
+              // Update order with delivery ID
+              await Order.updateOne(inputs.orderId)
+              .set({
+                deliveryId: logisticsDelivery.id,
+              });
+            }
+
             // Send slack notification to orders channel
             await axios.post(sails.config.custom.slackOrdersWebhook, {
               text: `New order created #${orderDetails.id} for £${orderDetails.total / 100}! Check it out: https://app.itsaboutpeepl.com/orders/${orderDetails.id}`,

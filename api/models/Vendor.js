@@ -58,6 +58,18 @@ module.exports = {
       description: 'Phone number of the restaurant.',
       allowNull: true
     },
+    pickupAddressLineOne: {
+      type: 'string'
+    },
+    pickupAddressLineTwo: {
+      type: 'string'
+    },
+    pickupAddressCity: {
+      type: 'string'
+    },
+    pickupAddressPostCode: {
+      type: 'string'
+    },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
