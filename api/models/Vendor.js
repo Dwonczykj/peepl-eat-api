@@ -59,16 +59,20 @@ module.exports = {
       allowNull: true
     },
     pickupAddressLineOne: {
-      type: 'string'
+      type: 'string',
+      allowNull: true
     },
     pickupAddressLineTwo: {
-      type: 'string'
+      type: 'string',
+      allowNull: true
     },
     pickupAddressCity: {
-      type: 'string'
+      type: 'string',
+      allowNull: true
     },
     pickupAddressPostCode: {
-      type: 'string'
+      type: 'string',
+      allowNull: true
     },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
