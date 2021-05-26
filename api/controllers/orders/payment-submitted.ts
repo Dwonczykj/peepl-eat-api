@@ -133,6 +133,7 @@ module.exports = {
               deliveryPhoneNumber: orderDetails.deliveryPhoneNumber,
               deliveryAddressLineOne: orderDetails.deliveryAddressLineOne,
               deliveryAddressLineTwo: orderDetails.deliveryAddressLineTwo,
+              deliveryAddressCity: '',
               deliveryAddressPostCode: orderDetails.deliveryAddressPostCode,
               deliveryComments: orderDetails.deliveryAddressInstructions,
               deliverAfter: orderDetails.items[0].deliverySlot.startTime,
