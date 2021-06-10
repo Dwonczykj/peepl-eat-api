@@ -1,0 +1,2361 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Swagger Json",
+    "description": "This is a generated swagger json for your sails project",
+    "termsOfService": "http://example.com/terms",
+    "contact": {
+      "name": "Theophilus Omoregbee",
+      "url": "http://github.com/theo4u",
+      "email": "theo4u@ymail.com"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:1337/"
+    }
+  ],
+  "externalDocs": {
+    "url": "https://theoomoregbee.github.io/"
+  },
+  "tags": [
+    {
+      "name": "View all vendors"
+    },
+    {
+      "name": "View my orders"
+    },
+    {
+      "name": "View vendors"
+    },
+    {
+      "name": "View all orders"
+    },
+    {
+      "name": "View discount codes"
+    },
+    {
+      "name": "View create vendor"
+    },
+    {
+      "name": "Get product delivery methods"
+    },
+    {
+      "name": "Create order"
+    },
+    {
+      "name": "Payment submitted"
+    },
+    {
+      "name": "Create vendor"
+    },
+    {
+      "name": "Edit vendor"
+    },
+    {
+      "name": "Edit product"
+    },
+    {
+      "name": "Create product"
+    },
+    {
+      "name": "Create product option"
+    },
+    {
+      "name": "Edit product option"
+    },
+    {
+      "name": "Create product option value"
+    },
+    {
+      "name": "Edit product option value"
+    },
+    {
+      "name": "Archive order"
+    },
+    {
+      "name": "Update product status"
+    },
+    {
+      "name": "Create discount"
+    },
+    {
+      "name": "Edit discount"
+    },
+    {
+      "name": "Check discount code"
+    },
+    {
+      "name": "Get product options"
+    },
+    {
+      "name": "Subscribe to order"
+    },
+    {
+      "name": "Download image"
+    },
+    {
+      "name": "View edit vendor"
+    },
+    {
+      "name": "View vendor menu"
+    },
+    {
+      "name": "View order confirmation"
+    },
+    {
+      "name": "View homepage"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "deliverymethod": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/deliverymethod-without-required-constraint"
+          },
+          {
+            "required": [
+              "name"
+            ]
+          }
+        ]
+      },
+      "deliverymethod-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **DeliveryMethod**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the delivery method."
+          },
+          "description": {
+            "type": "string",
+            "description": "A brief description of the shipping method."
+          },
+          "priceModifier": {
+            "type": "number",
+            "format": "double",
+            "description": "A positive or negative integer representing the amount of pence to adjust the base price by."
+          },
+          "postCodeRestrictionRegex": {
+            "type": "string",
+            "description": "A regular expression specifying which postcodes are eligible for this delivery method."
+          },
+          "methodType": {
+            "type": "string",
+            "default": "courier",
+            "enum": [
+              "courier",
+              "collection"
+            ],
+            "example": "courier"
+          },
+          "products": {
+            "description": "Array of **product**'s or array of FK's when creating / updating / not populated",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/product"
+            }
+          },
+          "deliveryMethodSlots": {
+            "description": "Array of **deliverymethodslot**'s or array of FK's when creating / updating / not populated",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/deliverymethodslot"
+            }
+          }
+        }
+      },
+      "deliverymethodslot": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/deliverymethodslot-without-required-constraint"
+          },
+          {
+            "required": [
+              "startTime",
+              "endTime",
+              "deliveryMethod"
+            ]
+          }
+        ]
+      },
+      "deliverymethodslot-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **DeliveryMethodSlot**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "startTime": {
+            "type": "number",
+            "format": "double",
+            "description": "A unixtime representing the start of the delivery slot."
+          },
+          "endTime": {
+            "type": "number",
+            "format": "double",
+            "description": "A unixtime representing the end of the delivery slot."
+          },
+          "slotsRemaining": {
+            "type": "number",
+            "format": "double",
+            "nullable": true,
+            "description": "The number of these slots that are still available."
+          },
+          "deliveryMethod": {
+            "description": "The delivery method that this slot applies to. JSON dictionary representing the **deliverymethod** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/deliverymethod"
+              }
+            ]
+          }
+        }
+      },
+      "discount": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/discount-without-required-constraint"
+          },
+          {
+            "required": [
+              "code",
+              "percentage"
+            ]
+          }
+        ]
+      },
+      "discount-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **Discount**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 30,
+            "minLength": 3,
+            "uniqueItems": true
+          },
+          "percentage": {
+            "type": "number",
+            "format": "double",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "expiryDateTime": {
+            "type": "number",
+            "format": "double"
+          },
+          "timesUsed": {
+            "type": "number",
+            "format": "double",
+            "default": 0
+          },
+          "maxUses": {
+            "type": "number",
+            "format": "double"
+          },
+          "isEnabled": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "order": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/order-without-required-constraint"
+          },
+          {
+            "required": [
+              "total",
+              "orderedDateTime",
+              "deliveryName",
+              "deliveryEmail",
+              "deliveryPhoneNumber",
+              "deliveryAddressLineOne",
+              "deliveryAddressPostCode"
+            ]
+          }
+        ]
+      },
+      "order-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **Order**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "total": {
+            "type": "number",
+            "format": "double",
+            "description": "The order total in pence."
+          },
+          "orderedDateTime": {
+            "type": "number",
+            "format": "double",
+            "description": "The unixtime when the order was placed."
+          },
+          "paidDateTime": {
+            "type": "number",
+            "format": "double",
+            "description": "The unixtime when the order payment was confirmed (if at all)."
+          },
+          "deliveryName": {
+            "type": "string",
+            "description": "The name for the delivery."
+          },
+          "deliveryEmail": {
+            "type": "string",
+            "format": "email",
+            "description": "The email for the delivery."
+          },
+          "deliveryPhoneNumber": {
+            "type": "string",
+            "description": "The phone number for the delivery."
+          },
+          "deliveryAddressLineOne": {
+            "type": "string",
+            "description": "The first line of the delivery address."
+          },
+          "deliveryAddressLineTwo": {
+            "type": "string",
+            "description": "The second line of the delivery address."
+          },
+          "deliveryAddressPostCode": {
+            "type": "string",
+            "pattern": "^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\\s?[0-9][A-Za-z]{2})$/",
+            "description": "The post code of the delivery address."
+          },
+          "deliveryAddressInstructions": {
+            "type": "string",
+            "description": "Details about how/where to deliver the order.",
+            "maxLength": 200
+          },
+          "customer": {
+            "type": "string",
+            "description": "The wallet address of the customer."
+          },
+          "paymentJobId": {
+            "type": "string"
+          },
+          "isArchived": {
+            "type": "boolean",
+            "default": false
+          },
+          "deliveryId": {
+            "type": "string",
+            "description": "The ID to identify the delivery in the logistics system"
+          },
+          "discount": {
+            "description": "JSON dictionary representing the **discount** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/discount"
+              }
+            ]
+          },
+          "items": {
+            "description": "Array of **orderitem**'s or array of FK's when creating / updating / not populated",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/orderitem"
+            }
+          }
+        }
+      },
+      "orderitem": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/orderitem-without-required-constraint"
+          },
+          {
+            "required": [
+              "order",
+              "product"
+            ]
+          }
+        ]
+      },
+      "orderitem-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **OrderItem**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "order": {
+            "description": "The order to which the item belongs JSON dictionary representing the **order** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/order"
+              }
+            ]
+          },
+          "product": {
+            "description": "The product which has been ordered. JSON dictionary representing the **product** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/product"
+              }
+            ]
+          },
+          "deliveryMethod": {
+            "description": "The delivery method used to deliver the item. JSON dictionary representing the **deliverymethod** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/deliverymethod"
+              }
+            ]
+          },
+          "deliverySlot": {
+            "description": "The delivery slot chosen by the user for the item. JSON dictionary representing the **deliverymethodslot** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/deliverymethodslot"
+              }
+            ]
+          },
+          "optionValues": {
+            "description": "Array of **orderitemoptionvalue**'s or array of FK's when creating / updating / not populated",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/orderitemoptionvalue"
+            }
+          }
+        }
+      },
+      "orderitemoptionvalue": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/orderitemoptionvalue-without-required-constraint"
+          },
+          {
+            "required": [
+              "option",
+              "optionValue"
+            ]
+          }
+        ]
+      },
+      "orderitemoptionvalue-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **OrderItemOptionValue**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "option": {
+            "description": "JSON dictionary representing the **productoption** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/productoption"
+              }
+            ]
+          },
+          "optionValue": {
+            "description": "JSON dictionary representing the **productoptionvalue** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/productoptionvalue"
+              }
+            ]
+          },
+          "orderItem": {
+            "description": "JSON dictionary representing the **orderitem** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/orderitem"
+              }
+            ]
+          }
+        }
+      },
+      "product": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/product-without-required-constraint"
+          },
+          {
+            "required": [
+              "name",
+              "basePrice",
+              "vendor"
+            ]
+          }
+        ]
+      },
+      "product-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **Product**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "basePrice": {
+            "type": "number",
+            "format": "double",
+            "description": "Base product price in pence. This can be modified by product options or delivery methods."
+          },
+          "imageFd": {
+            "type": "string"
+          },
+          "imageMime": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string",
+            "description": "Full path to the product image."
+          },
+          "isAvailable": {
+            "type": "boolean",
+            "description": "Boolean to represent whether the product is available or not."
+          },
+          "priority": {
+            "type": "number",
+            "format": "double",
+            "description": "Temporary way to store priority of products"
+          },
+          "vendor": {
+            "description": "The seller of the product. JSON dictionary representing the **vendor** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/vendor"
+              }
+            ]
+          },
+          "options": {
+            "description": "A collection of options that apply to the product (i.e. colour). Array of **productoption**'s or array of FK's when creating / updating / not populated",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/productoption"
+            }
+          },
+          "deliveryMethods": {
+            "description": "The delivery methods applicable to this product. Array of **deliverymethod**'s or array of FK's when creating / updating / not populated",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/deliverymethod"
+            }
+          }
+        }
+      },
+      "productoption": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/productoption-without-required-constraint"
+          },
+          {
+            "required": [
+              "product"
+            ]
+          }
+        ]
+      },
+      "productoption-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **ProductOption**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the product options, for example \"colour\"."
+          },
+          "product": {
+            "description": "The product for which the option applies. JSON dictionary representing the **product** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/product"
+              }
+            ]
+          },
+          "values": {
+            "description": "The values that can be chosen for this option (i.e. blue, green) Array of **productoptionvalue**'s or array of FK's when creating / updating / not populated",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/productoptionvalue"
+            }
+          }
+        }
+      },
+      "productoptionvalue": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/productoptionvalue-without-required-constraint"
+          },
+          {
+            "required": [
+              "name"
+            ]
+          }
+        ]
+      },
+      "productoptionvalue-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **ProductOptionValue**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the option value (e.g. Blue)"
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the option value (e.g. This is a great sky blue shade!)"
+          },
+          "priceModifier": {
+            "type": "number",
+            "format": "double",
+            "description": "The amount of pence to add or subtract from the product total for this option."
+          },
+          "isAvailable": {
+            "type": "boolean",
+            "description": "Represents whether or not the option value is available."
+          },
+          "options": {
+            "description": "The options to which this value can apply. Array of **productoption**'s or array of FK's when creating / updating / not populated",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/productoption"
+            }
+          }
+        }
+      },
+      "user": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/user-without-required-constraint"
+          },
+          {
+            "required": [
+              "walletId"
+            ]
+          }
+        ]
+      },
+      "user-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **User**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "walletId": {
+            "type": "string",
+            "uniqueItems": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "newsletterOptInDate": {
+            "type": "number",
+            "format": "double"
+          },
+          "addressLineOne": {
+            "type": "string"
+          },
+          "addressLineTwo": {
+            "type": "string"
+          },
+          "town": {
+            "type": "string"
+          },
+          "postcode": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "marketingOptIn": {
+            "type": "boolean"
+          }
+        }
+      },
+      "vendor": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/vendor-without-required-constraint"
+          },
+          {
+            "required": [
+              "name",
+              "walletId"
+            ]
+          }
+        ]
+      },
+      "vendor-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **Vendor**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the vendor."
+          },
+          "type": {
+            "type": "string",
+            "default": "restaurant",
+            "description": "The type of vendor.",
+            "example": "restaurant"
+          },
+          "description": {
+            "type": "string",
+            "description": "A brief description of the vendor."
+          },
+          "walletId": {
+            "type": "string",
+            "pattern": "^0x[a-fA-F0-9]{40}$",
+            "description": "The blockchain wallet address for the vendor. Used to distribute payments from customers."
+          },
+          "imageFd": {
+            "type": "string",
+            "description": "A description of where the featured image file can be found"
+          },
+          "imageMime": {
+            "type": "string",
+            "description": "The mime type of the featured image"
+          },
+          "deliveryRestrictionDetails": {
+            "type": "string",
+            "nullable": true,
+            "description": "This is a free text description of the restaurant's restrictions, used temporarily."
+          },
+          "status": {
+            "type": "string",
+            "default": "inactive",
+            "enum": [
+              "active",
+              "draft",
+              "inactive"
+            ],
+            "example": "inactive"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "nullable": true,
+            "description": "Phone number of the restaurant."
+          },
+          "pickupAddressLineOne": {
+            "type": "string",
+            "nullable": true
+          },
+          "pickupAddressLineTwo": {
+            "type": "string",
+            "nullable": true
+          },
+          "pickupAddressCity": {
+            "type": "string",
+            "nullable": true
+          },
+          "pickupAddressPostCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "products": {
+            "description": "Array of **product**'s or array of FK's when creating / updating / not populated",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/product"
+            }
+          }
+        }
+      }
+    },
+    "parameters": {
+      "AttributeFilterParam": {
+        "in": "query",
+        "name": "_*_",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "description": "To filter results based on a particular attribute, specify a query parameter with the same name as the attribute defined on your model. For instance, if our `Purchase` model has an `amount` attribute, we could send `GET /purchase?amount=99.99` to return a list of $99.99 purchases."
+      },
+      "WhereQueryParam": {
+        "in": "query",
+        "name": "where",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "description": "Instead of filtering based on a specific attribute, you may instead choose to provide a `where` parameter with the WHERE piece of a [Waterline criteria](https://sailsjs.com/documentation/concepts/models-and-orm/query-language), _encoded as a JSON string_. This allows you to take advantage of `contains`, `startsWith`, and other sub-attribute criteria modifiers for more powerful `find()` queries.\n\ne.g. `?where={\"name\":{\"contains\":\"theodore\"}}`"
+      },
+      "LimitQueryParam": {
+        "in": "query",
+        "name": "limit",
+        "required": false,
+        "schema": {
+          "type": "integer"
+        },
+        "description": "The maximum number of records to send back (useful for pagination). Defaults to 30."
+      },
+      "SkipQueryParam": {
+        "in": "query",
+        "name": "skip",
+        "required": false,
+        "schema": {
+          "type": "integer"
+        },
+        "description": "The number of records to skip (useful for pagination)."
+      },
+      "SortQueryParam": {
+        "in": "query",
+        "name": "sort",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "description": "The sort order. By default, returned records are sorted by primary key value in ascending order.\n\ne.g. `?sort=lastName%20ASC`"
+      }
+    }
+  },
+  "paths": {
+    "/vendors": {
+      "get": {
+        "summary": "View all vendors",
+        "description": "Display \"All vendors\" page.",
+        "tags": [
+          "View all vendors"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/orders": {
+      "get": {
+        "summary": "View my orders",
+        "description": "Display \"My orders\" page.",
+        "tags": [
+          "View my orders"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/admin/vendors": {
+      "get": {
+        "summary": "View vendors",
+        "description": "Display \"Vendors\" page.",
+        "tags": [
+          "View vendors"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/admin/orders": {
+      "get": {
+        "summary": "View all orders",
+        "description": "Display \"All orders\" page.",
+        "tags": [
+          "View all orders"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/admin/discount-codes": {
+      "get": {
+        "summary": "View discount codes",
+        "description": "Display \"Discount codes\" page.",
+        "tags": [
+          "View discount codes"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/admin/vendors/new": {
+      "get": {
+        "summary": "View create vendor",
+        "description": "Display \"Create vendor\" page.",
+        "tags": [
+          "View create vendor"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/products/get-product-delivery-methods": {
+      "post": {
+        "summary": "Get product delivery methods",
+        "description": "Get the delivery methods for an array of products.",
+        "tags": [
+          "Get product delivery methods"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "productids",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested resource"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/orders/create-order": {
+      "post": {
+        "summary": "Create order",
+        "description": "This action is responsible for the creation of new orders.",
+        "tags": [
+          "Create order"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "items",
+            "required": true,
+            "schema": {},
+            "description": "Cart items from the frontend, which include the product id and corresponding delivery methods, options and relevant delivery slots."
+          },
+          {
+            "in": "query",
+            "name": "address",
+            "required": true,
+            "schema": {},
+            "description": "The user's address."
+          },
+          {
+            "in": "query",
+            "name": "total",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "The total order value, including shipping. This will be calculated on the backend eventually."
+          },
+          {
+            "in": "query",
+            "name": "marketingOptIn",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "discountCode",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested resource"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/orders/payment-submitted": {
+      "post": {
+        "summary": "Payment submitted",
+        "description": "Called by the frontend when the payment has been made.",
+        "tags": [
+          "Payment submitted"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "orderId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "The ID of the order that has been paid for."
+          },
+          {
+            "in": "query",
+            "name": "jobId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The job ID of the payment."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested resource"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/create-vendor": {
+      "post": {
+        "summary": "Create vendor",
+        "tags": [
+          "Create vendor"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "description",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "restaurant",
+                "shop"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "image",
+            "required": true,
+            "schema": {}
+          },
+          {
+            "in": "query",
+            "name": "walletId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            }
+          },
+          {
+            "in": "query",
+            "name": "phoneNumber",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "deliveryRestrictionDetails",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "draft",
+                "active",
+                "inactive"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "example": {},
+                      "type": "object",
+                      "properties": {},
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "No file was attached."
+                    },
+                    {
+                      "type": "string",
+                      "description": "The file is too big."
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/edit-vendor": {
+      "post": {
+        "summary": "Edit vendor",
+        "tags": [
+          "Edit vendor"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "description",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "image",
+            "required": false,
+            "schema": {}
+          },
+          {
+            "in": "query",
+            "name": "walletId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            }
+          },
+          {
+            "in": "query",
+            "name": "phoneNumber",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            }
+          },
+          {
+            "in": "query",
+            "name": "deliveryRestrictionDetails",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "draft",
+                "active",
+                "inactive"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "example": {},
+                      "type": "object",
+                      "properties": {},
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "No file was attached."
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/edit-product": {
+      "post": {
+        "summary": "Edit product",
+        "tags": [
+          "Edit product"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "name",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "description",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "basePrice",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "image",
+            "required": false,
+            "schema": {}
+          },
+          {
+            "in": "query",
+            "name": "isAvailable",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "priority",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {},
+                  "type": "object",
+                  "properties": {},
+                  "description": "Success"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "There is no product with that ID!"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/create-product": {
+      "post": {
+        "summary": "Create product",
+        "tags": [
+          "Create product"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "description",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "basePrice",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "image",
+            "required": true,
+            "schema": {}
+          },
+          {
+            "in": "query",
+            "name": "isAvailable",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "priority",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vendor",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "example": {},
+                      "type": "object",
+                      "properties": {},
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "No file was attached."
+                    },
+                    {
+                      "type": "string",
+                      "description": "The file is too big."
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/create-product-option": {
+      "post": {
+        "summary": "Create product option",
+        "tags": [
+          "Create product option"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "product",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {},
+                  "type": "object",
+                  "properties": {},
+                  "description": "Success"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/edit-product-option": {
+      "post": {
+        "summary": "Edit product option",
+        "tags": [
+          "Edit product option"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {},
+                  "type": "object",
+                  "properties": {},
+                  "description": "Success"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/create-product-option-value": {
+      "post": {
+        "summary": "Create product option value",
+        "tags": [
+          "Create product option value"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "description",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "priceModifier",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "isAvailable",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "productOption",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {},
+                  "type": "object",
+                  "properties": {},
+                  "description": "Success"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/edit-product-option-value": {
+      "post": {
+        "summary": "Edit product option value",
+        "tags": [
+          "Edit product option value"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "description",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "priceModifier",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "isAvailable",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {},
+                  "type": "object",
+                  "properties": {},
+                  "description": "Success"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/archive-order": {
+      "post": {
+        "summary": "Archive order",
+        "tags": [
+          "Archive order"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "orderId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested resource"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/update-product-status": {
+      "post": {
+        "summary": "Update product status",
+        "tags": [
+          "Update product status"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "productIds",
+            "required": true,
+            "schema": {}
+          },
+          {
+            "in": "query",
+            "name": "isAvailable",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/create-discount": {
+      "post": {
+        "summary": "Create discount",
+        "tags": [
+          "Create discount"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "percentage",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "maximum": 100,
+              "minimum": 0
+            }
+          },
+          {
+            "in": "query",
+            "name": "expiryDateTime",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "maxUses",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "isEnabled",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested resource"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/edit-discount": {
+      "post": {
+        "summary": "Edit discount",
+        "tags": [
+          "Edit discount"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "code",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "percentage",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "maximum": 100,
+              "minimum": 0
+            }
+          },
+          {
+            "in": "query",
+            "name": "expiryDateTime",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "maxUses",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "isEnabled",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested resource"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/discounts/check-discount-code/{discountCode}": {
+      "get": {
+        "summary": "Check discount code",
+        "description": "Checks the validity of the discount code and, if valid, returns the details.",
+        "tags": [
+          "Check discount code"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "discountCode",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/products/get-product-options/{productId}": {
+      "get": {
+        "summary": "Get product options",
+        "description": "Get the options for the product as well as the relevant options.",
+        "tags": [
+          "Get product options"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "productId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "The ID of the product that we want the options for."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested resource"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/orders/subscribe-to-order/{orderId}": {
+      "get": {
+        "summary": "Subscribe to order",
+        "tags": [
+          "Subscribe to order"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "orderId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested resource"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/vendors/download-image/{vendorid}": {
+      "get": {
+        "summary": "Download image",
+        "description": "Download image file (returning a stream).",
+        "tags": [
+          "Download image"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "vendorid",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested resource"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/products/download-image/{productId}": {
+      "get": {
+        "summary": "Download image",
+        "description": "Download image file (returning a stream).",
+        "tags": [
+          "Download image"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "productId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested resource"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/admin/vendors/{vendorid}": {
+      "get": {
+        "summary": "View edit vendor",
+        "description": "Display \"Edit vendor\" page.",
+        "tags": [
+          "View edit vendor"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "vendorid",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/vendors/{vendorid}": {
+      "get": {
+        "summary": "View vendor menu",
+        "description": "Display \"Vendor menu\" page.",
+        "tags": [
+          "View vendor menu"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "vendorid",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/orders/{orderId}": {
+      "get": {
+        "summary": "View order confirmation",
+        "description": "Display \"Order confirmation\" page.",
+        "tags": [
+          "View order confirmation"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "orderId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "summary": "View homepage",
+        "description": "Display homepage.",
+        "tags": [
+          "View homepage"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    }
+  }
+}
