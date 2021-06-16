@@ -124,7 +124,7 @@ module.exports = {
 
           if(sails.config.environment === 'production'){
             // TODO: Error handling
-            var logisticsDelivery = await sails.helpers.sendToLogistics.with({
+            var logisticsDetails = {
               pickupAddressLineOne: orderDetails.items[0].product.vendor.pickupAddressLineOne,
               pickupAddressLineTwo: orderDetails.items[0].product.vendor.pickupAddressLineTwo,
               pickupAddressCity: orderDetails.items[0].product.vendor.pickupAddressCity,
@@ -138,7 +138,9 @@ module.exports = {
               deliveryComments: orderDetails.deliveryAddressInstructions,
               deliverAfter: orderDetails.items[0].deliverySlot.startTime,
               deliverBefore: orderDetails.items[0].deliverySlot.endTime
-            })
+            };
+
+            var logisticsDelivery = await sails.helpers.sendToLogistics.with(logisticsDetails)
             .catch((err) => {
               console.log(err);
             });
