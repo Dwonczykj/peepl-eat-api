@@ -17,6 +17,9 @@ module.exports = {
 
     success: {
       viewTemplatePath: 'pages/admin/edit-vendor'
+    },
+    successJSON: {
+      statusCode: 200,
     }
 
   },
@@ -26,8 +29,14 @@ module.exports = {
     var vendor = await Vendor.findOne(vendorid)
     .populate('products&products.options&options.values');
 
-    // Respond with view.
-    return exits.success({vendor});
+    // Respond with view or JSON.
+    if(this.req.wantsJSON) {
+      return exits.successJSON(
+        {vendor}
+      );
+    } else {
+      return exits.success({vendor});
+    }
 
   }
 

@@ -16,6 +16,9 @@ module.exports = {
 
     success: {
       viewTemplatePath: 'pages/orders/order-confirmation'
+    },
+    successJSON: {
+      statusCode: 200,
     }
 
   },
@@ -30,10 +33,14 @@ module.exports = {
       return exits.error();
     }
 
-    // Respond with view.
-    return exits.success({
-      order
-    });
+    // Respond with view or JSON.
+    if(this.req.wantsJSON) {
+      return exits.successJSON(
+        {order}
+      );
+    } else {
+      return exits.success({order});
+    }
 
   }
 

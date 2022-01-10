@@ -9,6 +9,9 @@ module.exports = {
 
     success: {
       viewTemplatePath: 'pages/admin/vendors'
+    },
+    successJSON: {
+      statusCode: 200,
     }
 
   },
@@ -16,8 +19,14 @@ module.exports = {
   fn: async function (inputs, exits) {
     var vendors = await Vendor.find();
 
-    // Respond with view.
-    return exits.success({vendors});
+    // Respond with view or JSON.
+    if(this.req.wantsJSON) {
+      return exits.successJSON(
+        {vendors}
+      );
+    } else {
+      return exits.success({vendors});
+    }
 
   }
 

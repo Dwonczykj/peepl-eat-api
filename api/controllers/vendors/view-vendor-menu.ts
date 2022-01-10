@@ -17,6 +17,9 @@ module.exports = {
 
     success: {
       viewTemplatePath: 'pages/vendors/vendor-menu'
+    },
+    successJSON: {
+      statusCode: 200,
     }
 
   },
@@ -37,8 +40,14 @@ module.exports = {
       return exits.error();
     }
 
-    // Respond with view.
-    return exits.success({vendor, user, wallet: this.req.session.walletId});
+    // Respond with view or JSON.
+    if(this.req.wantsJSON) {
+      return exits.successJSON(
+        {vendor, user, wallet: this.req.session.walletId}
+      );
+    } else {
+      return exits.success({vendor, user, wallet: this.req.session.walletId});
+    }
 
   }
 

@@ -11,6 +11,9 @@ module.exports = {
 
     success: {
       viewTemplatePath: 'pages/vendors/all-vendors'
+    },
+    successJSON: {
+      statusCode: 200,
     }
 
   },
@@ -30,7 +33,13 @@ module.exports = {
       hasOrders = true;
     }
 
-    // Respond with view.
-    return exits.success({vendors, hasOrders});
+    // Respond with view or JSON.
+    if(this.req.wantsJSON) {
+      return exits.successJSON(
+        {vendors, hasOrders}
+      );
+    } else {
+      return exits.success({vendors, hasOrders});
+    }
   }
 };

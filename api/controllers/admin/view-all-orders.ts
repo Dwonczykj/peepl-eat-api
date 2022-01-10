@@ -9,6 +9,9 @@ module.exports = {
 
     success: {
       viewTemplatePath: 'pages/orders/all-orders'
+    },
+    successJSON: {
+      statusCode: 200,
     }
 
   },
@@ -26,8 +29,14 @@ module.exports = {
       .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue');
     }
 
-    // Respond with view.
-    return exits.success({orders, isVendor});
+    // Respond with view or JSON.
+    if(this.req.wantsJSON) {
+      return exits.successJSON(
+        {orders, isVendor}
+      );
+    } else {
+      return exits.success({orders, isVendor});
+    }
 
   }
 
