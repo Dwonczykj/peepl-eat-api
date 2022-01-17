@@ -12,7 +12,8 @@ module.exports = {
   inputs: {
     name: {
       type: 'string',
-      required: true
+      required: true,
+      maxLength: 50
     },
     description: {
       type: 'string',
