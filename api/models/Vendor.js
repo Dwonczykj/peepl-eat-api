@@ -15,14 +15,16 @@ module.exports = {
     name: {
       type: 'string',
       description: 'The name of the vendor.',
-      required: true
+      required: true,
+      maxLength: 50
     },
     type: {
       type: 'string',
       description: 'The type of vendor.',
       // isIn: ['restaurant', 'shop'],
       defaultsTo: 'restaurant',
-      required: false
+      required: false,
+      maxLength: 50
     },
     description: {
       type: 'string',

@@ -21,7 +21,8 @@ parasails.registerPage('admin-edit-vendor', {
     previewImageSrc: '',
     formRules: {
       name: {
-        required: true
+        required: true,
+        maxLength: 50
       },
       description: {
         maxLength: 400,
