@@ -20,7 +20,7 @@ module.exports.policies = {
   'view-homepage': true,
   'orders/payment-submitted': true,
   'admin/*': true, // TODO: Change this
-  'vendors/download-image': true
+  'vendors/download-image': true,
   'products/download-image': true
   // '*': true,
 
