@@ -21,6 +21,7 @@ module.exports.policies = {
   'orders/payment-submitted': true,
   'admin/*': true, // TODO: Change this
   'vendors/download-image': true
+  'products/download-image': true
   // '*': true,
 
 };
