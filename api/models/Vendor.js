@@ -29,7 +29,8 @@ module.exports = {
     description: {
       type: 'string',
       description: 'A brief description of the vendor.',
-      required: false
+      required: false,
+      maxLength: 200
     },
     walletId: {
       type: 'string',
@@ -75,6 +76,16 @@ module.exports = {
     pickupAddressPostCode: {
       type: 'string',
       allowNull: true
+    },
+    costLevel: {
+      type: 'number',
+      min: 1,
+      max: 3
+    },
+    rating: {
+      type: 'number',
+      min: 0,
+      max: 5
     },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗

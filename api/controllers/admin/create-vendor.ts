@@ -42,6 +42,16 @@ module.exports = {
     status: {
       type: 'string',
       isIn: ['draft', 'active', 'inactive']
+    },
+    costLevel: {
+      type: 'number',
+      min: 1,
+      max: 3
+    },
+    rating: {
+      type: 'number',
+      min: 0,
+      max: 5
     }
   },
 
