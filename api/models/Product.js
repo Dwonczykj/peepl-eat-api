@@ -22,6 +22,10 @@ module.exports = {
       type: 'string',
       required: false
     },
+    shortDescription: {
+      type: 'string',
+      maxLength: 300,
+    },
     basePrice: {
       type: 'number',
       description: 'Base product price in pence. This can be modified by product options or delivery methods.',
@@ -68,7 +72,11 @@ module.exports = {
       collection: 'deliverymethod',
       via: 'products',
       description: 'The delivery methods applicable to this product.'
-    }
+    },
+    category: {
+      model: 'productcategory',
+      description: 'The category of the product.',
+    },
 
   },
 
