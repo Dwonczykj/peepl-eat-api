@@ -4,6 +4,8 @@ declare var OrderItemOptionValue: any;
 declare var OrderItem: any;
 declare var Order: any;
 declare var Discount: any;
+const axios = require('axios').default;
+
 module.exports = {
 
 
@@ -127,12 +129,13 @@ module.exports = {
       .set({total: calculatedOrderTotal});
     }
 
-    // Subscribe calling websocket to order room
+    /* // Subscribe calling websocket to order room
     sails.sockets.join(this.req, 'order' + order.id, (err) => {
       if(err) {
         return exits.error();
       }
-    });
+    }); */
+
 
     var user = await User.findOne({walletId: this.req.session.walletId});
 
@@ -184,8 +187,29 @@ module.exports = {
       });
     }
 
-    // All done.
-    return exits.success(order.id);
+
+    // Create PaymentIntent on Peepl Pay
+    // TODO: Move this to helper
+
+    const instance = axios.create({
+      baseURL: 'http://localhost:1338/api/v1',
+      // timeout: 1000,
+      headers: {'Authorization': 'Basic OlFGQVJYWVktMkRSNE0xMy1QM0ZUQ1BULTQ0TVQ1UTI='}
+    });
+
+    instance.post('/payment_intents', {
+      amount: calculatedOrderTotal,
+      currency: 'GBP',
+      recipientWalletAddress: '0xf039CD9391cB28a7e632D07821deeBc249a32410',
+      vendorDisplayName: 'Peepl'
+    })
+    .then((response) => {
+      // All done.
+      return exits.success({orderID: order.id, paymentIntentID: response.data.paymentIntent.publicId});
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 
   }
 

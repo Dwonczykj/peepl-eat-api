@@ -38,6 +38,7 @@ module.exports.routes = {
 
   'POST /api/v1/orders/create-order': { action: 'orders/create-order' },
   'POST /api/v1/orders/payment-submitted': { action: 'orders/payment-submitted' },
+  'POST /api/v1/orders/peepl-pay-webhook': { action: 'orders/peepl-pay-webhook' },
 
   // ADMIN
   'GET /admin/vendors': { action: 'admin/view-vendors' },

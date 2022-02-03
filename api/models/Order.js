@@ -67,9 +67,12 @@ module.exports = {
       type: 'string',
       description: 'The wallet address of the customer.'
     },
-    paymentJobId: {
+    paymentStatus: {
       type: 'string',
       // unique: true
+    },
+    paymentIntentID: {
+      type: 'string'
     },
     isArchived: {
       type: 'boolean',

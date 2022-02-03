@@ -52,6 +52,9 @@
       "name": "Payment submitted"
     },
     {
+      "name": "Peepl pay webhook"
+    },
+    {
       "name": "Create vendor"
     },
     {
@@ -988,6 +991,7 @@
           "costLevel": {
             "type": "number",
             "format": "double",
+            "nullable": true,
             "maximum": 3,
             "minimum": 1
           },
@@ -1378,6 +1382,43 @@
               "type": "string"
             },
             "description": "The job ID of the payment."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested resource"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/orders/peepl-pay-webhook": {
+      "post": {
+        "summary": "Peepl pay webhook",
+        "tags": [
+          "Peepl pay webhook"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "publicId",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
