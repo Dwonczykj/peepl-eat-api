@@ -69,6 +69,7 @@ module.exports = {
     },
     paymentStatus: {
       type: 'string',
+      defaultsTo: 'unpaid'
       // unique: true
     },
     paymentIntentID: {

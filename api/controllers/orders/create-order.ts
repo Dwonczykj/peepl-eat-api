@@ -203,9 +203,13 @@ module.exports = {
       recipientWalletAddress: '0xf039CD9391cB28a7e632D07821deeBc249a32410',
       vendorDisplayName: 'Peepl'
     })
-    .then((response) => {
+    .then(async (response) => {
+      var paymentIntentId = response.data.paymentIntent.publicId;
+      await Order.updateOne(order.id)
+      .set({paymentIntentId: paymentIntentId});
+
       // All done.
-      return exits.success({orderID: order.id, paymentIntentID: response.data.paymentIntent.publicId});
+      return exits.success({orderID: order.id, paymentIntentID: paymentIntentId});
     })
     .catch((err) => {
       console.log(err);
