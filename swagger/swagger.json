@@ -589,10 +589,15 @@
             "description": "Note Sails special attributes: autoIncrement"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 50
           },
           "description": {
             "type": "string"
+          },
+          "shortDescription": {
+            "type": "string",
+            "maxLength": 300
           },
           "basePrice": {
             "type": "number",
@@ -638,6 +643,71 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/deliverymethod"
+            }
+          },
+          "category": {
+            "description": "The category of the product. JSON dictionary representing the **productcategory** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/productcategory"
+              }
+            ]
+          }
+        }
+      },
+      "productcategory": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/productcategory-without-required-constraint"
+          },
+          {
+            "required": [
+              "name",
+              "vendor"
+            ]
+          }
+        ]
+      },
+      "productcategory-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **ProductCategory**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the product category."
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "The URL of the product category image."
+          },
+          "vendor": {
+            "description": "The category owner. JSON dictionary representing the **vendor** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/vendor"
+              }
+            ]
+          },
+          "products": {
+            "description": "Array of **product**'s or array of FK's when creating / updating / not populated",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/product"
             }
           }
         }
@@ -863,7 +933,8 @@
           },
           "description": {
             "type": "string",
-            "description": "A brief description of the vendor."
+            "description": "A brief description of the vendor.",
+            "maxLength": 200
           },
           "walletId": {
             "type": "string",
@@ -913,6 +984,18 @@
           "pickupAddressPostCode": {
             "type": "string",
             "nullable": true
+          },
+          "costLevel": {
+            "type": "number",
+            "format": "double",
+            "maximum": 3,
+            "minimum": 1
+          },
+          "rating": {
+            "type": "number",
+            "format": "double",
+            "maximum": 5,
+            "minimum": 0
           },
           "products": {
             "description": "Array of **product**'s or array of FK's when creating / updating / not populated",
@@ -1389,6 +1472,28 @@
                 "inactive"
               ]
             }
+          },
+          {
+            "in": "query",
+            "name": "costLevel",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "maximum": 3,
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "rating",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "maximum": 5,
+              "minimum": 0
+            }
           }
         ],
         "responses": {
@@ -1504,6 +1609,28 @@
                 "inactive"
               ]
             }
+          },
+          {
+            "in": "query",
+            "name": "costLevel",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "maximum": 3,
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "rating",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "maximum": 5,
+              "minimum": 0
+            }
           }
         ],
         "responses": {
@@ -1558,7 +1685,8 @@
             "name": "name",
             "required": false,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "maxLength": 50
             }
           },
           {
@@ -1637,7 +1765,8 @@
             "name": "name",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "maxLength": 50
             }
           },
           {
