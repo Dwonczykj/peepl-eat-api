@@ -90,8 +90,9 @@ module.exports = {
         deliveryAddressLineTwo: inputs.address.lineTwo,
         deliveryAddressPostCode: inputs.address.postCode,
         deliveryAddressInstructions: inputs.address.deliveryInstructions,
-        customer: this.req.session.walletId,
-        discount: discount.id
+        customerWalletAddress: this.req.session.walletId,
+        discount: discount.id,
+        vendor: inputs.vendor
       }).fetch();
     } else {
       order = await Order.create({
@@ -104,7 +105,8 @@ module.exports = {
         deliveryAddressLineTwo: inputs.address.lineTwo,
         deliveryAddressPostCode: inputs.address.postCode,
         deliveryAddressInstructions: inputs.address.deliveryInstructions,
-        customer: this.req.session.walletId,
+        customerWalletAddress: this.req.session.walletId,
+        vendor: inputs.vendor
       }).fetch();
     }
 
@@ -137,7 +139,7 @@ module.exports = {
     }); */
 
 
-    var user = await User.findOne({walletId: this.req.session.walletId});
+    /* var user = await User.findOne({walletId: this.req.session.walletId});
 
     // Create or update user record by walletId
     if(!user){
@@ -163,7 +165,7 @@ module.exports = {
         postcode: inputs.address.postCode,
         marketingOptIn: inputs.marketingOptIn
       });
-    }
+    } */
 
     if(inputs.marketingOptIn) {
       mailchimp.setConfig({

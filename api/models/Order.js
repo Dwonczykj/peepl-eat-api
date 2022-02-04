@@ -63,14 +63,13 @@ module.exports = {
       description: 'Details about how/where to deliver the order.',
       maxLength: 200
     },
-    customer: {
+    customerWalletAddress: {
       type: 'string',
       description: 'The wallet address of the customer.'
     },
     paymentStatus: {
       type: 'string',
       defaultsTo: 'unpaid'
-      // unique: true
     },
     paymentIntentId: {
       type: 'string'
@@ -102,7 +101,11 @@ module.exports = {
     items: {
       collection: 'orderitem',
       via: 'order'
-    }
+    },
+    vendor: {
+      model: 'vendor',
+      required: true
+    },
 
   },
 
