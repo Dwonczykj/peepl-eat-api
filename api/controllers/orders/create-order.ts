@@ -199,7 +199,6 @@ module.exports = {
 
     instance.post('/payment_intents', {
       amount: calculatedOrderTotal,
-      currency: 'GBP',
       recipientWalletAddress: '0xf039CD9391cB28a7e632D07821deeBc249a32410',
       vendorDisplayName: 'Peepl'
     })
