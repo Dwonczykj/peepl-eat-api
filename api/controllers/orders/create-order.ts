@@ -200,7 +200,8 @@ module.exports = {
     instance.post('/payment_intents', {
       amount: calculatedOrderTotal,
       recipientWalletAddress: '0xf039CD9391cB28a7e632D07821deeBc249a32410',
-      vendorDisplayName: 'Peepl'
+      vendorDisplayName: 'Peepl',
+      webhookAddress: 'http://localhost:1337/api/v1/orders/peepl-pay-webhook?wallet=test'
     })
     .then(async (response) => {
       var paymentIntentId = response.data.paymentIntent.publicId;

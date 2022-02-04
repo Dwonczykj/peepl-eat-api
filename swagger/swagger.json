@@ -399,7 +399,12 @@
             "type": "string",
             "description": "The wallet address of the customer."
           },
-          "paymentJobId": {
+          "paymentStatus": {
+            "type": "string",
+            "default": "unpaid",
+            "example": "unpaid"
+          },
+          "paymentIntentId": {
             "type": "string"
           },
           "isArchived": {

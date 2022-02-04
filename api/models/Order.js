@@ -72,7 +72,7 @@ module.exports = {
       defaultsTo: 'unpaid'
       // unique: true
     },
-    paymentIntentID: {
+    paymentIntentId: {
       type: 'string'
     },
     isArchived: {

@@ -27,7 +27,7 @@ module.exports = {
     var unixtime = Date.now();
 
     // Update order with payment ID and time
-    await Order.updateOne(inputs.orderId)
+    await Order.updateOne({paymentIntentId: inputs.publicId})
     .set({
       paymentStatus: 'paid',
       paidDateTime: unixtime
