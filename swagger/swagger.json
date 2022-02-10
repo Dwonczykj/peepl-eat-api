@@ -326,7 +326,8 @@
               "deliveryEmail",
               "deliveryPhoneNumber",
               "deliveryAddressLineOne",
-              "deliveryAddressPostCode"
+              "deliveryAddressPostCode",
+              "vendor"
             ]
           }
         ]
@@ -395,7 +396,7 @@
             "description": "Details about how/where to deliver the order.",
             "maxLength": 200
           },
-          "customer": {
+          "customerWalletAddress": {
             "type": "string",
             "description": "The wallet address of the customer."
           },
@@ -429,6 +430,14 @@
             "items": {
               "$ref": "#/components/schemas/orderitem"
             }
+          },
+          "vendor": {
+            "description": "JSON dictionary representing the **vendor** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/vendor"
+              }
+            ]
           }
         }
       },
