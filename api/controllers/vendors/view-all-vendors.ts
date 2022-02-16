@@ -20,7 +20,7 @@ module.exports = {
 
   fn: async function (inputs, exits) {
     var vendors = await Vendor.find({status: 'active'});
-    var orders = await Order.find({customer: this.req.session.walletId, paidDateTime: {'>': 0}});
+    var orders = await Order.find({customerWalletAddress: this.req.session.walletId, paidDateTime: {'>': 0}});
     var hasOrders = false;
 
     var isVendor = await Vendor.findOne({walletId: this.req.session.walletId});

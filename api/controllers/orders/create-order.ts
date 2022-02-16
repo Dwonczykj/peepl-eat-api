@@ -51,7 +51,7 @@ module.exports = {
     var md5 = require('md5');
 
     // TODO: Refactor all of this code to run concurrently where possible
-
+    // TODO: Error handling here.
     for (var item in inputs.items) {
       inputs.items[item].optionValues = [];
       // TODO: Refactor to batch SQL query
@@ -194,7 +194,7 @@ module.exports = {
     // TODO: Move this to helper
 
     const instance = axios.create({
-      baseURL: 'http://localhost:1338/api/v1',
+      baseURL: 'http://pay.itsaboutpeepl.com/api/v1',
       // timeout: 1000,
       headers: {'Authorization': 'Basic OlFGQVJYWVktMkRSNE0xMy1QM0ZUQ1BULTQ0TVQ1UTI='}
     });
@@ -203,7 +203,7 @@ module.exports = {
       amount: calculatedOrderTotal,
       recipientWalletAddress: '0xf039CD9391cB28a7e632D07821deeBc249a32410',
       vendorDisplayName: 'Peepl',
-      webhookAddress: 'http://localhost:1337/api/v1/orders/peepl-pay-webhook?wallet=test'
+      webhookAddress: 'http://app.itaboutpeepl.com/api/v1/orders/peepl-pay-webhook?wallet=test'
     })
     .then(async (response) => {
       var paymentIntentId = response.data.paymentIntent.publicId;
