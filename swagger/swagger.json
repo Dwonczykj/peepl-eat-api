@@ -1332,7 +1332,7 @@
             "name": "items",
             "required": true,
             "schema": {},
-            "description": "Cart items from the frontend, which include the product id and corresponding delivery methods, options and relevant delivery slots."
+            "description": "Cart items from the frontend, which include the product id and corresponding options."
           },
           {
             "in": "query",
@@ -1349,7 +1349,7 @@
               "type": "number",
               "format": "double"
             },
-            "description": "The total order value, including shipping. This will be calculated on the backend eventually."
+            "description": "The total order value, including shipping."
           },
           {
             "in": "query",
@@ -1363,6 +1363,40 @@
             "in": "query",
             "name": "discountCode",
             "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vendor",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "fulfilmentMethod",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "fulfilmentSlotFrom",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "fulfilmentSlotTo",
+            "required": true,
             "schema": {
               "type": "string"
             }

@@ -35,6 +35,7 @@ module.exports = {
     var moment = require('moment');
     // TODO: Consider timezones
     // TODO: Account for overnight opening hours
+    // TODO: Generate IDs for slots to simplify logic (but must account for changes to opening hours and slot duration)
 
     var availableSlots = [];
 
@@ -66,7 +67,7 @@ module.exports = {
     }
 
     /* var openingHours = {
-        dayOfWeek: 'monday', // Sunday
+        dayOfWeek: 'monday', // Monday
         specificDate: null,
         openTime: '09:00',
         closeTime: '17:00'
@@ -87,9 +88,9 @@ module.exports = {
         endTime: ''
       };
 
-      slot.startTime = startTime;
+      slot.startTime = startTime.clone();
       startTime.add(fulfilmentMethod.slotLength, 'minutes');
-      slot.endTime = startTime;
+      slot.endTime = startTime.clone();
 
       slots.push(slot);
     }
@@ -105,7 +106,9 @@ module.exports = {
     ]; */
 
     // Find orders for that fulfilment method between the start and end times.
-    var orders = await Order.find({fulfilmentMethod: inputs.fulfilmentMethodId, fulfilmentSlotFrom: {'>=': moment(openTime, 'DD/MM/YYYY HH:mm').toString()}, fulfilmentSlotTo: {'<=': moment(closeTime, 'DD/MM/YYYY HH:mm').toString()}});
+    var fulfilmentSlotFrom = moment(openTime, 'DD/MM/YYYY HH:mm').format('YYYY-MM-DD HH:mm:ss');
+    var fulfilmentSlotTo = moment(closeTime, 'DD/MM/YYYY HH:mm').format('YYYY-MM-DD HH:mm:ss');
+    var orders = await Order.find({fulfilmentMethod: inputs.fulfilmentMethodId, fulfilmentSlotFrom: {'>=': fulfilmentSlotFrom}, fulfilmentSlotTo: {'<=': fulfilmentSlotTo}});
 
     /* var orders = [{
       fulfilmentSlotFrom: '17/02/2022 10:00',
@@ -121,7 +124,7 @@ module.exports = {
     for(var slotI of slots) {
       // Filter out orders between start and end of slot.
       var relevantOrders = orders.filter(order => {
-        if(order.fulfilmentSlotFrom >= slotI.startTime && order.fulfilmentSlotTo <= slotI.endTime) {
+        if(moment(order.fulfilmentSlotFrom).isSameOrAfter(slotI.startTime) && moment(order.fulfilmentSlotTo, 'YYYY-MM-DD HH:mm:ss').isSameOrBefore(slotI.endTime)) {
           return true;
         } else {
           return false;

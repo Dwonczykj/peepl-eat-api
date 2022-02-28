@@ -23,10 +23,10 @@ module.exports = {
 
     if(isVendor){
       orders = await Order.find({paidDateTime: {'>': 0}, isArchived: false})
-      .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue');
+      .populate('items.product&optionValues&optionValues.option&optionValue');
     } else {
       orders = await Order.find({paidDateTime: {'>': 0}, isArchived: false})
-      .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue');
+      .populate('items.product&optionValues&optionValues.option&optionValue');
     }
 
     // Respond with view or JSON.

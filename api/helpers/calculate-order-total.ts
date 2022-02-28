@@ -1,4 +1,5 @@
 declare var Order: any;
+declare var FulfilmentMethod: any;
 declare var Discount: any;
 declare var _: any;
 
@@ -26,11 +27,11 @@ module.exports = {
 
   fn: async function (inputs) {
     var order = await Order.findOne(inputs.orderId)
-    .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue&discount');
+    .populate('items.product&optionValues&optionValues.option&optionValue&discount');
 
     var workingTotal = 0;
 
-    var seenDeliveryMethods = [];
+    // var seenDeliveryMethods = [];
     for(var item in order.items) {
       var productTotal = order.items[item].product.basePrice;
 
@@ -38,13 +39,17 @@ module.exports = {
         productTotal += order.items[item].optionValues[optionValue].optionValue.priceModifier;
       }
 
-      if(!_.contains(seenDeliveryMethods, order.items[item].deliveryMethod.id)) { // If not seen this delivery method already.
+      /* if(!_.contains(seenDeliveryMethods, order.items[item].deliveryMethod.id)) { // If not seen this delivery method already.
         seenDeliveryMethods.push(order.items[item].deliveryMethod.id);
         workingTotal += order.items[item].deliveryMethod.priceModifier;
-      }
+      } */
 
       workingTotal += productTotal;
     }
+
+    var fulfilmentMethod = await FulfilmentMethod.findOne(order.fulfilmentMethod);
+
+    workingTotal += fulfilmentMethod.priceModifier;
 
     if(order.discount) {
       var discount = await Discount.findOne(order.discount);

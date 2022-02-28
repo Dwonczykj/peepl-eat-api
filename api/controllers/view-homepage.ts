@@ -13,7 +13,9 @@ module.exports = {
   },
 
   fn: async function () {
-    await sails.helpers.getAvailableSlots('28/02/2022', 1);
+    var slots = await sails.helpers.getAvailableSlots('28/02/2022', 1);
+
+    console.log(slots);
 
     // Respond with view.
     return {};

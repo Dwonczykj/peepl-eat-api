@@ -34,8 +34,6 @@ module.exports = {
       sort: 'priority DESC'
     });
 
-    var user = await User.findOne({walletId: this.req.session.walletId});
-
     if(!vendor){
       return exits.error();
     }
@@ -43,10 +41,10 @@ module.exports = {
     // Respond with view or JSON.
     if(this.req.wantsJSON) {
       return exits.successJSON(
-        {vendor, user, wallet: this.req.session.walletId}
+        {vendor, wallet: this.req.session.walletId}
       );
     } else {
-      return exits.success({vendor, user, wallet: this.req.session.walletId});
+      return exits.success({vendor, wallet: this.req.session.walletId});
     }
 
   }

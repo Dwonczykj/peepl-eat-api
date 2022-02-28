@@ -27,7 +27,7 @@ module.exports = {
 
     // Handle missing orders
     var order = await Order.findOne(inputs.orderId)
-    .populate('items.product&deliveryMethod&deliverySlot&optionValues&optionValues.option&optionValue&vendor');
+    .populate('items.product&optionValues&optionValues.option&optionValue&vendor');
 
     if(!order){
       return exits.error();

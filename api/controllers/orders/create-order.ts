@@ -18,7 +18,7 @@ module.exports = {
   inputs: {
     items: {
       type: 'ref',
-      description: 'Cart items from the frontend, which include the product id and corresponding delivery methods, options and relevant delivery slots.',
+      description: 'Cart items from the frontend, which include the product id and corresponding options.',
       required: true
     },
     address: {
@@ -28,7 +28,7 @@ module.exports = {
     },
     total: {
       type: 'number',
-      description: 'The total order value, including shipping. This will be calculated on the backend eventually.',
+      description: 'The total order value, including shipping.',
       required: true
     },
     marketingOptIn: {
@@ -37,7 +37,23 @@ module.exports = {
     discountCode: {
       type: 'string',
       required: false
-    }
+    },
+    vendor: {
+      type: 'number',
+      required: true
+    },
+    fulfilmentMethod: {
+      type: 'number',
+      required: true
+    },
+    fulfilmentSlotFrom: {
+      type: 'string',
+      required: true
+    },
+    fulfilmentSlotTo: {
+      type: 'string',
+      required: true
+    },
   },
 
 
@@ -47,8 +63,14 @@ module.exports = {
 
 
   fn: async function (inputs, exits) {
-    var mailchimp = require('@mailchimp/mailchimp_marketing');
-    var md5 = require('md5');
+    /* var mailchimp = require('@mailchimp/mailchimp_marketing');
+    var md5 = require('md5'); */
+
+    var vendor = await Vendor.findOne(inputs.vendor);
+
+    if(!vendor) {
+      throw 'invalidVendor';
+    }
 
     // TODO: Refactor all of this code to run concurrently where possible
     // TODO: Error handling here.
@@ -79,6 +101,8 @@ module.exports = {
       }
     }
 
+    // TODO: Validate that fulfilment method belongs to vendor
+    // TODO: Validate fulfilment slot times
     if(discount) {
       order = await Order.create({
         total: inputs.total,
@@ -92,7 +116,10 @@ module.exports = {
         deliveryAddressInstructions: inputs.address.deliveryInstructions,
         customerWalletAddress: this.req.session.walletId,
         discount: discount.id,
-        vendor: inputs.vendor
+        vendor: vendor.id,
+        fulfilmentMethod: inputs.fulfilmentMethod,
+        fulfilmentSlotFrom: inputs.fulfilmentSlotFrom,
+        fulfilmentSlotTo: inputs.fulfilmentSlotTo,
       }).fetch();
     } else {
       order = await Order.create({
@@ -106,7 +133,10 @@ module.exports = {
         deliveryAddressPostCode: inputs.address.postCode,
         deliveryAddressInstructions: inputs.address.deliveryInstructions,
         customerWalletAddress: this.req.session.walletId,
-        vendor: inputs.vendor
+        vendor: vendor.id,
+        fulfilmentMethod: inputs.fulfilmentMethod,
+        fulfilmentSlotFrom: inputs.fulfilmentSlotFrom,
+        fulfilmentSlotTo: inputs.fulfilmentSlotTo,
       }).fetch();
     }
 
@@ -114,11 +144,7 @@ module.exports = {
       object.product = object.id;
       object.order = order.id;
 
-      // TODO: Reduce object from frontend so it contains IDs of associations only
-      object.deliveryMethod = object.deliveryMethod.id;
-      object.deliverySlot = object.deliverySlot.id;
-
-      return _.pick(object, ['order', 'product', 'deliveryMethod', 'deliverySlot', 'optionValues']);
+      return _.pick(object, ['order', 'product', 'optionValues']);
     });
 
     await OrderItem.createEach(updatedItems);
@@ -127,6 +153,7 @@ module.exports = {
     var calculatedOrderTotal = await sails.helpers.calculateOrderTotal.with({orderId: order.id});
 
     if(order.total !== calculatedOrderTotal) {
+      // TODO: Log any instances of this, as it shouldn't happen (indicated frontend logic error)
       await Order.updateOne(order.id)
       .set({total: calculatedOrderTotal});
     }
@@ -167,7 +194,7 @@ module.exports = {
       });
     } */
 
-    if(inputs.marketingOptIn) {
+    /* if(inputs.marketingOptIn) {
       mailchimp.setConfig({
         apiKey: sails.config.custom.mailchimpAPIKey,
         server: 'us7'
@@ -187,13 +214,13 @@ module.exports = {
       .catch((err) => {
         console.log(err);
       });
-    }
+    } */
 
 
     // Create PaymentIntent on Peepl Pay
     // TODO: Move this to helper
 
-    const instance = axios.create({
+    /* const instance = axios.create({
       baseURL: 'http://pay.itsaboutpeepl.com/api/v1',
       // timeout: 1000,
       headers: {'Authorization': 'Basic OlFGQVJYWVktMkRSNE0xMy1QM0ZUQ1BULTQ0TVQ1UTI='}
@@ -215,7 +242,9 @@ module.exports = {
     })
     .catch((err) => {
       console.log(err);
-    });
+    }); */
+
+    return exits.success({orderID: order.id, paymentIntentID: undefined});
 
   }
 
