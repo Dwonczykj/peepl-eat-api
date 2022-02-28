@@ -1,5 +1,5 @@
 /**
- * DeliveryMethod.js
+ * FulfilmentMethod.js
  *
  * @description :: A model definition represents a database table/collection.
  * @docs        :: https://sailsjs.com/docs/concepts/models-and-orm/models
@@ -15,7 +15,6 @@ module.exports = {
     name: {
       type: 'string',
       description: 'The name of the delivery method.',
-      required: true
     },
     description: {
       type: 'string',
@@ -25,16 +24,31 @@ module.exports = {
       type: 'number',
       description: 'A positive or negative integer representing the amount of pence to adjust the base price by.'
     },
+    // TODO: Change restrictions to dynamic based on vendor co-ords and radius
     postCodeRestrictionRegex: {
       type: 'string',
       description: 'A regular expression specifying which postcodes are eligible for this delivery method.'
     },
     methodType: {
       type: 'string',
-      isIn: ['courier', 'collection'],
-      defaultsTo: 'courier'
+      isIn: ['delivery', 'collection'],
+      defaultsTo: 'delivery'
     },
-
+    slotLength: {
+      type: 'number',
+      description: 'Slot length in minutes',
+      min: 0,
+      max: 1440
+    },
+    bufferLength: {
+      type: 'number',
+      min: 0,
+      description: 'The required buffer time before booking a slot.'
+    },
+    maxOrders: {
+      type: 'number',
+      description: 'The maximum number of orders allow per slot.'
+    },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
@@ -44,13 +58,13 @@ module.exports = {
     //  ╔═╗╔═╗╔═╗╔═╗╔═╗╦╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
     //  ╠═╣╚═╗╚═╗║ ║║  ║╠═╣ ║ ║║ ║║║║╚═╗
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
-    products: {
-      collection: 'product',
-      via: 'deliveryMethods'
+    vendor: {
+      model: 'vendor',
+      required: true
     },
-    deliveryMethodSlots: {
-      collection: 'deliverymethodslot',
-      via: 'deliveryMethod'
+    openingHours: {
+      collection: 'openingHours',
+      via: 'fulfilmentMethod'
     }
   },
 

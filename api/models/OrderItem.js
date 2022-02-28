@@ -32,14 +32,6 @@ module.exports = {
       description: 'The product which has been ordered.',
       required: true
     },
-    deliveryMethod: {
-      model: 'deliverymethod',
-      description: 'The delivery method used to deliver the item.'
-    },
-    deliverySlot: {
-      model: 'deliverymethodslot',
-      description: 'The delivery slot chosen by the user for the item.'
-    },
     optionValues: {
       collection: 'orderitemoptionvalue',
       via: 'orderItem'

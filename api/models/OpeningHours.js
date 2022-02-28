@@ -1,5 +1,5 @@
 /**
- * DeliveryMethodSlot.js
+ * OpeningHours.js
  *
  * @description :: A model definition represents a database table/collection.
  * @docs        :: https://sailsjs.com/docs/concepts/models-and-orm/models
@@ -12,20 +12,24 @@ module.exports = {
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
     //  ╩  ╩╚═╩╩ ╩╩ ╩ ╩ ╚╝ ╚═╝╚═╝
-    startTime: {
-      type: 'number',
-      required: true,
-      description: 'A unixtime representing the start of the delivery slot.'
+    dayOfWeek: {
+      type: 'string',
+      isIn: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
+      // required: true
     },
-    endTime: {
-      type: 'number',
-      required: true,
-      description: 'A unixtime representing the end of the delivery slot.'
+    specialDate: {
+      type: 'ref',
+      columnType: 'date',
+      description: 'Specific date override - for example Christmas day',
+      unique: true
     },
-    slotsRemaining: {
-      type: 'number',
-      description: 'The number of these slots that are still available.',
-      allowNull: true
+    openTime: {
+      type: 'ref',
+      columnType: 'time'
+    },
+    closeTime: {
+      type: 'ref',
+      columnType: 'time'
     },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
@@ -36,10 +40,8 @@ module.exports = {
     //  ╔═╗╔═╗╔═╗╔═╗╔═╗╦╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
     //  ╠═╣╚═╗╚═╗║ ║║  ║╠═╣ ║ ║║ ║║║║╚═╗
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
-    deliveryMethod: {
-      model: 'deliverymethod',
-      required: true,
-      description: 'The delivery method that this slot applies to.'
+    fulfilmentMethod: {
+      model: 'fulfilmentMethod'
     }
   },
 

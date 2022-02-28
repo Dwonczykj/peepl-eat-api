@@ -82,6 +82,16 @@ module.exports = {
       type: 'string',
       description: 'The ID to identify the delivery in the logistics system'
     },
+    fulfilmentSlotFrom: {
+      type: 'ref',
+      columnType: 'datetime',
+      description: 'The beginning of the estimated fulfilment slot.'
+    },
+    fulfilmentSlotTo: {
+      type: 'ref',
+      columnType: 'datetime',
+      description: 'The end of the estimated fulfilment slot.'
+    },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
@@ -95,6 +105,9 @@ module.exports = {
     //   model: 'user',
     //   required: true
     // },
+    fulfilmentMethod: {
+      model: 'fulfilmentmethod'
+    },
     discount: {
       model: 'discount'
     },

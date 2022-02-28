@@ -68,11 +68,6 @@ module.exports = {
       via: 'product',
       description: 'A collection of options that apply to the product (i.e. colour).'
     },
-    deliveryMethods: {
-      collection: 'deliverymethod',
-      via: 'products',
-      description: 'The delivery methods applicable to this product.'
-    },
     category: {
       model: 'productcategory',
       description: 'The category of the product.',

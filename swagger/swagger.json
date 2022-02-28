@@ -117,138 +117,6 @@
   ],
   "components": {
     "schemas": {
-      "deliverymethod": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/deliverymethod-without-required-constraint"
-          },
-          {
-            "required": [
-              "name"
-            ]
-          }
-        ]
-      },
-      "deliverymethod-without-required-constraint": {
-        "type": "object",
-        "description": "Sails ORM Model **DeliveryMethod**",
-        "properties": {
-          "createdAt": {
-            "type": "number",
-            "format": "double"
-          },
-          "updatedAt": {
-            "type": "number",
-            "format": "double"
-          },
-          "id": {
-            "type": "integer",
-            "format": "int64",
-            "uniqueItems": true,
-            "description": "Note Sails special attributes: autoIncrement"
-          },
-          "name": {
-            "type": "string",
-            "description": "The name of the delivery method."
-          },
-          "description": {
-            "type": "string",
-            "description": "A brief description of the shipping method."
-          },
-          "priceModifier": {
-            "type": "number",
-            "format": "double",
-            "description": "A positive or negative integer representing the amount of pence to adjust the base price by."
-          },
-          "postCodeRestrictionRegex": {
-            "type": "string",
-            "description": "A regular expression specifying which postcodes are eligible for this delivery method."
-          },
-          "methodType": {
-            "type": "string",
-            "default": "courier",
-            "enum": [
-              "courier",
-              "collection"
-            ],
-            "example": "courier"
-          },
-          "products": {
-            "description": "Array of **product**'s or array of FK's when creating / updating / not populated",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/product"
-            }
-          },
-          "deliveryMethodSlots": {
-            "description": "Array of **deliverymethodslot**'s or array of FK's when creating / updating / not populated",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/deliverymethodslot"
-            }
-          }
-        }
-      },
-      "deliverymethodslot": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/deliverymethodslot-without-required-constraint"
-          },
-          {
-            "required": [
-              "startTime",
-              "endTime",
-              "deliveryMethod"
-            ]
-          }
-        ]
-      },
-      "deliverymethodslot-without-required-constraint": {
-        "type": "object",
-        "description": "Sails ORM Model **DeliveryMethodSlot**",
-        "properties": {
-          "createdAt": {
-            "type": "number",
-            "format": "double"
-          },
-          "updatedAt": {
-            "type": "number",
-            "format": "double"
-          },
-          "id": {
-            "type": "integer",
-            "format": "int64",
-            "uniqueItems": true,
-            "description": "Note Sails special attributes: autoIncrement"
-          },
-          "startTime": {
-            "type": "number",
-            "format": "double",
-            "description": "A unixtime representing the start of the delivery slot."
-          },
-          "endTime": {
-            "type": "number",
-            "format": "double",
-            "description": "A unixtime representing the end of the delivery slot."
-          },
-          "slotsRemaining": {
-            "type": "number",
-            "format": "double",
-            "nullable": true,
-            "description": "The number of these slots that are still available."
-          },
-          "deliveryMethod": {
-            "description": "The delivery method that this slot applies to. JSON dictionary representing the **deliverymethod** instance or FK when creating / updating / not populated",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/deliverymethod"
-              }
-            ]
-          }
-        }
-      },
       "discount": {
         "type": "object",
         "allOf": [
@@ -309,6 +177,154 @@
           "isEnabled": {
             "type": "boolean",
             "default": false
+          }
+        }
+      },
+      "fulfilmentmethod": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/fulfilmentmethod-without-required-constraint"
+          },
+          {
+            "required": [
+              "vendor"
+            ]
+          }
+        ]
+      },
+      "fulfilmentmethod-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **FulfilmentMethod**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the delivery method."
+          },
+          "description": {
+            "type": "string",
+            "description": "A brief description of the shipping method."
+          },
+          "priceModifier": {
+            "type": "number",
+            "format": "double",
+            "description": "A positive or negative integer representing the amount of pence to adjust the base price by."
+          },
+          "postCodeRestrictionRegex": {
+            "type": "string",
+            "description": "A regular expression specifying which postcodes are eligible for this delivery method."
+          },
+          "methodType": {
+            "type": "string",
+            "default": "delivery",
+            "enum": [
+              "delivery",
+              "collection"
+            ],
+            "example": "delivery"
+          },
+          "slotLength": {
+            "type": "number",
+            "format": "double",
+            "description": "Slot length in minutes",
+            "maximum": 1440,
+            "minimum": 0
+          },
+          "bufferLength": {
+            "type": "number",
+            "format": "double",
+            "description": "The required buffer time before booking a slot.",
+            "minimum": 0
+          },
+          "maxOrders": {
+            "type": "number",
+            "format": "double",
+            "description": "The maximum number of orders allow per slot."
+          },
+          "vendor": {
+            "description": "JSON dictionary representing the **vendor** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/vendor"
+              }
+            ]
+          },
+          "openingHours": {
+            "description": "Array of **openinghours**'s or array of FK's when creating / updating / not populated",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/openinghours"
+            }
+          }
+        }
+      },
+      "openinghours": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/openinghours-without-required-constraint"
+          }
+        ]
+      },
+      "openinghours-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **OpeningHours**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "dayOfWeek": {
+            "type": "string",
+            "enum": [
+              "monday",
+              "tuesday",
+              "wednesday",
+              "thursday",
+              "friday",
+              "saturday",
+              "sunday"
+            ]
+          },
+          "specialDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Specific date override - for example Christmas day",
+            "uniqueItems": true
+          },
+          "openTime": {},
+          "closeTime": {},
+          "fulfilmentMethod": {
+            "description": "JSON dictionary representing the **fulfilmentmethod** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/fulfilmentmethod"
+              }
+            ]
           }
         }
       },
@@ -416,6 +432,24 @@
             "type": "string",
             "description": "The ID to identify the delivery in the logistics system"
           },
+          "fulfilmentSlotFrom": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The beginning of the estimated fulfilment slot."
+          },
+          "fulfilmentSlotTo": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The end of the estimated fulfilment slot."
+          },
+          "fulfilmentMethod": {
+            "description": "JSON dictionary representing the **fulfilmentmethod** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/fulfilmentmethod"
+              }
+            ]
+          },
           "discount": {
             "description": "JSON dictionary representing the **discount** instance or FK when creating / updating / not populated",
             "oneOf": [
@@ -486,22 +520,6 @@
             "oneOf": [
               {
                 "$ref": "#/components/schemas/product"
-              }
-            ]
-          },
-          "deliveryMethod": {
-            "description": "The delivery method used to deliver the item. JSON dictionary representing the **deliverymethod** instance or FK when creating / updating / not populated",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/deliverymethod"
-              }
-            ]
-          },
-          "deliverySlot": {
-            "description": "The delivery slot chosen by the user for the item. JSON dictionary representing the **deliverymethodslot** instance or FK when creating / updating / not populated",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/deliverymethodslot"
               }
             ]
           },
@@ -653,13 +671,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/productoption"
-            }
-          },
-          "deliveryMethods": {
-            "description": "The delivery methods applicable to this product. Array of **deliverymethod**'s or array of FK's when creating / updating / not populated",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/deliverymethod"
             }
           },
           "category": {

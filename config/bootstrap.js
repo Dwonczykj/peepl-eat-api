@@ -42,6 +42,23 @@ module.exports.bootstrap = async function() {
     status: 'active'
   }).fetch();
 
+  var fulfilmentMethod = await FulfilmentMethod.create({
+    priceModifier: 200,
+    postCodeRestrictionRegex: '.',
+    methodType: 'delivery',
+    slotLength: 60,
+    bufferLength: 15,
+    maxOrders: 10,
+    vendor: delifonseca.id
+  }).fetch();
+
+  var openingHours = await OpeningHours.create({
+    dayOfWeek: 'monday',
+    openTime: '09:00',
+    closeTime: '17:00',
+    fulfilmentMethod: fulfilmentMethod.id
+  });
+
   var burnsNight = await Product.create({
     name: 'Burns Night - Dine @ Home (For 1)',
     description: 'Unfortunately, this year the 25th falls on a Monday. You won’t be able to join us, so we\'ve made our Dine@home Burns inspired instead.',
@@ -132,21 +149,6 @@ module.exports.bootstrap = async function() {
     isAvailable: true,
     options: [dessertOption.id]
   }]);
-
-  var localDeliveryMethod = await DeliveryMethod.create({
-    name: 'Local Courier',
-    description: 'Delivered fresh by one of our reliable local couriers!',
-    priceModifier: 200,
-    postCodeRestrictionRegex: '.',
-    products: [burnsNight.id]
-  }).fetch();
-
-  await DeliveryMethodSlot.create({
-    startTime: 1649243393,
-    endTime: 1649246993,
-    slotsRemaining: 3,
-    deliveryMethod: localDeliveryMethod.id
-  });
 
   // Save new bootstrap version
   await sails.helpers.fs.writeJson.with({
