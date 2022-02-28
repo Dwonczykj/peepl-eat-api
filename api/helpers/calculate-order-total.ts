@@ -31,7 +31,6 @@ module.exports = {
 
     var workingTotal = 0;
 
-    // var seenDeliveryMethods = [];
     for(var item in order.items) {
       var productTotal = order.items[item].product.basePrice;
 
@@ -39,16 +38,10 @@ module.exports = {
         productTotal += order.items[item].optionValues[optionValue].optionValue.priceModifier;
       }
 
-      /* if(!_.contains(seenDeliveryMethods, order.items[item].deliveryMethod.id)) { // If not seen this delivery method already.
-        seenDeliveryMethods.push(order.items[item].deliveryMethod.id);
-        workingTotal += order.items[item].deliveryMethod.priceModifier;
-      } */
-
       workingTotal += productTotal;
     }
 
     var fulfilmentMethod = await FulfilmentMethod.findOne(order.fulfilmentMethod);
-
     workingTotal += fulfilmentMethod.priceModifier;
 
     if(order.discount) {

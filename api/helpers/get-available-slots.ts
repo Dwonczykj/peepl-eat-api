@@ -136,41 +136,6 @@ module.exports = {
       }
     }
 
-    // What we want to return:
-    /* var availableSlots = [{
-      slotId: 0,
-      startTime: '17/02/2022 09:00',
-      endTime: '17/02/2022 10:00',
-    }, {
-      slotId: 1,
-      startTime: '17/02/2022 10:00',
-      endTime: '17/02/2022 11:00',
-    }, {
-      slotId: 2,
-      startTime: '17/02/2022 11:00',
-      endTime: '17/02/2022 12:00',
-    }, {
-      slotId: 3,
-      startTime: '17/02/2022 12:00',
-      endTime: '17/02/2022 13:00',
-    }, {
-      slotId: 4,
-      startTime: '17/02/2022 13:00',
-      endTime: '17/02/2022 14:00',
-    }, {
-      slotId: 5,
-      startTime: '17/02/2022 14:00',
-      endTime: '17/02/2022 15:00',
-    }, {
-      slotId: 6,
-      startTime: '17/02/2022 15:00',
-      endTime: '17/02/2022 16:00',
-    }, {
-      slotId: 7,
-      startTime: '17/02/2022 16:00',
-      endTime: '17/02/2022 17:00',
-    }] */
-
     // Send back the result through the success exit.
     return availableSlots;
   }

@@ -25,6 +25,7 @@ module.exports.routes = {
   'GET /vendors/:vendorid': { action: 'vendors/view-vendor-menu' },
   'GET /vendors/download-image/:vendorid': { action: 'vendors/download-image' },
   'GET /products/download-image/:productId': { action: 'products/download-image' },
+  'GET /api/v1/vendors/get-fulfilment-slots': { action: 'vendors/get-fulfilment-slots' },
 
   'GET /orders/:orderId': { action: 'orders/view-order-confirmation' },
   'GET /orders': { action: 'orders/view-my-orders' },

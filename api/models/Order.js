@@ -106,7 +106,8 @@ module.exports = {
     //   required: true
     // },
     fulfilmentMethod: {
-      model: 'fulfilmentmethod'
+      model: 'fulfilmentmethod',
+      required: true
     },
     discount: {
       model: 'discount'
