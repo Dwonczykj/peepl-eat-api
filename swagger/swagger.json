@@ -43,6 +43,9 @@
       "name": "View create vendor"
     },
     {
+      "name": "Get fulfilment slots"
+    },
+    {
       "name": "Get product delivery methods"
     },
     {
@@ -343,6 +346,7 @@
               "deliveryPhoneNumber",
               "deliveryAddressLineOne",
               "deliveryAddressPostCode",
+              "fulfilmentMethod",
               "vendor"
             ]
           }
@@ -1281,6 +1285,26 @@
         "responses": {
           "200": {
             "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/vendors/get-fulfilment-slots": {
+      "get": {
+        "summary": "Get fulfilment slots",
+        "tags": [
+          "Get fulfilment slots"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The requested resource"
           },
           "404": {
             "description": "Resource not found"

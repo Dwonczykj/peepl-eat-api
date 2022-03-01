@@ -69,16 +69,16 @@ module.exports = {
     var vendor = await Vendor.findOne(inputs.vendor);
 
     if(!vendor) {
-      throw 'invalidVendor';
+      return exits.error();
     }
 
     // TODO: Refactor all of this code to run concurrently where possible
     // TODO: Error handling here.
     for (var item in inputs.items) {
       inputs.items[item].optionValues = [];
-      // TODO: Refactor to batch SQL query
       for (var option in inputs.items[item].options) {
         if(inputs.items[item].options[option] !== '') {
+          // TODO: Change to append to array then use createEach
           var newOptionValuePair = await OrderItemOptionValue.create({
             option: option,
             optionValue: inputs.items[item].options[option],
