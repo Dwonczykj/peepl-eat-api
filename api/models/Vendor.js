@@ -100,6 +100,12 @@ module.exports = {
     products: {
       collection: 'product',
       via: 'vendor'
+    },
+    collectionFulfilmentMethod: {
+      model: 'fulfilmentmethod'
+    },
+    deliveryCollectionMethod: {
+      model: 'fulfilmentmethod'
     }
   },
 

@@ -321,6 +321,10 @@
           },
           "openTime": {},
           "closeTime": {},
+          "isOpen": {
+            "type": "boolean",
+            "default": false
+          },
           "fulfilmentMethod": {
             "description": "JSON dictionary representing the **fulfilmentmethod** instance or FK when creating / updating / not populated",
             "oneOf": [
@@ -1036,6 +1040,22 @@
             "items": {
               "$ref": "#/components/schemas/product"
             }
+          },
+          "collectionFulfilmentMethod": {
+            "description": "JSON dictionary representing the **fulfilmentmethod** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/fulfilmentmethod"
+              }
+            ]
+          },
+          "deliveryCollectionMethod": {
+            "description": "JSON dictionary representing the **fulfilmentmethod** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/fulfilmentmethod"
+              }
+            ]
           }
         }
       }
@@ -1301,7 +1321,25 @@
         "tags": [
           "Get fulfilment slots"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "vendor",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "date",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "The requested resource"

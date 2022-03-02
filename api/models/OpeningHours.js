@@ -31,6 +31,10 @@ module.exports = {
       type: 'ref',
       columnType: 'time'
     },
+    isOpen: {
+      type: 'boolean',
+      defaultsTo: false
+    },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗

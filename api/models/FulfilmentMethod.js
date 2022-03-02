@@ -47,7 +47,7 @@ module.exports = {
     },
     maxOrders: {
       type: 'number',
-      description: 'The maximum number of orders allow per slot.'
+      description: 'The maximum number of orders allowed per slot.'
     },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
