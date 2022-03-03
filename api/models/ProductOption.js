@@ -32,7 +32,7 @@ module.exports = {
     },
     values: {
       collection: 'productoptionvalue',
-      via: 'options',
+      via: 'option',
       description: 'The values that can be chosen for this option (i.e. blue, green)'
     }
 

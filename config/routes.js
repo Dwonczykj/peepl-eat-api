@@ -21,14 +21,17 @@ module.exports.routes = {
 
   'GET /': { action: 'view-homepage' },
 
+  // VENDORS
   'GET /vendors': {action: 'vendors/view-all-vendors'},
   'GET /vendors/:vendorid': { action: 'vendors/view-vendor-menu' },
   'GET /vendors/download-image/:vendorid': { action: 'vendors/download-image' },
   'GET /products/download-image/:productId': { action: 'products/download-image' },
   'GET /api/v1/vendors/get-fulfilment-slots': { action: 'vendors/get-fulfilment-slots' },
 
+  // ORDERS
   'GET /orders/:orderId': { action: 'orders/view-order-confirmation' },
   'GET /orders': { action: 'orders/view-my-orders' },
+  'GET /api/v1/orders/get-order-status': { action: 'orders/get-order-status' },
 
   // DISCOUNTS
   'GET /api/v1/discounts/check-discount-code/:discountCode': { action: 'discounts/check-discount-code' },
@@ -44,8 +47,11 @@ module.exports.routes = {
   // ADMIN
   'GET /admin/vendors': { action: 'admin/view-vendors' },
   'GET /admin/vendors/new': { action: 'admin/view-create-vendor' },
-  'POST /api/v1/admin/create-vendor': { action: 'admin/create-vendor' },
   'GET /admin/vendors/:vendorid': { action: 'admin/view-edit-vendor' },
+  'GET /admin/orders': { action: 'admin/view-all-orders' },
+  'GET /admin/discount-codes': { action: 'admin/view-discount-codes' },
+
+  'POST /api/v1/admin/create-vendor': { action: 'admin/create-vendor' },
   'POST /api/v1/admin/edit-vendor': { action: 'admin/edit-vendor' },
   'POST /api/v1/admin/edit-product': { action: 'admin/edit-product' },
   'POST /api/v1/admin/create-product': { action: 'admin/create-product' },
@@ -55,21 +61,8 @@ module.exports.routes = {
   'POST /api/v1/admin/edit-product-option-value': { action: 'admin/edit-product-option-value' },
   'POST /api/v1/admin/archive-order': { action: 'admin/archive-order' },
   'POST /api/v1/admin/update-product-status': { action: 'admin/update-product-status' },
-  'GET /admin/orders': { action: 'admin/view-all-orders' },
-  'GET /admin/discount-codes': { action: 'admin/view-discount-codes' },
   'POST /api/v1/admin/create-discount': { action: 'admin/create-discount' },
   'POST /api/v1/admin/edit-discount': { action: 'admin/edit-discount' },
-
-  /***************************************************************************
-  *                                                                          *
-  * More custom routes here...                                               *
-  * (See https://sailsjs.com/config/routes for examples.)                    *
-  *                                                                          *
-  * If a request to a URL doesn't match any of the routes in this file, it   *
-  * is matched against "shadow routes" (e.g. blueprint routes).  If it does  *
-  * not match any of those, it is matched against static assets.             *
-  *                                                                          *
-  ***************************************************************************/
-
+  'POST /api/v1/admin/create-product-category': { action: 'admin/create-product-category' },
 
 };

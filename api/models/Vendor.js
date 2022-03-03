@@ -106,6 +106,14 @@ module.exports = {
     },
     deliveryCollectionMethod: {
       model: 'fulfilmentmethod'
+    },
+    vendorCategories: {
+      collection: 'vendorcategory',
+      via: 'vendors'
+    },
+    productCategories: {
+      collection: 'productcategory',
+      via: 'vendor'
     }
   },
 

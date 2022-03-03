@@ -32,6 +32,10 @@ module.exports.bootstrap = async function() {
     return;
   } //•
 
+  var vendorCategory = await VendorCategory.create({
+    name: 'Test Category',
+  }).fetch();
+
   var delifonseca = await Vendor.create({
     name: 'Delifonseca',
     type: 'restaurant',
@@ -39,7 +43,13 @@ module.exports.bootstrap = async function() {
     walletId: '0xf039CD9391cB28a7e632D07821deeBc249a32410',
     imageFd: __dirname + '/../assets/images/vendors/spitroast.jpg',
     imageMime: 'image/jpeg',
-    status: 'active'
+    status: 'active',
+    vendorCategories: [vendorCategory.id]
+  }).fetch();
+
+  var productCategory = await ProductCategory.create({
+    name: 'Test Product Category',
+    vendor: delifonseca.id
   }).fetch();
 
   var fulfilmentMethod = await FulfilmentMethod.create({
@@ -53,7 +63,7 @@ module.exports.bootstrap = async function() {
   }).fetch();
 
   var openingHours = await OpeningHours.create({
-    dayOfWeek: 'monday',
+    dayOfWeek: 'thursday',
     openTime: '09:00',
     closeTime: '17:00',
     fulfilmentMethod: fulfilmentMethod.id
@@ -78,22 +88,22 @@ module.exports.bootstrap = async function() {
     name: 'Traditional Cullen Skink – smoked haddock, potato and leek soup (GF)',
     priceModifier: 0,
     isAvailable: true,
-    options: [starterOption.id]
+    option: starterOption.id
   }, {
     name: 'Rabbit ‘cock-a-leekie’ terrine. A chicken, rabbit and leek terrine served with whisky jelly and oatcakes',
     priceModifier: 0,
     isAvailable: true,
-    options: [starterOption.id]
+    option: starterOption.id
   }, {
     name: 'Classic traditional haggis, neeps and tatties',
     priceModifier: 0,
     isAvailable: true,
-    options: [starterOption.id]
+    option: starterOption.id
   }, {
     name: 'Martin’s classic vegetarian haggis, neeps and tatties (V)',
     priceModifier: 0,
     isAvailable: true,
-    options: [starterOption.id]
+    option: starterOption.id
   }]);
 
   var mainOption = await ProductOption.create({
@@ -105,27 +115,27 @@ module.exports.bootstrap = async function() {
     name: 'Venison, beef and beer stew, whiskey dumplings and creamy mash',
     priceModifier: 0,
     isAvailable: true,
-    options: [mainOption.id]
+    option: mainOption.id
   }, {
     name: 'Darne of Scottish salmon, kale, creamy mash and Loch Spelve mussel sauce (GF)',
     priceModifier: 0,
     isAvailable: true,
-    options: [mainOption.id]
+    option: mainOption.id
   }, {
     name: 'Lanarkshire blue portobello mushroom top hat with rumbledethump croquettes and pearl onion pickle (V)',
     priceModifier: 0,
     isAvailable: true,
-    options: [mainOption.id]
+    option: mainOption.id
   }, {
     name: 'Classic traditional haggis, neeps and tatties',
     priceModifier: 0,
     isAvailable: true,
-    options: [mainOption.id]
+    option: mainOption.id
   }, {
     name: 'Martin’s classic vegetarian haggis, neeps and tatties (V)',
     priceModifier: 0,
     isAvailable: true,
-    options: [mainOption.id]
+    option: mainOption.id
   }]);
 
   var dessertOption = await ProductOption.create({
@@ -137,17 +147,17 @@ module.exports.bootstrap = async function() {
     name: 'Traditional Cranachan (V)',
     priceModifier: 0,
     isAvailable: true,
-    options: [dessertOption.id]
+    option: dessertOption.id
   }, {
     name: 'Bitter chocolate tart with Drambuie fudge  (V/GF)',
     priceModifier: 0,
     isAvailable: true,
-    options: [dessertOption.id]
+    option: dessertOption.id
   }, {
     name: 'Ecclefechan Border Tart (V)',
     priceModifier: 0,
     isAvailable: true,
-    options: [dessertOption.id]
+    option: dessertOption.id
   }]);
 
   // Save new bootstrap version

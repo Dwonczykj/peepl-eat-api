@@ -38,7 +38,7 @@ module.exports = {
       name: inputs.name,
       description: inputs.description,
       isAvailable: inputs.isAvailable,
-      options: [inputs.productOption]
+      option: inputs.productOption
     }).fetch()
     .catch((err) => {
       console.log(err);
