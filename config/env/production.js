@@ -147,7 +147,7 @@ module.exports = {
     ***************************************************************************/
     cors: {
       allowOrigins: [
-        'https://app.itsaboutpeepl.com',
+        'https://vegi.itsaboutpeepl.com',
       ]
     },
 
@@ -181,8 +181,8 @@ module.exports = {
     * > (For a full list, see https://sailsjs.com/plugins/sessions)            *
     *                                                                          *
     ***************************************************************************/
-    adapter: '@sailshq/connect-redis',
-    url: 'redis://localhost:6379/0',
+    // adapter: '@sailshq/connect-redis',
+    // url: 'redis://localhost:6379/0',
     //--------------------------------------------------------------------------
     // /\   OR, to avoid checking it in to version control, you might opt to
     // ||   set sensitive credentials like this using an environment variable.
@@ -246,7 +246,7 @@ module.exports = {
     *                                                                          *
     ***************************************************************************/
     onlyAllowOrigins: [
-      'https://app.itsaboutpeepl.com',
+      'https://vegi.itsaboutpeepl.com',
     ],
 
 
@@ -363,7 +363,7 @@ module.exports = {
   *                                                                         *
   ***************************************************************************/
   custom: {
-    baseUrl: 'https://app.itsaboutpeepl.com',
+    baseUrl: 'https://vegi.itsaboutpeepl.com',
     internalEmailAddress: 'support@itsaboutpeepl.com',
     buildNumber: 1
 
