@@ -22,6 +22,6 @@ module.exports.custom = {
   slackOrdersWebhook: 'https://hooks.slack.com/services/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',
   coopcycleUrl: 'https://agile-delivery.coopcycle.org',
   peeplPayUrl: 'http://pay.itsaboutpeepl.com/api/v1',
-  peeplAPIKey: 'OlFGQVJYWVktMkRSNE0xMy1QM0ZUQ1BULTQ0TVQ1UTI=',
-  peeplWebhookAddress: 'http://app.itaboutpeepl.com/api/v1/orders/peepl-pay-webhook'
+  peeplAPIKey: 'Oko4WFgwUFEtVlI2NE01Ry1QTkVBMzFZLVlQVllRQ1o=',
+  peeplWebhookAddress: 'https://vegi.itaboutpeepl.com/api/v1/orders/peepl-pay-webhook'
 };
