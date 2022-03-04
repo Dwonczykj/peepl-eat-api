@@ -17,7 +17,7 @@ module.exports = {
   },
 
   fn: async function (inputs, exits) {
-    // var isVendor = await Vendor.findOne({walletId: this.req.session.walletId});
+    // var isVendor = await Vendor.findOne({walletAddress: this.req.session.walletId});
     var isVendor = true;
     var orders;
 

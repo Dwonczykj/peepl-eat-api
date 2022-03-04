@@ -25,12 +25,6 @@
   },
   "tags": [
     {
-      "name": "View all vendors"
-    },
-    {
-      "name": "View my orders"
-    },
-    {
       "name": "View vendors"
     },
     {
@@ -40,19 +34,22 @@
       "name": "View discount codes"
     },
     {
+      "name": "View all vendors"
+    },
+    {
+      "name": "View my orders"
+    },
+    {
       "name": "View create vendor"
     },
     {
       "name": "Get fulfilment slots"
     },
     {
-      "name": "Get product delivery methods"
-    },
-    {
       "name": "Create order"
     },
     {
-      "name": "Payment submitted"
+      "name": "Get order status"
     },
     {
       "name": "Peepl pay webhook"
@@ -94,28 +91,22 @@
       "name": "Edit discount"
     },
     {
-      "name": "Check discount code"
+      "name": "Create product category"
     },
     {
       "name": "Get product options"
     },
     {
-      "name": "Subscribe to order"
+      "name": "Check discount code"
+    },
+    {
+      "name": "View vendor menu"
     },
     {
       "name": "Download image"
     },
     {
       "name": "View edit vendor"
-    },
-    {
-      "name": "View vendor menu"
-    },
-    {
-      "name": "View order confirmation"
-    },
-    {
-      "name": "View homepage"
     }
   ],
   "components": {
@@ -256,7 +247,7 @@
           "maxOrders": {
             "type": "number",
             "format": "double",
-            "description": "The maximum number of orders allow per slot."
+            "description": "The maximum number of orders allowed per slot."
           },
           "vendor": {
             "description": "JSON dictionary representing the **vendor** instance or FK when creating / updating / not populated",
@@ -848,12 +839,13 @@
             "type": "boolean",
             "description": "Represents whether or not the option value is available."
           },
-          "options": {
-            "description": "The options to which this value can apply. Array of **productoption**'s or array of FK's when creating / updating / not populated",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/productoption"
-            }
+          "option": {
+            "description": "The option to which this value can apply. JSON dictionary representing the **productoption** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/productoption"
+              }
+            ]
           }
         }
       },
@@ -932,7 +924,7 @@
           {
             "required": [
               "name",
-              "walletId"
+              "walletAddress"
             ]
           }
         ]
@@ -972,7 +964,7 @@
             "description": "A brief description of the vendor.",
             "maxLength": 200
           },
-          "walletId": {
+          "walletAddress": {
             "type": "string",
             "pattern": "^0x[a-fA-F0-9]{40}$",
             "description": "The blockchain wallet address for the vendor. Used to distribute payments from customers."
@@ -1041,21 +1033,74 @@
               "$ref": "#/components/schemas/product"
             }
           },
-          "collectionFulfilmentMethod": {
-            "description": "JSON dictionary representing the **fulfilmentmethod** instance or FK when creating / updating / not populated",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/fulfilmentmethod"
-              }
-            ]
+          "fulfilmentMethods": {
+            "description": "Array of **fulfilmentmethod**'s or array of FK's when creating / updating / not populated",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/fulfilmentmethod"
+            }
           },
-          "deliveryCollectionMethod": {
-            "description": "JSON dictionary representing the **fulfilmentmethod** instance or FK when creating / updating / not populated",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/fulfilmentmethod"
-              }
+          "vendorCategories": {
+            "description": "Array of **vendorcategory**'s or array of FK's when creating / updating / not populated",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/vendorcategory"
+            }
+          },
+          "productCategories": {
+            "description": "Array of **productcategory**'s or array of FK's when creating / updating / not populated",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/productcategory"
+            }
+          }
+        }
+      },
+      "vendorcategory": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/vendorcategory-without-required-constraint"
+          },
+          {
+            "required": [
+              "name"
             ]
+          }
+        ]
+      },
+      "vendorcategory-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **VendorCategory**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the product category."
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "The URL of the product category image."
+          },
+          "vendors": {
+            "description": "Array of **vendor**'s or array of FK's when creating / updating / not populated",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/vendor"
+            }
           }
         }
       }
@@ -1109,80 +1154,6 @@
     }
   },
   "paths": {
-    "/vendors": {
-      "get": {
-        "summary": "View all vendors",
-        "description": "Display \"All vendors\" page.",
-        "tags": [
-          "View all vendors"
-        ],
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "type": "string",
-                      "description": "Success"
-                    },
-                    {
-                      "type": "string",
-                      "description": "Success"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/orders": {
-      "get": {
-        "summary": "View my orders",
-        "description": "Display \"My orders\" page.",
-        "tags": [
-          "View my orders"
-        ],
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "type": "string",
-                      "description": "Success"
-                    },
-                    {
-                      "type": "string",
-                      "description": "Success"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
     "/admin/vendors": {
       "get": {
         "summary": "View vendors",
@@ -1294,6 +1265,80 @@
         }
       }
     },
+    "/api/v1/vendors": {
+      "get": {
+        "summary": "View all vendors",
+        "description": "Display \"All vendors\" page.",
+        "tags": [
+          "View all vendors"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/orders": {
+      "get": {
+        "summary": "View my orders",
+        "description": "Display \"My orders\" page.",
+        "tags": [
+          "View my orders"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/admin/vendors/new": {
       "get": {
         "summary": "View create vendor",
@@ -1338,34 +1383,6 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The requested resource"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/api/v1/products/get-product-delivery-methods": {
-      "post": {
-        "summary": "Get product delivery methods",
-        "description": "Get the delivery methods for an array of products.",
-        "tags": [
-          "Get product delivery methods"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "productids",
-            "required": true,
-            "schema": {}
           }
         ],
         "responses": {
@@ -1477,32 +1494,22 @@
         }
       }
     },
-    "/api/v1/orders/payment-submitted": {
-      "post": {
-        "summary": "Payment submitted",
-        "description": "Called by the frontend when the payment has been made.",
+    "/api/v1/orders/get-order-status": {
+      "get": {
+        "summary": "Get order status",
         "tags": [
-          "Payment submitted"
+          "Get order status"
         ],
         "parameters": [
           {
             "in": "query",
             "name": "orderId",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "number",
               "format": "double"
             },
-            "description": "The ID of the order that has been paid for."
-          },
-          {
-            "in": "query",
-            "name": "jobId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "The job ID of the payment."
+            "description": "ID of the order"
           }
         ],
         "responses": {
@@ -1599,7 +1606,7 @@
           },
           {
             "in": "query",
-            "name": "walletId",
+            "name": "walletAddress",
             "required": true,
             "schema": {
               "type": "string",
@@ -1734,7 +1741,7 @@
           },
           {
             "in": "query",
-            "name": "walletId",
+            "name": "walletAddress",
             "required": true,
             "schema": {
               "type": "string",
@@ -2464,29 +2471,19 @@
         }
       }
     },
-    "/api/v1/discounts/check-discount-code/{discountCode}": {
-      "get": {
-        "summary": "Check discount code",
-        "description": "Checks the validity of the discount code and, if valid, returns the details.",
+    "/api/v1/admin/create-product-category": {
+      "post": {
+        "summary": "Create product category",
         "tags": [
-          "Check discount code"
+          "Create product category"
         ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "discountCode",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "The requested resource"
           },
           "404": {
-            "description": "Not found"
+            "description": "Resource not found"
           },
           "500": {
             "description": "Internal server error"
@@ -2526,16 +2523,47 @@
         }
       }
     },
-    "/api/v1/orders/subscribe-to-order/{orderId}": {
+    "/api/v1/discounts/check-discount-code/{discountCode}": {
       "get": {
-        "summary": "Subscribe to order",
+        "summary": "Check discount code",
+        "description": "Checks the validity of the discount code and, if valid, returns the details.",
         "tags": [
-          "Subscribe to order"
+          "Check discount code"
         ],
         "parameters": [
           {
             "in": "path",
-            "name": "orderId",
+            "name": "discountCode",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/vendors/{vendorid}": {
+      "get": {
+        "summary": "View vendor menu",
+        "description": "Display \"Vendor menu\" page.",
+        "tags": [
+          "View vendor menu"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "vendorid",
             "required": true,
             "schema": {
               "type": "number",
@@ -2545,7 +2573,23 @@
         ],
         "responses": {
           "200": {
-            "description": "The requested resource"
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
           },
           "404": {
             "description": "Resource not found"
@@ -2655,121 +2699,6 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/vendors/{vendorid}": {
-      "get": {
-        "summary": "View vendor menu",
-        "description": "Display \"Vendor menu\" page.",
-        "tags": [
-          "View vendor menu"
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "vendorid",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "type": "string",
-                      "description": "Success"
-                    },
-                    {
-                      "type": "string",
-                      "description": "Success"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/orders/{orderId}": {
-      "get": {
-        "summary": "View order confirmation",
-        "description": "Display \"Order confirmation\" page.",
-        "tags": [
-          "View order confirmation"
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "orderId",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "type": "string",
-                      "description": "Success"
-                    },
-                    {
-                      "type": "string",
-                      "description": "Success"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/": {
-      "get": {
-        "summary": "View homepage",
-        "description": "Display homepage.",
-        "tags": [
-          "View homepage"
-        ],
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Success"
           },
           "404": {
             "description": "Resource not found"

@@ -33,14 +33,14 @@ module.exports.bootstrap = async function() {
   } //•
 
   var vendorCategory = await VendorCategory.create({
-    name: 'Test Category',
+    name: 'Delis',
   }).fetch();
 
   var delifonseca = await Vendor.create({
     name: 'Delifonseca',
     type: 'restaurant',
     description: 'Life\'s too short to have a bad meal. Delifonseca is here to help you enjoy the finer tastes in life.',
-    walletId: '0xf039CD9391cB28a7e632D07821deeBc249a32410',
+    walletAddress: '0xf039CD9391cB28a7e632D07821deeBc249a32410',
     imageFd: __dirname + '/../assets/images/vendors/spitroast.jpg',
     imageMime: 'image/jpeg',
     status: 'active',
@@ -66,7 +66,8 @@ module.exports.bootstrap = async function() {
     dayOfWeek: 'thursday',
     openTime: '09:00',
     closeTime: '17:00',
-    fulfilmentMethod: fulfilmentMethod.id
+    fulfilmentMethod: fulfilmentMethod.id,
+    isOpen: true
   });
 
   var burnsNight = await Product.create({
@@ -77,6 +78,7 @@ module.exports.bootstrap = async function() {
     vendor: delifonseca.id,
     imageFd: __dirname + '/../assets/images/products/1.jpeg',
     imageMime: 'image/jpeg',
+    category: productCategory.id
   }).fetch();
 
   var starterOption = await ProductOption.create({
@@ -159,6 +161,12 @@ module.exports.bootstrap = async function() {
     isAvailable: true,
     option: dessertOption.id
   }]);
+
+  var discountCode = await Discount.create({
+    code: 'DELI10',
+    percentage: 10,
+    isEnabled: true
+  });
 
   // Save new bootstrap version
   await sails.helpers.fs.writeJson.with({

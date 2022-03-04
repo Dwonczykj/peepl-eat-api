@@ -24,7 +24,7 @@ module.exports = {
     var orders = [];
     var hasOrders = false;
 
-    /* var isVendor = await Vendor.findOne({walletId: this.req.session.walletId});
+    /* var isVendor = await Vendor.findOne({walletAddress: this.req.session.walletAddress});
 
     if(isVendor) {
       return this.res.redirect('/admin/orders');
@@ -37,7 +37,7 @@ module.exports = {
     // Respond with view or JSON.
     if(this.req.wantsJSON) {
       return exits.successJSON(
-        {vendors, hasOrders}
+        {vendors}
       );
     } else {
       return exits.success({vendors, hasOrders});

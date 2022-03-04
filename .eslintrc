@@ -50,7 +50,11 @@
     "ProductOptionValue": true,
     "User": true,
     "Vendor": true,
-    "Discount": true
+    "Discount": true,
+    "FulfilmentMethod": true,
+    "OpeningHours": true,
+    "ProductCategory": true,
+    "VendorCategory": true
     // …and any others (e.g. `"Organization": true`)
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   },

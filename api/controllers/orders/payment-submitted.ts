@@ -62,7 +62,7 @@ module.exports = {
         } else {
           // Validations
           // Incorrect Recipient
-          if(paymentRecipientWallet !== orderDetails.items[0].product.vendor.walletId) {
+          if(paymentRecipientWallet !== orderDetails.items[0].product.vendor.walletAddress) {
             error = 'Recipient doesn\'t match!';
             sails.sockets.broadcast('order' + orderDetails.id, 'paymentError', {orderId: orderDetails.id, message: error});
             return exits.error({message: error});

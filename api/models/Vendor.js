@@ -32,7 +32,7 @@ module.exports = {
       required: false,
       maxLength: 200
     },
-    walletId: {
+    walletAddress: {
       type: 'string',
       description: 'The blockchain wallet address for the vendor. Used to distribute payments from customers.',
       required: true,
@@ -101,11 +101,15 @@ module.exports = {
       collection: 'product',
       via: 'vendor'
     },
-    collectionFulfilmentMethod: {
+    /* collectionFulfilmentMethod: {
       model: 'fulfilmentmethod'
     },
     deliveryCollectionMethod: {
       model: 'fulfilmentmethod'
+    }, */
+    fulfilmentMethods: {
+      collection: 'fulfilmentmethod',
+      via: 'vendor'
     },
     vendorCategories: {
       collection: 'vendorcategory',

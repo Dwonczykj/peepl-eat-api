@@ -28,7 +28,7 @@ module.exports = {
       type: 'ref',
       required: true
     },
-    walletId: {
+    walletAddress: {
       type: 'string',
       required: true,
       regex: /^0x[a-fA-F0-9]{40}$/
@@ -88,7 +88,7 @@ module.exports = {
       name: inputs.name,
       description: inputs.description,
       type: inputs.type,
-      walletId: inputs.walletId,
+      walletAddress: inputs.walletAddress,
       deliveryRestrictionDetails: inputs.deliveryRestrictionDetails
     }).fetch();
 

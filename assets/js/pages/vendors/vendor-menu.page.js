@@ -224,7 +224,7 @@ parasails.registerPage('vendor-menu', {
         action: 'pay',
         amount: (this.finalTotal) / 100, //Pence to pounds
         currency: 'GBPX',
-        destination: this.vendor.walletId,
+        destination: this.vendor.walletAddress,
         orderId: result.toString()
       };
 

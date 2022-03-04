@@ -31,7 +31,7 @@ module.exports = {
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
     vendors: {
       collection: 'vendor',
-      via: 'category'
+      via: 'vendorCategories'
     }
   },
 

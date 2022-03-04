@@ -8,7 +8,10 @@ module.exports = {
 
 
   inputs: {
-
+    orderId: {
+      type: 'number',
+      description: 'ID of the order'
+    }
   },
 
 
@@ -18,9 +21,10 @@ module.exports = {
 
 
   fn: async function (inputs) {
+    var order = await Order.findOne(inputs.orderId);
 
     // All done.
-    return;
+    return order;
 
   }
 

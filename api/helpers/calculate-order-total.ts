@@ -1,7 +1,6 @@
 declare var Order: any;
 declare var FulfilmentMethod: any;
 declare var Discount: any;
-declare var _: any;
 
 module.exports = {
 

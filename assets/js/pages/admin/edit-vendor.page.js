@@ -13,7 +13,7 @@ parasails.registerPage('admin-edit-vendor', {
       description: '',
       image: '',
       type: 'restaurant',
-      walletId: '0x',
+      walletAddress: '0x',
       deliveryRestrictionDetails: '',
       status: 'draft',
       products: []
@@ -30,7 +30,7 @@ parasails.registerPage('admin-edit-vendor', {
       },
       type: {
       },
-      walletId: {
+      walletAddress: {
         required: true,
         maxLength: 100,
         regex: /^0x[a-fA-F0-9]{40}$/

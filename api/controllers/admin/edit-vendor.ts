@@ -23,7 +23,7 @@ module.exports = {
     image:{
       type: 'ref',
     },
-    walletId: {
+    walletAddress: {
       type: 'string',
       required: true,
       regex: /^0x[a-fA-F0-9]{40}$/

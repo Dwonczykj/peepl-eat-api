@@ -1,9 +1,9 @@
 /* eslint-disable camelcase */
-declare var User: any;
 declare var OrderItemOptionValue: any;
 declare var OrderItem: any;
 declare var Order: any;
 declare var Discount: any;
+declare var _: any;
 const axios = require('axios').default;
 
 module.exports = {
@@ -158,13 +158,6 @@ module.exports = {
       .set({total: calculatedOrderTotal});
     }
 
-    /* // Subscribe calling websocket to order room
-    sails.sockets.join(this.req, 'order' + order.id, (err) => {
-      if(err) {
-        return exits.error();
-      }
-    }); */
-
 
     /* var user = await User.findOne({walletId: this.req.session.walletId});
 
@@ -220,17 +213,17 @@ module.exports = {
     // Create PaymentIntent on Peepl Pay
     // TODO: Move this to helper
 
-    /* const instance = axios.create({
-      baseURL: 'http://pay.itsaboutpeepl.com/api/v1',
+    const instance = axios.create({
+      baseURL: sails.config.custom.peeplPayUrl,
       // timeout: 1000,
-      headers: {'Authorization': 'Basic OlFGQVJYWVktMkRSNE0xMy1QM0ZUQ1BULTQ0TVQ1UTI='}
+      headers: {'Authorization': 'Basic ' + sails.config.custom.peeplAPIKey}
     });
 
     instance.post('/payment_intents', {
       amount: calculatedOrderTotal,
-      recipientWalletAddress: '0xf039CD9391cB28a7e632D07821deeBc249a32410',
-      vendorDisplayName: 'Peepl',
-      webhookAddress: 'http://app.itaboutpeepl.com/api/v1/orders/peepl-pay-webhook?wallet=test'
+      recipientWalletAddress: vendor.walletAddress,
+      vendorDisplayName: vendor.name,
+      webhookAddress: sails.config.custom.peeplWebhookAddress
     })
     .then(async (response) => {
       var paymentIntentId = response.data.paymentIntent.publicId;
@@ -242,9 +235,9 @@ module.exports = {
     })
     .catch((err) => {
       console.log(err);
-    }); */
-
-    return exits.success({orderID: order.id, paymentIntentID: undefined});
+      // TODO: Error handling in case this fails
+      return exits.error();
+    });
 
   }
 
