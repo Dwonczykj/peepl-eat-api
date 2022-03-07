@@ -4,7 +4,6 @@ declare var OrderItem: any;
 declare var Order: any;
 declare var Discount: any;
 declare var _: any;
-const axios = require('axios').default;
 
 module.exports = {
 
@@ -66,6 +65,8 @@ module.exports = {
     /* var mailchimp = require('@mailchimp/mailchimp_marketing');
     var md5 = require('md5'); */
 
+    // TODO: Validation (products belong to vendor, fulfilmentMethod belongs to vendor, timeslot is valid, options are related to products, optionvalues are valid for options)
+
     var vendor = await Vendor.findOne(inputs.vendor);
 
     if(!vendor) {
@@ -120,7 +121,12 @@ module.exports = {
         fulfilmentMethod: inputs.fulfilmentMethod,
         fulfilmentSlotFrom: inputs.fulfilmentSlotFrom,
         fulfilmentSlotTo: inputs.fulfilmentSlotTo,
-      }).fetch();
+      }).fetch()
+      .intercept({name: 'UsageError'}, (err) => {
+        console.log(err);
+        // TODO: Give more specific error
+        return 'invalid';
+      });
     } else {
       order = await Order.create({
         total: inputs.total,
@@ -137,9 +143,15 @@ module.exports = {
         fulfilmentMethod: inputs.fulfilmentMethod,
         fulfilmentSlotFrom: inputs.fulfilmentSlotFrom,
         fulfilmentSlotTo: inputs.fulfilmentSlotTo,
-      }).fetch();
+      }).fetch()
+      .intercept({name: 'UsageError'}, (err) => {
+        console.log(err);
+        // TODO: Give more specific error
+        return 'invalid';
+      });
     }
 
+    // Strip unneccesary data from order items
     var updatedItems = _.map(inputs.items, (object) => {
       object.product = object.id;
       object.order = order.id;
@@ -147,45 +159,18 @@ module.exports = {
       return _.pick(object, ['order', 'product', 'optionValues']);
     });
 
+    // Create each order item
     await OrderItem.createEach(updatedItems);
 
     // Calculate the order total on the backend
     var calculatedOrderTotal = await sails.helpers.calculateOrderTotal.with({orderId: order.id});
 
+    // If frontend total is incorrect
     if(order.total !== calculatedOrderTotal) {
       // TODO: Log any instances of this, as it shouldn't happen (indicated frontend logic error)
       await Order.updateOne(order.id)
       .set({total: calculatedOrderTotal});
     }
-
-
-    /* var user = await User.findOne({walletId: this.req.session.walletId});
-
-    // Create or update user record by walletId
-    if(!user){
-      await User.create({
-        walletId: this.req.session.walletId,
-        name: inputs.address.name,
-        email: inputs.address.email,
-        phoneNumber: inputs.address.phoneNumber,
-        addressLineOne: inputs.address.lineOne,
-        addressLineTwo: inputs.address.lineTwo,
-        postcode: inputs.address.postCode,
-        marketingOptIn: inputs.marketingOptIn
-      });
-    } else {
-      if(user.marketingOptIn) {inputs.marketingOptIn = true;} // Ignore missing opt-in if user already opted in
-      await User.updateOne(user.id)
-      .set({
-        name: inputs.address.name,
-        email: inputs.address.email,
-        phoneNumber: inputs.address.phoneNumber,
-        addressLineOne: inputs.address.lineOne,
-        addressLineTwo: inputs.address.lineTwo,
-        postcode: inputs.address.postCode,
-        marketingOptIn: inputs.marketingOptIn
-      });
-    } */
 
     /* if(inputs.marketingOptIn) {
       mailchimp.setConfig({
@@ -211,33 +196,16 @@ module.exports = {
 
 
     // Create PaymentIntent on Peepl Pay
-    // TODO: Move this to helper
+    var paymentIntentId = await sails.helpers.createPaymentIntent(calculatedOrderTotal,
+      vendor.walletAddress,
+      vendor.name
+    );
 
-    const instance = axios.create({
-      baseURL: sails.config.custom.peeplPayUrl,
-      // timeout: 1000,
-      headers: {'Authorization': 'Basic ' + sails.config.custom.peeplAPIKey}
-    });
+    await Order.updateOne(order.id)
+    .set({paymentIntentId: paymentIntentId});
 
-    instance.post('/payment_intents', {
-      amount: calculatedOrderTotal,
-      recipientWalletAddress: vendor.walletAddress,
-      vendorDisplayName: vendor.name,
-      webhookAddress: sails.config.custom.peeplWebhookAddress
-    })
-    .then(async (response) => {
-      var paymentIntentId = response.data.paymentIntent.publicId;
-      await Order.updateOne(order.id)
-      .set({paymentIntentId: paymentIntentId});
-
-      // All done.
-      return exits.success({orderID: order.id, paymentIntentID: paymentIntentId});
-    })
-    .catch((err) => {
-      console.log(err);
-      // TODO: Error handling in case this fails
-      return exits.error();
-    });
+    // All done.
+    return exits.success({orderID: order.id, paymentIntentID: paymentIntentId});
 
   }
 

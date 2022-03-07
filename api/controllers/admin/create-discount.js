@@ -39,6 +39,7 @@ module.exports = {
     inputs.code = inputs.code.toUpperCase();
 
     var newDiscount = await Discount.create(inputs).fetch();
+    // TODO: Handling uniqueness error from database query
 
     // All done.
     return exits.success({

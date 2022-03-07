@@ -20,19 +20,6 @@ module.exports = {
 
   fn: async function (inputs, exits) {
     var vendors = await Vendor.find({status: 'active'});
-    // var orders = await Order.find({customerWalletAddress: this.req.session.walletId, paidDateTime: {'>': 0}});
-    var orders = [];
-    var hasOrders = false;
-
-    /* var isVendor = await Vendor.findOne({walletAddress: this.req.session.walletAddress});
-
-    if(isVendor) {
-      return this.res.redirect('/admin/orders');
-    } */
-
-    if(orders.length > 0){
-      hasOrders = true;
-    }
 
     // Respond with view or JSON.
     if(this.req.wantsJSON) {
@@ -40,7 +27,7 @@ module.exports = {
         {vendors}
       );
     } else {
-      return exits.success({vendors, hasOrders});
+      return exits.success({vendors, hasOrders: false});
     }
   }
 };

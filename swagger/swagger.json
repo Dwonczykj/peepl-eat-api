@@ -1517,7 +1517,7 @@
             "description": "The requested resource"
           },
           "404": {
-            "description": "Resource not found"
+            "description": "Not found"
           },
           "500": {
             "description": "Internal server error"

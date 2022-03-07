@@ -16,15 +16,21 @@ module.exports = {
 
 
   exits: {
-
+    notFound: {
+      responseType: 'notFound'
+    }
   },
 
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
     var order = await Order.findOne(inputs.orderId);
 
-    // All done.
-    return order;
+    if(order){
+      // All done.
+      return exits.success(order);
+    } else {
+      return exits.notFound();
+    }
 
   }
 
