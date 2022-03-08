@@ -19,11 +19,48 @@ parasails.registerPage('admin-edit-vendor', {
       products: []
     },
     openingHours: [{
-      dayOfWeek: '',
-      openTime: '',
-      closeTime: '',
-      isOpen: true
-    }],
+        dayOfWeek: 'monday',
+        openTime: '',
+        closeTime: '',
+        isOpen: true
+      },
+      {
+        dayOfWeek: 'tuesday',
+        openTime: '',
+        closeTime: '',
+        isOpen: true
+      },
+      {
+        dayOfWeek: 'wednesday',
+        openTime: '',
+        closeTime: '',
+        isOpen: true
+      },
+      {
+        dayOfWeek: 'thursday',
+        openTime: '',
+        closeTime: '',
+        isOpen: true
+      },
+      {
+        dayOfWeek: 'friday',
+        openTime: '',
+        closeTime: '',
+        isOpen: true
+      },
+      {
+        dayOfWeek: 'saturday',
+        openTime: '',
+        closeTime: '',
+        isOpen: true
+      },
+      {
+        dayOfWeek: 'sunday',
+        openTime: '',
+        closeTime: '',
+        isOpen: true
+      },
+    ],
     previewImageSrc: '',
     formRules: {
       name: {

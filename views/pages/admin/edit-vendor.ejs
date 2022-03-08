@@ -84,9 +84,13 @@
     <!-- <ajax-form :form-data="openingHours" :syncing.sync="syncing" :form-rules="formRules" :form-errors.sync="formErrors" :cloud-error.sync="cloudError" @submitted="vendorSubmitted" :action="(vendor.id) ?  'editVendor' : 'createVendor'"></ajax-form> -->
     <fieldset>
       <h2 class="h5 mt-3">Opening Hours</h2>
-      <div v-for="(day, index) in ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']">
-        <input type="checkbox" :id=day v-model="openingHours[index].isOpen">
-        <label :for=day>{{day}} {{index}}</label>
+      <div v-for="(hours, index) in openingHours">
+        <input type="checkbox" :id=hours.dayOfWeek v-model="hours.isOpen">
+        <label :for=hours.dayOfWeek>{{hours.dayOfWeek}}</label>
+        <label for="appt">Select opening time:</label>
+        <input type="time" id="appt" name="appt" v-model="hours.openTime" :disabled="!hours.isOpen">
+        <label for="appt">Select closing time:</label>
+        <input type="time" id="appt" name="appt" v-model="hours.closeTime" :disabled="!hours.isOpen">
       </div>
     </fieldset>
     <!-- </ajax-form> -->
