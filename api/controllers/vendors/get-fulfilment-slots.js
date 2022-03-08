@@ -30,26 +30,26 @@ module.exports = {
     // var dt = new moment(inputs.date, 'DD/MM/YYYY'); // Moment version of date
     // var dayOfWeek = dt.format('dddd').toLowerCase(); // e.g. monday
 
+    // TODO: Need to return delivery pricing
+    // TODO: Postcode restrictions
+
     var deliverySlots = [];
     var collectionSlots = [];
 
-    var deliveryFulfilmentMethod = await FulfilmentMethod.find({vendor: inputs.vendor, methodType: 'delivery'}).limit(1);
-    if(deliveryFulfilmentMethod.length > 0){
-      deliverySlots = await sails.helpers.getAvailableSlots(inputs.date, deliveryFulfilmentMethod[0].id);
+    var vendor = await Vendor.findOne(inputs.vendor);
+
+    if(vendor.deliveryFulfilmentMethod){
+      deliverySlots = await sails.helpers.getAvailableSlots(inputs.date, vendor.deliveryFulfilmentMethod);
     }
 
-    var collectionFulfilmentMethod = await FulfilmentMethod.find({vendor: inputs.vendor, methodType: 'collection'}).limit(1);
-    if(collectionFulfilmentMethod.length > 0){
-      collectionSlots = await sails.helpers.getAvailableSlots(inputs.date, collectionFulfilmentMethod[0].id);
+    if(vendor.collectionFulfilmentMethod){
+      collectionSlots = await sails.helpers.getAvailableSlots(inputs.date, vendor.collectionFulfilmentMethod);
     }
 
-
-    // All done.
     return {
       deliverySlots,
       collectionSlots
     };
-
   }
 
 

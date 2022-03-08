@@ -1032,12 +1032,21 @@
               "$ref": "#/components/schemas/product"
             }
           },
-          "fulfilmentMethods": {
-            "description": "Array of **fulfilmentmethod**'s or array of FK's when creating / updating / not populated",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/fulfilmentmethod"
-            }
+          "collectionFulfilmentMethod": {
+            "description": "JSON dictionary representing the **fulfilmentmethod** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/fulfilmentmethod"
+              }
+            ]
+          },
+          "deliveryFulfilmentMethod": {
+            "description": "JSON dictionary representing the **fulfilmentmethod** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/fulfilmentmethod"
+              }
+            ]
           },
           "vendorCategories": {
             "description": "Array of **vendorcategory**'s or array of FK's when creating / updating / not populated",
