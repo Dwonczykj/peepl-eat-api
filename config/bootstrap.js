@@ -70,6 +70,8 @@ module.exports.bootstrap = async function() {
     isOpen: true
   });
 
+  await Vendor.updateOne(delifonseca.id, {deliveryFulfilmentMethod: fulfilmentMethod.id});
+
   var burnsNight = await Product.create({
     name: 'Burns Night - Dine @ Home (For 1)',
     description: 'Unfortunately, this year the 25th falls on a Monday. You won’t be able to join us, so we\'ve made our Dine@home Burns inspired instead.',

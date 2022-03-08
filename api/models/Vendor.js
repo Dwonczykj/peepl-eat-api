@@ -101,16 +101,16 @@ module.exports = {
       collection: 'product',
       via: 'vendor'
     },
-    /* collectionFulfilmentMethod: {
+    collectionFulfilmentMethod: {
       model: 'fulfilmentmethod'
     },
-    deliveryCollectionMethod: {
+    deliveryFulfilmentMethod: {
       model: 'fulfilmentmethod'
-    }, */
-    fulfilmentMethods: {
-      collection: 'fulfilmentmethod',
-      via: 'vendor'
     },
+    // fulfilmentMethods: {
+    //   collection: 'fulfilmentmethod',
+    //   via: 'vendor'
+    // },
     vendorCategories: {
       collection: 'vendorcategory',
       via: 'vendors'
