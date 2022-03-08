@@ -307,8 +307,7 @@
           "specialDate": {
             "type": "string",
             "format": "date",
-            "description": "Specific date override - for example Christmas day",
-            "uniqueItems": true
+            "description": "Specific date override - for example Christmas day"
           },
           "openTime": {},
           "closeTime": {},

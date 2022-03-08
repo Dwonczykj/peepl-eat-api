@@ -81,6 +81,16 @@
       </div>
     </fieldset>
 
+    <!-- <ajax-form :form-data="openingHours" :syncing.sync="syncing" :form-rules="formRules" :form-errors.sync="formErrors" :cloud-error.sync="cloudError" @submitted="vendorSubmitted" :action="(vendor.id) ?  'editVendor' : 'createVendor'"></ajax-form> -->
+    <fieldset>
+      <h2 class="h5 mt-3">Opening Hours</h2>
+      <div v-for="(day, index) in ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']">
+        <input type="checkbox" :id=day v-model="openingHours[index].isOpen">
+        <label :for=day>{{day}} {{index}}</label>
+      </div>
+    </fieldset>
+    <!-- </ajax-form> -->
+
   </div>
 </div>
 <%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>

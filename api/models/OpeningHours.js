@@ -21,7 +21,7 @@ module.exports = {
       type: 'ref',
       columnType: 'date',
       description: 'Specific date override - for example Christmas day',
-      unique: true
+      // unique: true
     },
     openTime: {
       type: 'ref',

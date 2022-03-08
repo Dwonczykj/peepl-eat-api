@@ -18,6 +18,12 @@ parasails.registerPage('admin-edit-vendor', {
       status: 'draft',
       products: []
     },
+    openingHours: [{
+      dayOfWeek: '',
+      openTime: '',
+      closeTime: '',
+      isOpen: true
+    }],
     previewImageSrc: '',
     formRules: {
       name: {
