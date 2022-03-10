@@ -55,6 +55,7 @@ module.exports.routes = {
   'GET /admin/vendors/:vendorid': { action: 'admin/view-edit-vendor' },
   'GET /admin/orders': { action: 'admin/view-all-orders' },
   'GET /admin/discount-codes': { action: 'admin/view-discount-codes' },
+  'GET /admin/approve-order/:orderId': { action: 'admin/view-approve-order' },
 
   'POST /api/v1/admin/create-vendor': { action: 'admin/create-vendor' },
   'POST /api/v1/admin/edit-vendor': { action: 'admin/edit-vendor' },
