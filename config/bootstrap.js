@@ -44,6 +44,7 @@ module.exports.bootstrap = async function() {
     imageFd: __dirname + '/../assets/images/vendors/spitroast.jpg',
     imageMime: 'image/jpeg',
     status: 'active',
+    phoneNumber: '+447495995614',
     vendorCategories: [vendorCategory.id]
   }).fetch();
 

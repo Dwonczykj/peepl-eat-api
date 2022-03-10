@@ -104,6 +104,7 @@ module.exports = {
 
     // TODO: Validate that fulfilment method belongs to vendor
     // TODO: Validate fulfilment slot times
+    // TODO: Test this validation
     if(discount) {
       order = await Order.create({
         total: inputs.total,
@@ -196,16 +197,16 @@ module.exports = {
 
 
     // Create PaymentIntent on Peepl Pay
-    var paymentIntentId = await sails.helpers.createPaymentIntent(calculatedOrderTotal,
+    var newPaymentIntent = await sails.helpers.createPaymentIntent(calculatedOrderTotal,
       vendor.walletAddress,
       vendor.name
     );
 
     await Order.updateOne(order.id)
-    .set({paymentIntentId: paymentIntentId});
+    .set({paymentIntentId: newPaymentIntent.paymentIntentId});
 
     // All done.
-    return exits.success({orderID: order.id, paymentIntentID: paymentIntentId});
+    return exits.success({orderID: order.id, paymentIntentID: newPaymentIntent.paymentIntentId});
 
   }
 

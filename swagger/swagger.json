@@ -110,6 +110,9 @@
     },
     {
       "name": "View edit vendor"
+    },
+    {
+      "name": "View approve order"
     }
   ],
   "components": {
@@ -926,7 +929,8 @@
           {
             "required": [
               "name",
-              "walletAddress"
+              "walletAddress",
+              "phoneNumber"
             ]
           }
         ]
@@ -996,7 +1000,6 @@
           },
           "phoneNumber": {
             "type": "string",
-            "nullable": true,
             "description": "Phone number of the restaurant."
           },
           "pickupAddressLineOne": {
@@ -2768,6 +2771,38 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/admin/approve-order/{orderId}": {
+      "get": {
+        "summary": "View approve order",
+        "description": "Display \"Approve order\" page.",
+        "tags": [
+          "View approve order"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "orderId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "The order to be approved or declined."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
           },
           "404": {
             "description": "Resource not found"

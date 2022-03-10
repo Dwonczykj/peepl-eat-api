@@ -10,8 +10,8 @@
               <ol v-if="item.optionValues && item.optionValues.length" class="order-confirmation__option-values">
                 <li v-for="optionValue in item.optionValues"><b>{{optionValue.option.name}}</b>: {{optionValue.optionValue.name}}</li>
               </ol>
-              <h2 class="h6 border-top pt-3 mt-3 mb-0"><b>Delivery:</b> {{item.deliveryMethod.name}}</h2>
-              <b>Slot:</b> {{item.deliverySlot.startTime | formatDeliverySlot}} - {{item.deliverySlot.endTime | formatDeliverySlot}}</p>
+              <h2 class="h6 border-top pt-3 mt-3 mb-0"><b>Delivery:</b> </h2>
+              
             </div>
             <p><b>Name:</b> {{order.deliveryName}}
             <br><b>Email:</b> {{order.deliveryEmail}}

@@ -59,7 +59,7 @@ module.exports = {
     phoneNumber: {
       type: 'string',
       description: 'Phone number of the restaurant.',
-      allowNull: true
+      required: true
     },
     pickupAddressLineOne: {
       type: 'string',

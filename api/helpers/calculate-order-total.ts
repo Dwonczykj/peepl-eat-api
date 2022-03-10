@@ -44,6 +44,7 @@ module.exports = {
     workingTotal += fulfilmentMethod.priceModifier;
 
     if(order.discount) {
+      // TODO: Round to nearest whole number
       var discount = await Discount.findOne(order.discount);
 
       if(discount && discount.percentage) {
