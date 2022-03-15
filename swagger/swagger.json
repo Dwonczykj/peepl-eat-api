@@ -97,6 +97,9 @@
       "name": "Create or Update Opening Hours"
     },
     {
+      "name": "Approve or decline order"
+    },
+    {
       "name": "Get product options"
     },
     {
@@ -446,6 +449,18 @@
             "format": "date-time",
             "description": "The end of the estimated fulfilment slot."
           },
+          "publicId": {
+            "type": "string"
+          },
+          "tipAmount": {
+            "type": "number",
+            "format": "double",
+            "description": "Amount of tip in pence"
+          },
+          "restaurantAccepted": {
+            "type": "boolean",
+            "default": false
+          },
           "fulfilmentMethod": {
             "description": "JSON dictionary representing the **fulfilmentmethod** instance or FK when creating / updating / not populated",
             "oneOf": [
@@ -591,6 +606,46 @@
                 "$ref": "#/components/schemas/orderitem"
               }
             ]
+          }
+        }
+      },
+      "postaldistrict": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/postaldistrict-without-required-constraint"
+          }
+        ]
+      },
+      "postaldistrict-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **PostalDistrict**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "outcode": {
+            "type": "string",
+            "description": "The outcode for any post codes within this district.",
+            "example": "L1"
+          },
+          "vendors": {
+            "description": "Array of **vendor**'s or array of FK's when creating / updating / not populated",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/vendor"
+            }
           }
         }
       },
@@ -1067,6 +1122,13 @@
             "items": {
               "$ref": "#/components/schemas/productcategory"
             }
+          },
+          "fulfilmentPostalDistricts": {
+            "description": "Array of **postaldistrict**'s or array of FK's when creating / updating / not populated",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/postaldistrict"
+            }
           }
         }
       },
@@ -1286,7 +1348,16 @@
         "tags": [
           "View all vendors"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "outcode",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -1308,7 +1379,7 @@
             }
           },
           "404": {
-            "description": "Resource not found"
+            "description": "Not found"
           },
           "500": {
             "description": "Internal server error"
@@ -1492,6 +1563,15 @@
             "required": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "tipAmount",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
             }
           }
         ],
@@ -2563,6 +2643,44 @@
         }
       }
     },
+    "/api/v1/admin/approve-or-decline-order": {
+      "post": {
+        "summary": "Approve or decline order",
+        "tags": [
+          "Approve or decline order"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "orderId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Public ID for the order."
+          },
+          {
+            "in": "query",
+            "name": "restaurantAccepted",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested resource"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/api/v1/products/get-product-options/{productId}": {
       "get": {
         "summary": "Get product options",
@@ -2794,8 +2912,7 @@
             "name": "orderId",
             "required": true,
             "schema": {
-              "type": "number",
-              "format": "double"
+              "type": "string"
             },
             "description": "The order to be approved or declined."
           }

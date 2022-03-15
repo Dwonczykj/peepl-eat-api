@@ -41,7 +41,6 @@ module.exports = {
       from: 'VegiApp'
     })
     .then((message) => {
-      console.log(message.sid);
       return message.sid;
     })
     .catch((err) => {

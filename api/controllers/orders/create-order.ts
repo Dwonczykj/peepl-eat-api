@@ -53,6 +53,10 @@ module.exports = {
       type: 'string',
       required: true
     },
+    tipAmount: {
+      type: 'number',
+      required: false
+    }
   },
 
 
@@ -122,6 +126,7 @@ module.exports = {
         fulfilmentMethod: inputs.fulfilmentMethod,
         fulfilmentSlotFrom: inputs.fulfilmentSlotFrom,
         fulfilmentSlotTo: inputs.fulfilmentSlotTo,
+        tipAmount: inputs.tipAmount
       }).fetch()
       .intercept({name: 'UsageError'}, (err) => {
         console.log(err);
@@ -144,6 +149,7 @@ module.exports = {
         fulfilmentMethod: inputs.fulfilmentMethod,
         fulfilmentSlotFrom: inputs.fulfilmentSlotFrom,
         fulfilmentSlotTo: inputs.fulfilmentSlotTo,
+        tipAmount: inputs.tipAmount
       }).fetch()
       .intercept({name: 'UsageError'}, (err) => {
         console.log(err);
@@ -169,6 +175,7 @@ module.exports = {
     // If frontend total is incorrect
     if(order.total !== calculatedOrderTotal) {
       // TODO: Log any instances of this, as it shouldn't happen (indicated frontend logic error)
+      console.log('Order total mismatch');
       await Order.updateOne(order.id)
       .set({total: calculatedOrderTotal});
     }
@@ -204,6 +211,8 @@ module.exports = {
 
     await Order.updateOne(order.id)
     .set({paymentIntentId: newPaymentIntent.paymentIntentId});
+
+    await sails.helpers.sendSmsNotification.with({body: 'You have received a new order from Vegi for delivery between ' + inputs.fulfilmentSlotFrom + ' and ' + inputs.fulfilmentSlotTo + '. To accept or decline: ' + sails.config.custom.baseUrl + '/admin/approve-order/' + order.publicId, to: vendor.phoneNumber});
 
     // All done.
     return exits.success({orderID: order.id, paymentIntentID: newPaymentIntent.paymentIntentId});

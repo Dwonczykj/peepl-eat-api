@@ -4,7 +4,7 @@
  * @description :: A model definition represents a database table/collection.
  * @docs        :: https://sailsjs.com/docs/concepts/models-and-orm/models
  */
-
+const { v4: uuidv4 } = require('uuid');
 module.exports = {
 
   attributes: {
@@ -92,6 +92,17 @@ module.exports = {
       columnType: 'datetime',
       description: 'The end of the estimated fulfilment slot.'
     },
+    publicId: {
+      type: 'string'
+    },
+    tipAmount: {
+      type: 'number',
+      description: 'Amount of tip in pence'
+    },
+    restaurantAccepted: {
+      type: 'boolean',
+      defaultsTo: false
+    },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
@@ -122,5 +133,10 @@ module.exports = {
     },
 
   },
+
+  beforeCreate: function(valuesToSet, proceed) {
+    valuesToSet.publicId = uuidv4();
+    return proceed();
+  }
 
 };

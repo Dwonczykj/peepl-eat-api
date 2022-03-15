@@ -8,7 +8,7 @@ module.exports = {
 
   inputs:{
     orderId: {
-      type: 'number',
+      type: 'string',
       description: 'The order to be approved or declined.',
       required: true
     }
@@ -24,7 +24,8 @@ module.exports = {
 
 
   fn: async function (inputs) {
-    var order = await Order.findOne(inputs.orderId);
+    var order = await Order.findOne({publicId: inputs.orderId})
+    .populate('items.product&optionValues&optionValues.option&optionValue');
 
     // Respond with view.
     return {order};

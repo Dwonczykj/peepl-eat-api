@@ -30,7 +30,8 @@
     "sails-mysql": "^1.0.1",
     "sass": "^1.32.4",
     "ts-node": "^9.1.1",
-    "twilio": "^3.75.1"
+    "twilio": "^3.75.1",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.21.0",
