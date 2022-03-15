@@ -54,6 +54,8 @@ module.exports = {
       }
     }
 
+    workingTotal = workingTotal + order.tipAmount;
+
     return workingTotal;
   }
 
