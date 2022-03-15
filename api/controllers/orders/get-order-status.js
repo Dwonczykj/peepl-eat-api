@@ -27,7 +27,7 @@ module.exports = {
 
     if(order){
       // All done.
-      return exits.success(order);
+      return exits.success(order.paymentStatus);
     } else {
       return exits.notFound();
     }

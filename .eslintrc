@@ -54,7 +54,8 @@
     "FulfilmentMethod": true,
     "OpeningHours": true,
     "ProductCategory": true,
-    "VendorCategory": true
+    "VendorCategory": true,
+    "PostalDistrict": true
     // …and any others (e.g. `"Organization": true`)
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   },
