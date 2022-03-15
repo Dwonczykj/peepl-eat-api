@@ -118,6 +118,10 @@ module.exports = {
     productCategories: {
       collection: 'productcategory',
       via: 'vendor'
+    },
+    fulfilmentPostalDistricts: {
+      collection: 'postaldistrict',
+      via: 'vendors'
     }
   },
 

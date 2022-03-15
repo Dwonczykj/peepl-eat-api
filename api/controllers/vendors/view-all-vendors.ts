@@ -1,4 +1,5 @@
 declare var Vendor: any;
+declare var PostalDistrict: any;
 declare var Order: any;
 
 module.exports = {
@@ -7,6 +8,13 @@ module.exports = {
 
   description: 'Display "All vendors" page.',
 
+  inputs: {
+    outcode: {
+      type: 'string',
+      required: true
+    }
+  },
+
   exits: {
 
     success: {
@@ -14,20 +22,28 @@ module.exports = {
     },
     successJSON: {
       statusCode: 200,
+    },
+    notFound: {
+      responseType: 'notFound'
     }
 
   },
 
   fn: async function (inputs, exits) {
-    var vendors = await Vendor.find({status: 'active'});
+    var postalDistrict = await PostalDistrict.findOne({outcode: inputs.outcode})
+    .populate('vendors');
 
-    // Respond with view or JSON.
-    if(this.req.wantsJSON) {
-      return exits.successJSON(
-        {vendors}
-      );
+    if(postalDistrict){
+      // Respond with view or JSON.
+      if(this.req.wantsJSON) {
+        return exits.successJSON(
+          {vendors: postalDistrict.vendors}
+        );
+      } else {
+        return exits.success({vendors: postalDistrict.vendors});
+      }
     } else {
-      return exits.success({vendors, hasOrders: false});
+      return exits.notFound();
     }
   }
 };

@@ -33,8 +33,18 @@ module.exports.bootstrap = async function() {
   } //•
 
   var vendorCategory = await VendorCategory.create({
-    name: 'Delis',
+    name: 'Uncategorised',
   }).fetch();
+
+  var postalDistricts = await PostalDistrict.createEach([
+    {
+      outcode: 'L1'
+    }, {
+      outcode: 'L2'
+    }, {
+      outcode: 'L3'
+    }
+  ]).fetch();
 
   var delifonseca = await Vendor.create({
     name: 'Delifonseca',
@@ -45,11 +55,12 @@ module.exports.bootstrap = async function() {
     imageMime: 'image/jpeg',
     status: 'active',
     phoneNumber: '+447495995614',
-    vendorCategories: [vendorCategory.id]
+    vendorCategories: [vendorCategory.id],
+    fulfilmentPostalDistricts: [postalDistricts[0].id, postalDistricts[1].id, postalDistricts[2].id]
   }).fetch();
 
   var productCategory = await ProductCategory.create({
-    name: 'Test Product Category',
+    name: 'Lunch',
     vendor: delifonseca.id
   }).fetch();
 
