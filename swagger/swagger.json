@@ -55,6 +55,9 @@
       "name": "Peepl pay webhook"
     },
     {
+      "name": "Get order details"
+    },
+    {
       "name": "Create vendor"
     },
     {
@@ -349,6 +352,7 @@
               "deliveryPhoneNumber",
               "deliveryAddressLineOne",
               "deliveryAddressPostCode",
+              "customerWalletAddress",
               "fulfilmentMethod",
               "vendor"
             ]
@@ -421,6 +425,7 @@
           },
           "customerWalletAddress": {
             "type": "string",
+            "pattern": "^0x[a-fA-F0-9]{40}$",
             "description": "The wallet address of the customer."
           },
           "paymentStatus": {
@@ -1582,6 +1587,14 @@
               "type": "number",
               "format": "double"
             }
+          },
+          {
+            "in": "query",
+            "name": "walletAddress",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -1658,6 +1671,35 @@
           },
           "404": {
             "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/orders/get-order-details": {
+      "get": {
+        "summary": "Get order details",
+        "tags": [
+          "Get order details"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "orderId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested resource"
+          },
+          "404": {
+            "description": "Not found"
           },
           "500": {
             "description": "Internal server error"
