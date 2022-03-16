@@ -5,6 +5,13 @@ module.exports = {
 
   description: 'Display "My orders" page.',
 
+  inputs: {
+    walletId: {
+      type: 'string',
+      required: true
+    }
+  },
+
   exits: {
 
     success: {
@@ -17,7 +24,7 @@ module.exports = {
   },
 
   fn: async function (inputs, exits) {
-    var orders = await Order.find({customer: this.req.session.walletId, paidDateTime: {'>': 0}})
+    var orders = await Order.find({customerWalletAddress: inputs.walletId, paidDateTime: {'>': 0}})
     .populate('items.product&optionValues&optionValues.option&optionValue');
 
     // Respond with view or JSON.

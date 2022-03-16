@@ -1394,7 +1394,16 @@
         "tags": [
           "View my orders"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "walletId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
