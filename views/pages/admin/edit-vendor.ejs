@@ -84,14 +84,34 @@
     <!-- <ajax-form :form-data="openingHours" :syncing.sync="syncing" :form-rules="formRules" :form-errors.sync="formErrors" :cloud-error.sync="cloudError" @submitted="vendorSubmitted" :action="(vendor.id) ?  'editVendor' : 'createVendor'"></ajax-form> -->
     <fieldset>
       <h2 class="h5 mt-3">Opening Hours</h2>
-      <div v-for="(hours, index) in openingHours">
-        <input type="checkbox" :id=hours.dayOfWeek v-model="hours.isOpen">
-        <label :for=hours.dayOfWeek>{{hours.dayOfWeek}}</label>
-        <label for="appt">Select opening time:</label>
-        <input type="time" id="appt" name="appt" v-model="hours.openTime" :disabled="!hours.isOpen">
-        <label for="appt">Select closing time:</label>
-        <input type="time" id="appt" name="appt" v-model="hours.closeTime" :disabled="!hours.isOpen">
-      </div>
+      <input type="radio" id="collection" value="col" v-model="fulfilmethod">
+      <label for="collection">Collection</label>
+      <br>
+      <input type="radio" id="delivery" value="del" v-model="fulfilmethod">
+      <label for="delivery">Delivery</label>
+      <template v-if="fulfilmethod=='del'">
+        <ajax-form :form-data="delFul" :syncing.sync="syncing" :form-errors.sync="formErrors" :cloud-error.sync="cloudError" :action="createUpdateOpeninghours">
+          <div v-for="(hours, index) in delFul.openingHours">
+            <input type="checkbox" :id=hours.dayOfWeek v-model="hours.isOpen">
+            <label :for=hours.dayOfWeek>{{hours.dayOfWeek}}</label>
+            <label for="appt">Select opening time:</label>
+            <input type="time" id="appt" name="appt" v-model="hours.openTime" :disabled="!hours.isOpen">
+            <label for="appt">Select closing time:</label>
+            <input type="time" id="appt" name="appt" v-model="hours.closeTime" :disabled="!hours.isOpen">
+          </div>
+          <ajax-button class="btn btn-peepl mt-4" type="submit" :syncing="syncing" v-bind:class="{ 'is-loading': syncing }">Save changes</ajax-button>
+        </ajax-form>
+      </template>
+      <template v-else>
+        <div v-for="(hours, index) in colFul.openingHours">
+          <input type="checkbox" :id=hours.dayOfWeek v-model="hours.isOpen">
+          <label :for=hours.dayOfWeek>{{hours.dayOfWeek}}</label>
+          <label for="appt">Select opening time:</label>
+          <input type="time" id="appt" name="appt" v-model="hours.openTime" :disabled="!hours.isOpen">
+          <label for="appt">Select closing time:</label>
+          <input type="time" id="appt" name="appt" v-model="hours.closeTime" :disabled="!hours.isOpen">
+        </div>
+      </template>
     </fieldset>
     <!-- </ajax-form> -->
 

@@ -18,49 +18,6 @@ parasails.registerPage('admin-edit-vendor', {
       status: 'draft',
       products: []
     },
-    openingHours: [{
-        dayOfWeek: 'monday',
-        openTime: '',
-        closeTime: '',
-        isOpen: true
-      },
-      {
-        dayOfWeek: 'tuesday',
-        openTime: '',
-        closeTime: '',
-        isOpen: true
-      },
-      {
-        dayOfWeek: 'wednesday',
-        openTime: '',
-        closeTime: '',
-        isOpen: true
-      },
-      {
-        dayOfWeek: 'thursday',
-        openTime: '',
-        closeTime: '',
-        isOpen: true
-      },
-      {
-        dayOfWeek: 'friday',
-        openTime: '',
-        closeTime: '',
-        isOpen: true
-      },
-      {
-        dayOfWeek: 'saturday',
-        openTime: '',
-        closeTime: '',
-        isOpen: true
-      },
-      {
-        dayOfWeek: 'sunday',
-        openTime: '',
-        closeTime: '',
-        isOpen: true
-      },
-    ],
     previewImageSrc: '',
     formRules: {
       name: {
@@ -79,8 +36,9 @@ parasails.registerPage('admin-edit-vendor', {
         regex: /^0x[a-fA-F0-9]{40}$/
       },
       status: {
-      },
+      }
     },
+    fulfilmethod: "del"
   },
 
   //  ╦  ╦╔═╗╔═╗╔═╗╦ ╦╔═╗╦  ╔═╗
@@ -89,7 +47,8 @@ parasails.registerPage('admin-edit-vendor', {
   beforeMount: function() {
   },
   mounted: async function() {
-    _.extend(this, SAILS_LOCALS);
+    _.extend(this, SAILS_LOCALS); 
+    //TODO: Get current opening times
     this.vendor.image = '';
   },
 
