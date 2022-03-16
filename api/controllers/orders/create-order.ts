@@ -106,6 +106,7 @@ module.exports = {
       }
     }
 
+    // TODO: Check if vendor delivers to that area
     // TODO: Validate that fulfilment method belongs to vendor
     // TODO: Validate fulfilment slot times
     // TODO: Test this validation
