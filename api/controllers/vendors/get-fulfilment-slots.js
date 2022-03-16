@@ -36,19 +36,22 @@ module.exports = {
     var deliverySlots = [];
     var collectionSlots = [];
 
-    var vendor = await Vendor.findOne(inputs.vendor);
+    var vendor = await Vendor.findOne(inputs.vendor)
+    .populate('deliveryFulfilmentMethod&collectionFulfilmentMethod');
 
     if(vendor.deliveryFulfilmentMethod){
-      deliverySlots = await sails.helpers.getAvailableSlots(inputs.date, vendor.deliveryFulfilmentMethod);
+      deliverySlots = await sails.helpers.getAvailableSlots(inputs.date, vendor.deliveryFulfilmentMethod.id);
     }
 
     if(vendor.collectionFulfilmentMethod){
-      collectionSlots = await sails.helpers.getAvailableSlots(inputs.date, vendor.collectionFulfilmentMethod);
+      collectionSlots = await sails.helpers.getAvailableSlots(inputs.date, vendor.collectionFulfilmentMethod.id);
     }
 
     return {
-      deliverySlots,
-      collectionSlots
+      collectionMethod: vendor.collectionFulfilmentMethod,
+      deliveryMethod: vendor.deliveryFulfilmentMethod,
+      collectionSlots,
+      deliverySlots
     };
   }
 

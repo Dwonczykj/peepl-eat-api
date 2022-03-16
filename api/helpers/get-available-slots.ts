@@ -12,8 +12,8 @@ module.exports = {
   inputs: {
     date: {
       type: 'string',
-      description: 'The date for which time slots need to be generated. Format DD/MM/YYYY',
-      defaultsTo: '17/02/2022',
+      description: 'The date for which time slots need to be generated. Format YYYY-MM-DD',
+      defaultsTo: '2022-03-03',
     },
     fulfilmentMethodId: {
       type: 'number',
@@ -48,7 +48,7 @@ module.exports = {
       ordersPerSlot: 1
     }; */
 
-    var dt = new moment(inputs.date, 'DD/MM/YYYY'); // Moment version of date
+    var dt = new moment(inputs.date, 'YYYY-MM-DD'); // Moment version of date
     var dayOfWeek = dt.format('dddd').toLowerCase(); // e.g. monday
 
     // Get special opening hours from DB (for specific date)
@@ -79,8 +79,8 @@ module.exports = {
       var openTime = inputs.date + ' ' + openingHours.openTime; // e.g. 25/12/2022 09:00
       var closeTime = inputs.date + ' ' + openingHours.closeTime; // e.g. 25/12/2022 17:00
 
-      var startTime = moment(openTime, 'DD/MM/YYYY HH:mm'); // Start time for creating slots.
-      var endTime = moment(closeTime, 'DD/MM/YYYY HH:mm'); // End time for creating slots.
+      var startTime = moment(openTime, 'YYYY-MM-DD HH:mm'); // Start time for creating slots.
+      var endTime = moment(closeTime, 'YYYY-MM-DD HH:mm'); // End time for creating slots.
 
       var slots = [];
 
@@ -109,9 +109,9 @@ module.exports = {
       ]; */
 
       // Find orders for that fulfilment method between the start and end times.
-      var fulfilmentSlotFrom = moment(openTime, 'DD/MM/YYYY HH:mm').format('YYYY-MM-DD HH:mm:ss');
-      var fulfilmentSlotTo = moment(closeTime, 'DD/MM/YYYY HH:mm').format('YYYY-MM-DD HH:mm:ss');
-      var orders = await Order.find({fulfilmentMethod: inputs.fulfilmentMethodId, fulfilmentSlotFrom: {'>=': fulfilmentSlotFrom}, fulfilmentSlotTo: {'<=': fulfilmentSlotTo}});
+      // var fulfilmentSlotFrom = moment(openTime, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DD HH:mm:ss');
+      // var fulfilmentSlotTo = moment(closeTime, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DD HH:mm:ss');
+      var orders = await Order.find({fulfilmentMethod: inputs.fulfilmentMethodId, fulfilmentSlotFrom: {'>=': openTime}, fulfilmentSlotTo: {'<=': closeTime}});
 
       /* var orders = [{
         fulfilmentSlotFrom: '17/02/2022 10:00',
