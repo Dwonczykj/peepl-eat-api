@@ -26,5 +26,7 @@ module.exports.custom = {
   peeplWebhookAddress: 'https://vegi.itaboutpeepl.com/api/v1/orders/peepl-pay-webhook',
   twilioSID: 'AC2bc72aa996c7a9f5b33771c1135e0261',
   twilioAuthToken: '496e6e1846ad69163857ea3d7fa347e4',
-  baseUrl: 'http://localhost:1337'
+  baseUrl: 'http://localhost:1337',
+  pplTokenAddress: '0xa2C7CdB72d177f6259cD12a9A06Fdfd9625419D4',
+  pplRewardsPoolAddress: '0x29249e06e8D3e4933cc403AB73136e698a08c38b'
 };
