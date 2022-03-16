@@ -181,8 +181,8 @@ module.exports = {
     * > (For a full list, see https://sailsjs.com/plugins/sessions)            *
     *                                                                          *
     ***************************************************************************/
-    adapter: '@sailshq/connect-redis',
-    url: 'redis://localhost:6379/0',
+    // adapter: '@sailshq/connect-redis',
+    // url: 'redis://localhost:6379/0',
     //--------------------------------------------------------------------------
     // /\   OR, to avoid checking it in to version control, you might opt to
     // ||   set sensitive credentials like this using an environment variable.
