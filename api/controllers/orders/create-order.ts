@@ -56,6 +56,10 @@ module.exports = {
     tipAmount: {
       type: 'number',
       required: false
+    },
+    walletAddress: {
+      type: 'string',
+      required: true
     }
   },
 
@@ -75,6 +79,12 @@ module.exports = {
 
     if(!vendor) {
       return exits.error();
+    }
+
+    var slotsValid = await sails.helpers.validateDeliverySlot.with({fulfilmentMethodId: inputs.fulfilmentMethod, fulfilmentSlotFrom: inputs.fulfilmentSlotFrom, fulfilmentSlotTo: inputs.fulfilmentSlotTo});
+
+    if(!slotsValid){
+      return exits.error('Invalid delivery slot');
     }
 
     // TODO: Refactor all of this code to run concurrently where possible
@@ -121,7 +131,7 @@ module.exports = {
         deliveryAddressLineTwo: inputs.address.lineTwo,
         deliveryAddressPostCode: inputs.address.postCode,
         deliveryAddressInstructions: inputs.address.deliveryInstructions,
-        customerWalletAddress: this.req.session.walletId,
+        customerWalletAddress: inputs.walletAddress,
         discount: discount.id,
         vendor: vendor.id,
         fulfilmentMethod: inputs.fulfilmentMethod,
@@ -145,7 +155,7 @@ module.exports = {
         deliveryAddressLineTwo: inputs.address.lineTwo,
         deliveryAddressPostCode: inputs.address.postCode,
         deliveryAddressInstructions: inputs.address.deliveryInstructions,
-        customerWalletAddress: this.req.session.walletId,
+        customerWalletAddress: inputs.walletAddress,
         vendor: vendor.id,
         fulfilmentMethod: inputs.fulfilmentMethod,
         fulfilmentSlotFrom: inputs.fulfilmentSlotFrom,
@@ -202,7 +212,6 @@ module.exports = {
         console.log(err);
       });
     } */
-
 
     // Create PaymentIntent on Peepl Pay
     var newPaymentIntent = await sails.helpers.createPaymentIntent(calculatedOrderTotal,

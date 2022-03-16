@@ -65,7 +65,9 @@ module.exports = {
     },
     customerWalletAddress: {
       type: 'string',
-      description: 'The wallet address of the customer.'
+      description: 'The wallet address of the customer.',
+      required: true,
+      regex: /^0x[a-fA-F0-9]{40}$/
     },
     paymentStatus: {
       type: 'string',
