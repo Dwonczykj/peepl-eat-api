@@ -48,6 +48,7 @@ module.exports.routes = {
   'POST /api/v1/orders/create-order': { action: 'orders/create-order' },
   'GET /api/v1/orders/get-order-status': { action: 'orders/get-order-status' },
   'POST /api/v1/orders/peepl-pay-webhook': { action: 'orders/peepl-pay-webhook' },
+  'GET /api/v1/orders/get-order-details': { action: 'orders/get-order-details' },
 
   // ADMIN
   'GET /admin/vendors': { action: 'admin/view-vendors' },
