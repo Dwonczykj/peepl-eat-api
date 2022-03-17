@@ -30,6 +30,7 @@ module.exports = {
 
     var workingTotal = 0;
 
+    // Add together product totals w/ options
     for(var item in order.items) {
       var productTotal = order.items[item].product.basePrice;
 
@@ -40,9 +41,7 @@ module.exports = {
       workingTotal += productTotal;
     }
 
-    var fulfilmentMethod = await FulfilmentMethod.findOne(order.fulfilmentMethod);
-    workingTotal += fulfilmentMethod.priceModifier;
-
+    // Apply discount
     if(order.discount) {
       // TODO: Round to nearest whole number
       var discount = await Discount.findOne(order.discount);
@@ -54,6 +53,11 @@ module.exports = {
       }
     }
 
+    // Add delivery cost
+    var fulfilmentMethod = await FulfilmentMethod.findOne(order.fulfilmentMethod);
+    workingTotal += fulfilmentMethod.priceModifier;
+
+    // Add tip amount
     workingTotal = workingTotal + order.tipAmount;
 
     return workingTotal;
