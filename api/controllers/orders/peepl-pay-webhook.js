@@ -26,11 +26,16 @@ module.exports = {
     var unixtime = Date.now();
 
     // Update order with payment ID and time
-    var order = await Order.updateOne({paymentIntentId: inputs.publicId})
+    await Order.updateOne({paymentIntentId: inputs.publicId})
     .set({
       paymentStatus: 'paid',
       paidDateTime: unixtime
     });
+
+    var order = await Order.findOne({paymentIntentId: inputs.publicId})
+    .populate('vendor');
+
+    await sails.helpers.sendSmsNotification.with({body: 'You have received a new order from Vegi for delivery between ' + order.fulfilmentSlotFrom + ' and ' + order.fulfilmentSlotTo + '. To accept or decline: ' + sails.config.custom.baseUrl + '/admin/approve-order/' + order.publicId, to: order.vendor.phoneNumber});
 
     await sails.helpers.issuePeeplReward.with({
       rewardAmount: (order.total * 0.1) / 10, // (10% order total in pence) / 10 pence (value of PPL token)
