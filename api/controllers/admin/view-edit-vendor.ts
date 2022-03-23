@@ -26,16 +26,22 @@ module.exports = {
 
 
   fn: async function ({vendorid}, exits) {
+    //Get current opening hours
     var vendor = await Vendor.findOne(vendorid)
     .populate('products&products.option&option.values');
-
+    var delFul = await Vendor.findOne(vendorid)
+    .populate('deliveryFulfilmentMethod&deliveryFulfilmentMethod.openingHours')
+    var colFul = await Vendor.findOne(vendorid)
+    .populate('collectionFulfilmentMethod&collectionFulfilmentMethod.openingHours')
+    var delFul = delFul.deliveryFulfilmentMethod;
+    var colFul = colFul.collectionFulfilmentMethod;
     // Respond with view or JSON.
     if(this.req.wantsJSON) {
       return exits.successJSON(
-        {vendor}
+        {vendor, delFul, colFul}
       );
     } else {
-      return exits.success({vendor});
+      return exits.success({vendor, delFul, colFul});
     }
 
   }
