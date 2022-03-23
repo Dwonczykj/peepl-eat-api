@@ -76,7 +76,6 @@ module.exports = {
     })
     .intercept('E_EXCEEDS_UPLOAD_LIMIT', 'tooBig')
     .intercept((err) => new Error('The photo upload failed! ' + err.message));
-    // TODO: Handle missing image
 
     if(!imageInfo) {
       return exits.noFileAttached();
@@ -92,37 +91,41 @@ module.exports = {
       walletAddress: inputs.walletAddress,
       deliveryRestrictionDetails: inputs.deliveryRestrictionDetails
     }).fetch();
-    
+
     //Create FulfilmentMethods
     const del = await FulfilmentMethod.create({vendor:newVendor.id, methodType:'delivery'}).fetch();
     const col = await FulfilmentMethod.create({vendor:newVendor.id, methodType:'collection'}).fetch();
-    
-    newVendor = await Vendor.updateOne(newVendor.id).set({deliveryFulfilmentMethod: del.id, collectionFulfilmentMethod: col.id});
+
+    await Vendor.updateOne(newVendor.id).set({
+      deliveryFulfilmentMethod: del.id,
+      collectionFulfilmentMethod: col.id
+    });
 
     //Generate collection/delivery blank opening hours
     var openingHoursDel = [];
     var openingHoursCol= [];
     var weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
-    weekdays.forEach(function(weekday){
+    weekdays.forEach((weekday) => {
       openingHoursDel.push({
         dayOfWeek: weekday,
         isOpen: false,
         fulfilmentMethod: del.id
-      })
+      });
     });
 
-    weekdays.forEach(function(weekday){
+    weekdays.forEach((weekday) => {
       openingHoursCol.push({
         dayOfWeek: weekday,
         isOpen: false,
         fulfilmentMethod: col.id
-      })
+      });
     });
 
     const newHoursCol = await OpeningHours.createEach(openingHoursCol).fetch();
     const newHoursIDsCol = newHoursCol.map(({ id }) => id);
     await FulfilmentMethod.addToCollection(col.id, 'openingHours').members(newHoursIDsCol);
+
     const newHoursDel = await OpeningHours.createEach(openingHoursDel).fetch();
     const newHoursIDsDel = newHoursDel.map(({ id }) => id);
     await FulfilmentMethod.addToCollection(del.id, 'openingHours').members(newHoursIDsDel);

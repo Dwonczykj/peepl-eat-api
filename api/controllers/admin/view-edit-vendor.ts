@@ -29,12 +29,17 @@ module.exports = {
     //Get current opening hours
     var vendor = await Vendor.findOne(vendorid)
     .populate('products&products.option&option.values');
+
     var delFul = await Vendor.findOne(vendorid)
-    .populate('deliveryFulfilmentMethod&deliveryFulfilmentMethod.openingHours')
+    .populate('deliveryFulfilmentMethod&deliveryFulfilmentMethod.openingHours');
+
     var colFul = await Vendor.findOne(vendorid)
-    .populate('collectionFulfilmentMethod&collectionFulfilmentMethod.openingHours')
-    var delFul = delFul.deliveryFulfilmentMethod;
-    var colFul = colFul.collectionFulfilmentMethod;
+    .populate('collectionFulfilmentMethod&collectionFulfilmentMethod.openingHours');
+
+    delFul = delFul.deliveryFulfilmentMethod;
+
+    colFul = colFul.collectionFulfilmentMethod;
+
     // Respond with view or JSON.
     if(this.req.wantsJSON) {
       return exits.successJSON(
