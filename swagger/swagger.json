@@ -2645,27 +2645,6 @@
         "parameters": [
           {
             "in": "query",
-            "name": "vendorID",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            }
-          },
-          {
-            "in": "query",
-            "name": "type",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "collection",
-                "delivery"
-              ]
-            }
-          },
-          {
-            "in": "query",
             "name": "openinghours",
             "required": false,
             "schema": {}
