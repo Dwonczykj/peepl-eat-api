@@ -1600,7 +1600,7 @@
         ],
         "responses": {
           "200": {
-            "description": "The requested resource"
+            "description": "Success"
           },
           "404": {
             "description": "Resource not found"

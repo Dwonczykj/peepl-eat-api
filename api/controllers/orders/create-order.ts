@@ -65,7 +65,9 @@ module.exports = {
 
 
   exits: {
-
+    invalidSlot: {
+      responseType: 'serverError'
+    }
   },
 
 
@@ -84,7 +86,7 @@ module.exports = {
     var slotsValid = await sails.helpers.validateDeliverySlot.with({fulfilmentMethodId: inputs.fulfilmentMethod, fulfilmentSlotFrom: inputs.fulfilmentSlotFrom, fulfilmentSlotTo: inputs.fulfilmentSlotTo});
 
     if(!slotsValid){
-      return exits.error('Invalid delivery slot');
+      return exits.invalidSlot('Invalid delivery slot');
     }
 
     // TODO: Refactor all of this code to run concurrently where possible

@@ -35,6 +35,7 @@ module.exports = {
     // TODO: Consider timezones
     // TODO: Account for overnight opening hours
     // TODO: Generate IDs for slots to simplify logic (but must account for changes to opening hours and slot duration)
+    // TODO: Limit to 7 days in future
 
     var availableSlots = [];
 
