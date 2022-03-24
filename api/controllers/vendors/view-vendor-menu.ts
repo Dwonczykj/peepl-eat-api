@@ -16,10 +16,10 @@ module.exports = {
   exits: {
 
     success: {
-      viewTemplatePath: 'pages/vendors/vendor-menu'
-    },
-    successJSON: {
       statusCode: 200,
+    },
+    notFound: {
+      responseType: 'notFound'
     }
 
   },
@@ -30,17 +30,12 @@ module.exports = {
     .populate('products');
 
     if(!vendor){
-      return exits.error();
+      return exits.notFound();
     }
 
-    // Respond with view or JSON.
-    if(this.req.wantsJSON) {
-      return exits.successJSON(
-        {vendor, wallet: this.req.session.walletId}
-      );
-    } else {
-      return exits.success({vendor, wallet: this.req.session.walletId});
-    }
+    return exits.success(
+      {vendor}
+    );
 
   }
 

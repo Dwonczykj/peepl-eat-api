@@ -1480,7 +1480,8 @@
             "name": "date",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "pattern": "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$"
             }
           }
         ],
@@ -2793,26 +2794,10 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "type": "string",
-                      "description": "Success"
-                    },
-                    {
-                      "type": "string",
-                      "description": "Success"
-                    }
-                  ]
-                }
-              }
-            }
+            "description": "Success"
           },
           "404": {
-            "description": "Resource not found"
+            "description": "Not found"
           },
           "500": {
             "description": "Internal server error"

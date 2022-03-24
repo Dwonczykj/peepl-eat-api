@@ -25,12 +25,11 @@ module.exports = {
   fn: async function (inputs, exits) {
     var order = await Order.findOne(inputs.orderId);
 
-    if(order){
-      // All done.
-      return exits.success({paymentStatus: order.paymentStatus});
-    } else {
+    if(!order){
       return exits.notFound();
     }
+
+    return exits.success({paymentStatus: order.paymentStatus});
 
   }
 
