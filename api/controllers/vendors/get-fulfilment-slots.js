@@ -14,7 +14,8 @@ module.exports = {
     },
     date: {
       type: 'string',
-      required: true
+      required: true,
+      regex: /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/
     }
   },
 
@@ -30,7 +31,6 @@ module.exports = {
     // var dt = new moment(inputs.date, 'DD/MM/YYYY'); // Moment version of date
     // var dayOfWeek = dt.format('dddd').toLowerCase(); // e.g. monday
 
-    // TODO: Need to return delivery pricing
     // TODO: Postcode restrictions
 
     var deliverySlots = [];

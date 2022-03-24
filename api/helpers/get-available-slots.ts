@@ -13,7 +13,8 @@ module.exports = {
     date: {
       type: 'string',
       description: 'The date for which time slots need to be generated. Format YYYY-MM-DD',
-      defaultsTo: '2022-03-03',
+      example: '2022-03-24',
+      regex: /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/
     },
     fulfilmentMethodId: {
       type: 'number',
@@ -23,11 +24,9 @@ module.exports = {
 
 
   exits: {
-
     success: {
       outputFriendlyName: 'Available slots',
     },
-
   },
 
 
@@ -127,14 +126,20 @@ module.exports = {
       for(var slotI of slots) {
         // Filter out orders between start and end of slot.
         var relevantOrders = orders.filter(order => {
-          if(moment(order.fulfilmentSlotFrom).isSameOrAfter(slotI.startTime) && moment(order.fulfilmentSlotTo, 'YYYY-MM-DD HH:mm:ss').isSameOrBefore(slotI.endTime)) {
+          var mSlotFrom = moment(order.fulfilmentSlotFrom);
+          var mSlotTo = moment(order.fulfilmentSlotTo);
+
+          if(mSlotFrom.isSameOrAfter(slotI.startTime) && mSlotTo.isSameOrBefore(slotI.endTime)) {
             return true;
           } else {
             return false;
           }
         });
 
-        if (relevantOrders.length < fulfilmentMethod.maxOrders) { // If there aren't too many orders in the slot
+        // Is the time slot after current time plus fulfilment method buffer
+        var isInFuture = moment(slotI.startTime).isAfter(moment().add(fulfilmentMethod.bufferLength, 'minutes'));
+
+        if ((relevantOrders.length < fulfilmentMethod.maxOrders) && isInFuture) { // If there aren't too many orders in the slot
           availableSlots.push(slotI); // Add slot to availableSlots array
         }
       }
