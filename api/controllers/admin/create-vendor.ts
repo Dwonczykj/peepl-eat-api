@@ -92,43 +92,10 @@ module.exports = {
       deliveryRestrictionDetails: inputs.deliveryRestrictionDetails
     }).fetch();
 
-    //Create FulfilmentMethods
-    const del = await FulfilmentMethod.create({vendor:newVendor.id, methodType:'delivery'}).fetch();
-    const col = await FulfilmentMethod.create({vendor:newVendor.id, methodType:'collection'}).fetch();
-
-    await Vendor.updateOne(newVendor.id).set({
-      deliveryFulfilmentMethod: del.id,
-      collectionFulfilmentMethod: col.id
+    // Initialise delivery methods
+    await sails.helpers.initialiseDeliveryMethods.with({
+      vendor: newVendor.id
     });
-
-    //Generate collection/delivery blank opening hours
-    var openingHoursDel = [];
-    var openingHoursCol= [];
-    var weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-
-    weekdays.forEach((weekday) => {
-      openingHoursDel.push({
-        dayOfWeek: weekday,
-        isOpen: false,
-        fulfilmentMethod: del.id
-      });
-    });
-
-    weekdays.forEach((weekday) => {
-      openingHoursCol.push({
-        dayOfWeek: weekday,
-        isOpen: false,
-        fulfilmentMethod: col.id
-      });
-    });
-
-    const newHoursCol = await OpeningHours.createEach(openingHoursCol).fetch();
-    const newHoursIDsCol = newHoursCol.map(({ id }) => id);
-    await FulfilmentMethod.addToCollection(col.id, 'openingHours').members(newHoursIDsCol);
-
-    const newHoursDel = await OpeningHours.createEach(openingHoursDel).fetch();
-    const newHoursIDsDel = newHoursDel.map(({ id }) => id);
-    await FulfilmentMethod.addToCollection(del.id, 'openingHours').members(newHoursIDsDel);
 
     // All done.
     return exits.success({

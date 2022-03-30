@@ -18,10 +18,13 @@ module.exports = {
   },
 
   fn: async function (inputs, exits) {
+    // TODO: Proper error handling
     inputs.openingHours.forEach(
         async hours => {
           await OpeningHours.updateOne(hours.id).set(hours);
         }
     );
+    return exits.success(inputs.openingHours);
   }
+
 };
