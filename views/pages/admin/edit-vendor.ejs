@@ -90,7 +90,7 @@
       <input type="radio" id="delivery" value="del" v-model="fulfilmethod">
       <label for="delivery">Delivery</label>
       <template v-if="fulfilmethod=='del'">
-        <ajax-form :form-data="delFul" :syncing.sync="syncing" :form-errors.sync="formErrors" :cloud-error.sync="cloudError" :action="createUpdateOpeninghours">
+        <ajax-form :form-data="delFul" :syncing.sync="syncing" :form-errors.sync="formErrors" :cloud-error.sync="cloudError" :action="'createUpdateOpeninghours'">
           <div v-for="(hours, index) in delFul.openingHours">
             <input type="checkbox" :id=hours.dayOfWeek v-model="hours.isOpen">
             <label :for=hours.dayOfWeek>{{hours.dayOfWeek}}</label>
@@ -99,7 +99,7 @@
             <label for="appt">Select closing time:</label>
             <input type="time" id="appt" name="appt" v-model="hours.closeTime" :disabled="!hours.isOpen">
           </div>
-          <ajax-button class="btn btn-peepl mt-4" type="submit" :syncing="syncing" v-bind:class="{ 'is-loading': syncing }">Save changes</ajax-button>
+          <ajax-button class="btn btn-peepl mt-4" type="submit" :syncing="syncing" @submitted="openingHoursSubmitted" v-bind:class="{ 'is-loading': syncing }">Save changes</ajax-button>
         </ajax-form>
       </template>
       <template v-else>

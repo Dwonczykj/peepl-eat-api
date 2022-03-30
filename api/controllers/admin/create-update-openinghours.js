@@ -4,7 +4,7 @@ module.exports = {
   friendlyName: 'Create or Update Opening Hours',
 
   inputs: {
-    openinghours: {
+    openingHours: {
       type: 'json',
       columnType: 'array'
     }
@@ -18,7 +18,7 @@ module.exports = {
   },
 
   fn: async function (inputs, exits) {
-    inputs.openinghours.forEach(
+    inputs.openingHours.forEach(
         async hours => {
           await OpeningHours.updateOne(hours.id).set(hours);
         }

@@ -2646,7 +2646,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "openinghours",
+            "name": "openingHours",
             "required": false,
             "schema": {}
           }

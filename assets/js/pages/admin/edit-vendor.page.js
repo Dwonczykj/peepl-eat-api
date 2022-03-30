@@ -18,6 +18,8 @@ parasails.registerPage('admin-edit-vendor', {
       status: 'draft',
       products: []
     },
+    colFul: {},
+    delFul: {},
     previewImageSrc: '',
     formRules: {
       name: {
@@ -87,6 +89,9 @@ parasails.registerPage('admin-edit-vendor', {
     vendorSubmitted: function({id}) {
       this.vendor.id = id;
       window.history.pushState({}, '', '/admin/vendors/' + id);
+    },
+    openingHoursSubmitted: function() {
+      console.log(delFul);
     },
     clickAddProduct: function(){
       var newProduct = {
