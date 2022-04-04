@@ -106,13 +106,7 @@ parasails.registerPage('admin-edit-vendor', {
       this.vendor.products.push(newProduct);
     },
     updatePostalDistricts: function() {
-      var postalDistricts = this.postalDistricts.map(function(postalDistrict) {
-        if(postalDistrict.checked){
-          return postalDistrict.id;
-        } else {
-          return null;
-        }
-      });
+      var postalDistricts = this.postalDistricts.filter(district => district.checked).map((a)=>{return a.id});
       console.log(postalDistricts);
       return {districts: postalDistricts, vendorId: this.vendor.id};
     }
