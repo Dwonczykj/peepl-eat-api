@@ -37,13 +37,29 @@ module.exports = {
     var colFul = await Vendor.findOne(vendorid)
     .populate('collectionFulfilmentMethod&collectionFulfilmentMethod.openingHours');
 
+    var vendorFulfilmentPostalDistricts = await Vendor.findOne(vendorid)
+    .populate('fulfilmentPostalDistricts');
+
+    // Get all postal districts
+    var postalDistricts = await PostalDistrict.find();
+
+    // set checked to true on postalDistricts that are also in vendorFulfilmentPostalDistricts
+    postalDistricts.forEach((postalDistrict) => {
+      var found = false;
+      vendorFulfilmentPostalDistricts.fulfilmentPostalDistricts.forEach((vendorPostalDistrict) => {
+        if(vendorPostalDistrict.id === postalDistrict.id){
+          found = true;
+        }
+      });
+      if(found){
+        postalDistrict.checked = true;
+      }
+    });
+
     delFul = delFul.deliveryFulfilmentMethod;
 
     colFul = colFul.collectionFulfilmentMethod;
-
-    // get postal districts from the database
-    var postalDistricts = await PostalDistrict.find();
-
+    
     // Respond with view or JSON.
     if(this.req.wantsJSON) {
       return exits.successJSON(
