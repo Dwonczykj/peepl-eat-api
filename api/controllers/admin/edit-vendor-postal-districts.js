@@ -27,7 +27,9 @@ module.exports = {
 
 
   fn: async function (inputs) {
-    var updatedVendor = await Vendor.updateOne({id: inputs.vendorId}).set({postalDistricts: inputs.districts});
+    var updatedVendor = await Vendor.replaceCollection(inputs.vendorId, 'fulfilmentPostalDistricts')
+    .members(inputs.districts);
+
     return updatedVendor;
   }
 
