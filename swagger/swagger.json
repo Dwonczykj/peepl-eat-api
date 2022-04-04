@@ -94,7 +94,7 @@
       "name": "Edit discount"
     },
     {
-      "name": "Create or Update Opening Hours"
+      "name": "Update Opening Hours"
     },
     {
       "name": "Approve or decline order"
@@ -2616,9 +2616,9 @@
     },
     "/api/v1/admin/create-update-openinghours": {
       "post": {
-        "summary": "Create or Update Opening Hours",
+        "summary": "Update Opening Hours",
         "tags": [
-          "Create or Update Opening Hours"
+          "Update Opening Hours"
         ],
         "parameters": [
           {

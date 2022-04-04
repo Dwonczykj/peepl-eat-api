@@ -1,7 +1,7 @@
 
 
 module.exports = {
-  friendlyName: 'Create or Update Opening Hours',
+  friendlyName: 'Update Opening Hours',
 
   inputs: {
     openingHours: {

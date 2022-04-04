@@ -70,8 +70,7 @@ module.exports.routes = {
   'POST /api/v1/admin/update-product-status': { action: 'admin/update-product-status' },
   'POST /api/v1/admin/create-discount': { action: 'admin/create-discount' },
   'POST /api/v1/admin/edit-discount': { action: 'admin/edit-discount' },
-  'POST /api/v1/admin/create-product-category': { action: 'admin/create-product-category' },
-  'POST /api/v1/admin/create-update-openinghours': { action: 'admin/create-update-openinghours'},
+  'POST /api/v1/admin/create-update-openinghours': { action: 'admin/update-openinghours'},
   'POST /api/v1/admin/approve-or-decline-order': { action: 'admin/approve-or-decline-order' },
 
 };
