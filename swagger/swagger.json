@@ -34,6 +34,9 @@
       "name": "View discount codes"
     },
     {
+      "name": "View postal districts"
+    },
+    {
       "name": "View all vendors"
     },
     {
@@ -98,6 +101,12 @@
     },
     {
       "name": "Approve or decline order"
+    },
+    {
+      "name": "Create postal district"
+    },
+    {
+      "name": "Edit postal district"
     },
     {
       "name": "Get product options"
@@ -1333,6 +1342,27 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/admin/postal-districts": {
+      "get": {
+        "summary": "View postal districts",
+        "description": "Display \"Postal districts\" page.",
+        "tags": [
+          "View postal districts"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
           },
           "404": {
             "description": "Resource not found"
@@ -2673,6 +2703,73 @@
             "required": true,
             "schema": {
               "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested resource"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/create-postal-district": {
+      "post": {
+        "summary": "Create postal district",
+        "tags": [
+          "Create postal district"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "outcode",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested resource"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/edit-postal-district": {
+      "post": {
+        "summary": "Edit postal district",
+        "tags": [
+          "Edit postal district"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "outcode",
+            "required": false,
+            "schema": {
+              "type": "string"
             }
           }
         ],
