@@ -23,7 +23,7 @@ module.exports.custom = {
   coopcycleUrl: 'https://agile-delivery.coopcycle.org',
   peeplPayUrl: 'https://pay.itsaboutpeepl.com/api/v1',
   peeplAPIKey: 'Oko4WFgwUFEtVlI2NE01Ry1QTkVBMzFZLVlQVllRQ1o=',
-  peeplWebhookAddress: 'https://vegi.itsaboutpeepl.com/api/v1/orders/peepl-pay-webhook',
+  peeplWebhookAddress: 'https://localhost:1337/api/v1/orders/peepl-pay-webhook',
   twilioSID: 'AC2bc72aa996c7a9f5b33771c1135e0261',
   twilioAuthToken: '496e6e1846ad69163857ea3d7fa347e4',
   baseUrl: 'http://localhost:1337',

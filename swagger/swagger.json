@@ -94,9 +94,6 @@
       "name": "Edit discount"
     },
     {
-      "name": "Create product category"
-    },
-    {
       "name": "Create or Update Opening Hours"
     },
     {
@@ -2604,26 +2601,6 @@
             }
           }
         ],
-        "responses": {
-          "200": {
-            "description": "The requested resource"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/api/v1/admin/create-product-category": {
-      "post": {
-        "summary": "Create product category",
-        "tags": [
-          "Create product category"
-        ],
-        "parameters": [],
         "responses": {
           "200": {
             "description": "The requested resource"
