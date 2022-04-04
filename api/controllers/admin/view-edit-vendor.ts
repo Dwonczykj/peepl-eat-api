@@ -1,4 +1,5 @@
 declare var Vendor: any;
+declare var PostalDistrict: any;
 module.exports = {
 
 
@@ -40,13 +41,16 @@ module.exports = {
 
     colFul = colFul.collectionFulfilmentMethod;
 
+    // get postal districts from the database
+    var postalDistricts = await PostalDistrict.find();
+
     // Respond with view or JSON.
     if(this.req.wantsJSON) {
       return exits.successJSON(
-        {vendor, delFul, colFul}
+        {vendor, delFul, colFul, postalDistricts}
       );
     } else {
-      return exits.success({vendor, delFul, colFul});
+      return exits.success({vendor, delFul, colFul, postalDistricts});
     }
 
   }
