@@ -92,11 +92,6 @@ module.exports = {
       deliveryRestrictionDetails: inputs.deliveryRestrictionDetails
     }).fetch();
 
-    // Initialise delivery methods
-    await sails.helpers.initialiseDeliveryMethods.with({
-      vendor: newVendor.id
-    });
-
     // All done.
     return exits.success({
       id: newVendor.id
