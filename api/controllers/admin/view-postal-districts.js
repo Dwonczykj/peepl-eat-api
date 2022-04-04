@@ -17,9 +17,13 @@ module.exports = {
 
 
   fn: async function () {
+    // Get the list of postal districts.
+    var postalDistricts = await PostalDistrict.find();
 
     // Respond with view.
-    return {};
+    return {
+      postalDistricts: postalDistricts
+    };
 
   }
 

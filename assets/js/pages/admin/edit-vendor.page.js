@@ -20,6 +20,7 @@ parasails.registerPage('admin-edit-vendor', {
     },
     colFul: {},
     delFul: {},
+    postalDistricts: [],
     previewImageSrc: '',
     formRules: {
       name: {
@@ -50,7 +51,6 @@ parasails.registerPage('admin-edit-vendor', {
   },
   mounted: async function() {
     _.extend(this, SAILS_LOCALS);
-    //TODO: Get current opening times
     this.vendor.image = '';
   },
 
@@ -91,7 +91,6 @@ parasails.registerPage('admin-edit-vendor', {
       window.history.pushState({}, '', '/admin/vendors/' + id);
     },
     openingHoursSubmitted: function() {
-      // console.log(delFul);
     },
     clickAddProduct: function(){
       var newProduct = {

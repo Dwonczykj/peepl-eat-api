@@ -1,7 +1,21 @@
 <div id="postal-districts" v-cloak>
 
-  <h1>TODO: Implement this page.</h1>
-  <p>(See also <em>assets/styles/pages/admin/postal-districts.less</em>, <em>assets/js/pages/admin/postal-districts.page.js</em>, and <em>api/controllers/admin/view-postal-districts.js</em>.)</p>
+  <%- partial('../../partials/admin-navbar.ejs') %>
 
+  <div class="container">
+
+    <div class="mb-3">
+      <h1>Postal Districts</h1>
+
+      <fieldset>  
+        <edit-postal-district v-for="postalDistrict in postalDistricts" :postaldistrict="postalDistrict">
+        </edit-postal-district>
+   
+        <div class="d-md-flex my-3 action-card-actions">
+          <button class="btn btn-peepl btn-sm ml-auto" @click="clickAddPostalDistrict">Add a new postal district</button>
+        </div>
+      </fieldset>
+    </div>
+  </div>
 </div>
 <%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>

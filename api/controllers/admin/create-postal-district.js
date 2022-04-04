@@ -23,7 +23,7 @@ module.exports = {
   fn: async function (inputs) {
     var postalDistrict = await PostalDistrict.create({
       outcode: inputs.outcode
-    });
+    }).fetch();
 
     // All done.
     return postalDistrict;

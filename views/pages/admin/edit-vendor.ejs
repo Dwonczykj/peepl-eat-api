@@ -71,6 +71,23 @@
       </edit-product>
 
       <div class="d-md-flex my-3 action-card-actions">
+        <!-- <select class="form-control form-control-sm mr-3">
+          <option value="true">Set as available</option>
+          <option value="false">Set as unavailable</option>
+        </select>
+        <br/>
+        <button class="btn btn-peepl btn-sm">Apply</button> -->
+        <button class="btn btn-peepl btn-sm ml-auto" @click="clickAddProduct">Add a new product</button>
+      </div>
+    </fieldset>
+
+    <fieldset v-if="vendor.id">
+      <h2 class="h5 mt-5">Postal Districts</h2>
+
+      <template :v-for="postalDistrict in postalDistricts" :postalDistrict="postalDistrict">
+      </template>
+
+      <div class="d-md-flex my-3 action-card-actions">
         <select class="form-control form-control-sm mr-3">
           <option value="true">Set as available</option>
           <option value="false">Set as unavailable</option>
@@ -90,7 +107,7 @@
       <input type="radio" id="delivery" value="del" v-model="fulfilmethod">
       <label for="delivery">Delivery</label>
       <template v-if="fulfilmethod=='del'">
-        <ajax-form :form-data="delFul" :syncing.sync="syncing" :form-errors.sync="formErrors" :cloud-error.sync="cloudError" :action="'createUpdateOpeninghours'">
+        <ajax-form :form-data="delFul" :syncing.sync="syncing" :form-errors.sync="formErrors" :cloud-error.sync="cloudError" :action="'updateOpeninghours'">
           <div v-for="(hours, index) in delFul.openingHours">
             <input type="checkbox" :id=hours.dayOfWeek v-model="hours.isOpen">
             <label :for=hours.dayOfWeek>{{hours.dayOfWeek}}</label>
@@ -103,7 +120,7 @@
         </ajax-form>
       </template>
       <template v-else>
-        <ajax-form :form-data="colFul" :syncing.sync="syncing" :form-errors.sync="formErrors" :cloud-error.sync="cloudError" :action="'createUpdateOpeninghours'">
+        <ajax-form :form-data="colFul" :syncing.sync="syncing" :form-errors.sync="formErrors" :cloud-error.sync="cloudError" :action="'updateOpeninghours'">
           <div v-for="(hours, index) in colFul.openingHours">
             <input type="checkbox" :id=hours.dayOfWeek v-model="hours.isOpen">
             <label :for=hours.dayOfWeek>{{hours.dayOfWeek}}</label>
