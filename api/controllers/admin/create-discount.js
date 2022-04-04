@@ -38,8 +38,9 @@ module.exports = {
   fn: async function (inputs, exits) {
     inputs.code = inputs.code.toUpperCase();
 
-    var newDiscount = await Discount.create(inputs).fetch();
     // TODO: Handling uniqueness error from database query
+    var newDiscount = await Discount.create(inputs).fetch()
+    .intercept('E_UNIQUE', 'duplicateCode');
 
     // All done.
     return exits.success({

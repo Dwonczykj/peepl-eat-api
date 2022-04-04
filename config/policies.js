@@ -16,12 +16,7 @@ module.exports.policies = {
   * (`true` allows public access)                                            *
   *                                                                          *
   ***************************************************************************/
-  /* '*': ['has-wallet'],
-  'view-homepage': true,
-  'orders/payment-submitted': true,
-  'admin/*': true, // TODO: Change this
-  'vendors/download-image': true,
-  'products/download-image': true */
+  /* 'admin/*': true, // TODO: Change this */
   '*': true,
 
 };
