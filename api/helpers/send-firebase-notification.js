@@ -19,13 +19,16 @@ module.exports = {
       required: true
     },
     title: {
-      type: 'string'
+      type: 'string',
+      required: true
     },
     body: {
-      type: 'string'
+      type: 'string',
+      defaultsTo: ''
     },
     data: {
-      type: 'ref'
+      type: 'ref',
+      defaultsTo: {}
     }
   },
 
@@ -52,10 +55,10 @@ module.exports = {
     admin.messaging()
     .sendToTopic(inputs.topic, message)
     .then((res)=> {
-      sails.log(res);
       return res;
     }).catch((err)=> {
       sails.log(err);
+      throw new Error(err);
     });
 
   }

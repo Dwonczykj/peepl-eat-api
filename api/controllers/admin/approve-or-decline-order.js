@@ -32,13 +32,18 @@ module.exports = {
 
     if(order.restaurantAccepted) {
       // Restaurant has previously accepted, they cannot cancel the order after this.
-      throw 'error';
+      throw new Error('Restaurant has already accepted this order.');
     }
 
     await Order.updateOne({publicId: inputs.orderId})
     .set({restaurantAccepted: inputs.restaurantAccepted});
 
     // Send notification to customer that their order has been accepted/declined.
+    await sails.helpers.sendFirebaseNotification.with({
+      topic: 'order-' + order.id,
+      title: 'Order update',
+      body: 'Your order has been ' + (inputs.restaurantAccepted ? 'accepted 😎' : 'declined 😔') + '.'
+    });
 
     // All done.
     return;
