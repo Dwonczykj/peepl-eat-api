@@ -64,24 +64,6 @@ module.exports.bootstrap = async function() {
     vendor: delifonseca.id
   }).fetch();
 
-  var fulfilmentMethod = await FulfilmentMethod.create({
-    priceModifier: 200,
-    postCodeRestrictionRegex: '.',
-    methodType: 'delivery',
-    slotLength: 60,
-    bufferLength: 15,
-    maxOrders: 10,
-    vendor: delifonseca.id
-  }).fetch();
-
-  await OpeningHours.create({
-    dayOfWeek: 'thursday',
-    openTime: '09:00',
-    closeTime: '17:00',
-    fulfilmentMethod: fulfilmentMethod.id,
-    isOpen: true
-  });
-
   await Vendor.updateOne(delifonseca.id, {deliveryFulfilmentMethod: fulfilmentMethod.id});
 
   var burnsNight = await Product.create({
