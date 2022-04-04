@@ -33,4 +33,4 @@ module.exports = function(viewFilePath, body = {}) {
 
     res.render(viewFilePath);
   });
-}
+};

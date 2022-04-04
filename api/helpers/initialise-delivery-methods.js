@@ -67,7 +67,7 @@ module.exports = {
     const newHoursCol = await OpeningHours.createEach(openingHoursCol).fetch();
     const newHoursIDsCol = newHoursCol.map(({ id }) => id);
     await FulfilmentMethod.addToCollection(col.id, 'openingHours').members(newHoursIDsCol);
-    
+
     return;
   }
 

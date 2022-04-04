@@ -74,7 +74,7 @@ module.exports.bootstrap = async function() {
     vendor: delifonseca.id
   }).fetch();
 
-  var openingHours = await OpeningHours.create({
+  await OpeningHours.create({
     dayOfWeek: 'thursday',
     openTime: '09:00',
     closeTime: '17:00',
@@ -176,7 +176,7 @@ module.exports.bootstrap = async function() {
     option: dessertOption.id
   }]);
 
-  var discountCode = await Discount.create({
+  await Discount.create({
     code: 'DELI10',
     percentage: 10,
     isEnabled: true

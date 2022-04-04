@@ -49,12 +49,13 @@ module.exports = {
       }
     };
 
-    admin.messaging().sendToTopic(inputs.topic, message)
+    admin.messaging()
+    .sendToTopic(inputs.topic, message)
     .then((res)=> {
-      console.log(res);
+      sails.log(res);
       return res;
     }).catch((err)=> {
-      console.log(err);
+      sails.log(err);
     });
 
   }
