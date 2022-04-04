@@ -53,6 +53,13 @@ parasails.registerPage('admin-edit-vendor', {
     _.extend(this, SAILS_LOCALS);
     this.vendor.image = '';
   },
+  filters: {
+    capitalise: function(value) {
+      if (!value) return '';
+      value = value.toString();
+      return value.charAt(0).toUpperCase() + value.slice(1);
+    }
+  },
 
   //  ╦╔╗╔╔╦╗╔═╗╦═╗╔═╗╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
   //  ║║║║ ║ ║╣ ╠╦╝╠═╣║   ║ ║║ ║║║║╚═╗

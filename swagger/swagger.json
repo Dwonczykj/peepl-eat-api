@@ -1962,6 +1962,7 @@
             "schema": {
               "type": "number",
               "format": "double",
+              "nullable": true,
               "maximum": 3,
               "minimum": 1
             }
@@ -1973,6 +1974,7 @@
             "schema": {
               "type": "number",
               "format": "double",
+              "nullable": true,
               "maximum": 5,
               "minimum": 0
             }

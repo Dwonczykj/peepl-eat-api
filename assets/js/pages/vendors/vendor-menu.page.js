@@ -333,6 +333,11 @@ parasails.registerPage('vendor-menu', {
       if (!value) {return '';}
       value = moment.unix(value).calendar();
       return value;
+    },
+    capitalise: function (value) {
+      if (!value) {return ''; }
+      value = value.toString();
+      return value.toUpperCase();
     }
   },
   computed: {

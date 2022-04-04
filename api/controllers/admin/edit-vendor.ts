@@ -43,12 +43,14 @@ module.exports = {
     costLevel: {
       type: 'number',
       min: 1,
-      max: 3
+      max: 3,
+      allowNull: true
     },
     rating: {
       type: 'number',
       min: 0,
-      max: 5
+      max: 5,
+      allowNull: true
     }
   },
 

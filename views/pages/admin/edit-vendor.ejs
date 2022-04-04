@@ -96,7 +96,7 @@
     </ajax-form>
 
     <!-- <ajax-form :form-data="openingHours" :syncing.sync="syncing" :form-rules="formRules" :form-errors.sync="formErrors" :cloud-error.sync="cloudError" @submitted="vendorSubmitted" :action="(vendor.id) ?  'editVendor' : 'createVendor'"></ajax-form> -->
-    <fieldset>
+    <fieldset v-if="vendor.id">
       <h2 class="h5 mt-3">Opening Hours</h2>
       <input type="radio" id="collection" value="col" v-model="fulfilmethod">
       <label for="collection">Collection</label>
@@ -107,7 +107,7 @@
         <ajax-form :form-data="delFul" :syncing.sync="syncing" :form-errors.sync="formErrors" :cloud-error.sync="cloudError" :action="'updateOpeninghours'">
           <div v-for="(hours, index) in delFul.openingHours">
             <input type="checkbox" :id=hours.dayOfWeek v-model="hours.isOpen">
-            <label :for=hours.dayOfWeek>{{hours.dayOfWeek}}</label>
+            <label :for=hours.dayOfWeek>{{hours.dayOfWeek | capitalise}}</label>
             <label for="appt">Select opening time:</label>
             <input type="time" id="appt" name="appt" v-model="hours.openTime" :disabled="!hours.isOpen">
             <label for="appt">Select closing time:</label>
@@ -120,7 +120,7 @@
         <ajax-form :form-data="colFul" :syncing.sync="syncing" :form-errors.sync="formErrors" :cloud-error.sync="cloudError" :action="'updateOpeninghours'">
           <div v-for="(hours, index) in colFul.openingHours">
             <input type="checkbox" :id=hours.dayOfWeek v-model="hours.isOpen">
-            <label :for=hours.dayOfWeek>{{hours.dayOfWeek}}</label>
+            <label :for=hours.dayOfWeek>{{hours.dayOfWeek | capitalise}}</label>
             <label for="appt">Select opening time:</label>
             <input type="time" id="appt" name="appt" v-model="hours.openTime" :disabled="!hours.isOpen">
             <label for="appt">Select closing time:</label>

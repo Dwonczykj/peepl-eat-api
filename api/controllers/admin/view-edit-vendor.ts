@@ -59,7 +59,7 @@ module.exports = {
     delFul = delFul.deliveryFulfilmentMethod;
 
     colFul = colFul.collectionFulfilmentMethod;
-    
+
     // Respond with view or JSON.
     if(this.req.wantsJSON) {
       return exits.successJSON(
