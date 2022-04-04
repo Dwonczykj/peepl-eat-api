@@ -109,6 +109,9 @@
       "name": "Edit postal district"
     },
     {
+      "name": "Edit vendor postal districts"
+    },
+    {
       "name": "Get product options"
     },
     {
@@ -2771,6 +2774,44 @@
             "schema": {
               "type": "string"
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested resource"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/edit-vendor-postal-districts": {
+      "post": {
+        "summary": "Edit vendor postal districts",
+        "tags": [
+          "Edit vendor postal districts"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "districts",
+            "required": true,
+            "schema": {},
+            "description": "The districts to be added to the vendor"
+          },
+          {
+            "in": "query",
+            "name": "vendorId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "The id of the vendor to be edited"
           }
         ],
         "responses": {

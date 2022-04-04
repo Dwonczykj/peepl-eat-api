@@ -80,19 +80,20 @@
         <button class="btn btn-peepl btn-sm ml-auto" @click="clickAddProduct">Add a new product</button>
       </div>
     </fieldset>
+    <ajax-form :handle-parsing="updatePostalDistricts" :syncing.sync="syncing" :cloud-error.sync="cloudError" @submitted="syncing = false" :action="'editVendorPostalDistricts'">
+      <fieldset v-if="vendor.id">
+        <h2 class="h5 mt-5">Postal Districts</h2>
 
-    <fieldset v-if="vendor.id">
-      <h2 class="h5 mt-5">Postal Districts</h2>
+        <template v-for="postalDistrict in postalDistricts" :postalDistrict="postalDistrict">
+          <input type="checkbox" v-model=postalDistrict.checked :id=postalDistrict.id>
+          <label :for=postalDistrict.id>{{postalDistrict.outcode}}</label><br>
+        </template>
 
-      <template v-for="postalDistrict in postalDistricts" :postalDistrict="postalDistrict">
-        <input type="checkbox" v-model=postalDistrict.checked :id=postalDistrict.id>
-        <label :for=postalDistrict.id>{{postalDistrict.outcode}}</label><br>
-      </template>
-
-      <div class="d-md-flex my-3 action-card-actions">
-        <button class="btn btn-peepl btn-sm">Apply</button>
-      </div>
-    </fieldset>
+        <div class="d-md-flex my-3 action-card-actions">
+          <ajax-button class="btn btn-peepl btn-sm" type="submit" :syncing="syncing" v-bind:class="{ 'is-loading': syncing }">Save Changes</ajax-button>
+        </div>
+      </fieldset>
+    </ajax-form>
 
     <!-- <ajax-form :form-data="openingHours" :syncing.sync="syncing" :form-rules="formRules" :form-errors.sync="formErrors" :cloud-error.sync="cloudError" @submitted="vendorSubmitted" :action="(vendor.id) ?  'editVendor' : 'createVendor'"></ajax-form> -->
     <fieldset>
