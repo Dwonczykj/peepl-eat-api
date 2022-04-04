@@ -73,5 +73,7 @@ module.exports.routes = {
   'POST /api/v1/admin/edit-discount': { action: 'admin/edit-discount' },
   'POST /api/v1/admin/create-update-openinghours': { action: 'admin/update-openinghours'},
   'POST /api/v1/admin/approve-or-decline-order': { action: 'admin/approve-or-decline-order' },
+  'POST /api/v1/admin/create-postal-district': { action: 'admin/create-postal-district' },
+  'POST /api/v1/admin/edit-postal-district': { action: 'admin/edit-postal-district' },
 
 };
