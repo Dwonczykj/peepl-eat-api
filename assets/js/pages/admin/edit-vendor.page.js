@@ -102,7 +102,19 @@ parasails.registerPage('admin-edit-vendor', {
         options: []
       };
 
+
       this.vendor.products.push(newProduct);
+    },
+    updatePostalDistricts: function() {
+      var postalDistricts = this.postalDistricts.map(function(postalDistrict) {
+        if(postalDistrict.checked){
+          return postalDistrict.id;
+        } else {
+          return null;
+        }
+      });
+      console.log(postalDistricts);
+      return {districts: postalDistricts, vendorId: this.vendor.id};
     }
   },
 });
