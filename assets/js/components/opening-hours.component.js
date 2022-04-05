@@ -92,4 +92,3 @@ parasails.registerComponent('openingHours', {
     //…
   }
 });
-  
