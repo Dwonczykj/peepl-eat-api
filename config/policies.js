@@ -16,7 +16,11 @@ module.exports.policies = {
   * (`true` allows public access)                                            *
   *                                                                          *
   ***************************************************************************/
-  /* 'admin/*': true, // TODO: Change this */
+  'admin/*': 'is-logged-in',
+  'admin/view-login': true,
+  'admin/login': true,
+  'admin/view-create-vendor': 'is-super-admin',
+  'admin/create-vendor': 'is-super-admin',
   '*': true,
 
 };

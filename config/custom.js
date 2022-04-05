@@ -28,5 +28,6 @@ module.exports.custom = {
   twilioAuthToken: '496e6e1846ad69163857ea3d7fa347e4',
   baseUrl: 'http://localhost:1337',
   pplTokenAddress: '0xa2C7CdB72d177f6259cD12a9A06Fdfd9625419D4',
-  pplRewardsPoolAddress: '0x29249e06e8D3e4933cc403AB73136e698a08c38b'
+  pplRewardsPoolAddress: '0x29249e06e8D3e4933cc403AB73136e698a08c38b',
+  passwordSaltRounds: 10,
 };

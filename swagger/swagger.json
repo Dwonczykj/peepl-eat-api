@@ -25,6 +25,12 @@
   },
   "tags": [
     {
+      "name": "View login"
+    },
+    {
+      "name": "Login"
+    },
+    {
       "name": "View vendors"
     },
     {
@@ -931,7 +937,9 @@
           },
           {
             "required": [
-              "walletId"
+              "passwordHash",
+              "name",
+              "vendor"
             ]
           }
         ]
@@ -954,38 +962,28 @@
             "uniqueItems": true,
             "description": "Note Sails special attributes: autoIncrement"
           },
-          "walletId": {
+          "email": {
             "type": "string",
+            "format": "email",
             "uniqueItems": true
+          },
+          "passwordHash": {
+            "type": "string"
           },
           "name": {
             "type": "string"
           },
-          "email": {
-            "type": "string",
-            "format": "email"
+          "isSuperAdmin": {
+            "type": "boolean",
+            "default": false
           },
-          "newsletterOptInDate": {
-            "type": "number",
-            "format": "double"
-          },
-          "addressLineOne": {
-            "type": "string"
-          },
-          "addressLineTwo": {
-            "type": "string"
-          },
-          "town": {
-            "type": "string"
-          },
-          "postcode": {
-            "type": "string"
-          },
-          "phoneNumber": {
-            "type": "string"
-          },
-          "marketingOptIn": {
-            "type": "boolean"
+          "vendor": {
+            "description": "JSON dictionary representing the **vendor** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/vendor"
+              }
+            ]
           }
         }
       },
@@ -1143,6 +1141,13 @@
             "items": {
               "$ref": "#/components/schemas/postaldistrict"
             }
+          },
+          "users": {
+            "description": "Array of **user**'s or array of FK's when creating / updating / not populated",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/user"
+            }
           }
         }
       },
@@ -1244,6 +1249,73 @@
     }
   },
   "paths": {
+    "/admin/login": {
+      "get": {
+        "summary": "View login",
+        "description": "Display \"Login\" page.",
+        "tags": [
+          "View login"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "post": {
+        "summary": "Login",
+        "description": "Login admin.",
+        "tags": [
+          "Login"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "emailAddress",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          },
+          {
+            "in": "query",
+            "name": "password",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "rememberMe",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/admin/vendors": {
       "get": {
         "summary": "View vendors",

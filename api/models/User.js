@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 /**
  * User.js
  *
@@ -12,39 +13,22 @@ module.exports = {
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
     //  ╩  ╩╚═╩╩ ╩╩ ╩ ╩ ╚╝ ╚═╝╚═╝
-    walletId: {
-      type: 'string',
-      required: true,
-      unique: true
-    },
-    name: {
-      type: 'string'
-    },
     email: {
       type: 'string',
       isEmail: true,
-      // unique: true,
+      unique: true,
     },
-    newsletterOptInDate: {
-      type: 'number',
-    },
-    addressLineOne: {
-      type: 'string'
-    },
-    addressLineTwo: {
-      type: 'string'
-    },
-    town: {
-      type: 'string'
-    },
-    postcode: {
+    passwordHash: {
       type: 'string',
+      required: true,
     },
-    phoneNumber:{
-      type: 'string'
+    name: {
+      type: 'string',
+      required: true,
     },
-    marketingOptIn: {
-      type: 'boolean'
+    isSuperAdmin: {
+      type: 'boolean',
+      defaultsTo: false,
     },
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
@@ -54,11 +38,28 @@ module.exports = {
     //  ╔═╗╔═╗╔═╗╔═╗╔═╗╦╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
     //  ╠═╣╚═╗╚═╗║ ║║  ║╠═╣ ║ ║║ ║║║║╚═╗
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
-    // orders: {
-    //   collection: 'order',
-    //   via: 'customer'
-    // }
+    vendor: {
+      model: 'vendor',
+      required: true,
+    }
 
   },
+
+  customToJSON: function() {
+    return _.omit(this, ['passwordHash']);
+  },
+
+  beforeCreate: async function(user, cb){
+    const saltRounds = sails.config.custom.passwordSaltRounds;
+
+    try{
+      user.password = await bcrypt.hash(user.password, saltRounds);
+    } catch(err) {
+      throw err;
+    }
+
+    return cb();
+  }
+
 
 };

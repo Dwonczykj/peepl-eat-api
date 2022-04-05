@@ -31,14 +31,21 @@ module.exports = {
 
 
   exits: {
-
+    duplicateCode: {
+      statusCode: 409,
+    }
   },
 
 
   fn: async function (inputs, exits) {
+    let user = await User.findOne(inputs.userId);
+
+    if(!user.isSuperAdmin){
+      inputs.vendor = user.vendor;
+    }
+
     inputs.code = inputs.code.toUpperCase();
 
-    // TODO: Handling uniqueness error from database query
     var newDiscount = await Discount.create(inputs).fetch()
     .intercept('E_UNIQUE', 'duplicateCode');
 

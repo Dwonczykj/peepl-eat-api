@@ -107,10 +107,6 @@ module.exports = {
     deliveryFulfilmentMethod: {
       model: 'fulfilmentmethod'
     },
-    // fulfilmentMethods: {
-    //   collection: 'fulfilmentmethod',
-    //   via: 'vendor'
-    // },
     vendorCategories: {
       collection: 'vendorcategory',
       via: 'vendors'
@@ -122,6 +118,10 @@ module.exports = {
     fulfilmentPostalDistricts: {
       collection: 'postaldistrict',
       via: 'vendors'
+    },
+    users: {
+      collection: 'user',
+      via: 'vendor'
     }
   },
 
