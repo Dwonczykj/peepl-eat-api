@@ -22,15 +22,15 @@ module.exports = {
   },
 
 
-  fn: async function (inputs, exits) {
+  fn: async function (inputs) {
     var order = await Order.findOne(inputs.orderId);
 
-    if(order){
-      // All done.
-      return exits.success({order});
-    } else {
-      return exits.notFound();
+    if(!order) {
+      throw 'notFound';
     }
+
+    // All done.
+    return {order};
 
   }
 

@@ -1,4 +1,5 @@
 declare var Order: any;
+declare var User: any;
 module.exports = {
 
   friendlyName: 'View all orders',
@@ -17,25 +18,18 @@ module.exports = {
   },
 
   fn: async function (inputs, exits) {
-    // var isVendor = await Vendor.findOne({walletAddress: this.req.session.walletId});
-    var isVendor = true;
-    var orders;
+    let user = await User.findOne(this.req.session.userId);
 
-    if(isVendor){
-      orders = await Order.find({paidDateTime: {'>': 0}, isArchived: false})
-      .populate('items.product&optionValues&optionValues.option&optionValue');
-    } else {
-      orders = await Order.find({paidDateTime: {'>': 0}, isArchived: false})
-      .populate('items.product&optionValues&optionValues.option&optionValue');
-    }
+    let orders = await Order.find({paidDateTime: {'>': 0}, isArchived: false, vendor: user.vendor})
+    .populate('items.product&optionValues&optionValues.option&optionValue');
 
     // Respond with view or JSON.
     if(this.req.wantsJSON) {
       return exits.successJSON(
-        {orders, isVendor}
+        {orders}
       );
     } else {
-      return exits.success({orders, isVendor});
+      return exits.success({orders});
     }
 
   }

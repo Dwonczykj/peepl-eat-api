@@ -22,11 +22,32 @@ module.exports = {
 
 
   exits: {
-
+    notFound:{
+      responseType: 'notFound'
+    },
+    unauthorised:{
+      responseType: 'unauthorised'
+    }
   },
 
 
   fn: async function (inputs) {
+    // Check whether user is authorised for vendor.
+    let vendor = await Vendor.findOne({id: inputs.vendorId});
+    if(!vendor){
+      throw 'Vendor not found';
+    }
+
+    // Check if user is authorised to edit product option.
+    var isAuthorisedForVendor = await sails.helpers.isAuthorisedForVendor.with({
+      userId: this.req.session.userId,
+      vendorId: inputs.vendorId
+    });
+
+    if(!isAuthorisedForVendor) {
+      throw 'unauthorised';
+    }
+
     var updatedVendor = await Vendor.replaceCollection(inputs.vendorId, 'fulfilmentPostalDistricts')
     .members(inputs.districts);
 

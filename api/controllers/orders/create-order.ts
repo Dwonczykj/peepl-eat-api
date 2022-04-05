@@ -2,7 +2,6 @@
 declare var OrderItemOptionValue: any;
 declare var OrderItem: any;
 declare var Order: any;
-declare var Discount: any;
 declare var _: any;
 
 module.exports = {
@@ -66,8 +65,12 @@ module.exports = {
 
   exits: {
     invalidSlot: {
-      responseType: 'serverError'
-    }
+      statusCode: 400,
+      description: 'The fulfilment slot is invalid.'
+    },
+    notFound: {
+      responseType: 'notFound'
+    },
   },
 
 
@@ -76,14 +79,18 @@ module.exports = {
     var md5 = require('md5'); */
 
     // TODO: Validation (products belong to vendor, fulfilmentMethod belongs to vendor, timeslot is valid, options are related to products, optionvalues are valid for options)
-
     var vendor = await Vendor.findOne(inputs.vendor);
 
     if(!vendor) {
-      return exits.error();
+      return exits.notFound();
     }
 
-    var slotsValid = await sails.helpers.validateDeliverySlot.with({fulfilmentMethodId: inputs.fulfilmentMethod, fulfilmentSlotFrom: inputs.fulfilmentSlotFrom, fulfilmentSlotTo: inputs.fulfilmentSlotTo});
+    var slotsValid = await sails.helpers.validateDeliverySlot
+      .with({
+        fulfilmentMethodId: inputs.fulfilmentMethod,
+        fulfilmentSlotFrom: inputs.fulfilmentSlotFrom,
+        fulfilmentSlotTo: inputs.fulfilmentSlotTo
+      });
 
     if(!slotsValid){
       return exits.invalidSlot('Invalid delivery slot');
@@ -105,17 +112,11 @@ module.exports = {
       }
     }
 
-    var discount;
     var order;
+    var discount;
 
     if(inputs.discountCode){
-      var discountDb = await Discount.findOne({code: inputs.discountCode});
-      var currentTime = new Date().getTime();
-
-      // Check validity
-      if(discountDb && (discountDb.expiryDateTime === 0 || discountDb.expiryDateTime >= currentTime) && (discountDb.maxUses === 0 || discountDb.timesUsed < discountDb.maxUses)){
-        discount = discountDb;
-      }
+      discount = await sails.helpers.checkDiscountCode(inputs.discountCode);
     }
 
     // TODO: Check if vendor delivers to that area
@@ -140,12 +141,7 @@ module.exports = {
         fulfilmentSlotFrom: inputs.fulfilmentSlotFrom,
         fulfilmentSlotTo: inputs.fulfilmentSlotTo,
         tipAmount: inputs.tipAmount
-      }).fetch()
-      .intercept({name: 'UsageError'}, (err) => {
-        console.log(err);
-        // TODO: Give more specific error
-        return 'invalid';
-      });
+      }).fetch();
     } else {
       order = await Order.create({
         total: inputs.total,
@@ -163,12 +159,7 @@ module.exports = {
         fulfilmentSlotFrom: inputs.fulfilmentSlotFrom,
         fulfilmentSlotTo: inputs.fulfilmentSlotTo,
         tipAmount: inputs.tipAmount
-      }).fetch()
-      .intercept({name: 'UsageError'}, (err) => {
-        console.log(err);
-        // TODO: Give more specific error
-        return 'invalid';
-      });
+      }).fetch();
     }
 
     // Strip unneccesary data from order items
@@ -188,11 +179,15 @@ module.exports = {
     // If frontend total is incorrect
     if(order.total !== calculatedOrderTotal) {
       // TODO: Log any instances of this, as it shouldn't happen (indicated frontend logic error)
-      console.log('Order total mismatch');
+      sails.log('Order total mismatch');
+
+      // Update with correct amount
       await Order.updateOne(order.id)
       .set({total: calculatedOrderTotal});
     }
 
+
+    // TODO: Move to helper
     /* if(inputs.marketingOptIn) {
       mailchimp.setConfig({
         apiKey: sails.config.custom.mailchimpAPIKey,
@@ -221,6 +216,7 @@ module.exports = {
       vendor.name
     );
 
+    // Update order with payment intent
     await Order.updateOne(order.id)
     .set({paymentIntentId: newPaymentIntent.paymentIntentId});
 

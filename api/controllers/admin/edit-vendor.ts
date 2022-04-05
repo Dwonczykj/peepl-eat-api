@@ -63,9 +63,36 @@ module.exports = {
       description: 'No file was attached.',
       responseType: 'badRequest'
     },
+    notFound: {
+      description: 'There is no vendor with that ID!',
+      responseType: 'notFound'
+    },
+    unauthorised: {
+      description: 'You are not authorised to edit this vendor.',
+      responseType: 'unauthorised'
+    },
+    tooBig: {
+      description: 'The file attached is too big.',
+      responseType: 'badRequest'
+    }
   },
 
-  fn: async function (inputs, exits) {
+  fn: async function (inputs) {
+    let vendor = await Vendor.findOne({ id: inputs.id });
+
+    if (!vendor) {
+      throw 'notFound';
+    }
+
+    // Check if user is authorised to edit vendor.
+    var isAuthorisedForVendor = await sails.helpers.isAuthorisedForVendor.with({
+      userId: this.req.session.userId,
+      vendorId: vendor.id
+    });
+
+    if (!isAuthorisedForVendor) {
+      throw 'unauthorised';
+    }
 
     if(inputs.image){
       var imageInfo = await sails.uploadOne(inputs.image, {
@@ -80,16 +107,12 @@ module.exports = {
       }
     }
 
-    var newVendor = await Vendor.updateOne(inputs.id).set(inputs)
-    .catch((err) => {
-      console.log(err);
-      return exits.serverError();
-    });
+    var newVendor = await Vendor.updateOne(inputs.id).set(inputs);
 
     // All done.
-    return exits.success({
+    return {
       id: newVendor.id
-    });
+    };
   }
 
 

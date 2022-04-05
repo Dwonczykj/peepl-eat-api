@@ -96,11 +96,11 @@ parasails.registerComponent('editProduct', {
           </edit-product-option>
 
           <div class="d-md-flex my-3 action-card-actions">
-            <select class="form-control form-control-sm mr-3" disabled>
+            <!--select class="form-control form-control-sm mr-3" disabled>
               <option>Delete</option>
             </select>
             <br/>
-            <button class="btn btn-secondary btn-sm" disabled>Apply</button>
+            <button class="btn btn-secondary btn-sm" disabled>Apply</button>-->
             <button class="btn btn-peepl btn-sm ml-auto" @click="clickAddProductOption">Add a new option</button>
           </div>
         </fieldset>
@@ -117,6 +117,9 @@ parasails.registerComponent('editProduct', {
   mounted: async function(){
     //…
     this.product.vendor = this.vendorid;
+    if(!this.product.options){
+      Vue.set(this.product, 'options', []);
+    }
   },
   beforeDestroy: function() {
     //…
@@ -174,7 +177,6 @@ parasails.registerComponent('editProduct', {
         name: '[Draft Option]',
         values: []
       };
-
       this.product.options.push(newProductOption);
     }
   }

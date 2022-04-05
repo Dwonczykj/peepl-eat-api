@@ -103,32 +103,8 @@
       <br>
       <input type="radio" id="delivery" value="del" v-model="fulfilmethod">
       <label for="delivery">Delivery</label>
-      <template v-if="fulfilmethod=='del'">
-        <ajax-form :form-data="delFul" :syncing.sync="syncing" :form-errors.sync="formErrors" :cloud-error.sync="cloudError" :action="'updateOpeninghours'">
-          <div v-for="(hours, index) in delFul.openingHours">
-            <input type="checkbox" :id=hours.dayOfWeek v-model="hours.isOpen">
-            <label :for=hours.dayOfWeek>{{hours.dayOfWeek | capitalise}}</label>
-            <label for="appt">Select opening time:</label>
-            <input type="time" id="appt" name="appt" v-model="hours.openTime" :disabled="!hours.isOpen">
-            <label for="appt">Select closing time:</label>
-            <input type="time" id="appt" name="appt" v-model="hours.closeTime" :disabled="!hours.isOpen">
-          </div>
-          <ajax-button class="btn btn-peepl mt-4" type="submit" :syncing="syncing" @submitted="openingHoursSubmitted" v-bind:class="{ 'is-loading': syncing }">Save changes</ajax-button>
-        </ajax-form>
-      </template>
-      <template v-else>
-        <ajax-form :form-data="colFul" :syncing.sync="syncing" :form-errors.sync="formErrors" :cloud-error.sync="cloudError" :action="'updateOpeninghours'">
-          <div v-for="(hours, index) in colFul.openingHours">
-            <input type="checkbox" :id=hours.dayOfWeek v-model="hours.isOpen">
-            <label :for=hours.dayOfWeek>{{hours.dayOfWeek | capitalise}}</label>
-            <label for="appt">Select opening time:</label>
-            <input type="time" id="appt" name="appt" v-model="hours.openTime" :disabled="!hours.isOpen">
-            <label for="appt">Select closing time:</label>
-            <input type="time" id="appt" name="appt" v-model="hours.closeTime" :disabled="!hours.isOpen">
-          </div>
-          <ajax-button class="btn btn-peepl mt-4" type="submit" :syncing="syncing" @submitted="openingHoursSubmitted" v-bind:class="{ 'is-loading': syncing }">Save changes</ajax-button>
-        </ajax-form>
-      </template>
+      
+      <opening-hours :fulfilment-method="(fulfilmethod=='del') ? delFul : colFul"></opening-hours>
     </fieldset>
     <!-- </ajax-form> -->
 

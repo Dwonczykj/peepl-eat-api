@@ -26,10 +26,22 @@ module.exports = {
   },
 
 
-  fn: async function ({vendorid}, exits) {
-    //Get current opening hours
+  fn: async function (inputs, exits) {
+    var vendorid;
+    let user = await User.findOne({id: this.req.session.userId});
+
+    if(user.isSuperAdmin && inputs.vendorid) {
+      vendorid = inputs.vendorid;
+    } else {
+      vendorid = user.vendor;
+    }
+
     var vendor = await Vendor.findOne(vendorid)
-    .populate('products&products.option&option.values');
+    .populate('products&products.options&options.values');
+
+    if(!vendor) {
+      return exits.notFound();
+    }
 
     var delFul = await Vendor.findOne(vendorid)
     .populate('deliveryFulfilmentMethod&deliveryFulfilmentMethod.openingHours');

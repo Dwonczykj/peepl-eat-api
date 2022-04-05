@@ -32,6 +32,18 @@ module.exports = {
   },
 
   fn: async function (inputs, exits) {
+    let productOptionValue = await ProductOptionValue.findOne({ id: inputs.id }).populate('option.product');
+
+    // Check if user has permission to edit the product option value.
+    var isAuthorisedForVendor = await sails.helpers.isAuthorisedForVendor.with({
+      userId: this.req.session.userId,
+      vendorId: productOptionValue.option.product.vendor
+    });
+
+    if(!isAuthorisedForVendor) {
+      return exits.error(new Error('You are not authorised to edit this product option value.'));
+    }
+
     var newProductOptionValue = await ProductOptionValue.updateOne(inputs.id).set(inputs);
 
     // All done.

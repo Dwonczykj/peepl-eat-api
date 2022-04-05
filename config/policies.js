@@ -20,7 +20,13 @@ module.exports.policies = {
   'admin/view-login': true,
   'admin/login': true,
   'admin/view-create-vendor': 'is-super-admin',
+  'admin/view-vendors': 'is-super-admin',
   'admin/create-vendor': 'is-super-admin',
+  'admin/create-postal-district': 'is-super-admin',
+  'admin/edit-postal-district': 'is-super-admin',
+  'admin/view-postal-districts': 'is-super-admin',
+  'admin/edit-discount': 'is-super-admin',
+  'admin/view-discount-codes': 'is-super-admin',
   '*': true,
 
 };

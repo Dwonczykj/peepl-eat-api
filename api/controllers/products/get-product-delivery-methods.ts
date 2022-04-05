@@ -1,7 +1,7 @@
 declare var Product: any;
 module.exports = {
 
-  friendlyName: 'Get product delivery methods',
+  friendlyName: 'Get product delivery methods [DEPRECATED]',
 
   description: 'Get the delivery methods for an array of products.',
 

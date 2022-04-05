@@ -6,7 +6,8 @@ module.exports = {
   inputs: {
     openingHours: {
       type: 'json',
-      columnType: 'array'
+      description: 'The opening hours to be added to the vendor',
+      required: true
     }
   },
 

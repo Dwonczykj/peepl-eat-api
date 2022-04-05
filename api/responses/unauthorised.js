@@ -37,7 +37,7 @@ module.exports = function unauthorised() {
       delete req.session.userId;
     }
 
-    return res.redirect('/admin/login');
+    return res.redirect('/admin');
   }
 
 };

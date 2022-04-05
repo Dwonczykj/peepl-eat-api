@@ -1,11 +1,11 @@
-<div id="postal-districts" v-cloak>
+<div id="postal-districts" class="admin" v-cloak>
 
   <%- partial('../../partials/admin-navbar.ejs') %>
 
   <div class="container">
+    <h1 class="my-5">Postal Districts</h1>
 
     <div class="mb-3">
-      <h1>Postal Districts</h1>
 
       <fieldset>  
         <edit-postal-district v-for="postalDistrict in postalDistricts" :postaldistrict="postalDistrict">

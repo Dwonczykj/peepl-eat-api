@@ -41,7 +41,7 @@ parasails.registerPage('admin-edit-vendor', {
       status: {
       }
     },
-    fulfilmethod: 'del'
+    fulfilmethod: 'col'
   },
 
   //  ╦  ╦╔═╗╔═╗╔═╗╦ ╦╔═╗╦  ╔═╗
@@ -55,7 +55,9 @@ parasails.registerPage('admin-edit-vendor', {
   },
   filters: {
     capitalise: function(value) {
-      if (!value) return '';
+      if (!value) {
+        return '';
+      }
       value = value.toString();
       return value.charAt(0).toUpperCase() + value.slice(1);
     }
@@ -97,8 +99,6 @@ parasails.registerPage('admin-edit-vendor', {
       this.vendor.id = id;
       window.history.pushState({}, '', '/admin/vendors/' + id);
     },
-    openingHoursSubmitted: function() {
-    },
     clickAddProduct: function(){
       var newProduct = {
         name: '[Draft]',
@@ -113,8 +113,7 @@ parasails.registerPage('admin-edit-vendor', {
       this.vendor.products.push(newProduct);
     },
     updatePostalDistricts: function() {
-      var postalDistricts = this.postalDistricts.filter(district => district.checked).map((a)=>{return a.id});
-      console.log(postalDistricts);
+      var postalDistricts = this.postalDistricts.filter(district => district.checked).map((a)=>{return a.id;});
       return {districts: postalDistricts, vendorId: this.vendor.id};
     }
   },

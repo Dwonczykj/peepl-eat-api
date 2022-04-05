@@ -1,7 +1,7 @@
 module.exports = {
 
 
-  friendlyName: 'Update product status',
+  friendlyName: 'Update product statuses',
 
 
   description: '',
@@ -26,8 +26,10 @@ module.exports = {
 
 
   fn: async function (inputs, exits) {
+    // TODO: Test this
+    let user = await User.findOne({id: this.req.session.userId});
 
-    await Product.update(inputs.productIds)
+    await Product.update({id: inputs.productIds, vendor: user.vendor})
     .set({isAvailable: inputs.isAvailable});
 
     // All done.

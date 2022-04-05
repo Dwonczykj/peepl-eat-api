@@ -1,7 +1,7 @@
 declare var Vendor: any;
 module.exports = {
 
-  friendlyName: 'View vendor menu',
+  friendlyName: 'View vendor menu [DEPRECATED]',
 
   description: 'Display "Vendor menu" page.',
 

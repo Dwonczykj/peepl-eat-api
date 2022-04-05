@@ -26,29 +26,14 @@ module.exports = {
 
 
   fn: async function ({discountCode}, exits) {
-    discountCode = discountCode.toUpperCase();
+    var isValid = await sails.helpers.checkDiscountCode(discountCode);
 
-    var discount = await Discount.findOne({code: discountCode});
-    var currentTime = new Date().getTime();
-
-    if(!discount){
-      return exits.notFound();
-    }
-
-    if(discount.expiryDateTime && discount.expiryDateTime < currentTime){
-      return exits.expiredCode({message: 'That code has expired'});
-    }
-
-    if(discount.maxUses && discount.timesUsed >= discount.maxUses){
-      return exits.expiredCode({message: 'That code has been used too many times.'});
-    }
-
-    if(!discount.isEnabled) {
+    if(!isValid) {
       return exits.notFound();
     }
 
     // All done.
-    return exits.success({discount});
+    return exits.success({discount: isValid});
 
   }
 

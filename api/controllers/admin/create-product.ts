@@ -54,6 +54,17 @@ module.exports = {
   },
 
   fn: async function (inputs, exits) {
+    // Check that user is authorised to modify products for this vendor.
+    var isAuthorisedForVendor = await sails.helpers.isAuthorisedForVendor.with({
+      userId: this.req.session.userId,
+      vendorId: inputs.vendor
+    });
+
+    if(!isAuthorisedForVendor) {
+      return exits.error(new Error('You are not authorised to create products for this vendor.'));
+    }
+
+    // Check that the file is not too big.
     var imageInfo = await sails.uploadOne(inputs.image, {
       maxBytes: 30000000
     })
@@ -64,6 +75,7 @@ module.exports = {
       return exits.noFileAttached();
     }
 
+    // Create the new product
     var newProduct = await Product.create({
       imageFd: imageInfo.fd,
       imageMime: imageInfo.type,
@@ -73,10 +85,7 @@ module.exports = {
       isAvailable: inputs.isAvailable,
       priority: inputs.priority,
       vendor: inputs.vendor
-    }).fetch()
-    .catch((err) => {
-      console.log(err);
-    });
+    }).fetch();
 
     // All done.
     return exits.success({

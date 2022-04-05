@@ -1,6 +1,4 @@
-declare var Vendor: any;
 declare var PostalDistrict: any;
-declare var Order: any;
 
 module.exports = {
 

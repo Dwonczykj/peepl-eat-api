@@ -1,24 +1,24 @@
 parasails.registerComponent('editPostalDistrict', {
-    props: ['postaldistrict'],
+  props: ['postaldistrict'],
 
-    data: function() {
-        return {
-            formErrors: {},
-            syncing: false,
-            cloudError: '',
-            formRules: {
-                outcode: {
-                    required: true
-                }
-            },
+  data: function() {
+    return {
+      formErrors: {},
+      syncing: false,
+      cloudError: '',
+      formRules: {
+        outcode: {
+          required: true
         }
-    },
+      },
+    };
+  },
 
-    template: `
+  template: `
     <div class="my-3 p-3 p-md-4 rounded action-card">
         <details>
         <summary class="action-card__summary">
-            <span>{{ (postaldistrict.outcode ? postaldistrict.outcode : "Enter") | capitalise }}</span> <div class="text-muted ml-1"></div>
+            <span>{{ (postaldistrict.outcode ? postaldistrict.outcode : "Placeholder") | capitalise }}</span> <div class="text-muted ml-1"></div>
         </summary>
         <div class="action-card__content">
             <ajax-form :cloud-error.sync="cloudError" :form-data="postaldistrict" :form-rules="formRules" :syncing.sync="syncing" :form-errors.sync="formErrors" @submitted="createdPostalDistrict" :action="(postaldistrict.id) ?  'editPostalDistrict' : 'createPostalDistrict'">
@@ -38,20 +38,20 @@ parasails.registerComponent('editPostalDistrict', {
         </details>
     </div>`,
 
-    filters: {
-        capitalise: function (value) {
-          if (!value) {return ''; }
-          value = value.toString();
-          return value.toUpperCase();
-        }
-      },
-    
-      //  ╦╔╗╔╔╦╗╔═╗╦═╗╔═╗╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
-      //  ║║║║ ║ ║╣ ╠╦╝╠═╣║   ║ ║║ ║║║║╚═╗
-      //  ╩╝╚╝ ╩ ╚═╝╩╚═╩ ╩╚═╝ ╩ ╩╚═╝╝╚╝╚═╝
-      methods: {
-        createdPostalDistrict: function({id}){
-          Vue.set(this.postaldistrict, 'id', id);
-        },
-      }
+  filters: {
+    capitalise: function (value) {
+      if (!value) {return ''; }
+      value = value.toString();
+      return value.toUpperCase();
+    }
+  },
+
+  //  ╦╔╗╔╔╦╗╔═╗╦═╗╔═╗╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
+  //  ║║║║ ║ ║╣ ╠╦╝╠═╣║   ║ ║║ ║║║║╚═╗
+  //  ╩╝╚╝ ╩ ╚═╝╩╚═╩ ╩╚═╝ ╩ ╩╚═╝╝╚╝╚═╝
+  methods: {
+    createdPostalDistrict: function({id}){
+      Vue.set(this.postaldistrict, 'id', id);
+    },
+  }
 });

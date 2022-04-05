@@ -1,7 +1,7 @@
 declare var Order: any;
 module.exports = {
 
-  friendlyName: 'View order confirmation',
+  friendlyName: 'View order confirmation [DEPRECATED]',
 
   description: 'Display "Order confirmation" page.',
 

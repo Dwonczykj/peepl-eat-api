@@ -19,7 +19,7 @@ module.exports = {
   fn: async function () {
 
     if(this.req.session.userId){
-      return this.res.redirect('/admin/vendors');
+      return this.res.redirect('/admin');
     }
 
     // Respond with view.

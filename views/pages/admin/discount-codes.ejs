@@ -3,21 +3,20 @@
   <%- partial('../../partials/admin-navbar.ejs') %>
 
   <div class="container">
-
+    <h1 class="my-5">Discount Codes</h1>
     <div class="mb-3">
-      <h1>Discount Codes</h1>
 
       <fieldset>  
         <edit-discount v-for="discount in discounts" :discount="discount">
         </edit-discount>
   
         <div class="d-md-flex my-3 action-card-actions">
-          <select class="form-control form-control-sm mr-3" disabled>
+          <!-- <select class="form-control form-control-sm mr-3" disabled>
             <option value="true">Set as available</option>
             <option value="false">Set as unavailable</option>
           </select>
           <br/>
-          <button class="btn btn-peepl btn-sm">Apply</button>
+          <button class="btn btn-peepl btn-sm">Apply</button> -->
           <button class="btn btn-peepl btn-sm ml-auto" @click="clickAddDiscount">Add a new discount code</button>
         </div>
       </fieldset>

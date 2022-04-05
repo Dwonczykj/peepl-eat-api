@@ -25,6 +25,9 @@
   },
   "tags": [
     {
+      "name": "View edit vendor"
+    },
+    {
       "name": "View login"
     },
     {
@@ -94,7 +97,7 @@
       "name": "Archive order"
     },
     {
-      "name": "Update product status"
+      "name": "Update product statuses"
     },
     {
       "name": "Create discount"
@@ -124,13 +127,10 @@
       "name": "Check discount code"
     },
     {
-      "name": "View vendor menu"
+      "name": "View vendor menu [DEPRECATED]"
     },
     {
       "name": "Download image"
-    },
-    {
-      "name": "View edit vendor"
     },
     {
       "name": "View approve order"
@@ -1249,6 +1249,53 @@
     }
   },
   "paths": {
+    "/admin": {
+      "get": {
+        "summary": "View edit vendor",
+        "description": "Display \"Edit vendor\" page.",
+        "tags": [
+          "View edit vendor"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "vendorid",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/admin/login": {
       "get": {
         "summary": "View login",
@@ -1702,10 +1749,13 @@
         ],
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "The requested resource"
+          },
+          "400": {
+            "description": "The fulfilment slot is invalid."
           },
           "404": {
-            "description": "Resource not found"
+            "description": "Not found"
           },
           "500": {
             "description": "Internal server error"
@@ -2068,6 +2118,14 @@
                     {
                       "type": "string",
                       "description": "No file was attached."
+                    },
+                    {
+                      "type": "string",
+                      "description": "You are not authorised to edit this vendor."
+                    },
+                    {
+                      "type": "string",
+                      "description": "The file attached is too big."
                     }
                   ]
                 }
@@ -2075,7 +2133,7 @@
             }
           },
           "404": {
-            "description": "Resource not found"
+            "description": "There is no vendor with that ID!"
           },
           "500": {
             "description": "Internal server error"
@@ -2425,10 +2483,18 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "example": {},
-                  "type": "object",
-                  "properties": {},
-                  "description": "Success"
+                  "oneOf": [
+                    {
+                      "example": {},
+                      "type": "object",
+                      "properties": {},
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "You are not authorised to create product option values for this product option."
+                    }
+                  ]
                 }
               }
             }
@@ -2547,9 +2613,9 @@
     },
     "/api/v1/admin/update-product-status": {
       "post": {
-        "summary": "Update product status",
+        "summary": "Update product statuses",
         "tags": [
-          "Update product status"
+          "Update product statuses"
         ],
         "parameters": [
           {
@@ -2639,6 +2705,9 @@
           },
           "404": {
             "description": "Resource not found"
+          },
+          "409": {
+            "description": "Success"
           },
           "500": {
             "description": "Internal server error"
@@ -2731,8 +2800,9 @@
           {
             "in": "query",
             "name": "openingHours",
-            "required": false,
-            "schema": {}
+            "required": true,
+            "schema": {},
+            "description": "The opening hours to be added to the vendor"
           }
         ],
         "responses": {
@@ -2890,10 +2960,10 @@
         ],
         "responses": {
           "200": {
-            "description": "The requested resource"
+            "description": "Success"
           },
           "404": {
-            "description": "Resource not found"
+            "description": "Not found"
           },
           "500": {
             "description": "Internal server error"
@@ -2965,10 +3035,10 @@
     },
     "/api/v1/vendors/{vendorid}": {
       "get": {
-        "summary": "View vendor menu",
+        "summary": "View vendor menu [DEPRECATED]",
         "description": "Display \"Vendor menu\" page.",
         "tags": [
-          "View vendor menu"
+          "View vendor menu [DEPRECATED]"
         ],
         "parameters": [
           {

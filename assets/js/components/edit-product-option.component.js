@@ -65,13 +65,13 @@ parasails.registerComponent('editProductOption', {
           </edit-product-option-value>
 
           <div class="d-md-flex my-3 action-card-actions">
-            <select class="form-control form-control-sm mr-3" disabled>
+            <!--<select class="form-control form-control-sm mr-3" disabled>
               <option>Set as available</option>
               <option>Set as unavailable</option>
               <option>Delete</option>
             </select>
             <br/>
-            <button class="btn btn-secondary btn-sm" disabled>Apply</button>
+            <button class="btn btn-secondary btn-sm" disabled>Apply</button>-->
             <button @click="clickAddProductOptionValue" class="btn btn-peepl btn-sm ml-auto">Add a new value</button>
           </div>
         </fieldset>
