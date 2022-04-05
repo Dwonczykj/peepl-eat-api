@@ -261,9 +261,11 @@
           "slotLength": {
             "type": "number",
             "format": "double",
+            "default": 60,
             "description": "Slot length in minutes",
             "maximum": 1440,
-            "minimum": 0
+            "minimum": 30,
+            "example": 60
           },
           "bufferLength": {
             "type": "number",

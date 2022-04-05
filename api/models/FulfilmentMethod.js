@@ -37,8 +37,9 @@ module.exports = {
     slotLength: {
       type: 'number',
       description: 'Slot length in minutes',
-      min: 0,
-      max: 1440
+      min: 30,
+      max: 1440,
+      defaultsTo: 60
     },
     bufferLength: {
       type: 'number',

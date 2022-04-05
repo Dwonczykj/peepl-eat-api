@@ -1,5 +1,6 @@
 declare var OpeningHours: any;
 declare var FulfilmentMethod: any;
+var moment = require('moment');
 module.exports = {
 
 
@@ -31,7 +32,6 @@ module.exports = {
 
 
   fn: async function (inputs) {
-    var moment = require('moment');
     // TODO: Consider timezones
     // TODO: Account for overnight opening hours
     // TODO: Generate IDs for slots to simplify logic (but must account for changes to opening hours and slot duration)
@@ -140,7 +140,7 @@ module.exports = {
         // Is the time slot after current time plus fulfilment method buffer
         var isInFuture = moment(slotI.startTime).isAfter(moment().add(fulfilmentMethod.bufferLength, 'minutes'));
 
-        if ((relevantOrders.length < fulfilmentMethod.maxOrders) && isInFuture) { // If there aren't too many orders in the slot
+        if (!fulfilmentMethod.maxOrders || (relevantOrders.length <= fulfilmentMethod.maxOrders) && isInFuture) { // If there aren't too many orders in the slot
           availableSlots.push(slotI); // Add slot to availableSlots array
         }
       }
