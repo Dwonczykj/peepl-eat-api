@@ -53,7 +53,7 @@ module.exports = {
     const saltRounds = sails.config.custom.passwordSaltRounds;
 
     try{
-      user.password = await bcrypt.hash(user.password, saltRounds);
+      user.passwordHash = await bcrypt.hash(user.password, saltRounds);
     } catch(err) {
       throw err;
     }

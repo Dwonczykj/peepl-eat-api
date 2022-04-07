@@ -105,6 +105,7 @@ module.exports = {
       type: 'boolean',
       defaultsTo: false
     },
+    // TODO: Add rewardsIssued attribute
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
