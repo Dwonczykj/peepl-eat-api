@@ -38,13 +38,10 @@ module.exports = {
       required: true,
       regex: /^0x[a-fA-F0-9]{40}$/
     },
-    imageFd: {
+    imageUrl: {
       type: 'string',
-      description: 'A description of where the featured image file can be found'
-    },
-    imageMime: {
-      type: 'string',
-      description: 'The mime type of the featured image'
+      description: 'A description of where the featured image file can be found',
+      required: true
     },
     deliveryRestrictionDetails: {
       type: 'string',

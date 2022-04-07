@@ -31,6 +31,7 @@
     "sails-hook-uploads": "^0.4.3",
     "sails-mysql": "^1.0.1",
     "sass": "^1.32.4",
+    "skipper-s3": "^0.6.0",
     "ts-node": "^9.1.1",
     "twilio": "^3.75.1",
     "uuid": "^8.3.2"

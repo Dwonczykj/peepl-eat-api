@@ -51,8 +51,7 @@ module.exports.bootstrap = async function() {
     type: 'restaurant',
     description: 'Life\'s too short to have a bad meal. Delifonseca is here to help you enjoy the finer tastes in life.',
     walletAddress: '0xf039CD9391cB28a7e632D07821deeBc249a32410',
-    imageFd: __dirname + '/../assets/images/vendors/spitroast.jpg',
-    imageMime: 'image/jpeg',
+    imageUrl: 'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
     status: 'active',
     phoneNumber: '+447495995614',
     vendorCategories: [vendorCategory.id],
@@ -161,6 +160,15 @@ module.exports.bootstrap = async function() {
     percentage: 10,
     isEnabled: true
   });
+
+  // TODO: Create user
+  // await User.create({
+  //   email: 'adam@test.com',
+  //   passwordHash: 'Hello', // Hello
+  //   password: 'Hello', // Hello
+  //   name: 'Adam Galloway',
+  //   vendor: delifonseca.id
+  // });
 
   // Save new bootstrap version
   await sails.helpers.fs.writeJson.with({

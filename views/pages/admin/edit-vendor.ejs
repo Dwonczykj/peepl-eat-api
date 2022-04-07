@@ -48,7 +48,7 @@
 
       <fieldset>
         <h2 class="h5 mt-3">Featured Image</h2>
-        <img v-if="previewImageSrc || vendor.id" :src="(previewImageSrc) ? previewImageSrc : '/vendors/download-image/' + vendor.id" />
+        <img v-if="previewImageSrc || vendor.imageUrl" :src="(previewImageSrc) ? previewImageSrc : vendor.imageUrl" />
         <div class="custom-file">
           <input type="file" class="custom-file-input" accept="image/*" id="customFile" @change="changeVendorImageInput($event.target.files)">
           <label class="custom-file-label" for="customFile">{{imageName}}</label>
