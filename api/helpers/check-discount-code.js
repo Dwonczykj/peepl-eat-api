@@ -11,6 +11,9 @@ module.exports = {
     discountCode: {
       type: 'string',
       required: true
+    },
+    vendorId: {
+      type: 'number',
     }
   },
 
@@ -26,11 +29,14 @@ module.exports = {
 
   fn: async function (inputs) {
     var discountCode = inputs.discountCode.toUpperCase();
-
     var discount = await Discount.findOne({code: discountCode});
     var currentTime = new Date().getTime();
 
     if(!discount){
+      return false;
+    }
+
+    if(discount.vendor && (discount.vendor !== inputs.vendorId)){
       return false;
     }
 

@@ -198,6 +198,14 @@
           "isEnabled": {
             "type": "boolean",
             "default": false
+          },
+          "vendor": {
+            "description": "Optional vendor for this discount JSON dictionary representing the **vendor** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/vendor"
+              }
+            ]
           }
         }
       },
@@ -1443,7 +1451,17 @@
         "tags": [
           "View discount codes"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "vendorId",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -1734,7 +1752,8 @@
             "required": false,
             "schema": {
               "type": "number",
-              "format": "double"
+              "format": "double",
+              "default": 0
             }
           },
           {
@@ -3016,6 +3035,15 @@
             "required": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vendorId",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
             }
           }
         ],

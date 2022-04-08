@@ -6,6 +6,11 @@ module.exports = {
 
   description: 'Display "Discount codes" page.',
 
+  inputs: {
+    vendorId: {
+      type: 'number',
+    }
+  },
 
   exits: {
 
@@ -20,7 +25,17 @@ module.exports = {
 
 
   fn: async function (inputs, exits) {
-    var discounts = await Discount.find();
+    var discounts = [];
+    let user = await User.findOne({id: this.req.session.userId});
+
+    if(user.isSuperAdmin && inputs.vendorId) {
+      discounts = await Discount.find({vendor: inputs.vendorId});
+    } else if (user.isSuperAdmin) {
+      discounts = await Discount.find();
+    } else {
+      discounts = await Discount.find({vendor: user.vendor});
+    }
+
 
     // Respond with view or JSON.
     if(this.req.wantsJSON) {

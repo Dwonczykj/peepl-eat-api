@@ -11,6 +11,9 @@ module.exports = {
     discountCode: {
       type: 'string',
       required: true
+    },
+    vendorId: {
+      type: 'number',
     }
   },
 
@@ -25,8 +28,8 @@ module.exports = {
   },
 
 
-  fn: async function ({discountCode}, exits) {
-    var isValid = await sails.helpers.checkDiscountCode(discountCode);
+  fn: async function ({discountCode, vendorId}, exits) {
+    var isValid = await sails.helpers.checkDiscountCode(discountCode, vendorId);
 
     if(!isValid) {
       return exits.notFound();

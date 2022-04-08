@@ -25,8 +25,6 @@ module.exports.policies = {
   'admin/create-postal-district': 'is-super-admin',
   'admin/edit-postal-district': 'is-super-admin',
   'admin/view-postal-districts': 'is-super-admin',
-  'admin/edit-discount': 'is-super-admin',
-  'admin/view-discount-codes': 'is-super-admin',
   'admin/view-approve-order': true,
   'admin/approve-or-decline-order': true,
   '*': true,
