@@ -33,5 +33,6 @@ module.exports.custom = {
   amazonS3Secret: 'Ob+Z6nSxSLa95NSKheFAXPMT2OYzdKOMCuVmd52Q',
   amazonS3Bucket: 'vegiapp-1',
   amazonS3AccessKey: 'AKIA57YJIRDKCR42R7MU',
-  amazonS3BucketUrl: 'https://vegiapp-1.s3.us-east-1.amazonaws.com/'
+  amazonS3BucketUrl: 'https://vegiapp-1.s3.us-east-1.amazonaws.com/',
+  mailchimpListId: 'e538a63177'
 };

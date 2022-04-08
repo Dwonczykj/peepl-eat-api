@@ -54,7 +54,7 @@ module.exports = {
     },
     tipAmount: {
       type: 'number',
-      required: false
+      defaultsTo: 0
     },
     walletAddress: {
       type: 'string',
@@ -75,9 +75,6 @@ module.exports = {
 
 
   fn: async function (inputs, exits) {
-    /* var mailchimp = require('@mailchimp/mailchimp_marketing');
-    var md5 = require('md5'); */
-
     // TODO: Validation (products belong to vendor, fulfilmentMethod belongs to vendor, timeslot is valid, options are related to products, optionvalues are valid for options)
     var vendor = await Vendor.findOne(inputs.vendor);
 
@@ -116,12 +113,12 @@ module.exports = {
     var discount;
 
     if(inputs.discountCode){
-      discount = await sails.helpers.checkDiscountCode(inputs.discountCode);
+      // TODO: Return error if discount code is invalid
+      discount = await sails.helpers.checkDiscountCode(inputs.discountCode, inputs.vendor);
     }
 
     // TODO: Check if vendor delivers to that area
     // TODO: Validate that fulfilment method belongs to vendor
-    // TODO: Validate fulfilment slot times
     // TODO: Test this validation
     if(discount) {
       order = await Order.create({
@@ -185,30 +182,6 @@ module.exports = {
       await Order.updateOne(order.id)
       .set({total: calculatedOrderTotal});
     }
-
-
-    // TODO: Move to helper
-    /* if(inputs.marketingOptIn) {
-      mailchimp.setConfig({
-        apiKey: sails.config.custom.mailchimpAPIKey,
-        server: 'us7'
-      });
-
-      var customerEmailMd5 = md5(inputs.address.email.toLowerCase());
-      var listId = 'e538a63177'; // Peepl Newsletter
-
-      mailchimp.lists.setListMember(listId, customerEmailMd5, {
-        email_address: inputs.address.email,
-        status_if_new: 'subscribed',
-        merge_fields: {
-          FNAME: inputs.address.name,
-          POSTCODE: inputs.address.postCode
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    } */
 
     // Create PaymentIntent on Peepl Pay
     var newPaymentIntent = await sails.helpers.createPaymentIntent(calculatedOrderTotal,
