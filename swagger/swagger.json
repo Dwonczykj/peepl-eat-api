@@ -491,6 +491,11 @@
             "type": "boolean",
             "default": false
           },
+          "rewardsIssued": {
+            "type": "number",
+            "format": "double",
+            "default": 0
+          },
           "fulfilmentMethod": {
             "description": "JSON dictionary representing the **fulfilmentmethod** instance or FK when creating / updating / not populated",
             "oneOf": [

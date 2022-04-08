@@ -11,7 +11,7 @@ module.exports = async function (req, res, proceed) {
   if (!req.session.userId) {
     return res.redirect('/admin/login');
   }
-  // TODO: Handle case that user doens't exist
+  // TODO: Handle case that user doesn't exist
 
   return proceed();
 };

@@ -55,7 +55,7 @@ parasails.registerPage('login', {
     },
     submittedForm: function() {
       this.syncing = true;
-      window.location = '/admin/vendors';
+      window.location = '/admin';
     }
   }
 });
