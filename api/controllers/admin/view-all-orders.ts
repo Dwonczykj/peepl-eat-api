@@ -19,9 +19,15 @@ module.exports = {
 
   fn: async function (inputs, exits) {
     let user = await User.findOne(this.req.session.userId);
+    let orders;
 
-    let orders = await Order.find({paidDateTime: {'>': 0}, isArchived: false, vendor: user.vendor})
-    .populate('items.product&optionValues&optionValues.option&optionValue');
+    if(user.isSuperAdmin){
+      orders = await Order.find({paidDateTime: {'>': 0}, isArchived: false,})
+      .populate('items.product&optionValues&optionValues.option&optionValue');
+    } else {
+      orders = await Order.find({paidDateTime: {'>': 0}, isArchived: false, vendor: user.vendor})
+      .populate('items.product&optionValues&optionValues.option&optionValue');
+    }
 
     // Respond with view or JSON.
     if(this.req.wantsJSON) {
