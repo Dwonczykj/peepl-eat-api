@@ -130,9 +130,6 @@
       "name": "View vendor menu [DEPRECATED]"
     },
     {
-      "name": "Download image"
-    },
-    {
       "name": "View approve order"
     }
   ],
@@ -733,15 +730,8 @@
             "format": "double",
             "description": "Base product price in pence. This can be modified by product options or delivery methods."
           },
-          "imageFd": {
+          "imageUrl": {
             "type": "string"
-          },
-          "imageMime": {
-            "type": "string"
-          },
-          "image": {
-            "type": "string",
-            "description": "Full path to the product image."
           },
           "isAvailable": {
             "type": "boolean",
@@ -3089,68 +3079,6 @@
           },
           "404": {
             "description": "Not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/vendors/download-image/{vendorid}": {
-      "get": {
-        "summary": "Download image",
-        "description": "Download image file (returning a stream).",
-        "tags": [
-          "Download image"
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "vendorid",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The requested resource"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/products/download-image/{productId}": {
-      "get": {
-        "summary": "Download image",
-        "description": "Download image file (returning a stream).",
-        "tags": [
-          "Download image"
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "productId",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The requested resource"
-          },
-          "404": {
-            "description": "Resource not found"
           },
           "500": {
             "description": "Internal server error"
