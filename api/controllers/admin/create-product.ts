@@ -66,6 +66,10 @@ module.exports = {
 
     // Check that the file is not too big.
     var imageInfo = await sails.uploadOne(inputs.image, {
+      adapter: require('skipper-s3'),
+      key: sails.config.custom.amazonS3AccessKey,
+      secret: sails.config.custom.amazonS3Secret,
+      bucket: sails.config.custom.amazonS3Bucket,
       maxBytes: 30000000
     })
     .intercept('E_EXCEEDS_UPLOAD_LIMIT', 'tooBig')
@@ -77,8 +81,7 @@ module.exports = {
 
     // Create the new product
     var newProduct = await Product.create({
-      imageFd: imageInfo.fd,
-      imageMime: imageInfo.type,
+      imageUrl: sails.config.custom.amazonS3BucketUrl + imageInfo.fd,
       name: inputs.name,
       description: inputs.description,
       basePrice: inputs.basePrice,

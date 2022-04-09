@@ -31,15 +31,8 @@ module.exports = {
       description: 'Base product price in pence. This can be modified by product options or delivery methods.',
       required: true
     },
-    imageFd: {
-      type: 'string'
-    },
-    imageMime: {
-      type:'string'
-    },
-    image: {
+    imageUrl: {
       type: 'string',
-      description: 'Full path to the product image.'
     },
     isAvailable: {
       type: 'boolean',

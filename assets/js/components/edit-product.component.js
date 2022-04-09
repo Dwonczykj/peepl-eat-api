@@ -73,7 +73,7 @@ parasails.registerComponent('editProduct', {
           </div>
           <fieldset>
             <h2 class="h5 mt-3">Featured Image</h2>
-            <img v-if="previewImageSrc || product.id" :src="(previewImageSrc) ? previewImageSrc : '/products/download-image/' + product.id" />
+            <img v-if="previewImageSrc || product.id" :src="(previewImageSrc) ? previewImageSrc : product.imageUrl" />
             <div class="custom-file">
               <input :class="{ 'is-invalid': formErrors.image }" type="file" class="custom-file-input" accept="image/*" id="customFile" @change="changeProductImageInput($event.target.files)">
               <label class="custom-file-label" for="customFile">{{imageName}}</label>
