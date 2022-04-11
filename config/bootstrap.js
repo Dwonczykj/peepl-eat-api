@@ -161,13 +161,13 @@ module.exports.bootstrap = async function() {
   });
 
   // TODO: Create user
-  // await User.create({
-  //   email: 'adam@test.com',
-  //   passwordHash: 'Hello', // Hello
-  //   password: 'Hello', // Hello
-  //   name: 'Adam Galloway',
-  //   vendor: delifonseca.id
-  // });
+  await User.create({
+    email: 'adam@itsaboutpeepl.com',
+    password: 'Testing123!',
+    name: 'Adam Galloway',
+    vendor: delifonseca.id,
+    isSuperAdmin: true
+  });
 
   // Save new bootstrap version
   await sails.helpers.fs.writeJson.with({

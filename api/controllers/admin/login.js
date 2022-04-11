@@ -41,7 +41,7 @@ module.exports = {
       throw 'badCombo';
     }
 
-    const isValidPassword = await bcrypt.compare(inputs.password, user.passwordHash);
+    const isValidPassword = await bcrypt.compare(inputs.password, user.password);
     if(!isValidPassword){
       throw 'badCombo';
     }

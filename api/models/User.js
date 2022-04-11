@@ -18,7 +18,7 @@ module.exports = {
       isEmail: true,
       unique: true,
     },
-    passwordHash: {
+    password: {
       type: 'string',
       required: true,
     },
@@ -46,14 +46,14 @@ module.exports = {
   },
 
   customToJSON: function() {
-    return _.omit(this, ['passwordHash']);
+    return _.omit(this, ['password']);
   },
 
   beforeCreate: async function(user, cb){
     const saltRounds = sails.config.custom.passwordSaltRounds;
 
     try{
-      user.passwordHash = await bcrypt.hash(user.password, saltRounds);
+      user.password = await bcrypt.hash(user.password, saltRounds);
     } catch(err) {
       throw err;
     }
