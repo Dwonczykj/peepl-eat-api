@@ -1,4 +1,4 @@
-<div id="all-orders" v-cloak>
+<div id="all-orders" class="admin" v-cloak>
 
   <%- partial('../../partials/admin-navbar.ejs') %>
 
@@ -7,7 +7,7 @@
     <!-- <h1 class="h4 text-center my-4">All orders</h1> -->
     <div class="row">
         <div v-for="order in orders" class="col-md-6">
-          <div class="my-3 p-3 bg-white rounded">
+          <div class="my-3 p-3 bg-grey rounded">
             <p class="text-muted m-0">Order #{{order.id}} <span class="btn btn-peepl float-right" @click="clickArchiveOrder(order.id)">Archive</span></p>
             <div v-for="item in order.items">
               <h2 class="h5 border-top pt-3 mt-3 mb-0">{{item.product.name}}</h2>

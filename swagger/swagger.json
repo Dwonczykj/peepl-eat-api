@@ -1923,14 +1923,6 @@
           },
           {
             "in": "query",
-            "name": "deliveryRestrictionDetails",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
             "name": "status",
             "required": false,
             "schema": {
@@ -2051,15 +2043,6 @@
           {
             "in": "query",
             "name": "phoneNumber",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "nullable": true
-            }
-          },
-          {
-            "in": "query",
-            "name": "deliveryRestrictionDetails",
             "required": false,
             "schema": {
               "type": "string",
