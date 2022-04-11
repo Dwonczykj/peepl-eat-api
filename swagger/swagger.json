@@ -25,16 +25,13 @@
   },
   "tags": [
     {
-      "name": "View edit vendor"
+      "name": "View vendors"
     },
     {
       "name": "View login"
     },
     {
       "name": "Login"
-    },
-    {
-      "name": "View vendors"
     },
     {
       "name": "View all orders"
@@ -128,6 +125,9 @@
     },
     {
       "name": "View vendor menu [DEPRECATED]"
+    },
+    {
+      "name": "View edit vendor"
     },
     {
       "name": "View approve order"
@@ -942,7 +942,7 @@
           },
           {
             "required": [
-              "passwordHash",
+              "password",
               "name",
               "vendor"
             ]
@@ -972,7 +972,7 @@
             "format": "email",
             "uniqueItems": true
           },
-          "passwordHash": {
+          "password": {
             "type": "string"
           },
           "name": {
@@ -1036,6 +1036,10 @@
             "default": "restaurant",
             "description": "The type of vendor.",
             "maxLength": 50,
+            "enum": [
+              "restaurant",
+              "shop"
+            ],
             "example": "restaurant"
           },
           "description": {
@@ -1051,11 +1055,6 @@
           "imageUrl": {
             "type": "string",
             "description": "A description of where the featured image file can be found"
-          },
-          "deliveryRestrictionDetails": {
-            "type": "string",
-            "nullable": true,
-            "description": "This is a free text description of the restaurant's restrictions, used temporarily."
           },
           "status": {
             "type": "string",
@@ -1253,22 +1252,12 @@
   "paths": {
     "/admin": {
       "get": {
-        "summary": "View edit vendor",
-        "description": "Display \"Edit vendor\" page.",
+        "summary": "View vendors",
+        "description": "Display \"Vendors\" page.",
         "tags": [
-          "View edit vendor"
+          "View vendors"
         ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "vendorid",
-            "required": false,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "Success",

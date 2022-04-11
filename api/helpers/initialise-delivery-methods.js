@@ -48,6 +48,8 @@ module.exports = {
       openingHoursDel.push({
         dayOfWeek: weekday,
         isOpen: false,
+        openTime: '09:00',
+        closeTime: '17:00',
         fulfilmentMethod: del.id
       });
 
@@ -55,6 +57,8 @@ module.exports = {
       openingHoursCol.push({
         dayOfWeek: weekday,
         isOpen: false,
+        openTime: '09:00',
+        closeTime: '17:00',
         fulfilmentMethod: col.id
       });
     });

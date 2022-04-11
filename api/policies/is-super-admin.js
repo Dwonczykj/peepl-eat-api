@@ -20,5 +20,5 @@ module.exports = async function (req, res, proceed) {
     return proceed();
   }
 
-  return res.redirect('/admin');
+  return res.redirect('/admin/vendors/' + user.vendor);
 };

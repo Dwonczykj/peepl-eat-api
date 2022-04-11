@@ -54,7 +54,7 @@ module.exports.routes = {
   'GET /admin/login': { action: 'admin/view-login' },
   'POST /admin/login': { action: 'admin/login' },
 
-  'GET /admin': { action: 'admin/view-edit-vendor' },
+  'GET /admin': { action: 'admin/view-vendors' },
   'GET /admin/vendors': { action: 'admin/view-vendors' },
   'GET /admin/vendors/new': { action: 'admin/view-create-vendor' },
   'GET /admin/vendors/:vendorid': { action: 'admin/view-edit-vendor' },
