@@ -34,6 +34,9 @@
       "name": "Login"
     },
     {
+      "name": "Logout"
+    },
+    {
       "name": "View all orders"
     },
     {
@@ -1344,6 +1347,27 @@
         "responses": {
           "200": {
             "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/admin/logout": {
+      "get": {
+        "summary": "Logout",
+        "description": "Logout admin.",
+        "tags": [
+          "Logout"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The requested resource"
           },
           "404": {
             "description": "Resource not found"
