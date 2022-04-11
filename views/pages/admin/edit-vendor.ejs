@@ -26,10 +26,10 @@
         <label for="phoneNumber">Vendor Phone Number</label>
         <input type="text" :class="{ 'is-invalid': formErrors.phoneNumber }" v-model="vendor.phoneNumber" class="form-control" id="phoneNumber" >
       </div>
-      <div class="form-group">
+      <!-- <div class="form-group">
         <label for="vendorWallet">Delivery Restriction Details</label>
         <input type="text" placeholder="Delivers to L1, L2, L3" :class="{ 'is-invalid': formErrors.deliveryRestrictionDetails }" v-model="vendor.deliveryRestrictionDetails" class="form-control" id="vendorWallet" >
-      </div>
+      </div> -->
       <div class="form-group">
         <label for="vendorType">Vendor Type</label>
         <select class="form-control" id="vendorType" v-model="vendor.type" :disabled="vendor.id">

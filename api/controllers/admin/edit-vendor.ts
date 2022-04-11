@@ -32,10 +32,10 @@ module.exports = {
       type: 'string',
       allowNull: true
     },
-    deliveryRestrictionDetails: {
-      type: 'string',
-      allowNull: true
-    },
+    // deliveryRestrictionDetails: {
+    //   type: 'string',
+    //   allowNull: true
+    // },
     status: {
       type: 'string',
       isIn: ['draft', 'active', 'inactive']

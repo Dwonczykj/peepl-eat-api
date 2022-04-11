@@ -14,7 +14,7 @@ parasails.registerPage('admin-edit-vendor', {
       image: '',
       type: 'restaurant',
       walletAddress: '0x',
-      deliveryRestrictionDetails: '',
+      // deliveryRestrictionDetails: '',
       status: 'draft',
       products: []
     },

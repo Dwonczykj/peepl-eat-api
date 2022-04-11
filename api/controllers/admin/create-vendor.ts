@@ -36,9 +36,9 @@ module.exports = {
     phoneNumber: {
       type: 'string',
     },
-    deliveryRestrictionDetails: {
-      type: 'string'
-    },
+    // deliveryRestrictionDetails: {
+    //   type: 'string'
+    // },
     status: {
       type: 'string',
       isIn: ['draft', 'active', 'inactive']
@@ -92,7 +92,7 @@ module.exports = {
       phoneNumber: inputs.phoneNumber,
       type: inputs.type,
       walletAddress: inputs.walletAddress,
-      deliveryRestrictionDetails: inputs.deliveryRestrictionDetails
+      // deliveryRestrictionDetails: inputs.deliveryRestrictionDetails
     }).fetch();
 
     // All done.
