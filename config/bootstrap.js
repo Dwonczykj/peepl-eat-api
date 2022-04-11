@@ -69,8 +69,7 @@ module.exports.bootstrap = async function() {
     basePrice: 2200,
     isAvailable: true,
     vendor: delifonseca.id,
-    imageFd: __dirname + '/../assets/images/products/1.jpeg',
-    imageMime: 'image/jpeg',
+    imageUrl: 'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
     category: productCategory.id
   }).fetch();
 
