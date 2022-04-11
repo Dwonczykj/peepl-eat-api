@@ -21,9 +21,8 @@ module.exports = {
     type: {
       type: 'string',
       description: 'The type of vendor.',
-      // isIn: ['restaurant', 'shop'],
+      isIn: ['restaurant', 'shop'],
       defaultsTo: 'restaurant',
-      required: false,
       maxLength: 50
     },
     description: {
@@ -43,11 +42,11 @@ module.exports = {
       description: 'A description of where the featured image file can be found',
       required: true
     },
-    deliveryRestrictionDetails: {
+    /* deliveryRestrictionDetails: {
       type: 'string',
       description: 'This is a free text description of the restaurant\'s restrictions, used temporarily.',
       allowNull: true
-    },
+    }, */
     status: {
       type: 'string',
       isIn: ['active', 'draft', 'inactive'],
