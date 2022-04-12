@@ -8,6 +8,7 @@
  * For more information on configuration, check out:
  * https://sailsjs.com/config/http
  */
+const helmet = require("helmet");
 
 module.exports.http = {
   // Below code doesn't work within views, not sure why
@@ -40,16 +41,17 @@ module.exports.http = {
     *                                                                          *
     ***************************************************************************/
 
-    // order: [
-    //   'cookieParser',
-    //   'session',
-    //   'bodyParser',
-    //   'compress',
-    //   'poweredBy',
-    //   'router',
-    //   'www',
-    //   'favicon',
-    // ],
+    order: [
+      'helmet',
+      'cookieParser',
+      'session',
+      'bodyParser',
+      'compress',
+      'poweredBy',
+      'router',
+      'www',
+      'favicon',
+    ],
 
 
     /***************************************************************************
@@ -59,6 +61,12 @@ module.exports.http = {
     * https://sailsjs.com/config/http#?customizing-the-body-parser             *
     *                                                                          *
     ***************************************************************************/
+
+    helmet: (function(){
+      // Use the `helmet` package to help secure your Express/Sails app.
+      var middlewareFn = helmet();
+      return middlewareFn;
+    })()//</self-calling function ::>
 
     // bodyParser: (function _configureBodyParser(){
     //   var skipper = require('skipper');
