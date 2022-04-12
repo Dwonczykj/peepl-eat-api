@@ -945,6 +945,7 @@
           },
           {
             "required": [
+              "email",
               "password",
               "name",
               "vendor"

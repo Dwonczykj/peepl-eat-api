@@ -17,6 +17,15 @@ before(function(done) {
     // and disable all logs except errors and warnings:
     hooks: { grunt: false },
     log: { level: 'warn' },
+    models: {
+      // connection: 'unitTestConnection',
+      migrate: 'drop'
+    },
+    datastores: {
+      default: {
+        adapter: 'sails-disk'
+      }
+    }
 
   }, (err) => {
     if (err) { return done(err); }

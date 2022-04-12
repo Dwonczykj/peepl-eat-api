@@ -1,10 +1,9 @@
 /* eslint-disable no-undef */
 // test/integration/controllers/UserController.test.js
 var supertest = require('supertest');
-// var sails = require('sails');
 
-describe('UserController.login', () => {
-  describe('#login()', () => {
+describe('AdminController', () => {
+  describe('login()', () => {
     it('should return success', (done) => {
       supertest(sails.hooks.http.app)
       .post('/admin/login')
