@@ -57,9 +57,9 @@
   "main": "app.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/anonymous node/sails user/peepl-app-sail.git"
+    "url": "https://github.com/itsaboutpeepl/peepl-eat-api"
   },
-  "author": "anonymous node/sails user",
+  "author": "Peepl Ltd",
   "license": "",
   "engines": {
     "node": "^12.16"
