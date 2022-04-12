@@ -13,8 +13,9 @@
           </ol>
         </div>
 
-        <h2 class="h6 border-top pt-3 mt-3 mb-0"><b>Delivery:</b> </h2>
-        <p><b>Name:</b> {{order.deliveryName}}
+        <h3 class="border-top pt-3 mt-3 mb-0"><b>Delivery:</b> </h3>
+        <b>Delivery time:</b> {{order.fulfilmentSlotFrom}} - {{order.fulfilmentSlotTo}}
+        <br/><b>Name:</b> {{order.deliveryName}}
         <br><b>Email:</b> {{order.deliveryEmail}}
         <br><b>Number:</b> <a :href="'tel:'+order.deliveryPhoneNumber">{{order.deliveryPhoneNumber}}</a>
         <br><b>Line One:</b> {{order.deliveryAddressLineOne}}
