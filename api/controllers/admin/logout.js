@@ -17,7 +17,7 @@ module.exports = {
   },
 
 
-  fn: async function (inputs) {
+  fn: async function () {
     delete this.req.session.userId;
 
     // All done.
