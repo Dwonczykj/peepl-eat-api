@@ -104,7 +104,6 @@ module.exports = {
     .transaction(async (db: any)=> {
       // TODO: Error handling here.
       for (var item in inputs.items) {
-        inputs.items[item].optionValues = [];
         var orderItemOptionValues = [];
         for (var option in inputs.items[item].options) {
           orderItemOptionValues.push({
@@ -118,12 +117,7 @@ module.exports = {
         .fetch();
 
         // Get array of IDs from array of newOrderItemOptionValues
-        var newOrderItemOptionValueIds = [];
-        for (var i in newOrderItemOptionValues) {
-          newOrderItemOptionValueIds.push(newOrderItemOptionValues[i].id);
-        }
-
-        inputs.items[item].optionValues = newOrderItemOptionValueIds;
+        inputs.items[item].optionValues = newOrderItemOptionValues.map(({id: number}) => number);
       }
 
       // TODO: Check if vendor delivers to that area
