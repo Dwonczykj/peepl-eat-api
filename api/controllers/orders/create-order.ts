@@ -75,7 +75,7 @@ module.exports = {
 
 
   fn: async function (inputs, exits) {
-    // TODO: Validation (products belong to vendor, fulfilmentMethod belongs to vendor, timeslot is valid, options are related to products, optionvalues are valid for options)
+    // TODO: Validation (products belong to vendor, fulfilmentMethod belongs to vendor, options are related to products, optionvalues are valid for options)
     var vendor = await Vendor.findOne(inputs.vendor);
 
     if(!vendor) {
@@ -93,35 +93,42 @@ module.exports = {
       return exits.invalidSlot('Invalid delivery slot');
     }
 
-    // TODO: Refactor all of this code to run concurrently where possible
-    // TODO: Error handling here.
-    for (var item in inputs.items) {
-      inputs.items[item].optionValues = [];
-      for (var option in inputs.items[item].options) {
-        if(inputs.items[item].options[option] !== '') {
-          // TODO: Change to append to array then use createEach
-          var newOptionValuePair = await OrderItemOptionValue.create({
-            option: option,
-            optionValue: inputs.items[item].options[option],
-          }).fetch();
-          inputs.items[item].optionValues.push(newOptionValuePair.id);
-        }
-      }
-    }
-
-    var order;
-    var discount;
-
+    var discountId: number;
     if(inputs.discountCode){
       // TODO: Return error if discount code is invalid
-      discount = await sails.helpers.checkDiscountCode(inputs.discountCode, inputs.vendor);
+      var discount = await sails.helpers.checkDiscountCode(inputs.discountCode, inputs.vendor);
+      discountId = discount.id;
     }
 
-    // TODO: Check if vendor delivers to that area
-    // TODO: Validate that fulfilment method belongs to vendor
-    // TODO: Test this validation
-    if(discount) {
-      order = await Order.create({
+    await sails.getDatastore()
+    .transaction(async (db: any)=> {
+      // TODO: Error handling here.
+      for (var item in inputs.items) {
+        inputs.items[item].optionValues = [];
+        var orderItemOptionValues = [];
+        for (var option in inputs.items[item].options) {
+          orderItemOptionValues.push({
+            option: option,
+            optionValue: inputs.items[item].options[option],
+          });
+        }
+
+        var newOrderItemOptionValues = await OrderItemOptionValue.createEach(orderItemOptionValues)
+        .usingConnection(db)
+        .fetch();
+
+        // Get array of IDs from array of newOrderItemOptionValues
+        var newOrderItemOptionValueIds = [];
+        for (var i in newOrderItemOptionValues) {
+          newOrderItemOptionValueIds.push(newOrderItemOptionValues[i].id);
+        }
+
+        inputs.items[item].optionValues = newOrderItemOptionValueIds;
+      }
+
+      // TODO: Check if vendor delivers to that area
+      // TODO: Validate that fulfilment method belongs to vendor
+      var order = await Order.create({
         total: inputs.total,
         orderedDateTime: Date.now(),
         deliveryName: inputs.address.name,
@@ -132,70 +139,58 @@ module.exports = {
         deliveryAddressPostCode: inputs.address.postCode,
         deliveryAddressInstructions: inputs.address.deliveryInstructions,
         customerWalletAddress: inputs.walletAddress,
-        discount: discount.id,
+        discount: discountId,
         vendor: vendor.id,
         fulfilmentMethod: inputs.fulfilmentMethod,
         fulfilmentSlotFrom: inputs.fulfilmentSlotFrom,
         fulfilmentSlotTo: inputs.fulfilmentSlotTo,
         tipAmount: inputs.tipAmount
-      }).fetch();
-    } else {
-      order = await Order.create({
-        total: inputs.total,
-        orderedDateTime: Date.now(),
-        deliveryName: inputs.address.name,
-        deliveryEmail: inputs.address.email,
-        deliveryPhoneNumber: inputs.address.phoneNumber,
-        deliveryAddressLineOne: inputs.address.lineOne,
-        deliveryAddressLineTwo: inputs.address.lineTwo,
-        deliveryAddressPostCode: inputs.address.postCode,
-        deliveryAddressInstructions: inputs.address.deliveryInstructions,
-        customerWalletAddress: inputs.walletAddress,
-        vendor: vendor.id,
-        fulfilmentMethod: inputs.fulfilmentMethod,
-        fulfilmentSlotFrom: inputs.fulfilmentSlotFrom,
-        fulfilmentSlotTo: inputs.fulfilmentSlotTo,
-        tipAmount: inputs.tipAmount
-      }).fetch();
-    }
+      })
+      .usingConnection(db)
+      .fetch();
 
-    // Strip unneccesary data from order items
-    var updatedItems = _.map(inputs.items, (object) => {
-      object.product = object.id;
-      object.order = order.id;
+      // Strip unneccesary data from order items
+      var updatedItems = _.map(inputs.items, (object) => {
+        object.order = order.id;
+        object.product = object.id;
 
-      return _.pick(object, ['order', 'product', 'optionValues']);
-    });
+        return _.pick(object, ['order', 'product', 'optionValues']);
+      });
 
-    // Create each order item
-    await OrderItem.createEach(updatedItems);
+      // Create each order item
+      await OrderItem.createEach(updatedItems)
+      .usingConnection(db);
 
-    // Calculate the order total on the backend
-    var calculatedOrderTotal = await sails.helpers.calculateOrderTotal.with({orderId: order.id});
+      // Calculate the order total on the backend
+      var calculatedOrderTotal = await sails.helpers.calculateOrderTotal.with({orderId: order.id});
 
-    // If frontend total is incorrect
-    if(order.total !== calculatedOrderTotal) {
-      // TODO: Log any instances of this, as it shouldn't happen (indicated frontend logic error)
-      sails.log('Order total mismatch');
+      // If frontend total is incorrect
+      if(order.total !== calculatedOrderTotal) {
+        // TODO: Log any instances of this, as it shouldn't happen (indicated frontend logic error)
+        sails.log('Order total mismatch');
 
-      // Update with correct amount
+        // Update with correct amount
+        await Order.updateOne(order.id)
+        .set({total: calculatedOrderTotal})
+        .usingConnection(db);
+      }
+
+      // Create PaymentIntent on Peepl Pay
+      // TODO: error handling
+      var newPaymentIntent = await sails.helpers.createPaymentIntent(
+        calculatedOrderTotal,
+        vendor.walletAddress,
+        vendor.name
+      );
+
+      // Update order with payment intent
       await Order.updateOne(order.id)
-      .set({total: calculatedOrderTotal});
-    }
+      .set({paymentIntentId: newPaymentIntent.paymentIntentId})
+      .usingConnection(db);
 
-    // Create PaymentIntent on Peepl Pay
-    var newPaymentIntent = await sails.helpers.createPaymentIntent(calculatedOrderTotal,
-      vendor.walletAddress,
-      vendor.name
-    );
-
-    // Update order with payment intent
-    await Order.updateOne(order.id)
-    .set({paymentIntentId: newPaymentIntent.paymentIntentId});
-
-    // All done.
-    return exits.success({orderID: order.id, paymentIntentID: newPaymentIntent.paymentIntentId});
-
+      // All done.
+      return exits.success({orderID: order.id, paymentIntentID: newPaymentIntent.paymentIntentId});
+    });
   }
 
 };
