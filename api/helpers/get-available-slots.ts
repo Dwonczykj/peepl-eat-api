@@ -79,8 +79,8 @@ module.exports = {
       var openTime = inputs.date + ' ' + openingHours.openTime; // e.g. 25/12/2022 09:00
       var closeTime = inputs.date + ' ' + openingHours.closeTime; // e.g. 25/12/2022 17:00
 
-      var startTime = moment(openTime, 'YYYY-MM-DD HH:mm'); // Start time for creating slots.
-      var endTime = moment(closeTime, 'YYYY-MM-DD HH:mm'); // End time for creating slots.
+      var startTime = moment.utc(openTime, 'YYYY-MM-DD HH:mm'); // Start time for creating slots.
+      var endTime = moment.utc(closeTime, 'YYYY-MM-DD HH:mm'); // End time for creating slots.
 
       var slots = [];
 
@@ -127,8 +127,8 @@ module.exports = {
       for(var slotI of slots) {
         // Filter out orders between start and end of slot.
         var relevantOrders = orders.filter(order => {
-          var mSlotFrom = moment(order.fulfilmentSlotFrom);
-          var mSlotTo = moment(order.fulfilmentSlotTo);
+          var mSlotFrom = moment.utc(order.fulfilmentSlotFrom);
+          var mSlotTo = moment.utc(order.fulfilmentSlotTo);
 
           if(mSlotFrom.isSameOrAfter(slotI.startTime) && mSlotTo.isSameOrBefore(slotI.endTime)) {
             return true;
@@ -138,7 +138,7 @@ module.exports = {
         });
 
         // Is the time slot after current time plus fulfilment method buffer
-        var isInFuture = moment(slotI.startTime).isAfter(moment().add(fulfilmentMethod.bufferLength, 'minutes'));
+        var isInFuture = moment.utc(slotI.startTime).isAfter(moment().add(fulfilmentMethod.bufferLength, 'minutes'));
 
         if (!fulfilmentMethod.maxOrders || (relevantOrders.length <= fulfilmentMethod.maxOrders) && isInFuture) { // If there aren't too many orders in the slot
           availableSlots.push(slotI); // Add slot to availableSlots array
