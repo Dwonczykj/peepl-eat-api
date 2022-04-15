@@ -43,12 +43,11 @@ module.exports = {
 
     // Apply discount
     if(order.discount) {
-      // TODO: Round to nearest whole number
       var discount = await Discount.findOne(order.discount);
 
       if(discount && discount.percentage) {
         var multiplier = discount.percentage / 100;
-        var discountAmount = workingTotal * multiplier;
+        var discountAmount = Math.trunc(workingTotal * multiplier);
         workingTotal = workingTotal - discountAmount;
       }
     }
