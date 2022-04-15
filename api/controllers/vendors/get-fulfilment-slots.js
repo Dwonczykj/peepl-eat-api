@@ -26,12 +26,6 @@ module.exports = {
 
 
   fn: async function (inputs) {
-    // var moment = require('moment');
-
-    // var dt = new moment(inputs.date, 'DD/MM/YYYY'); // Moment version of date
-    // var dayOfWeek = dt.format('dddd').toLowerCase(); // e.g. monday
-
-    // TODO: Postcode restrictions
 
     var deliverySlots = [];
     var collectionSlots = [];
