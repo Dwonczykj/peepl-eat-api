@@ -45,6 +45,13 @@ module.exports = {
       body: 'Your order has been ' + (inputs.restaurantAccepted ? 'accepted 😎' : 'declined 😔') + '.'
     });
 
+    if(inputs.restaurantAccepted){
+      await sails.helpers.issuePeeplReward.with({
+        rewardAmount: (order.total * 0.1) / 10, // (10% order total in pence) / 10 pence (value of PPL token)
+        recipient: order.customerWalletAddress
+      });
+    }
+
     // All done.
     return;
 

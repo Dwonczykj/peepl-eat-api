@@ -37,11 +37,6 @@ module.exports = {
 
     await sails.helpers.sendSmsNotification.with({body: 'You have received a new order from Vegi for delivery between ' + order.fulfilmentSlotFrom + ' and ' + order.fulfilmentSlotTo + '. To accept or decline: ' + sails.config.custom.baseUrl + '/admin/approve-order/' + order.publicId, to: order.vendor.phoneNumber});
 
-    await sails.helpers.issuePeeplReward.with({
-      rewardAmount: (order.total * 0.1) / 10, // (10% order total in pence) / 10 pence (value of PPL token)
-      recipient: order.customerWalletAddress
-    });
-
     // // Send order confirmation email
     // await sails.helpers.sendTemplateEmail.with({
     //   template: 'email-order-confirmation-new',
