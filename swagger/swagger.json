@@ -127,6 +127,9 @@
       "name": "Check discount code"
     },
     {
+      "name": "View vendor menu [DEPRECATED]"
+    },
+    {
       "name": "View edit vendor"
     },
     {
@@ -3030,6 +3033,37 @@
             "in": "query",
             "name": "vendorId",
             "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/vendors/{vendorid}": {
+      "get": {
+        "summary": "View vendor menu [DEPRECATED]",
+        "description": "Display \"Vendor menu\" page.",
+        "tags": [
+          "View vendor menu [DEPRECATED]"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "vendorid",
+            "required": true,
             "schema": {
               "type": "number",
               "format": "double"

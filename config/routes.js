@@ -22,28 +22,17 @@ module.exports.routes = {
   // 'GET /': { action: 'view-homepage' },
 
   // VENDORS
-  // 'GET /vendors': {action: 'vendors/view-all-vendors'},
-  // 'GET /vendors/:vendorid': { action: 'vendors/view-vendor-menu' },
-
-  // 'GET /vendors/download-image/:vendorid': { action: 'vendors/download-image' },
-  // 'GET /products/download-image/:productId': { action: 'products/download-image' },
-
   'GET /api/v1/vendors': {action: 'vendors/view-all-vendors'},
   'GET /api/v1/vendors/:vendorid': { action: 'vendors/view-vendor-menu' },
   'GET /api/v1/vendors/get-fulfilment-slots': { action: 'vendors/get-fulfilment-slots' },
 
   // PRODUCT OPTIONS
-  // 'GET /api/v1/orders/subscribe-to-order/:orderId': { action: 'orders/subscribe-to-order', isSocket: true },
-  // 'POST /api/v1/products/get-product-delivery-methods': { action: 'products/get-product-delivery-methods' },
   'GET /api/v1/products/get-product-options/:productId': { action: 'products/get-product-options' },
 
   // DISCOUNTS
   'GET /api/v1/discounts/check-discount-code/:discountCode': { action: 'discounts/check-discount-code' },
 
   // ORDERS
-  // 'GET /orders/:orderId': { action: 'orders/view-order-confirmation' },
-  // 'GET /orders': { action: 'orders/view-my-orders' },
-  // 'POST /api/v1/orders/payment-submitted': { action: 'orders/payment-submitted' },
   'GET /api/v1/orders': { action: 'orders/view-my-orders' },
   'POST /api/v1/orders/create-order': { action: 'orders/create-order' },
   'GET /api/v1/orders/get-order-status': { action: 'orders/get-order-status' },
