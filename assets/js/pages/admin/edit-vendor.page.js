@@ -96,8 +96,10 @@ parasails.registerPage('admin-edit-vendor', {
       reader.readAsDataURL(selectedFile);
     },
     vendorSubmitted: function({id}) {
-      this.vendor.id = id;
-      window.history.pushState({}, '', '/admin/vendors/' + id);
+      if (id) {
+        this.vendor.id = id;
+        window.history.pushState({}, '', '/admin/vendors/' + id);
+      }
     },
     clickAddProduct: function(){
       var newProduct = {
