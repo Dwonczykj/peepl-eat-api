@@ -175,7 +175,10 @@ module.exports = {
         calculatedOrderTotal,
         vendor.walletAddress,
         vendor.name
-      );
+      )
+      .catch(() => {
+        return exits.error('Error creating payment intent');
+      });
 
       // Update order with payment intent
       await Order.updateOne(order.id)
