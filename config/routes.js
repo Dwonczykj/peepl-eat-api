@@ -21,10 +21,14 @@ module.exports.routes = {
 
   // 'GET /': { action: 'view-homepage' },
 
+  // POSTAL DISTRICTS
+  'GET /api/v1/postal-districts/get-all-postal-districts': { action: 'postal-districts/get-all-postal-districts' },
+
   // VENDORS
   'GET /api/v1/vendors': {action: 'vendors/view-all-vendors'},
   'GET /api/v1/vendors/:vendorid': { action: 'vendors/view-vendor-menu' },
   'GET /api/v1/vendors/get-fulfilment-slots': { action: 'vendors/get-fulfilment-slots' },
+  'GET /api/v1/vendors/get-postal-districts': { action: 'vendors/get-postal-districts' },
 
   // PRODUCT OPTIONS
   'GET /api/v1/products/get-product-options/:productId': { action: 'products/get-product-options' },
