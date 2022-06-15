@@ -33,6 +33,9 @@ module.exports = {
     priority: {
       type: 'number'
     },
+    isFeatured: {
+      type: 'boolean'
+    },
     vendor: {
       type: 'number'
     }

@@ -29,6 +29,9 @@ module.exports = {
     },
     priority: {
       type: 'number'
+    },
+    isFeatured: {
+      type: 'boolean'
     }
   },
 
