@@ -146,9 +146,10 @@ module.exports = {
     *                                                                          *
     ***************************************************************************/
     cors: {
-      allowOrigins: [
-        'https://vegi.itsaboutpeepl.com',
-      ]
+      // allowOrigins: [
+      //   'https://vegi.itsaboutpeepl.com',
+      // ]
+      allowOrigins: '*',
     },
 
   },
