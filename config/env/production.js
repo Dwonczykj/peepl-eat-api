@@ -149,6 +149,7 @@ module.exports = {
       // allowOrigins: [
       //   'https://vegi.itsaboutpeepl.com',
       // ]
+      allRoutes: true,
       allowOrigins: '*',
     },
 
