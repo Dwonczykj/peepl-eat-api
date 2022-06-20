@@ -50,6 +50,9 @@ module.exports = {
         rewardAmount: (order.total * 0.1) / 10, // (10% order total in pence) / 10 pence (value of PPL token)
         recipient: order.customerWalletAddress
       });
+
+      await Order.updateOne({publicId: inputs.orderId})
+      .set({rewardsIssued: (order.total * 0.1) / 10});
     }
 
     // All done.

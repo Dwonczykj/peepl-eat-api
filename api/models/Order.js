@@ -105,7 +105,6 @@ module.exports = {
       type: 'boolean',
       defaultsTo: false
     },
-    // TODO: Add rewardsIssued attribute
     rewardsIssued: {
       type: 'number',
       defaultsTo: 0

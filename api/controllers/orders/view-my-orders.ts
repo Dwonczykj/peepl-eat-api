@@ -25,7 +25,7 @@ module.exports = {
 
   fn: async function (inputs, exits) {
     var orders = await Order.find({customerWalletAddress: inputs.walletId, paidDateTime: {'>': 0}})
-    .populate('items.product&optionValues&optionValues.option&optionValue');
+    .populate('vendor&items.product&optionValues&optionValues.option&optionValue');
 
     // Respond with view or JSON.
     if(this.req.wantsJSON) {
