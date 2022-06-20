@@ -42,7 +42,7 @@ module.exports = {
       type: 'number',
       description: 'Temporary way to store priority of products'
     },
-    isFeaturef: {
+    isFeatured: {
       type: 'boolean',
       description: 'Boolean to represent whether the product is featured or not.'
     },
