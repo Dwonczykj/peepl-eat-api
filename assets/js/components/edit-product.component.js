@@ -71,6 +71,10 @@ parasails.registerComponent('editProduct', {
             <input v-model="product.isAvailable" type="checkbox" class="form-check-input" id="available">
             <label :class="{ 'is-invalid': formErrors.isAvailable }" class="form-check-label" for="available">Is Available</label>
           </div>
+          <div class="form-group form-check">
+            <input v-model="product.isFeatured" type="checkbox" class="form-check-input" id="featured">
+            <label :class="{ 'is-invalid': formErrors.isFeatured }" class="form-check-label" for="featured">Is Featured</label>
+          </div>
           <fieldset>
             <h2 class="h5 mt-3">Featured Image</h2>
             <img v-if="previewImageSrc || product.id" :src="(previewImageSrc) ? previewImageSrc : product.imageUrl" />

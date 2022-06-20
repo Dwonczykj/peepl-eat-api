@@ -751,6 +751,10 @@
             "format": "double",
             "description": "Temporary way to store priority of products"
           },
+          "isFeatured": {
+            "type": "boolean",
+            "description": "Boolean to represent whether the product is featured or not."
+          },
           "vendor": {
             "description": "The seller of the product. JSON dictionary representing the **vendor** instance or FK when creating / updating / not populated",
             "oneOf": [
@@ -2272,6 +2276,14 @@
               "type": "number",
               "format": "double"
             }
+          },
+          {
+            "in": "query",
+            "name": "isFeatured",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -2351,6 +2363,14 @@
             "schema": {
               "type": "number",
               "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "isFeatured",
+            "required": false,
+            "schema": {
+              "type": "boolean"
             }
           },
           {
