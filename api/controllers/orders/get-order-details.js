@@ -23,7 +23,8 @@ module.exports = {
 
 
   fn: async function (inputs) {
-    var order = await Order.findOne(inputs.orderId);
+    var order = await Order.findOne(inputs.orderId)
+    .populate('vendor');
 
     if(!order) {
       throw 'notFound';
