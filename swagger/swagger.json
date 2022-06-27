@@ -1163,6 +1163,10 @@
             "items": {
               "$ref": "#/components/schemas/user"
             }
+          },
+          "isVegan": {
+            "type": "boolean",
+            "default": false
           }
         }
       },
@@ -2041,6 +2045,14 @@
               "maximum": 5,
               "minimum": 0
             }
+          },
+          {
+            "in": "query",
+            "name": "isVegan",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -2170,6 +2182,14 @@
               "nullable": true,
               "maximum": 5,
               "minimum": 0
+            }
+          },
+          {
+            "in": "query",
+            "name": "isVegan",
+            "required": false,
+            "schema": {
+              "type": "boolean"
             }
           }
         ],
