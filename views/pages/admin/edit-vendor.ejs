@@ -45,6 +45,10 @@
           <option value="active">Active</option>
         </select>
       </div>
+      <div class="form-group form-check">
+        <input v-model="vendor.isVegan" type="checkbox" class="form-check-input" id="vegan">
+        <label :class="{ 'is-invalid': formErrors.isVegan }" class="form-check-label" for="vegan">Is Vegan</label>
+      </div>
 
       <fieldset>
         <h2 class="h5 mt-3">Featured Image</h2>

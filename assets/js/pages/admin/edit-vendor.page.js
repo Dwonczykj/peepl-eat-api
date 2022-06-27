@@ -16,7 +16,8 @@ parasails.registerPage('admin-edit-vendor', {
       walletAddress: '0x',
       // deliveryRestrictionDetails: '',
       status: 'draft',
-      products: []
+      products: [],
+      isVegan: false,
     },
     colFul: {},
     delFul: {},
