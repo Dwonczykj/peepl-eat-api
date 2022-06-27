@@ -118,7 +118,11 @@ module.exports = {
     users: {
       collection: 'user',
       via: 'vendor'
-    }
+    },
+    isVegan: {
+      type: 'boolean',
+      defaultsTo: false
+    },
   },
 
   afterCreate: async function (newlyCreatedRecord, proceed) {
