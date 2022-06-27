@@ -51,6 +51,9 @@ module.exports = {
       min: 0,
       max: 5,
       allowNull: true
+    },
+    isVegan: {
+      type: 'boolean',
     }
   },
 

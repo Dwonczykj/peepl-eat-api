@@ -52,6 +52,9 @@ module.exports = {
       type: 'number',
       min: 0,
       max: 5
+    },
+    isVegan: {
+      type: 'boolean',
     }
   },
 
@@ -92,6 +95,7 @@ module.exports = {
       phoneNumber: inputs.phoneNumber,
       type: inputs.type,
       walletAddress: inputs.walletAddress,
+      isVegan: inputs.isVegan,
       // deliveryRestrictionDetails: inputs.deliveryRestrictionDetails
     }).fetch();
 
