@@ -52,6 +52,8 @@ module.exports = {
       }
     }
 
+    var withoutFees = workingTotal;
+
     // Add delivery cost
     var fulfilmentMethod = await FulfilmentMethod.findOne(order.fulfilmentMethod);
     workingTotal += fulfilmentMethod.priceModifier;
@@ -59,7 +61,12 @@ module.exports = {
     // Add tip amount
     workingTotal = workingTotal + order.tipAmount;
 
-    return workingTotal;
+    // TODO: Add service charge
+
+    return {
+      withoutFees: withoutFees,
+      finalAmount: workingTotal
+    };
   }
 
 };

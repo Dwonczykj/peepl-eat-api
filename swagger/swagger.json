@@ -1113,6 +1113,15 @@
             "maximum": 5,
             "minimum": 0
           },
+          "isVegan": {
+            "type": "boolean",
+            "default": false
+          },
+          "minimumOrderAmount": {
+            "type": "number",
+            "format": "double",
+            "minimum": 0
+          },
           "products": {
             "description": "Array of **product**'s or array of FK's when creating / updating / not populated",
             "type": "array",
@@ -1163,10 +1172,6 @@
             "items": {
               "$ref": "#/components/schemas/user"
             }
-          },
-          "isVegan": {
-            "type": "boolean",
-            "default": false
           }
         }
       },
@@ -1844,7 +1849,23 @@
             "description": "The requested resource"
           },
           "400": {
-            "description": "The fulfilment slot is invalid."
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "The fulfilment slot is invalid."
+                    },
+                    {
+                      "type": "string",
+                      "description": "The minimum order amount was not met."
+                    }
+                  ]
+                }
+              }
+            }
           },
           "404": {
             "description": "Not found"

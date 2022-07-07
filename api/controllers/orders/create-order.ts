@@ -68,6 +68,10 @@ module.exports = {
       statusCode: 400,
       description: 'The fulfilment slot is invalid.'
     },
+    minimumOrderAmount: {
+      statusCode: 400,
+      description: 'The minimum order amount was not met.'
+    },
     notFound: {
       responseType: 'notFound'
     },
@@ -159,26 +163,35 @@ module.exports = {
       var calculatedOrderTotal = await sails.helpers.calculateOrderTotal.with({orderId: order.id});
 
       // If frontend total is incorrect
-      if(order.total !== calculatedOrderTotal) {
+      if(order.total !== calculatedOrderTotal.finalAmount) {
         // TODO: Log any instances of this, as it shouldn't happen (indicated frontend logic error)
         sails.log('Order total mismatch');
 
         // Update with correct amount
         await Order.updateOne(order.id)
-        .set({total: calculatedOrderTotal})
+        .set({total: calculatedOrderTotal.finalAmount})
         .usingConnection(db);
+      }
+
+      // Return error if vendor minimum order value not met
+      if(calculatedOrderTotal.withoutFees < vendor.minimumOrderAmount) {
+        return exits.minimumOrderAmount('Vendor minimum order value not met');
       }
 
       // Create PaymentIntent on Peepl Pay
       // TODO: error handling
       var newPaymentIntent = await sails.helpers.createPaymentIntent(
-        calculatedOrderTotal,
+        calculatedOrderTotal.finalAmount,
         vendor.walletAddress,
         vendor.name
       )
       .catch(() => {
         return exits.error('Error creating payment intent');
       });
+
+      if(!newPaymentIntent) {
+        return exits.error('Error creating payment intent');
+      }
 
       // Update order with payment intent
       await Order.updateOne(order.id)

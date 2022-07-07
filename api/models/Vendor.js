@@ -84,6 +84,14 @@ module.exports = {
       min: 0,
       max: 5
     },
+    isVegan: {
+      type: 'boolean',
+      defaultsTo: false
+    },
+    minimumOrderAmount: {
+      type: 'number',
+      min: 0,
+    },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
@@ -118,10 +126,6 @@ module.exports = {
     users: {
       collection: 'user',
       via: 'vendor'
-    },
-    isVegan: {
-      type: 'boolean',
-      defaultsTo: false
     },
   },
 
