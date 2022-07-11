@@ -54,6 +54,10 @@ module.exports = {
     },
     isVegan: {
       type: 'boolean',
+    },
+    minimumOrderAmount: {
+      type: 'number',
+      min: 0,
     }
   },
 

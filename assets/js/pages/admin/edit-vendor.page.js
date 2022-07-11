@@ -18,6 +18,7 @@ parasails.registerPage('admin-edit-vendor', {
       status: 'draft',
       products: [],
       isVegan: false,
+      minimumOrderAmount: false,
     },
     colFul: {},
     delFul: {},
@@ -61,6 +62,12 @@ parasails.registerPage('admin-edit-vendor', {
       }
       value = value.toString();
       return value.charAt(0).toUpperCase() + value.slice(1);
+    },
+    convertToPounds: function (value) {
+      if (!value) {return '£0';}
+      value = '£' + (value/100).toFixed(2);
+      value = value.toString();
+      return value;
     }
   },
 

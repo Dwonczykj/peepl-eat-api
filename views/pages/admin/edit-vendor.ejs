@@ -45,6 +45,11 @@
           <option value="active">Active</option>
         </select>
       </div>
+      <div class="form-group">
+        <label for="minimumOrderAmount">Minimum order amount (pence)</label>
+        <input :class="{ 'is-invalid': formErrors.minimumOrderAmount }" v-model="vendor.minimumOrderAmount" type="number" class="form-control" id="minimumOrderAmount" required>
+        <p class="mt-2 text-muted">{{vendor.minimumOrderAmount | convertToPounds}}</p>
+      </div>
       <div class="form-group form-check">
         <input v-model="vendor.isVegan" type="checkbox" class="form-check-input" id="vegan">
         <label :class="{ 'is-invalid': formErrors.isVegan }" class="form-check-label" for="vegan">Is Vegan</label>
