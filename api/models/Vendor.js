@@ -42,11 +42,6 @@ module.exports = {
       description: 'A description of where the featured image file can be found',
       required: true
     },
-    /* deliveryRestrictionDetails: {
-      type: 'string',
-      description: 'This is a free text description of the restaurant\'s restrictions, used temporarily.',
-      allowNull: true
-    }, */
     status: {
       type: 'string',
       isIn: ['active', 'draft', 'inactive'],
