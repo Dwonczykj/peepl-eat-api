@@ -46,13 +46,16 @@ module.exports = {
     });
 
     if(inputs.restaurantAccepted){
+      // (10% order total in pence) / 10 pence (value of PPL token)
+      var rewardAmount = (order.total * 0.05) / 100;
+
       await sails.helpers.issuePeeplReward.with({
-        rewardAmount: (order.total * 0.1) / 10, // (10% order total in pence) / 10 pence (value of PPL token)
+        rewardAmount: rewardAmount,
         recipient: order.customerWalletAddress
       });
 
       await Order.updateOne({publicId: inputs.orderId})
-      .set({rewardsIssued: (order.total * 0.1) / 10});
+      .set({rewardsIssued: rewardAmount});
     }
 
     // All done.
