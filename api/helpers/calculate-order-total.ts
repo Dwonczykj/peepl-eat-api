@@ -1,4 +1,5 @@
 declare var Order: any;
+declare var Vendor: any;
 declare var FulfilmentMethod: any;
 declare var Discount: any;
 
@@ -61,7 +62,10 @@ module.exports = {
     // Add tip amount
     workingTotal = workingTotal + order.tipAmount;
 
-    // TODO: Add service charge
+    // Add platform fee (vendor specific)
+    var vendor = await Vendor.findOne(order.vendor);
+    var platformFee = vendor.platformFee;
+    workingTotal = workingTotal + platformFee;
 
     return {
       withoutFees: withoutFees,

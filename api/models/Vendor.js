@@ -87,6 +87,12 @@ module.exports = {
       type: 'number',
       min: 0,
     },
+    platformFee: {
+      type: 'number',
+      min: 0,
+      defaultsTo: 125,
+      description: 'The platform fee (in pence) that is charged for this vendor.'
+    },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗

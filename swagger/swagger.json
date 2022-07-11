@@ -1122,6 +1122,14 @@
             "format": "double",
             "minimum": 0
           },
+          "platformFee": {
+            "type": "number",
+            "format": "double",
+            "default": 125,
+            "description": "The platform fee (in pence) that is charged for this vendor.",
+            "minimum": 0,
+            "example": 125
+          },
           "products": {
             "description": "Array of **product**'s or array of FK's when creating / updating / not populated",
             "type": "array",
@@ -2220,6 +2228,7 @@
             "schema": {
               "type": "number",
               "format": "double",
+              "default": 0,
               "minimum": 0
             }
           }
