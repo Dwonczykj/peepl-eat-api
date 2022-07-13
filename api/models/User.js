@@ -31,6 +31,10 @@ module.exports = {
       type: 'boolean',
       defaultsTo: false,
     },
+    role: {
+      type: 'string',
+      isIn: ['owner', 'staff', 'courier'],
+    },
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
     //  ╚═╝╩ ╩╚═╝╚═╝═╩╝╚═╝
@@ -41,7 +45,7 @@ module.exports = {
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
     vendor: {
       model: 'vendor',
-      required: true,
+      // required: true,
     }
 
   },
