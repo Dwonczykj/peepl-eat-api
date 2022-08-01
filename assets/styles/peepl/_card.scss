@@ -10,8 +10,8 @@ $card-carousel-peek-overlap: 30px;
 
 .card-carousel {
   overflow-y: auto;
-  margin-left: math.div( $grid-gutter-width, -2 );
-  margin-right: math.div( $grid-gutter-width, -2 );
+  margin-left: $grid-gutter-width/-2;
+    margin-right: $grid-gutter-width/-2;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
@@ -24,12 +24,12 @@ $card-carousel-peek-overlap: 30px;
 }
 
 .card-carousel__item {
-  padding: 1.5rem math.div( $grid-gutter-width, 2 );
+  padding: 1.5rem $grid-gutter-width/2;
   display: flex;
   flex: 0 0 ( 100vw - #{$card-carousel-peek-overlap} );
   scroll-snap-align: start;
 
   & + & {
-    margin-left: math.div( $grid-gutter-width, -2 );
+    margin-left: $grid-gutter-width/-2;
   }
 }

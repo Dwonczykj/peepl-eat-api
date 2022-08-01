@@ -33,7 +33,12 @@ module.exports = {
     },
     role: {
       type: 'string',
-      isIn: ['owner', 'staff', 'courier'],
+      isIn: ['owner', 'staff', 'courier'], //TODO: Check with @Adam about where this is used...
+    },
+    vendorRole: {
+      type: 'string',
+      isIn: ['owner', 'inventoryManager', 'salesManager', 'courier', 'none'],
+      defaultsTo: 'none'
     },
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗

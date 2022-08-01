@@ -43,7 +43,7 @@ module.exports = {
 
   exits: {
     success: {
-      outputDescription: 'The newly created `Vendor`s ID.',
+      outputDescription: 'The newly created `Product`s ID.',
       outputExample: {}
     },
     noFileAttached: {

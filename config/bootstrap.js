@@ -154,11 +154,11 @@ module.exports.bootstrap = async function() {
     option: dessertOption.id
   }]);
 
-  await Discount.create({
-    code: 'DELI10',
-    percentage: 10,
-    isEnabled: true
-  });
+  // await Discount.create({
+  //   code: 'DELI10',
+  //   percentage: 10,
+  //   isEnabled: true
+  // });
 
   // TODO: Create user
   await User.create({
@@ -166,7 +166,20 @@ module.exports.bootstrap = async function() {
     password: 'Testing123!',
     name: 'Adam Galloway',
     vendor: delifonseca.id,
-    isSuperAdmin: true
+    isSuperAdmin: true,
+    vendorRole: 'none',
+    role: ''
+  });
+
+  // * Create sales Assistant
+  await User.create({
+    email: 'jdwonczyk@gmail.com',
+    password: 'Testing123!',
+    name: 'Sales Assistant 1',
+    vendor: delifonseca.id,
+    isSuperAdmin: false,
+    vendorRole: 'salesManager',
+    role: 'staff'
   });
 
   // Save new bootstrap version

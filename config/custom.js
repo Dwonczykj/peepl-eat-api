@@ -1,3 +1,6 @@
+const dotenv = require('dotenv').load('./env'); // alias of .config()
+const envConfig = dotenv.load().parsed;
+
 /**
  * Custom configuration
  * (sails.config.custom)
@@ -25,4 +28,6 @@ module.exports.custom = {
   peeplPayUrl: 'https://pay.itsaboutpeepl.com/api/v1',
   amazonS3BucketUrl: 'https://vegiapp-1.s3.us-east-1.amazonaws.com/',
   amazonS3Bucket: 'vegiapp-1',
+
+  passwordSaltRounds: envConfig['saltrounds'],
 };

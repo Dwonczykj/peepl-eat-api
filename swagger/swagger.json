@@ -88,6 +88,12 @@
       "name": "Create product"
     },
     {
+      "name": "Discontinue product"
+    },
+    {
+      "name": "Update User Vendor Role"
+    },
+    {
       "name": "Create product option"
     },
     {
@@ -131,6 +137,12 @@
     },
     {
       "name": "Check discount code"
+    },
+    {
+      "name": "Is user inventory manager"
+    },
+    {
+      "name": "Is user sales manager"
     },
     {
       "name": "View vendor menu [DEPRECATED]"
@@ -755,6 +767,16 @@
             "type": "boolean",
             "description": "Boolean to represent whether the product is featured or not."
           },
+          "status": {
+            "type": "string",
+            "default": "inactive",
+            "description": "string active|inactive to represent whether product is discontinued or not",
+            "enum": [
+              "active",
+              "inactive"
+            ],
+            "example": "inactive"
+          },
           "vendor": {
             "description": "The seller of the product. JSON dictionary representing the **vendor** instance or FK when creating / updating / not populated",
             "oneOf": [
@@ -957,8 +979,7 @@
             "required": [
               "email",
               "password",
-              "name",
-              "vendor"
+              "name"
             ]
           }
         ]
@@ -995,6 +1016,26 @@
           "isSuperAdmin": {
             "type": "boolean",
             "default": false
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "owner",
+              "staff",
+              "courier"
+            ]
+          },
+          "vendorRole": {
+            "type": "string",
+            "default": "none",
+            "enum": [
+              "owner",
+              "inventoryManager",
+              "salesManager",
+              "courier",
+              "none"
+            ],
+            "example": "none"
           },
           "vendor": {
             "description": "JSON dictionary representing the **vendor** instance or FK when creating / updating / not populated",
@@ -2352,9 +2393,16 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "example": {},
+                  "example": {
+                    "id": "old_product_id"
+                  },
                   "type": "object",
-                  "properties": {},
+                  "properties": {
+                    "id": {
+                      "example": "old_product_id",
+                      "type": "string"
+                    }
+                  },
                   "description": "Success"
                 }
               }
@@ -2471,6 +2519,130 @@
           },
           "404": {
             "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/discontinue-product": {
+      "post": {
+        "summary": "Discontinue product",
+        "description": "Voids a product item so that it still exists for future data analytics but is no longer available to be sold by a vendor.",
+        "tags": [
+          "Discontinue product"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vendor",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": "old_product_id"
+                  },
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "example": "old_product_id",
+                      "type": "string"
+                    }
+                  },
+                  "description": "Success"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/update-user-vendor-role": {
+      "post": {
+        "summary": "Update User Vendor Role",
+        "description": "Update the role of the user at the vendor they are registered to",
+        "tags": [
+          "Update User Vendor Role"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "vendorId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vendorRole",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "owner",
+                "inventoryManager",
+                "salesManager",
+                "courier",
+                "none"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "example": {},
+                      "type": "object",
+                      "properties": {},
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "You are not authorised to have a role with this vendor."
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VendorRole passed does not exist."
+          },
+          "404": {
+            "description": "There is no vendor with that ID!"
           },
           "500": {
             "description": "Internal server error"
@@ -3182,6 +3354,250 @@
           },
           "404": {
             "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/is-user-vendor-inventory-manager/{vendorId}": {
+      "get": {
+        "summary": "Is user inventory manager",
+        "tags": [
+          "Is user inventory manager"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "vendorId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "example": {
+                        "isInventoryManager": false,
+                        "vendorID": 0
+                      },
+                      "type": "object",
+                      "properties": {
+                        "isInventoryManager": {
+                          "example": false,
+                          "type": "boolean"
+                        },
+                        "vendorID": {
+                          "example": 0,
+                          "type": "integer",
+                          "format": "int64"
+                        }
+                      },
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "You are not authenticated"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/is-user-vendor-sales-manager/{vendorId}": {
+      "get": {
+        "summary": "Is user sales manager",
+        "tags": [
+          "Is user sales manager"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "vendorId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "example": {
+                        "isSalesManager": false,
+                        "vendorID": 0
+                      },
+                      "type": "object",
+                      "properties": {
+                        "isSalesManager": {
+                          "example": false,
+                          "type": "boolean"
+                        },
+                        "vendorID": {
+                          "example": 0,
+                          "type": "integer",
+                          "format": "int64"
+                        }
+                      },
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "You are not authenticated"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/is-user-vendor-owner/{vendorId}": {
+      "get": {
+        "summary": "Is user inventory manager",
+        "tags": [
+          "Is user inventory manager"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "vendorId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "example": {
+                        "isOwner": false,
+                        "vendorID": 0
+                      },
+                      "type": "object",
+                      "properties": {
+                        "isOwner": {
+                          "example": false,
+                          "type": "boolean"
+                        },
+                        "vendorID": {
+                          "example": 0,
+                          "type": "integer",
+                          "format": "int64"
+                        }
+                      },
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "You are not authenticated"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/is-user-vendor-admin/{vendorId}": {
+      "get": {
+        "summary": "Is user inventory manager",
+        "tags": [
+          "Is user inventory manager"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "vendorId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "example": {
+                        "isAdmin": false,
+                        "vendorID": 0
+                      },
+                      "type": "object",
+                      "properties": {
+                        "isAdmin": {
+                          "example": false,
+                          "type": "boolean"
+                        },
+                        "vendorID": {
+                          "example": 0,
+                          "type": "integer",
+                          "format": "int64"
+                        }
+                      },
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "You are not authenticated"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
           },
           "500": {
             "description": "Internal server error"
