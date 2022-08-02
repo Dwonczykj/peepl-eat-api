@@ -33,7 +33,11 @@ module.exports = {
     var vendor = await Vendor.findOne(inputs.vendor)
     .populate('deliveryFulfilmentMethod&collectionFulfilmentMethod');
 
-    if(vendor.deliveryFulfilmentMethod){
+    if(vendor.deliveryPartner){
+      var deliveryPartner = await DeliveryPartner.findOne(vendor.deliveryPartner);
+
+      deliverySlots = await sails.helpers.getAvailableSlots(inputs.date, deliveryPartner.deliveryFulfilmentMethod.id);
+    } else if(vendor.deliveryFulfilmentMethod){
       deliverySlots = await sails.helpers.getAvailableSlots(inputs.date, vendor.deliveryFulfilmentMethod.id);
     }
 
