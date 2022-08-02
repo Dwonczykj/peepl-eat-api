@@ -39,13 +39,13 @@ module.exports = {
     //  ╔═╗╔═╗╔═╗╔═╗╔═╗╦╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
     //  ╠═╣╚═╗╚═╗║ ║║  ║╠═╣ ║ ║║ ║║║║╚═╗
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
-    fulfilmentMethod: {
+    deliveryFulfilmentMethod: {
       model: 'FulfilmentMethod',
     }
   },
 
   afterCreate: async function (newlyCreatedRecord, proceed) {
-    await sails.helpers.initialiseDeliveryMethods(newlyCreatedRecord.id, 'vendor');
+    await sails.helpers.initialiseDeliveryMethods(newlyCreatedRecord.id, 'deliveryPartner');
 
     return proceed();
   }
