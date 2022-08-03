@@ -81,10 +81,10 @@ module.exports = {
     //   type: 'boolean',
     //   defaultsTo: false
     // },
-    deliveryId: {
-      type: 'string',
-      description: 'The ID to identify the delivery in the logistics system'
-    },
+    // deliveryId: {
+    //   type: 'string',
+    //   description: 'The ID to identify the delivery in the logistics system'
+    // },
     fulfilmentSlotFrom: {
       type: 'ref',
       columnType: 'datetime',
@@ -112,6 +112,10 @@ module.exports = {
     rewardsIssued: {
       type: 'number',
       defaultsTo: 0
+    },
+    sentToDeliveryPartner: {
+      type: 'boolean',
+      defaultsTo: false
     },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
