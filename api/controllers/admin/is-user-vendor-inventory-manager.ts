@@ -27,6 +27,9 @@ module.exports = {
       description: 'You are not authenticated',
       responseType: 'unauthorised'
     },
+    badCombo: {
+      responseType: 'unauthorised',
+    },
   },
 
   fn: async function (inputs) {

@@ -9,8 +9,28 @@
  * https://sailsjs.com/config/bootstrap
  */
 
+// Import the functions you need from the SDKs you need
+import { initializeApp } from 'firebase/app';
+
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const _firebaseConfig = {
+  apiKey: 'AIzaSyCeBtylKfX-VhK7TvWwjgOG-pxjwdOSdbQ',
+  authDomain: 'grept-wallet.firebaseapp.com',
+  projectId: 'grept-wallet',
+  storageBucket: 'grept-wallet.appspot.com',
+  messagingSenderId: '222395317174',
+  appId: '1:222395317174:web:5505ca345b5c6435ee5f17'
+};
+
+
 module.exports.bootstrap = async function() {
   _.extend(sails.hooks.http.app.locals, sails.config.http.locals);
+
+  // Initialize Firebase
+  const app = initializeApp(_firebaseConfig);
 
   // Import dependencies
   var path = require('path');

@@ -1,5 +1,5 @@
-declare var Order: any;
-declare var User: any;
+// declare var Order: any;
+// declare var User: any;
 module.exports = {
 
   friendlyName: 'View all orders',

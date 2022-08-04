@@ -6,6 +6,8 @@ const bcrypt = require('bcrypt');
  * @docs        :: https://sailsjs.com/docs/concepts/models-and-orm/models
  */
 
+import UserModel from './UserModel';
+
 module.exports = {
 
   attributes: {
@@ -19,10 +21,10 @@ module.exports = {
       unique: true,
       required: true,
     },
-    password: {
-      type: 'string',
-      required: true,
-    },
+    // password: {
+    //   type: 'string',
+    //   required: true,
+    // },
     name: {
       type: 'string',
       required: true,
@@ -51,25 +53,29 @@ module.exports = {
     vendor: {
       model: 'vendor',
       // required: true,
+    },
+    firebaseUser: {
+      type: 'object',
     }
 
-  },
+  } as { [K in keyof UserModel]: any },
 
-  customToJSON: function() {
-    return _.omit(this, ['password']);
-  },
+  // customToJSON: function() {
+  //   return _.omit(this, ['password']);
+  // },
 
-  beforeCreate: async function(user, cb){
-    const saltRounds = sails.config.custom.passwordSaltRounds;
+  //Can remove as using Firebase Auth
+  // beforeCreate: async function(user, cb){
+  //   const saltRounds = sails.config.custom.passwordSaltRounds;
 
-    try{
-      user.password = await bcrypt.hash(user.password, saltRounds);
-    } catch(err) {
-      throw err;
-    }
+  //   try{
+  //     user.password = await bcrypt.hash(user.password, saltRounds);
+  //   } catch(err) {
+  //     throw err;
+  //   }
 
-    return cb();
-  }
+  //   return cb();
+  // }
 
 
 };
