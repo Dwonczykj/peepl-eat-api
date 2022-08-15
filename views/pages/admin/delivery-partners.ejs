@@ -1,0 +1,27 @@
+<div id="admin-delivery-partners" class="admin" v-cloak>
+
+  <%- partial('../../partials/admin-navbar.ejs') %>
+
+  <div class="container">
+    <h1 class="my-5">Delivery Partners</h1>
+    <div class="mb-3">
+
+      <fieldset>  
+        <edit-delivery-partner v-for="deliveryPartner in deliveryPartners" :deliveryPartner="deliveryPartner">
+        </edit-delivery-partner>
+  
+        <div class="d-md-flex my-3 action-card-actions">
+          <!-- <select class="form-control form-control-sm mr-3" disabled>
+            <option value="true">Set as available</option>
+            <option value="false">Set as unavailable</option>
+          </select>
+          <br/>
+          <button class="btn btn-peepl btn-sm">Apply</button> -->
+          <button class="btn btn-peepl btn-sm ml-auto" @click="clickAddDeliveryPartner">Add a new delivery partner</button>
+        </div>
+      </fieldset>
+    </div>
+
+  </div>
+</div>
+<%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>
