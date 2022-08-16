@@ -157,7 +157,7 @@ module.exports = {
 
       // Create each order item
       await OrderItem.createEach(updatedItems)
-      .usingConnection(db);
+        .usingConnection(db);
 
       // Calculate the order total on the backend
       var calculatedOrderTotal = await sails.helpers.calculateOrderTotal.with({orderId: order.id});

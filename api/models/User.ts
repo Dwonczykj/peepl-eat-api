@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+// const bcrypt = require('bcrypt');
 /**
  * User.js
  *
@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt');
  * @docs        :: https://sailsjs.com/docs/concepts/models-and-orm/models
  */
 
-import UserModel from './UserModel';
+// import userModel = require('./UserModel');
 
 module.exports = {
 
@@ -18,6 +18,11 @@ module.exports = {
     email: {
       type: 'string',
       isEmail: true,
+      // unique: true,
+      required: false,
+    }, //TODO: Run a clean on the db to make this
+    phone: {
+      type: 'string',
       unique: true,
       required: true,
     },
@@ -35,7 +40,7 @@ module.exports = {
     },
     role: {
       type: 'string',
-      isIn: ['owner', 'staff', 'courier'], //TODO: Check with @Adam about where this is used...
+      isIn: ['owner', 'staff', 'courier'], // ! Not user anywhere at the moment
     },
     vendorRole: {
       type: 'string',
@@ -54,11 +59,16 @@ module.exports = {
       model: 'vendor',
       // required: true,
     },
-    firebaseUser: {
-      type: 'object',
-    }
+    // firebaseUser: { // https://sailsjs.com/documentation/concepts/models-and-orm/attributes#:~:text=%23-,Type,-%23
+    //   type: 'json', // https://sailsjs.com/documentation/concepts/models-and-orm/associations
+    // }
+    firebaseSessionToken: {
+      type: 'string',
+      required: true,
+    },
 
-  } as { [K in keyof UserModel]: any },
+  },
+  //} /*as { [K in keyof userModel]: any },
 
   // customToJSON: function() {
   //   return _.omit(this, ['password']);

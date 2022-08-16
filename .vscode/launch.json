@@ -6,6 +6,7 @@
     "configurations": [
         {
             "type": "pwa-node",
+            "runtimeExecutable": "/Users/joeyd/.nvm/versions/node/v17.1.0/bin/node",
             "request": "launch",
             "name": "Launch Program",
             "skipFiles": [

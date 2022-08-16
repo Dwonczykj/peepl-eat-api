@@ -15,9 +15,9 @@ module.exports = {
 
   exits: {
 
-    success: {
-      viewTemplatePath: 'pages/vendors/all-vendors'
-    },
+    // success: {
+    //   viewTemplatePath: 'pages/vendors/all-vendors'
+    // },
     successJSON: {
       statusCode: 200,
     },

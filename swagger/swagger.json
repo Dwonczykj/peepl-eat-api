@@ -31,9 +31,6 @@
       "name": "View login"
     },
     {
-      "name": "Login"
-    },
-    {
       "name": "Logout"
     },
     {
@@ -667,6 +664,11 @@
         "allOf": [
           {
             "$ref": "#/components/schemas/postaldistrict-without-required-constraint"
+          },
+          {
+            "required": [
+              "outcode"
+            ]
           }
         ]
       },
@@ -691,7 +693,8 @@
           "outcode": {
             "type": "string",
             "description": "The outcode for any post codes within this district.",
-            "example": "L1"
+            "example": "L1",
+            "uniqueItems": true
           },
           "vendors": {
             "description": "Array of **vendor**'s or array of FK's when creating / updating / not populated",
@@ -977,9 +980,9 @@
           },
           {
             "required": [
-              "email",
-              "password",
-              "name"
+              "phone",
+              "name",
+              "firebaseSessionToken"
             ]
           }
         ]
@@ -1004,11 +1007,11 @@
           },
           "email": {
             "type": "string",
-            "format": "email",
-            "uniqueItems": true
+            "format": "email"
           },
-          "password": {
-            "type": "string"
+          "phone": {
+            "type": "string",
+            "uniqueItems": true
           },
           "name": {
             "type": "string"
@@ -1044,6 +1047,37 @@
                 "$ref": "#/components/schemas/vendor"
               }
             ]
+          },
+          "firebaseSessionToken": {
+            "type": "string"
+          }
+        }
+      },
+      "usermodel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/usermodel-without-required-constraint"
+          }
+        ]
+      },
+      "usermodel-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **UserModel**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
           }
         }
       },
@@ -1378,52 +1412,6 @@
             "description": "Internal server error"
           }
         }
-      },
-      "post": {
-        "summary": "Login",
-        "description": "Login admin.",
-        "tags": [
-          "Login"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "emailAddress",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "email"
-            }
-          },
-          {
-            "in": "query",
-            "name": "password",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "rememberMe",
-            "required": false,
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
       }
     },
     "/admin/logout": {
@@ -1436,7 +1424,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "The requested resource"
+            "description": "Success"
           },
           "404": {
             "description": "Resource not found"
@@ -1608,23 +1596,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "type": "string",
-                      "description": "Success"
-                    },
-                    {
-                      "type": "string",
-                      "description": "Success"
-                    }
-                  ]
-                }
-              }
-            }
+            "description": "Success"
           },
           "404": {
             "description": "Not found"
@@ -3407,6 +3379,10 @@
                     {
                       "type": "string",
                       "description": "You are not authenticated"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
                     }
                   ]
                 }

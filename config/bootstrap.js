@@ -9,28 +9,18 @@
  * https://sailsjs.com/config/bootstrap
  */
 
-// Import the functions you need from the SDKs you need
-import { initializeApp } from 'firebase/app';
+const PostalDistrict = require('../api/models/PostalDistrict');
 
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-const _firebaseConfig = {
-  apiKey: 'AIzaSyCeBtylKfX-VhK7TvWwjgOG-pxjwdOSdbQ',
-  authDomain: 'grept-wallet.firebaseapp.com',
-  projectId: 'grept-wallet',
-  storageBucket: 'grept-wallet.appspot.com',
-  messagingSenderId: '222395317174',
-  appId: '1:222395317174:web:5505ca345b5c6435ee5f17'
-};
+async function asyncForEach(array, callback) {
+  for (let index = 0; index < array.length; index++) {
+    await callback(array[index], index, array);
+  }
+}
 
 
 module.exports.bootstrap = async function() {
   _.extend(sails.hooks.http.app.locals, sails.config.http.locals);
 
-  // Initialize Firebase
-  const app = initializeApp(_firebaseConfig);
 
   // Import dependencies
   var path = require('path');
@@ -56,7 +46,7 @@ module.exports.bootstrap = async function() {
     name: 'Uncategorised',
   }).fetch();
 
-  var postalDistricts = await PostalDistrict.createEach([
+  const createPostalDistricts = [
     {
       outcode: 'L1'
     }, {
@@ -64,7 +54,14 @@ module.exports.bootstrap = async function() {
     }, {
       outcode: 'L3'
     }
-  ]).fetch();
+  ];
+  asyncForEach(createPostalDistricts, async (pd) => {
+    var existingPd = await PostalDistrict.findOne(pd);
+    if (existingPd) {
+      PostalDistrict.removeFromCollection(pd);
+    }
+  });
+  var postalDistricts = await PostalDistrict.createEach(createPostalDistricts).fetch();
 
   var delifonseca = await Vendor.create({
     name: 'Delifonseca',
@@ -180,26 +177,43 @@ module.exports.bootstrap = async function() {
   //   isEnabled: true
   // });
 
-  // TODO: Create user
+  // * Create admin-user
   await User.create({
-    email: 'adam@itsaboutpeepl.com',
-    password: 'Testing123!',
-    name: 'Adam Galloway',
+    email: 'joey@vegi.com',
+    // password: 'Testing123!',
+    phone: '11118887755',
+    name: 'Joey Dwonczyk',
     vendor: delifonseca.id,
     isSuperAdmin: true,
     vendorRole: 'none',
-    role: ''
+    role: '',
+    firebaseSessionToken: 'DUMMY_FIREBASE_TOKEN',
+  });
+
+  // * Create consumer user
+  await User.create({
+    email: 'jdwonczyk.fit@gmail.com',
+    phone: '99998887766',
+    // password: 'Testing123!',
+    name: 'Consumer 1',
+    vendor: delifonseca.id,
+    isSuperAdmin: false,
+    vendorRole: 'none',
+    role: '',
+    firebaseSessionToken: 'DUMMY_FIREBASE_TOKEN',
   });
 
   // * Create sales Assistant
   await User.create({
     email: 'jdwonczyk@gmail.com',
-    password: 'Testing123!',
+    phone: '99998887777',
+    // password: 'Testing123!',
     name: 'Sales Assistant 1',
     vendor: delifonseca.id,
     isSuperAdmin: false,
     vendorRole: 'salesManager',
-    role: 'staff'
+    role: 'staff',
+    firebaseSessionToken: 'DUMMY_FIREBASE_TOKEN',
   });
 
   // Save new bootstrap version

@@ -21,7 +21,7 @@
  *   https://sailsjs.com/anatomy/app.js
  */
 
-require('ts-node/register');
+require('ts-node/register'); //TODO: enable type definition files here
 
 // Ensure we're in the project directory, so cwd-relative paths work as expected
 // no matter where we actually lift from.

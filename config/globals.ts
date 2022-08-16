@@ -8,9 +8,8 @@
  * For more information on any of these options, check out:
  * https://sailsjs.com/config/globals
  */
-import UserModel from '../api/models/UserModel';
 
-declare var User: UserModel;
+declare var User: any;
 declare var Order: any;
 declare var Vendor: any;
 

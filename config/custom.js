@@ -1,5 +1,6 @@
-const dotenv = require('dotenv').load('./env'); // alias of .config()
-const envConfig = dotenv.load().parsed;
+const dotenv = require('dotenv');//.load('./env'); // alias of .config()
+// const envConfig = dotenv.load().parsed;
+const envConfig = dotenv.config('./env').parsed;
 
 /**
  * Custom configuration

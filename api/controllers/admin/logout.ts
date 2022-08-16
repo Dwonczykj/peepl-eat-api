@@ -14,11 +14,13 @@ module.exports = {
 
 
   exits: {
+    success: {
 
+    },
   },
 
 
-  fn: async function () {
+  fn: async function (inputs, exits) {
     delete this.req.session.userId;
 
     const auth = getAuth();

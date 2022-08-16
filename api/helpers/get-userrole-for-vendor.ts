@@ -1,4 +1,3 @@
-import UserModel from "../models/UserModel";
 
 declare var User: any;
 
@@ -33,7 +32,7 @@ module.exports = {
 
   fn: async function (inputs) {
     // get the user
-    const user: UserModel = await User.findOne({
+    const user: any = await User.findOne({
       id: inputs.userId,
     });
 

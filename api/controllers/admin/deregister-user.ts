@@ -1,5 +1,6 @@
 import { getAuth, UserRecord } from 'firebase-admin/auth';
-import UserModel from "../../models/UserModel";
+// import * as UserModel from '../../models/UserModel';
+
 module.exports = {
 
 
@@ -45,7 +46,7 @@ module.exports = {
       id: this.req.session.userId
     });
 
-    let user: UserModel;
+    let user: any;
     let userFB: UserRecord;
 
     if (Object.keys(inputs).includes('id')) {

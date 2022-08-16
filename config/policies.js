@@ -27,6 +27,10 @@ module.exports.policies = {
   'admin/view-postal-districts': 'is-super-admin',
   'admin/view-approve-order': true,
   'admin/approve-or-decline-order': true,
+  'discounts/*': ['localize', 'firebase', 'firebase-auth'],
+  'orders/*': ['localize', 'firebase', 'firebase-auth'],
+  'products/*': ['localize', 'firebase', 'firebase-auth'],
+  'vendors/*': ['localize', 'firebase', 'firebase-auth'],
   '*': true,
 
 };
