@@ -259,10 +259,6 @@
             "format": "double",
             "description": "A positive or negative integer representing the amount of pence to adjust the base price by."
           },
-          "postCodeRestrictionRegex": {
-            "type": "string",
-            "description": "A regular expression specifying which postcodes are eligible for this delivery method."
-          },
           "methodType": {
             "type": "string",
             "default": "delivery",
@@ -957,8 +953,7 @@
             "required": [
               "email",
               "password",
-              "name",
-              "vendor"
+              "name"
             ]
           }
         ]
@@ -995,6 +990,14 @@
           "isSuperAdmin": {
             "type": "boolean",
             "default": false
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "owner",
+              "staff",
+              "courier"
+            ]
           },
           "vendor": {
             "description": "JSON dictionary representing the **vendor** instance or FK when creating / updating / not populated",
@@ -2405,7 +2408,7 @@
           {
             "in": "query",
             "name": "image",
-            "required": true,
+            "required": false,
             "schema": {}
           },
           {
@@ -2436,7 +2439,7 @@
           {
             "in": "query",
             "name": "vendor",
-            "required": false,
+            "required": true,
             "schema": {
               "type": "number",
               "format": "double"

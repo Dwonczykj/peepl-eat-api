@@ -96,7 +96,6 @@ module.exports = {
       type: inputs.type,
       walletAddress: inputs.walletAddress,
       isVegan: inputs.isVegan,
-      // deliveryRestrictionDetails: inputs.deliveryRestrictionDetails
     }).fetch();
 
     // All done.

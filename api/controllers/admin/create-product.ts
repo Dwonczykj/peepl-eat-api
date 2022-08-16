@@ -25,7 +25,6 @@ module.exports = {
     },
     image: {
       type: 'ref',
-      required: true
     },
     isAvailable: {
       type: 'boolean'
@@ -37,7 +36,8 @@ module.exports = {
       type: 'boolean'
     },
     vendor: {
-      type: 'number'
+      type: 'number',
+      required: true
     }
   },
 
@@ -69,7 +69,18 @@ module.exports = {
 
     var newProduct;
 
-    if(!inputs.image) {
+    // Check that the file is not too big.
+    var imageInfo = await sails.uploadOne(inputs.image, {
+      adapter: require('skipper-s3'),
+      key: sails.config.custom.amazonS3AccessKey,
+      secret: sails.config.custom.amazonS3Secret,
+      bucket: sails.config.custom.amazonS3Bucket,
+      maxBytes: 30000000
+    })
+    .intercept('E_EXCEEDS_UPLOAD_LIMIT', 'tooBig')
+    .intercept((err) => new Error('The photo upload failed! ' + err.message));
+
+    if(!imageInfo) {
       // Create the new product
       newProduct = await Product.create({
         name: inputs.name,
@@ -80,17 +91,6 @@ module.exports = {
         vendor: inputs.vendor
       }).fetch();
     } else {
-      // Check that the file is not too big.
-      var imageInfo = await sails.uploadOne(inputs.image, {
-        adapter: require('skipper-s3'),
-        key: sails.config.custom.amazonS3AccessKey,
-        secret: sails.config.custom.amazonS3Secret,
-        bucket: sails.config.custom.amazonS3Bucket,
-        maxBytes: 30000000
-      })
-      .intercept('E_EXCEEDS_UPLOAD_LIMIT', 'tooBig')
-      .intercept((err) => new Error('The photo upload failed! ' + err.message));
-
       newProduct = await Product.create({
         imageUrl: sails.config.custom.amazonS3BucketUrl + imageInfo.fd,
         name: inputs.name,
