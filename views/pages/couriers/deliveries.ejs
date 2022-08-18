@@ -1,0 +1,60 @@
+<div id="deliveries" v-cloak>
+  <div class="container">
+    <h1 class="h4 text-center my-4">Your deliveries</h1>
+
+    <div v-for="order in yourOrders" class="my-3 p-3 bg-white rounded">
+      <p class="text-muted m-0">Order #{{order.deliveryId}}</p>
+
+      <h2 class="h5 border-top pt-3 mt-3 mb-0">{{order.vendor.name}}</h2>
+      <ol class="order-confirmation__option-values">
+        <li>{{order.vendor.pickupAddressLineOne}}</li>
+        <li>{{order.vendor.pickupAddressLineTwo}}</li>
+        <li>{{order.vendor.pickupAddressCity}}</li>
+        <li>{{order.vendor.pickupAddressPostCode}}</li>
+      </ol>
+      <h2 class="h6 border-top pt-3 mt-3 mb-0">Delivery Address:</h2>
+      <ol class="order-confirmation__option-values">
+        <li>{{order.deliveryAddressLineOne}}</li>
+        <li>{{order.deliveryAddressLineTwo}}</li>
+        <li>{{order.deliveryAddressCity}}</li>
+        <li>{{order.deliveryAddressPostCode}}</li>
+      </ol>
+      <p>{{order.fulfilmentSlotFrom | formatDeliverySlot}} - {{order.fulfilmentSlotTo | formatDeliverySlot}}</p>
+
+    </div>
+    <h1 class="h4 text-center my-4">Unassigned deliveries</h1>
+
+
+    <!--! <ajax-form :form-data="otherOrders" :syncing.sync="syncing" :form-rules="formRules" :form-errors.sync="formErrors"
+      :cloud-error.sync="cloudError" @submitted="vendorSubmitted" :action="(vendor.id) ?  'editVendor' : 'createVendor'"> -->
+
+    <div v-for="order in otherOrders" class="my-3 p-3 bg-white rounded">
+
+
+      <!-- <form action="/couriers/update-delivery-availability" method="POST"> -->
+        <!-- TODO Turn this into a Header and then Card with delivery details and the Accept / Decline Buttons on the right that individually click the .page.js handler method. -->
+        <!-- <input type="checkbox" id="{{order.id}}" name="delivery-{{order.id}}" value="{{order.deliveryId}}" /> -->
+      <!-- </form> -->
+      <h2 class="h5 border-top pt-3 mt-3 mb-0">{{order.vendor.name}}</h2>
+      <ol class="order-confirmation__option-values">
+        <li>{{order.vendor.pickupAddressLineOne}}</li>
+        <li>{{order.vendor.pickupAddressLineTwo}}</li>
+        <li>{{order.vendor.pickupAddressCity}}</li>
+        <li>{{order.vendor.pickupAddressPostCode}}</li>
+      </ol>
+      <h2 class="h6 border-top pt-3 mt-3 mb-0">Delivery Address:</h2>
+      <ol class="order-confirmation__option-values">
+        <li>{{order.deliveryAddressLineOne}}</li>
+        <li>{{order.deliveryAddressLineTwo}}</li>
+        <li>{{order.deliveryAddressCity}}</li>
+        <li>{{order.deliveryAddressPostCode}}</li>
+      </ol>
+      <p>{{order.fulfilmentSlotFrom | formatDeliverySlot}} - {{order.fulfilmentSlotTo | formatDeliverySlot}}</p>
+      <button class="btn btn-peepl-green" @click="clickAcceptDelivery(order.publicId)">Accept</button>
+    </div>
+    <!-- <button class="btn btn-peepl-green" type="submit">Update</button> -->
+    <!-- <button class="btn btn-peepl-green" @click="clickUpdateDeliveryAvailability(order.publicId, true)">Approve</button>
+      <button class="btn btn-peepl-red" @click="clickApproveOrDeclineOrder(order.publicId, false)">Decline</button> -->
+  </div>
+</div>
+<%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>

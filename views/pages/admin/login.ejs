@@ -28,14 +28,15 @@
                           <ajax-button :syncing="syncing" class="btn-peepl btn-lg btn-block">Sign in</ajax-button>
                         </div>
                       </ajax-form> -->
-                      <button onclick="onLoginClick()" autofocus class="btn-peepl btn-lg btn-block">Sign in</button>
-                      <div id="firebaseui-auth-container"></div>
-                      <div id="loader">Loading...</div>
+                      <input type="tel" class="form-control" pattern='^\+?\d{0,13}' placeholder="Phone Number (Format: +999999999999)" :class="[formErrors.phoneNumber ? 'is-invalid' : '']" @change="changeUserPhoneNumber($event.target.text)">
+                      <button @click="clickLoginWithFirebase()" id="firebase-sign-in-button" autofocus class="btn-peepl btn-lg btn-block">Sign in</button>
+                      <div id="recaptcha-container"></div>
+                      
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<script src="/js/pages/vendors/recaptcha.js"></script>
+<!-- <script src="/js/pages/vendors/recaptcha.js"></script> -->
 <%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>

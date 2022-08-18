@@ -9,6 +9,7 @@
         <div v-for="item in order.items">
           <h2 class="h5 border-top pt-3 mt-3 mb-0">{{item.product.name}}</h2>
           <ol v-if="item.optionValues && item.optionValues.length" class="order-confirmation__option-values">
+            <!-- TODO: Add checkbox to li below to allow Vendor to approve some of the orders -> then handle auto refunds if not all items checked or declined. GRey the approve button if no items ticked -->
             <li v-for="optionValue in item.optionValues"><b>{{optionValue.option.name}}</b>: {{optionValue.optionValue.name}}</li>
           </ol>
         </div>

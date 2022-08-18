@@ -31,6 +31,7 @@ module.exports.policies = {
   'orders/*': ['localize', 'firebase', 'firebase-auth'],
   'products/*': ['localize', 'firebase', 'firebase-auth'],
   'vendors/*': ['localize', 'firebase', 'firebase-auth'],
+  'couriers/*': ['localize', 'firebase', 'firebase-auth', 'is-courier'],
   '*': true,
 
 };

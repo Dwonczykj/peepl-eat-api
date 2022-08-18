@@ -1,5 +1,5 @@
 /**
- * is-super-admin
+ * is-logged-in
  *
  *
  * For more about how to use policies, see:
@@ -16,9 +16,9 @@ module.exports = async function (req, res, proceed) {
     id: req.session.userId,
   });
 
-  if(user.isSuperAdmin){
+  if (user.role === 'courier') {
     return proceed();
   }
 
-  return res.redirect('/admin/vendors/' + user.vendor);
+  return res.redirect('/admin/login/');
 };

@@ -216,6 +216,19 @@ module.exports.bootstrap = async function() {
     firebaseSessionToken: 'DUMMY_FIREBASE_TOKEN',
   });
 
+  // * Create Courier
+  await User.create({
+    email: 'jdwonczy.corpk@gmail.com',
+    phone: '99995557777',
+    // password: 'Testing123!',
+    name: 'Courier 1',
+    vendor: delifonseca.id,
+    isSuperAdmin: false,
+    vendorRole: 'none',
+    role: 'courier',
+    firebaseSessionToken: 'DUMMY_FIREBASE_TOKEN',
+  });
+
   // Save new bootstrap version
   await sails.helpers.fs.writeJson.with({
     destination: bootstrapLastRunInfoPath,

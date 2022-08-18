@@ -1,0 +1,66 @@
+<div id="approve-delivery-availability" class="admin" v-cloak>
+  <%- partial('../../partials/courier-navbar.ejs') %>
+
+    <div class="container">
+
+      <div class="mb-3">
+        <div class="my-3 p-3 bg-white rounded">
+          <!-- <p class="text-muted m-0">Order #{{order.id}}</p> -->
+          <!-- TODO: view is not passed order, it is now passed a DeliveryInfomation -->
+          <div v-for="item in order.items">
+            <h2 class="h5 border-top pt-3 mt-3 mb-0">{{item.product.name}}</h2>
+            <ol v-if="item.optionValues && item.optionValues.length" class="order-confirmation__option-values">
+              <li v-for="optionValue in item.optionValues"><b>{{optionValue.option.name}}</b>:
+                {{optionValue.optionValue.name}}</li>
+            </ol>
+          </div>
+
+          <h3 class="border-top pt-3 mt-3 mb-0"><b>Delivery:</b> </h3>
+          <b>Delivery time:</b> {{order.fulfilmentSlotFrom}} - {{order.fulfilmentSlotTo}}
+          <br /><b>Name:</b> {{order.deliveryName}}
+          <br><b>Email:</b> {{order.deliveryEmail}}
+          <br><b>Number:</b> <a :href="'tel:'+order.deliveryPhoneNumber">{{order.deliveryPhoneNumber}}</a>
+          <br><b>Line One:</b> {{order.deliveryAddressLineOne}}
+          <br><b>Line Two:</b> {{order.deliveryAddressLineTwo}}
+          <br><b>Post Code:</b> {{order.deliveryAddressPostCode}}
+          <br><b>Notes:</b> {{order.deliveryAddressInstructions}}
+          <h2 class="h5 border-top pt-3 mt-3 mb-0 d-flex">
+            <span class="mr-auto">Total</span>
+            <span>£{{order.total / 100}}</span>
+          </h2>
+          <!-- <p class="mt-2 mb-0 d-flex text-success">
+          <span class="mr-auto">Reward</span>
+          <span>+ {{order.total}} PPL</span>
+        </p> -->
+        </div>
+
+        <div class="">
+          <label for="deliveryId">Courier Delivery ID</label>
+          <input type="text" class="form-control" id="deliveryId" @change="changeCourierDeliveryId($event.target.text)"
+            required>
+        </div>
+        <div v-if="!order.restaurantAccepted">
+          <button class="btn btn-peepl-green"
+            @click="clickAddDeliveryAvailabilityForOrder(true)">Approve</button>
+          <button class="btn btn-peepl-red"
+            @click="clickAddDeliveryAvailabilityForOrder(false)">Decline</button>
+        </div>
+        <div v-else>
+          <p>This order has been approved so it cannot be declined now.</p>
+        </div>
+      </div>
+    </div>
+    <!-- <h1>TODO: Implement this page.</h1> -->
+    <!-- <p>(See also <em>assets/styles/pages/admin/approve-order.less</em>, <em>assets/js/pages/admin/approve-order.page.js</em>, and <em>api/controllers/admin/view-approve-order.js</em>.)</p> -->
+    <script>
+      /* event listener */
+      document.getElementsByName("Thing")[0].addEventListener('change', doThing);
+
+      /* function */
+      function doThing() {
+        alert('Horray! Someone wrote "' + this.value + '"!');
+        debugger;
+      }
+    </script>
+</div>
+<%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>

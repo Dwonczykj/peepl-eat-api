@@ -1,7 +1,9 @@
+
+var parasails: any;
 /**
- * <opening-hours>
+ * <recaptcha>
  * -----------------------------------------------------------------------------
- * Opening hours component used in the edit-vendor screen.
+ * Recaptcha component used in the login screen.
  *
  * @type {Component}
  *
@@ -9,17 +11,17 @@
  * -----------------------------------------------------------------------------
  */
 
-parasails.registerComponent('openingHours', {
+parasails.registerComponent('recaptcha', {
   //  ╔═╗╦═╗╔═╗╔═╗╔═╗
   //  ╠═╝╠╦╝║ ║╠═╝╚═╗
   //  ╩  ╩╚═╚═╝╩  ╚═╝
   props: [
-    'fulfilment-method',
+    // 'fulfilment-method',
   ],
   //  ╦╔╗╔╦╔╦╗╦╔═╗╦    ╔═╗╔╦╗╔═╗╔╦╗╔═╗
   //  ║║║║║ ║ ║╠═╣║    ╚═╗ ║ ╠═╣ ║ ║╣
   //  ╩╝╚╝╩ ╩ ╩╩ ╩╩═╝  ╚═╝ ╩ ╩ ╩ ╩ ╚═╝
-  data: function (){
+  data: function () {
     return {
       syncing: false,
       formRules: {
@@ -40,43 +42,24 @@ parasails.registerComponent('openingHours', {
   //  ╠═╣ ║ ║║║║
   //  ╩ ╩ ╩ ╩ ╩╩═╝
   template: `
-    <ajax-form :form-data="fulfilmentMethod" :syncing.sync="syncing" :form-errors.sync="formErrors" :cloud-error.sync="cloudError" :action="'updateOpeninghours'">
-        <div class="my-3 p-3 p-md-4 rounded action-card" v-for="(hours, index) in fulfilmentMethod.openingHours">
-            <details>
-            <summary class="action-card__summary">
-                <span class="action-card__checkbox">
-                <input type="checkbox" :id=hours.dayOfWeek v-model="hours.isOpen">
-                </span>
-                <span :class="{'line-through': !hours.isOpen }">{{hours.dayOfWeek | capitalise}}</span> <div v-if="hours.isOpen" class="text-muted ml-1">{{hours.openTime}} - {{hours.closeTime}}</div>
-            </summary>
-            <div class="action-card__content">
-                <br/>
-                <label for="appt">Select opening time:</label>
-                <input type="time" id="appt" name="appt" v-model="hours.openTime" :disabled="!hours.isOpen">
-                <label for="appt">Select closing time:</label>
-                <input type="time" id="appt" name="appt" v-model="hours.closeTime" :disabled="!hours.isOpen">
-            </div>
-            </details>
-        </div>
-        <ajax-button class="btn btn-peepl mt-4" type="submit" :syncing="syncing" v-bind:class="{ 'is-loading': syncing }">Save changes</ajax-button>
-    </ajax-form>
+    <div id="recaptcha-container"></div>
     `,
 
   //  ╦  ╦╔═╗╔═╗╔═╗╦ ╦╔═╗╦  ╔═╗
   //  ║  ║╠╣ ║╣ ║  ╚╦╝║  ║  ║╣
   //  ╩═╝╩╚  ╚═╝╚═╝ ╩ ╚═╝╩═╝╚═╝
-  beforeMount: function() {
+  beforeMount: function () {
     //…
   },
-  mounted: async function(){
-    //…
+  mounted: async function () {
+    
   },
-  beforeDestroy: function() {
+  beforeDestroy: function () {
     //…
   },
 
   filters: {
-    capitalise: function(value) {
+    capitalise: function (value) {
       if (!value) {
         return '';
       }

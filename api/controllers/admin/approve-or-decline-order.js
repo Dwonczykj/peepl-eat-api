@@ -56,6 +56,9 @@ module.exports = {
 
       await Order.updateOne({publicId: inputs.orderId})
       .set({rewardsIssued: rewardAmount});
+    } else {
+      //TODO: Send a refund to the Customer account of amount order.total if the payment has already gone through. -> This should involve a peeplPay.revertTranasction(paymentId) rather than a new call
+      //TODO: If on the other hand, restaurantAccepted partialOrder, then we need to ensure that the payment to the vendor was only partial or that we refund the unavailable items.
     }
 
     // All done.

@@ -36,6 +36,9 @@ module.exports.routes = {
   // DISCOUNTS
   'GET /api/v1/discounts/check-discount-code/:discountCode': { action: 'discounts/check-discount-code' },
 
+  // COURIERS
+
+
   // ORDERS
   'GET /api/v1/orders': { action: 'orders/view-my-orders' },
   'POST /api/v1/orders/create-order': { action: 'orders/create-order' },
