@@ -31,4 +31,5 @@ module.exports.custom = {
   amazonS3Bucket: 'vegiapp-1',
 
   passwordSaltRounds: envConfig['saltrounds'],
+  // firebaseAPIKey: envConfig['firebaseAPIKey'],
 };

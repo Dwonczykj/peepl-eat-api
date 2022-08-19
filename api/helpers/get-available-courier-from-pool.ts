@@ -1,7 +1,515 @@
 declare var OpeningHours: any;
 declare var FulfilmentMethod: any;
 var moment = require('moment');
-import { couriers, DeliveryInformation, ICourier } from './couriers';
+
+
+const DELIVERY_AVAIL_PENDING = -1;
+
+export class DeliveryAvailability {
+  provisionalDeliveryId?: number;
+  courierId?: number;
+  get status(): string {
+    if(
+      this.provisionalDeliveryId !== null &&
+      this.provisionalDeliveryId !== undefined
+    ){
+      return 'accepted';
+    } else if(this.provisionalDeliveryId === DELIVERY_AVAIL_PENDING){
+      return 'pending';
+    } else {
+      return 'failed';
+    }
+  }
+
+  constructor(courierId: number, provisionalDeliveryId?: number) {
+    this.provisionalDeliveryId = provisionalDeliveryId;
+    this.courierId = courierId;
+  }
+}
+
+export class DeliveryInformation {
+  deliverBefore: Date;
+  deliverAfter: Date;
+
+  pickupAddressLineOne: string;
+  pickupAddressLineTwo: string;
+  pickupAddressCity: string;
+  pickupAddressPostCode: string;
+
+  pickupContactName: string;
+
+  deliveryContactName: string;
+  deliveryPhoneNumber: string;
+  deliveryComments: string;
+  deliveryAddressLineOne: string;
+  deliveryAddressLineTwo: string;
+  deliveryAddressCity: string;
+  deliveryAddressPostCode: string;
+
+  vegiOrderId: string;
+
+  constructor(
+    deliverBefore: Date,
+    deliverAfter: Date,
+    pickupAddressLineOne: string,
+    pickupAddressLineTwo: string,
+    pickupAddressCity: string,
+    pickupAddressPostCode: string,
+    pickupContactName: string,
+    deliveryContactName: string,
+    deliveryPhoneNumber: string,
+    deliveryComments: string,
+    deliveryAddressLineOne: string,
+    deliveryAddressLineTwo: string,
+    deliveryAddressCity: string,
+    deliveryAddressPostCode: string,
+    vegiOrderId: string
+  ) {
+    this.deliverBefore=deliverBefore;
+    this.deliverAfter=deliverAfter;
+    this.pickupAddressLineOne=pickupAddressLineOne;
+    this.pickupAddressLineTwo=pickupAddressLineTwo;
+    this.pickupAddressCity=pickupAddressCity;
+    this.pickupAddressPostCode=pickupAddressPostCode;
+    this.pickupContactName=pickupContactName;
+    this.deliveryContactName=deliveryContactName;
+    this.deliveryPhoneNumber=deliveryPhoneNumber;
+    this.deliveryComments=deliveryComments;
+    this.deliveryAddressLineOne=deliveryAddressLineOne;
+    this.deliveryAddressLineTwo=deliveryAddressLineTwo;
+    this.deliveryAddressCity=deliveryAddressCity;
+    this.deliveryAddressPostCode=deliveryAddressPostCode;
+    this.vegiOrderId=vegiOrderId;
+  }
+}
+
+export enum DeliveryStatus {
+  rejected = 'rejected',
+  accepted = 'accepted',
+  riderOnRouteToPickup = 'riderOnRouteToPickup',
+  riderOnRouteToCustomer = 'riderOnRouteToCustomer',
+  pickUpFailed = 'pickUpFailed',
+  dropOffFailed = 'dropOffFailed',
+  delivered = 'delivered',
+  emailResponseRequested= 'emailResponseRequested',
+  unknown = 'unknown',
+}
+
+export enum RequestReceived {
+  received,
+  failed,
+}
+
+export enum DeliveryConfirmation {
+  success = 0,
+  pendingEmail = 2,
+  cancelled = 1,
+  failure = -1,
+}
+
+export interface ICourier {
+  courierName: string;
+  courierId: number;
+
+  requestProvisionalDeliveryAvailability: (
+    inputs: DeliveryInformation,
+  ) => Promise<DeliveryAvailability>;
+
+  requestDeliveryConfirmation: (
+    provisionalDeliveryId: number,
+    deliveryInfo: DeliveryInformation,
+  ) => Promise<DeliveryConfirmation>;
+
+  cancelProvisionalDelivery: (
+    provisionalDeliveryId: number,
+    deliveryInfo: DeliveryInformation,
+  ) => Promise<RequestReceived>;
+
+  checkDeliveryStatus: (provisionalDeliveryId: number, deliveryInfo: DeliveryInformation) => Promise<DeliveryStatus>;
+}
+
+export class CoopCycleCourier implements ICourier {
+  courierName = 'CoopCycle';
+  courierId = 1;
+  client?:any;
+
+  private _requestDeliveryAvailabilityUrl = '/api/deliveries/availability'; //! Does not exist
+  private _requestDeliveryConfirmationUrl = '/api/deliveries/confirmation'; //! Does not exist
+  private _requestDeliveryCancellationUrl = '/api/deliveries/cancellation'; //! Does not exist
+  private _requestDeliveryUrl = '/api/deliveries';
+  private _requestJwtUrl = '/oauth2/token';
+
+  constructor() {
+    this._startSession();
+  }
+
+  private async _startSession() {
+    var axios = require('axios');
+
+    // TODO: Better management of Coopcycle JWT (move to DB and refresh after expiry?)
+    var jwtRequest = await axios({
+      method: 'post',
+      url: sails.config.custom.coopcycleUrl + this._requestJwtUrl,
+      auth: {
+        username: 'b8836e8d6ebb19ef277f02da9ec32e58',
+        password: '191f1c9a6593b48b166ae089b661237d3c7137d722edf41aecb070a9b7a6b8a6b73151a8336574440d683c2406f2d9ad7d50951bc9da0c742f17c59ac720b2e8'
+      },
+      data: {
+        'grant_type': 'client_credentials',
+        'scope': 'deliveries'
+      }
+    })
+    .catch((err)=> {
+      sails.log(err);
+    });
+
+    // Create HTTP client with new access token
+    this.client = axios.create({
+      baseURL: sails.config.custom.coopcycleUrl,
+      timeout: 5000,
+      headers: {'Authorization': 'Bearer ' + jwtRequest.data.access_token, 'Content-Type': 'application/ld+json'}
+    });
+  }
+
+  async requestProvisionalDeliveryAvailability(
+    inputs: DeliveryInformation,
+  ): Promise<DeliveryAvailability> {
+    
+
+    var deliverBefore = moment.unix(inputs.deliverBefore).calendar();
+    var deliverAfter = moment.unix(inputs.deliverAfter).calendar();
+
+    var requestBody = {
+      pickup: {
+        address: {
+          streetAddress: `${inputs.pickupAddressLineOne}, ${inputs.pickupAddressLineTwo}, ${inputs.pickupAddressCity}, ${inputs.pickupAddressPostCode}`,
+        },
+      },
+      dropoff: {
+        address: {
+          contactName: inputs.deliveryContactName,
+          telephone: inputs.deliveryPhoneNumber,
+          comments: inputs.deliveryComments,
+          streetAddress: `${inputs.deliveryAddressLineOne}, ${inputs.deliveryAddressLineTwo}, ${inputs.deliveryAddressCity}, ${inputs.deliveryAddressPostCode}`
+        },
+        before: deliverBefore,
+        after: deliverAfter
+      }
+    };
+
+    // Send the delivery information to Coopcycle
+    var response = await this.client.post(this._requestDeliveryAvailabilityUrl, requestBody)
+    .catch((err) => {
+      sails.log('Error requesting delivery availability from ' + this.courierName + '.');
+      sails.log(err);
+    });
+
+    return new DeliveryAvailability(this.courierId, response.data.id);
+  }
+
+  async requestDeliveryConfirmation(
+    provisionalDeliveryId: number,
+    info: DeliveryInformation,
+  ): Promise<DeliveryConfirmation> {
+    var requestBody = {
+      id: provisionalDeliveryId
+    };
+
+    // Send the delivery information to Coopcycle
+    var response = await this.client.post(this._requestDeliveryAvailabilityUrl, requestBody)
+      .catch((err) => {
+        sails.log('Error confirming the delivery from ' + this.courierName + '.');
+        sails.log(err);
+        return DeliveryConfirmation.failure;
+      });
+
+    if (response.data.status === 'confirmed'){
+      return DeliveryConfirmation.success;
+    } else if (response.data.status === 'cancelled') {
+      return DeliveryConfirmation.cancelled;
+    } else {
+      return DeliveryConfirmation.failure;
+    }
+  }
+
+  async cancelProvisionalDelivery(
+    provisionalDeliveryId: number,
+    info: DeliveryInformation,
+  ): Promise<RequestReceived> {
+    var requestBody = {
+      id: provisionalDeliveryId
+    };
+
+    // Send the delivery information to Coopcycle
+    var response = await this.client.post(this._requestDeliveryAvailabilityUrl, requestBody)
+      .catch((err) => {
+        sails.log('Error cancelling the delivery from ' + this.courierName + '.');
+        sails.log(err);
+        return RequestReceived.failed;
+      });
+
+    if (response.statusCode === 200){
+      return RequestReceived.received;
+    } else {
+      return RequestReceived.failed;
+    }
+  }
+
+  async checkDeliveryStatus(provisionalDeliveryId: number, info: DeliveryInformation): Promise<DeliveryStatus> {
+    var requestBody = {
+      id: provisionalDeliveryId
+    };
+
+    // Send the delivery information to Coopcycle
+    var response = await this.client.post(this._requestDeliveryAvailabilityUrl, requestBody)
+      .catch((err) => {
+        sails.log('Error fetching the delivery.');
+        sails.log(err);
+        return DeliveryStatus.unknown;
+      });
+
+    for (let element in DeliveryStatus) {
+      if (response.data.status.toString().toLowerCase() === ''){
+        return DeliveryStatus[element];
+      }
+    }
+    return DeliveryStatus.unknown;
+  }
+}
+
+export class AgileCourier implements ICourier {
+  courierName = 'Agile';
+  courierId = 2;
+  client?:any; //Send Emails to Agile with delivery requests and information
+  //TODO: Expose a dashboard for Agile to login to and accept a delivery that is backed by an api that allows couriers to programatically accept delivery requests. each deliveryrequest needs to have the vegi order id for this to be doable
+
+  private _requestDeliveryAvailabilityEmailAddress = 'danny@agile.com'; //! Does not exist
+  
+  constructor() {
+    
+  }
+
+  async requestProvisionalDeliveryAvailability(
+    deliveryInformation: DeliveryInformation,
+  ): Promise<DeliveryAvailability> {
+    
+
+    var deliverBefore = moment.unix(deliveryInformation.deliverBefore).calendar(); // TODO: Correct the formatting for this line to Today if today, 14:34 (16/08/2022 14:34 +00)
+    var deliverAfter = moment.unix(deliveryInformation.deliverAfter).calendar();
+
+    var requestBody = {
+      vegiOrderId: deliveryInformation.vegiOrderId, // * Needed for non-HTTP courier clients
+      subject: 'vegi Delivery Request - #' + deliveryInformation.vegiOrderId,
+      message: 'Please confirm delivery availability for the following delivery details',
+      pickup: {
+        address: {
+          streetAddress: `${deliveryInformation.pickupAddressLineOne}, ${deliveryInformation.pickupAddressLineTwo}, ${deliveryInformation.pickupAddressCity}, ${deliveryInformation.pickupAddressPostCode}`,
+          name: deliveryInformation.pickupContactName,
+        },
+      },
+      dropoff: {
+        address: {
+          contactName: deliveryInformation.deliveryContactName,
+          telephone: deliveryInformation.deliveryPhoneNumber,
+          comments: deliveryInformation.deliveryComments,
+          streetAddress: `${deliveryInformation.deliveryAddressLineOne}, ${deliveryInformation.deliveryAddressLineTwo}, ${deliveryInformation.deliveryAddressCity}, ${deliveryInformation.deliveryAddressPostCode}`
+        },
+        before: deliverBefore,
+        after: deliverAfter
+      }
+    };
+
+    // Send the delivery information to Courier
+    await sails.helpers.sendTemplateEmail
+      .with({
+        template: 'email-request-courier-availability',
+        templateData: {
+          vegiOrderId: requestBody.vegiOrderId,
+          pickup: requestBody.pickup,
+          dropoff: requestBody.dropoff,
+        },
+        to: this._requestDeliveryAvailabilityEmailAddress,
+        subject: requestBody.subject,
+        layout: false,
+      }).intercept('', (err) => {
+        sails.log('Error requesting delivery availability from ' + this.courierName + '.');
+        sails.log(err);
+      });
+    
+
+    return new DeliveryAvailability(this.courierId, DELIVERY_AVAIL_PENDING);
+  }
+
+  async requestDeliveryConfirmation(
+    provisionalDeliveryId: number,
+    deliveryInformation: DeliveryInformation,
+  ): Promise<DeliveryConfirmation> {
+    
+
+    var deliverBefore = moment.unix(deliveryInformation.deliverBefore).calendar(); // TODO: Correct the formatting for this line to Today if today, 14:34 (16/08/2022 14:34 +00)
+    var deliverAfter = moment.unix(deliveryInformation.deliverAfter).calendar();
+
+    var requestBody = {
+      vegiOrderId: deliveryInformation.vegiOrderId, // * Needed for non-HTTP courier clients
+      subject: 'vegi Delivery Confirmation Request - #' + deliveryInformation.vegiOrderId,
+      id: provisionalDeliveryId,
+      message: 'Please confirm delivery for this delivery id',
+      pickup: {
+        address: {
+          streetAddress: `${deliveryInformation.pickupAddressLineOne}, ${deliveryInformation.pickupAddressLineTwo}, ${deliveryInformation.pickupAddressCity}, ${deliveryInformation.pickupAddressPostCode}`,
+          name: deliveryInformation.pickupContactName,
+        },
+      },
+      dropoff: {
+        address: {
+          contactName: deliveryInformation.deliveryContactName,
+          telephone: deliveryInformation.deliveryPhoneNumber,
+          comments: deliveryInformation.deliveryComments,
+          streetAddress: `${deliveryInformation.deliveryAddressLineOne}, ${deliveryInformation.deliveryAddressLineTwo}, ${deliveryInformation.deliveryAddressCity}, ${deliveryInformation.deliveryAddressPostCode}`
+        },
+        before: deliverBefore,
+        after: deliverAfter
+      }
+    };
+
+    // Send the delivery information to Courier
+    await sails.helpers.sendTemplateEmail
+      .with({
+        template: 'email-request-courier-confirmation',
+        templateData: {
+          vegiOrderId: requestBody.vegiOrderId,
+          pickup: requestBody.pickup,
+          dropoff: requestBody.dropoff,
+        },
+        to: this._requestDeliveryAvailabilityEmailAddress,
+        subject: requestBody.subject,
+        layout: false,
+      }).intercept('', (err) => {
+        sails.log('Error requesting delivery availability from ' + this.courierName + '.');
+        sails.log(err);
+      });
+
+    //TODO: We either need a button for Danny to login and click to accept Delivery Request for Availability or we need to have someone check for inbound emails.
+    return DeliveryConfirmation.pendingEmail;
+  }
+
+  async cancelProvisionalDelivery(
+    provisionalDeliveryId: number,
+    deliveryInformation: DeliveryInformation,
+  ): Promise<RequestReceived> {
+    
+
+    var deliverBefore = moment.unix(deliveryInformation.deliverBefore).calendar(); // TODO: Correct the formatting for this line to Today if today, 14:34 (16/08/2022 14:34 +00)
+    var deliverAfter = moment.unix(deliveryInformation.deliverAfter).calendar();
+
+    var requestBody = {
+      vegiOrderId: deliveryInformation.vegiOrderId, // * Needed for non-HTTP courier clients
+      subject: 'vegi Delivery Cancellation Request - #' + deliveryInformation.vegiOrderId,
+      id: provisionalDeliveryId,
+      message: 'Please cancel the delivery request for this delivery id',
+      pickup: {
+        address: {
+          streetAddress: `${deliveryInformation.pickupAddressLineOne}, ${deliveryInformation.pickupAddressLineTwo}, ${deliveryInformation.pickupAddressCity}, ${deliveryInformation.pickupAddressPostCode}`,
+          name: deliveryInformation.pickupContactName,
+        },
+      },
+      dropoff: {
+        address: {
+          contactName: deliveryInformation.deliveryContactName,
+          telephone: deliveryInformation.deliveryPhoneNumber,
+          comments: deliveryInformation.deliveryComments,
+          streetAddress: `${deliveryInformation.deliveryAddressLineOne}, ${deliveryInformation.deliveryAddressLineTwo}, ${deliveryInformation.deliveryAddressCity}, ${deliveryInformation.deliveryAddressPostCode}`
+        },
+        before: deliverBefore,
+        after: deliverAfter
+      }
+    };
+
+    // Send the delivery information to Courier
+    await sails.helpers.sendTemplateEmail
+      .with({
+        template: 'email-request-courier-cancellation',
+        templateData: {
+          vegiOrderId: requestBody.vegiOrderId,
+          pickup: requestBody.pickup,
+          dropoff: requestBody.dropoff,
+        },
+        to: this._requestDeliveryAvailabilityEmailAddress,
+        subject: requestBody.subject,
+        layout: false,
+      }).intercept('', (err) => {
+        sails.log('Error requesting delivery availability from ' + this.courierName + '.');
+        sails.log(err);
+        return RequestReceived.failed;
+      });
+    return RequestReceived.received;
+  }
+
+  async checkDeliveryStatus(provisionalDeliveryId: number, deliveryInformation: DeliveryInformation): Promise<DeliveryStatus> {
+    
+
+    var deliverBefore = moment.unix(deliveryInformation.deliverBefore).calendar(); // TODO: Correct the formatting for this line to Today if today, 14:34 (16/08/2022 14:34 +00)
+    var deliverAfter = moment.unix(deliveryInformation.deliverAfter).calendar();
+
+    var requestBody = {
+      vegiOrderId: deliveryInformation.vegiOrderId, // * Needed for non-HTTP courier clients
+      subject: 'vegi Delivery Cancellation Request - #' + deliveryInformation.vegiOrderId,
+      id: provisionalDeliveryId,
+      message: 'Please cancel the delivery request for this delivery id',
+      pickup: {
+        address: {
+          streetAddress: `${deliveryInformation.pickupAddressLineOne}, ${deliveryInformation.pickupAddressLineTwo}, ${deliveryInformation.pickupAddressCity}, ${deliveryInformation.pickupAddressPostCode}`,
+          name: deliveryInformation.pickupContactName,
+        },
+      },
+      dropoff: {
+        address: {
+          contactName: deliveryInformation.deliveryContactName,
+          telephone: deliveryInformation.deliveryPhoneNumber,
+          comments: deliveryInformation.deliveryComments,
+          streetAddress: `${deliveryInformation.deliveryAddressLineOne}, ${deliveryInformation.deliveryAddressLineTwo}, ${deliveryInformation.deliveryAddressCity}, ${deliveryInformation.deliveryAddressPostCode}`
+        },
+        before: deliverBefore,
+        after: deliverAfter
+      }
+    };
+
+    // Send the delivery information to Courier
+    await sails.helpers.sendTemplateEmail
+      .with({
+        template: 'email-request-courier-cancellation',
+        templateData: {
+          vegiOrderId: requestBody.vegiOrderId,
+          pickup: requestBody.pickup,
+          dropoff: requestBody.dropoff,
+        },
+        to: this._requestDeliveryAvailabilityEmailAddress,
+        subject: requestBody.subject,
+        layout: false,
+      }).intercept('', (err) => {
+        sails.log('Error requesting delivery availability from ' + this.courierName + '.');
+        sails.log(err);
+        return RequestReceived.failed;
+      });
+
+    return DeliveryStatus.emailResponseRequested;
+  }
+}
+
+export const couriers = [
+    new CoopCycleCourier(),
+    new AgileCourier()
+  ];
+
+module.exports = {
+
+  couriers: [
+    new CoopCycleCourier(),
+    new AgileCourier()
+  ],
+
+};
+
 
 module.exports = {
 
@@ -33,7 +541,7 @@ module.exports = {
     //   // regex: /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/
     // },
     pickupFromVendor: {
-      model: 'vendor',
+      type: 'number',
       required: true,
     },
     deliveryContactName: {
@@ -91,6 +599,8 @@ module.exports = {
     var deliverBefore = moment.unix(inputs.deliverBefore).calendar();
     var deliverAfter = moment.unix(inputs.deliverAfter).calendar();
 
+    const vendor = Vendor.findOne({id:inputs.pickupFromVendor});
+
     var requestBody = {
       pickup: {
         address: {
@@ -116,11 +626,11 @@ module.exports = {
       const deliveryAvailability = await courier.requestProvisionalDeliveryAvailability(new DeliveryInformation(
         deliverBefore,
         deliverAfter,
-        inputs.pickupFromVendor.pickupAddressLineOne,
-        inputs.pickupFromVendor.pickupAddressLineTwo,
-        inputs.pickupFromVendor.pickupAddressCity,
-        inputs.pickupFromVendor.pickupAddressPostCode,
-        inputs.pickupFromVendor.name,
+        vendor.pickupAddressLineOne,
+        vendor.pickupAddressLineTwo,
+        vendor.pickupAddressCity,
+        vendor.pickupAddressPostCode,
+        vendor.name,
         inputs.deliveryContactName,
         inputs.deliveryPhoneNumber,
         inputs.deliveryComments,

@@ -1,8 +1,8 @@
 {
   "name": "peepl-app-sails",
   "private": true,
-  "version": "0.0.0",
-  "description": "a Sails application",
+  "version": "0.0.1",
+  "description": "vegi backend sails application",
   "keywords": [],
   "dependencies": {
     "@mailchimp/mailchimp_marketing": "^3.0.34",
@@ -40,6 +40,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@types/lodash-es": "^4.17.6",
     "@typescript-eslint/eslint-plugin": "^4.21.0",
     "@typescript-eslint/parser": "^4.21.0",
     "eslint": "^5.16.0",
@@ -49,6 +50,7 @@
   },
   "scripts": {
     "start": "NODE_ENV=production node app.js",
+    "tsc": "tsc ./assets/js",
     "sails": "$(npm bin)/sails",
     "lift": "$(npm bin)/sails lift",
     "test": "npm run lint && npm run custom-tests && echo 'Done.'",

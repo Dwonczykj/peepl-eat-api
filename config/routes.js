@@ -37,7 +37,10 @@ module.exports.routes = {
   'GET /api/v1/discounts/check-discount-code/:discountCode': { action: 'discounts/check-discount-code' },
 
   // COURIERS
-
+  'POST /api/v1/couriers/accept-reject-delivery-confirmation': { action: 'couriers/accept-reject-delivery-confirmation' },
+  'POST /api/v1/couriers/add-delivery-availability-for-order': { action: 'couriers/add-delivery-availability-for-order' },
+  'POST /api/v1/couriers/cancel-delivery': { action: 'couriers/cancel-delivery' },
+  'ALL /couriers/deliveries': { action: 'couriers/view-deliveries' },
 
   // ORDERS
   'GET /api/v1/orders': { action: 'orders/view-my-orders' },
@@ -48,8 +51,18 @@ module.exports.routes = {
 
   // ADMIN
   'GET /admin/login': { action: 'admin/view-login' },
-  'POST /admin/login': { action: 'admin/login' },
+  'GET /admin/account': { action: 'admin/view-account' },
+  // 'POST /admin/login': { action: 'admin/login' },
+  'GET /api/v1/admin/login': { action: 'admin/view-login' },
+  // 'POST /api/v1/admin/login': { action: 'admin/login' },
+  'POST /api/v1/admin/login-with-firebase': { action: 'admin/login-with-firebase' },
+
+  'POST /api/v1/admin/signup': { action: 'admin/signup' },
+  'POST /api/v1/admin/update-user': { action: 'admin/update-user' },
+
   'GET /admin/logout': { action: 'admin/logout' },
+  'ALL /api/v1/admin/logout': { action: 'admin/logout' },
+  'POST /api/v1/admin/deregister-user': { action: 'admin/deregister-user' },
 
   'GET /admin': { action: 'admin/view-vendors' },
   'GET /admin/vendors': { action: 'admin/view-vendors' },

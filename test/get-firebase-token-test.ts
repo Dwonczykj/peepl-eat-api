@@ -1,4 +1,4 @@
-const firebase = require('firebase-admin');
+var firebase = require('firebase-admin');
 const initializeApp = firebase.app.initalizeApp;
 
 

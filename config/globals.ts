@@ -13,6 +13,12 @@ declare var User: any;
 declare var Order: any;
 declare var Vendor: any;
 
+declare var firebase:any; // TODO: Remove once we make firebase an imported module, currently it is a CDN script
+declare var parasails:any;
+declare var SAILS_LOCALS:any;
+declare var Cloud: any;
+declare var sails: any;
+
 module.exports.globals = {
 
   /****************************************************************************

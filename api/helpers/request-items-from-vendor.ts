@@ -32,7 +32,7 @@ module.exports = {
     //   // regex: /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/
     // },
     vendor: {
-      model: 'vendor',
+      type: 'number',
       required: true,
     },
     items: {
@@ -58,7 +58,11 @@ module.exports = {
   },
 
 
-  fn: async function (inputs, exits) {
+  fn: async function (inputs) {
     //TODO: Implement this function
+
+    const vendor = Vendor.findOne({id:inputs.vendor});
+
+    throw 'notFound';
   }
 };

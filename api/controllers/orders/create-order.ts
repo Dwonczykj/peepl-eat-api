@@ -1,4 +1,4 @@
-import { ICourier } from '../../helpers/Couriers';
+import { ICourier } from '../../helpers/get-available-courier-from-pool';
 var moment = require('moment');
 
 /* eslint-disable camelcase */
