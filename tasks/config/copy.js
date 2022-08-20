@@ -15,11 +15,27 @@ module.exports = function(grunt) {
     dev: {
       files: [{
         expand: true,
-        cwd: './assets',
+        cwd: './assets/dependencies',
         src: ['**/*.!(coffee|less|scss|sass)'],
-        dest: '.tmp/public'
+        dest: '.tmp/public/dependencies'
       }]
     },
+    devbabel: {
+      files: [{
+        expand: true,
+        cwd: './assets/js',
+        src: ['**/*.!(coffee|less|scss|sass|page.js|page.ts|page.js.map|js|js.map|ts)'],
+        dest: '.tmp/public/js'
+      }]
+    },
+    // devbabelTest: {
+    //   files: [{
+    //     expand: true,
+    //     cwd: './assets/js',
+    //     src: ['**/*.!(coffee|less|scss|sass|page.js|js|js.map|ts)'],
+    //     dest: 'test_babel_grunt_lib'
+    //   }]
+    // },
     build: {
       files: [{
         expand: true,
