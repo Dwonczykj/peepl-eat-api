@@ -9,37 +9,18 @@
                         <h3 class="panel-title">Sign In</h3>
                     </div>
                     <div class="panel-body">
-                      <!-- <ajax-form :form-rules="formRules" :form-errors.sync="formErrors" :syncing.sync="syncing" :cloud-error.sync="cloudError"
-                                                                    @submitted="submittedFormFirebase()" :handle-parsing="handleParsingFormFirebase">
-                                                                    <div class="form-group">
-                                                                      <input type="tel" class="form-control" autofocus placeholder="PhoneNumber"
-                                                                        :class="[formErrors.phoneNumber ? 'is-invalid' : '']" v-model.trim="formData.phoneNumber">
-                                                                      <div class="invalid-feedback" v-if="formErrors.phoneNumber">Please provide a valid phoneNumber.</div>
-                                                                      </div>
-                                                                      <div class="form-group">
-                          <input type="email" class="form-control" autofocus placeholder="Email Address" :class="[formErrors.emailAddress ? 'is-invalid' : '']" v-model.trim="formData.emailAddress">
-                          <div class="invalid-feedback" v-if="formErrors.emailAddress">Please provide a valid email address.</div>
-                        </div>
-                        <div class="form-group">
-                          <input type="password" class="form-control" placeholder="Password" :class="[formErrors.password ? 'is-invalid' : '']" v-model.trim="formData.password">
-                          <div class="invalid-feedback" v-if="formErrors.password">Please enter your password.</div>
-                        </div>
-                        <div class="form-group">
-                          <input type="checkbox" id="remember" name="rememberMe" v-model="formData.rememberMe"/>
-                          <label for="remember">Remember Me</label>
-                        </div>
-                        <div id="recaptcha-container"></div>
-                        <p class="text-danger" v-if="cloudError==='badCombo'"><small>The credentials you entered are not associated with an account. Please check your email and/or password and try again.</small></p>
-                        <p class="text-danger" v-else-if="cloudError"><small>An error occured while processing your request. Please check your information and try again, or <a href="/contact">contact support</a> if the error persists.</small></p>
-                        <div class="form-group">
-                          <ajax-button @click="handleSignInFirebase" id="firebase-sign-in-button" :syncing="syncing"
-                            class="btn-peepl btn-lg btn-block">Sign in</ajax-button>
-                        </div>
-                      </ajax-form> -->
-                      <!-- <input type="tel" class="form-control" pattern='^\+?\d{0,13}' placeholder="Phone Number (Format: +999999999999)" :class="[formErrors.phoneNumber ? 'is-invalid' : '']" @change="changeUserPhoneNumber($event.target.text)"> -->
-                      <div id="firebaseui-auth-container"></div>
-                      <button @click="clickInitFirebaseButton()" id="firebase-sign-in-button" autofocus
-                        class="btn-peepl btn-lg btn-block">Sign in</button>
+                      <form id="numberForm" hidden>
+                        <input type="tel" id="phoneNumber" value="" placeholder="(+44)9999999999">
+                        <button type="button" id="submitNumberForVerification" @click="clickVerifyPhoneNumber">Submit Number</button>
+                      </form>
+                      <form id="verificationForm" hidden>
+                        <input type="text" id="verificationcode" value="" placeholder="enter verification">
+                        <button type="button" id="submitVerification" @click="verifyCodeSubmit">Submit Code</button>
+                      </form>
+                      <!-- <div id="firebaseui-auth-container"></div>
+                                                                                                                                                          <button @click="clickInitFirebaseButton" id="firebase-sign-in-button" autofocus
+                                                                                                                                                            class="btn-peepl btn-lg btn-block">Sign in</button> -->
+                      <button @click="loadFirstCaptchaUser" id="test-button" class="btn-lg btn-block">Start</button>
                     </div>
                 </div>
             </div>
