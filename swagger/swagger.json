@@ -100,9 +100,6 @@
       "name": "Edit product option value"
     },
     {
-      "name": "Archive order"
-    },
-    {
       "name": "Update product statuses"
     },
     {
@@ -462,10 +459,6 @@
           },
           "paymentIntentId": {
             "type": "string"
-          },
-          "isArchived": {
-            "type": "boolean",
-            "default": false
           },
           "deliveryId": {
             "type": "string",
@@ -2728,36 +2721,6 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/api/v1/admin/archive-order": {
-      "post": {
-        "summary": "Archive order",
-        "tags": [
-          "Archive order"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "orderId",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The requested resource"
           },
           "404": {
             "description": "Resource not found"

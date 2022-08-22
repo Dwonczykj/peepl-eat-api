@@ -22,11 +22,11 @@ module.exports = {
     let orders;
 
     if(user.isSuperAdmin){
-      orders = await Order.find({paidDateTime: {'>': 0}, isArchived: false,})
+      orders = await Order.find({paidDateTime: {'>': 0}})
       .sort('paidDateTime DESC')
       .populate('items.product&optionValues&optionValues.option&optionValue');
     } else {
-      orders = await Order.find({paidDateTime: {'>': 0}, isArchived: false, vendor: user.vendor})
+      orders = await Order.find({paidDateTime: {'>': 0}, vendor: user.vendor})
       .sort('paidDateTime DESC')
       .populate('items.product&optionValues&optionValues.option&optionValue');
     }

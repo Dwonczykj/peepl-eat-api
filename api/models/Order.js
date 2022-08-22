@@ -76,10 +76,10 @@ module.exports = {
     paymentIntentId: {
       type: 'string'
     },
-    isArchived: {
-      type: 'boolean',
-      defaultsTo: false
-    },
+    // isArchived: {
+    //   type: 'boolean',
+    //   defaultsTo: false
+    // },
     deliveryId: {
       type: 'string',
       description: 'The ID to identify the delivery in the logistics system'
