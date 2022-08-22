@@ -1467,6 +1467,20 @@
               ]
             },
             "description": "The acceptance status of the order"
+          },
+          {
+            "in": "query",
+            "name": "timePeriod",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "upcoming",
+                "past",
+                "all"
+              ]
+            },
+            "description": "The time period of the order"
           }
         ],
         "responses": {
