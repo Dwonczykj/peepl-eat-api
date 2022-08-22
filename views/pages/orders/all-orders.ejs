@@ -3,7 +3,17 @@
   <%- partial('../../partials/admin-navbar.ejs') %>
 
   <div class="container">
-    <h1 class="my-5">Paid Orders <% if(acceptanceStatus) { %>(<%= acceptanceStatus.charAt(0).toUpperCase() + acceptanceStatus.slice(1) %>)<% } %></h1>
+    <h1 class="mt-5">Paid Orders <% if(acceptanceStatus) { %>(<%= acceptanceStatus.charAt(0).toUpperCase() + acceptanceStatus.slice(1) %>)<% } %></h1>
+    <a :href="'?timePeriod='+this.timePeriod+'&acceptanceStatus='"><button class="btn" :class="(acceptanceStatus == '') ? 'btn-peepl' : 'btn-peepl-pale-grey'">All orders</button></a>
+    <a :href="'?timePeriod='+this.timePeriod+'&acceptanceStatus=pending'"><button class="btn" :class="(acceptanceStatus == 'pending') ? 'btn-peepl' : 'btn-peepl-pale-grey'">Pending orders</button></a>
+    <a :href="'?timePeriod='+this.timePeriod+'&acceptanceStatus=accepted'"><button class="btn" :class="(acceptanceStatus == 'accepted') ? 'btn-peepl' : 'btn-peepl-pale-grey'">Accepted orders</button></a>
+    <a :href="'?timePeriod='+this.timePeriod+'&acceptanceStatus=rejected'"><button class="btn" :class="(acceptanceStatus == 'rejected') ? 'btn-peepl' : 'btn-peepl-pale-grey'">Rejected orders</button></a>
+    <br>
+    <div class="mt-2">
+      <a :href="'?acceptanceStatus='+this.acceptanceStatus+'&timePeriod='"><button class="btn" :class="(timePeriod == '') ? 'btn-peepl' : 'btn-peepl-pale-grey'">All time</button></a>
+      <a :href="'?acceptanceStatus='+this.acceptanceStatus+'&timePeriod=past'"><button class="btn" :class="(timePeriod == 'past') ? 'btn-peepl' : 'btn-peepl-pale-grey'">Past</button></a>
+      <a :href="'?acceptanceStatus='+this.acceptanceStatus+'&timePeriod=upcoming'"><button class="btn" :class="(timePeriod == 'upcoming') ? 'btn-peepl' : 'btn-peepl-pale-grey'">Upcoming</button></a>
+    </div>
     <div class="row">
         <div v-for="order in orders" class="col-md-6">
           <order-card :order="order"></order-card>
