@@ -40,8 +40,6 @@ module.exports = {
 
     var validSlots = await sails.helpers.getAvailableSlots.with({date, fulfilmentMethodId: inputs.fulfilmentMethodId});
 
-    console.log(validSlots);
-
     // Find slot within list of valid slots
     const found = validSlots.find(slots => {
       return (moment(inputs.fulfilmentSlotFrom).isSame(slots.startTime)) && (moment(inputs.fulfilmentSlotTo).isSame(slots.endTime));

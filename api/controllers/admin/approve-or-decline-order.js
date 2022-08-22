@@ -30,9 +30,9 @@ module.exports = {
 
     var order = await Order.findOne({publicId: inputs.orderId});
 
-    if(order.restaurantAcceptanceStatus === 'accepted') {
-      // Restaurant has previously accepted, they cannot cancel the order after this.
-      throw new Error('Restaurant has already accepted this order.');
+    if(order.restaurantAcceptanceStatus !== 'unconfirmed') {
+      // Restaurant has previously accepted or declined the order, they cannot modify the order acceptance after this.
+      throw new Error('Restaurant has already accepted or declined this order.');
     }
 
     if(inputs.restaurantAccepted === true) {
