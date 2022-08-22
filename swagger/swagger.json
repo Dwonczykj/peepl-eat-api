@@ -487,11 +487,18 @@
           "tipAmount": {
             "type": "number",
             "format": "double",
-            "description": "Amount of tip in pence"
+            "description": "Amount of tip in pence",
+            "minimum": 0
           },
-          "restaurantAccepted": {
-            "type": "boolean",
-            "default": false
+          "restaurantAcceptanceStatus": {
+            "type": "string",
+            "default": "unconfirmed",
+            "enum": [
+              "unconfirmed",
+              "accepted",
+              "declined"
+            ],
+            "example": "unconfirmed"
           },
           "rewardsIssued": {
             "type": "number",

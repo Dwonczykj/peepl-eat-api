@@ -102,9 +102,10 @@ module.exports = {
       description: 'Amount of tip in pence',
       min: 0
     },
-    restaurantAccepted: {
-      type: 'boolean',
-      defaultsTo: false
+    restaurantAcceptanceStatus: {
+      type: 'string',
+      defaultsTo: 'unconfirmed',
+      isIn: ['unconfirmed', 'accepted', 'declined']
     },
     // TODO: Courier Accepted
     rewardsIssued: {

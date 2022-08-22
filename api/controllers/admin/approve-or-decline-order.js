@@ -30,23 +30,17 @@ module.exports = {
 
     var order = await Order.findOne({publicId: inputs.orderId});
 
-    if(order.restaurantAccepted) {
+    if(order.restaurantAcceptanceStatus === 'accepted') {
       // Restaurant has previously accepted, they cannot cancel the order after this.
       throw new Error('Restaurant has already accepted this order.');
     }
 
-    await Order.updateOne({publicId: inputs.orderId})
-    .set({restaurantAccepted: inputs.restaurantAccepted});
+    if(inputs.restaurantAccepted === true) {
+      await Order.updateOne({publicId: inputs.orderId})
+      .set({restaurantAcceptanceStatus: 'accepted'});
 
-    // Send notification to customer that their order has been accepted/declined.
-    await sails.helpers.sendFirebaseNotification.with({
-      topic: 'order-' + order.id,
-      title: 'Order update',
-      body: 'Your order has been ' + (inputs.restaurantAccepted ? 'accepted 😎' : 'declined 😔') + '.'
-    });
-
-    if(inputs.restaurantAccepted){
-      // (10% order total in pence) / 10 pence (value of PPL token)
+      // Issue Peepl rewards
+      // (5% order total in pence) / 10 pence (value of PPL token)
       var rewardAmount = (order.total * 0.05) / 100;
 
       await sails.helpers.issuePeeplReward.with({
@@ -56,12 +50,21 @@ module.exports = {
 
       await Order.updateOne({publicId: inputs.orderId})
       .set({rewardsIssued: rewardAmount});
+    } else if (inputs.restaurantAccepted === false) {
+      await Order.updateOne({publicId: inputs.orderId})
+      .set({restaurantAcceptanceStatus: 'declined'});
     }
+
+    // Send notification to customer that their order has been accepted/declined.
+    await sails.helpers.sendFirebaseNotification.with({
+      topic: 'order-' + order.id,
+      title: 'Order update',
+      body: 'Your order has been ' + (inputs.restaurantAccepted ? 'accepted 😎' : 'declined 😔') + '.'
+    });
 
     // All done.
     return;
 
   }
-
 
 };
