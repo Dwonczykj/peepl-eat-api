@@ -5,14 +5,8 @@
 
     <div class="mb-3">
       <order-card :order="order"></order-card>
-      <div v-if="order.restaurantAcceptanceStatus == 'pending'">
-        <button class="btn btn-peepl-green" @click="clickApproveOrDeclineOrder(order.publicId, true)">Approve</button>
-        <button class="btn btn-peepl-red" @click="clickApproveOrDeclineOrder(order.publicId, false)">Decline</button>
-      </div>
-      <div v-else>
-        <p>This order has been approved or rejected so it cannot be modified now.</p>
-      </div>
     </div>
+    
   </div>
   
 </div>
