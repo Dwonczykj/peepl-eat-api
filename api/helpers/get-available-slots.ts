@@ -140,7 +140,7 @@ module.exports = {
         // Is the time slot after current time plus fulfilment method buffer
         var isInFuture = moment.utc(slotI.startTime).isAfter(moment().add(fulfilmentMethod.bufferLength, 'minutes'));
 
-        if (!fulfilmentMethod.maxOrders || (relevantOrders.length <= fulfilmentMethod.maxOrders) && isInFuture) { // If there aren't too many orders in the slot
+        if ((!fulfilmentMethod.maxOrders || (relevantOrders.length <= fulfilmentMethod.maxOrders)) && isInFuture) { // If there aren't too many orders in the slot
           availableSlots.push(slotI); // Add slot to availableSlots array
         }
       }
