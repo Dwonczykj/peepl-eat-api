@@ -10,13 +10,10 @@ module.exports = {
   inputs: {
     vendor: {
       type: 'number',
-      required: true
     },
-    type:{
-      type: 'string',
-      isIn: ['deliveryPartner', 'vendor'],
-      required: true
-    }
+    deliveryPartner: {
+      type: 'number',
+    },
   },
 
 
@@ -33,20 +30,22 @@ module.exports = {
     // TODO: Do all this inside a transaction
 
     // Create FulfilmentMethods
-    const del = await FulfilmentMethod.create({vendor:inputs.vendor, methodType:'delivery'}).fetch();
-    var col;
-    if(inputs.type === 'vendor'){
-      col = await FulfilmentMethod.create({vendor:inputs.vendor, methodType:'collection'}).fetch();
-    }
+    let del;
+    let col;
 
     // Add FulfilmentMethods to Vendor/DeliveryPartner
-    if(inputs.type === 'vendor'){
+    if(inputs.vendor){
+      del = await FulfilmentMethod.create({vendor:inputs.vendor, methodType:'delivery'}).fetch();
+      col = await FulfilmentMethod.create({vendor:inputs.vendor, methodType:'collection'}).fetch();
+
       await Vendor.updateOne(inputs.vendor).set({
         deliveryFulfilmentMethod: del.id,
         collectionFulfilmentMethod: col.id
       });
-    } else if (inputs.type === 'deliveryPartner'){
-      await DeliveryPartner.updateOne(inputs.vendor).set({
+    } else if (inputs.deliveryPartner){
+      del = await FulfilmentMethod.create({deliveryPartner:inputs.deliveryPartner, methodType:'delivery'}).fetch();
+
+      await DeliveryPartner.updateOne(inputs.deliveryPartner).set({
         deliveryFulfilmentMethod: del.id,
       });
     }
@@ -67,7 +66,7 @@ module.exports = {
         fulfilmentMethod: del.id
       });
 
-      if(inputs.type === 'vendor'){
+      if(inputs.vendor){
         // Collection hours
         openingHoursCol.push({
           dayOfWeek: weekday,

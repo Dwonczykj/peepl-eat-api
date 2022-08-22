@@ -45,7 +45,7 @@ module.exports = {
   },
 
   afterCreate: async function (newlyCreatedRecord, proceed) {
-    await sails.helpers.initialiseDeliveryMethods(newlyCreatedRecord.id, 'deliveryPartner');
+    await sails.helpers.initialiseDeliveryMethods.with({deliveryPartner: newlyCreatedRecord.id});
 
     return proceed();
   }

@@ -141,6 +141,64 @@
   ],
   "components": {
     "schemas": {
+      "deliverypartner": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/deliverypartner-without-required-constraint"
+          },
+          {
+            "required": [
+              "name",
+              "email",
+              "phoneNumber"
+            ]
+          }
+        ]
+      },
+      "deliverypartner-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **DeliveryPartner**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the Delivery Partner.",
+            "maxLength": 50
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "The email of the Delivery Partner.",
+            "maxLength": 50
+          },
+          "phoneNumber": {
+            "type": "string",
+            "description": "Phone number of the Delivery Partner."
+          },
+          "deliveryFulfilmentMethod": {
+            "description": "JSON dictionary representing the **fulfilmentmethod** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/fulfilmentmethod"
+              }
+            ]
+          }
+        }
+      },
       "discount": {
         "type": "object",
         "allOf": [
@@ -217,11 +275,6 @@
         "allOf": [
           {
             "$ref": "#/components/schemas/fulfilmentmethod-without-required-constraint"
-          },
-          {
-            "required": [
-              "vendor"
-            ]
           }
         ]
       },
@@ -280,6 +333,9 @@
             "description": "The required buffer time before booking a slot.",
             "minimum": 0
           },
+          "orderCutoff": {
+            "description": "The time after which no new bookings can be made."
+          },
           "maxOrders": {
             "type": "number",
             "format": "double",
@@ -290,6 +346,14 @@
             "oneOf": [
               {
                 "$ref": "#/components/schemas/vendor"
+              }
+            ]
+          },
+          "deliveryPartner": {
+            "description": "JSON dictionary representing the **deliverypartner** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/deliverypartner"
               }
             ]
           },
@@ -455,14 +519,15 @@
           "paymentStatus": {
             "type": "string",
             "default": "unpaid",
+            "enum": [
+              "unpaid",
+              "paid",
+              "failed"
+            ],
             "example": "unpaid"
           },
           "paymentIntentId": {
             "type": "string"
-          },
-          "deliveryId": {
-            "type": "string",
-            "description": "The ID to identify the delivery in the logistics system"
           },
           "fulfilmentSlotFrom": {
             "type": "string",
@@ -497,6 +562,10 @@
             "type": "number",
             "format": "double",
             "default": 0
+          },
+          "sentToDeliveryPartner": {
+            "type": "boolean",
+            "default": false
           },
           "fulfilmentMethod": {
             "description": "JSON dictionary representing the **fulfilmentmethod** instance or FK when creating / updating / not populated",
@@ -1153,6 +1222,14 @@
             "oneOf": [
               {
                 "$ref": "#/components/schemas/fulfilmentmethod"
+              }
+            ]
+          },
+          "deliveryPartner": {
+            "description": "JSON dictionary representing the **deliverypartner** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/deliverypartner"
               }
             ]
           },
