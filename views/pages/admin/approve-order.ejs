@@ -4,33 +4,7 @@
   <div class="container">
 
     <div class="mb-3">
-      <div class="my-3 p-3 bg-white rounded">
-        <!-- <p class="text-muted m-0">Order #{{order.id}}</p> -->
-        <div v-for="item in order.items">
-          <h2 class="h5 border-top pt-3 mt-3 mb-0">{{item.product.name}}</h2>
-          <ol v-if="item.optionValues && item.optionValues.length" class="order-confirmation__option-values">
-            <li v-for="optionValue in item.optionValues"><b>{{optionValue.option.name}}</b>: {{optionValue.optionValue.name}}</li>
-          </ol>
-        </div>
-
-        <h3 class="border-top pt-3 mt-3 mb-0"><b>Delivery:</b> </h3>
-        <b>Delivery time:</b> {{order.fulfilmentSlotFrom}} - {{order.fulfilmentSlotTo}}
-        <br/><b>Name:</b> {{order.deliveryName}}
-        <br><b>Email:</b> {{order.deliveryEmail}}
-        <br><b>Number:</b> <a :href="'tel:'+order.deliveryPhoneNumber">{{order.deliveryPhoneNumber}}</a>
-        <br><b>Line One:</b> {{order.deliveryAddressLineOne}}
-        <br><b>Line Two:</b> {{order.deliveryAddressLineTwo}}
-        <br><b>Post Code:</b> {{order.deliveryAddressPostCode}}
-        <br><b>Notes:</b> {{order.deliveryAddressInstructions}}
-        <h2 class="h5 border-top pt-3 mt-3 mb-0 d-flex">
-          <span class="mr-auto">Total</span>
-          <span>£{{order.total / 100}}</span>
-        </h2>
-        <!-- <p class="mt-2 mb-0 d-flex text-success">
-          <span class="mr-auto">Reward</span>
-          <span>+ {{order.total}} PPL</span>
-        </p> -->
-      </div>
+      <order-card :order="order"></order-card>
       <div v-if="order.restaurantAcceptanceStatus == 'pending'">
         <button class="btn btn-peepl-green" @click="clickApproveOrDeclineOrder(order.publicId, true)">Approve</button>
         <button class="btn btn-peepl-red" @click="clickApproveOrDeclineOrder(order.publicId, false)">Decline</button>
