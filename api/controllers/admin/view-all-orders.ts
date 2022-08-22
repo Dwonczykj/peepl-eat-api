@@ -2,9 +2,17 @@ declare var Order: any;
 declare var User: any;
 module.exports = {
 
-  friendlyName: 'View all orders',
+  friendlyName: 'View orders',
 
-  description: 'Display "All orders" page.',
+  description: 'Display "orders" page.',
+
+  inputs: {
+    acceptanceStatus: {
+      type: 'string',
+      description: 'The acceptance status of the order',
+      isIn: ['accepted', 'rejected', 'pending'],
+    },
+  },
 
   exits: {
 
@@ -22,13 +30,27 @@ module.exports = {
     let orders;
 
     if(user.isSuperAdmin){
-      orders = await Order.find({paidDateTime: {'>': 0}})
-      .sort('paidDateTime DESC')
-      .populate('items.product&optionValues&optionValues.option&optionValue');
+      // Show orders for all vendors
+      if(!inputs.acceptanceStatus){
+        orders = await Order.find({paidDateTime: {'>': 0}})
+        .sort('paidDateTime DESC')
+        .populate('items.product&optionValues&optionValues.option&optionValue');
+      } else {
+        orders = await Order.find({restaurantAcceptanceStatus: inputs.acceptanceStatus, paidDateTime: {'>': 0}})
+        .sort('paidDateTime DESC')
+        .populate('items.product&optionValues&optionValues.option&optionValue');
+      }
     } else {
-      orders = await Order.find({paidDateTime: {'>': 0}, vendor: user.vendor})
-      .sort('paidDateTime DESC')
-      .populate('items.product&optionValues&optionValues.option&optionValue');
+      // Only show orders for vendor that the user is associated with
+      if(!inputs.acceptanceStatus){
+        orders = await Order.find({paidDateTime: {'>': 0}, vendor: user.vendor})
+        .sort('paidDateTime DESC')
+        .populate('items.product&optionValues&optionValues.option&optionValue');
+      } else {
+        orders = await Order.find({restaurantAcceptanceStatus: inputs.acceptanceStatus, paidDateTime: {'>': 0}, vendor: user.vendor})
+        .sort('paidDateTime DESC')
+        .populate('items.product&optionValues&optionValues.option&optionValue');
+      }
     }
 
     // Respond with view or JSON.
@@ -37,7 +59,7 @@ module.exports = {
         {orders}
       );
     } else {
-      return exits.success({orders});
+      return exits.success({acceptanceStatus: inputs.acceptanceStatus, orders});
     }
 
   }
