@@ -27,6 +27,11 @@ parasails.registerPage('all-orders', {
       if (!unixtime) {return '';}
       unixtime = moment.unix(unixtime).calendar();
       return unixtime;
+    },
+    capitalise: function (value) {
+      if (!value) {return ''; }
+      value = value.toString();
+      return value.charAt(0).toUpperCase() + value.slice(1);
     }
   }
 });
