@@ -19,7 +19,7 @@
           <a class="nav-link" :class="(pageName == 'postal-districts') ? 'active' : ''" href="/admin/postal-districts">Postal Districts</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" :class="(pageName == 'all-orders') ? 'active' : ''" href="/admin/orders">Orders</a>
+          <a class="nav-link" :class="(pageName == 'all-orders') ? 'active' : ''" href="/admin/orders?acceptanceStatus=accepted&timePeriod=upcoming">Orders</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="/admin/logout">Logout</a>
