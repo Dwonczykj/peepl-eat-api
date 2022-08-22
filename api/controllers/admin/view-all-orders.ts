@@ -12,6 +12,11 @@ module.exports = {
       description: 'The acceptance status of the order',
       isIn: ['accepted', 'rejected', 'pending'],
     },
+    timePeriod: {
+      type: 'string',
+      description: 'The time period of the order',
+      isIn: ['upcoming', 'past', 'all'],
+    }
   },
 
   exits: {
@@ -29,29 +34,39 @@ module.exports = {
     let user = await User.findOne(this.req.session.userId);
     let orders;
 
-    if(user.isSuperAdmin){
-      // Show orders for all vendors
-      if(!inputs.acceptanceStatus){
-        orders = await Order.find({paidDateTime: {'>': 0}})
-        .sort('paidDateTime DESC')
-        .populate('items.product&optionValues&optionValues.option&optionValue');
-      } else {
-        orders = await Order.find({restaurantAcceptanceStatus: inputs.acceptanceStatus, paidDateTime: {'>': 0}})
-        .sort('paidDateTime DESC')
-        .populate('items.product&optionValues&optionValues.option&optionValue');
-      }
-    } else {
-      // Only show orders for vendor that the user is associated with
-      if(!inputs.acceptanceStatus){
-        orders = await Order.find({paidDateTime: {'>': 0}, vendor: user.vendor})
-        .sort('paidDateTime DESC')
-        .populate('items.product&optionValues&optionValues.option&optionValue');
-      } else {
-        orders = await Order.find({restaurantAcceptanceStatus: inputs.acceptanceStatus, paidDateTime: {'>': 0}, vendor: user.vendor})
-        .sort('paidDateTime DESC')
-        .populate('items.product&optionValues&optionValues.option&optionValue');
-      }
+    let criteria = {
+      paidDateTime: {'>': 0},
+      restaurantAcceptanceStatus: undefined,
+      vendor: undefined,
+      fulfilmentSlotFrom: undefined,
+      fulfilmentSlotTo: undefined,
+    };
+
+    // Sort by fulfilment time ascending
+    let sort = 'fulfilmentSlotFrom ASC';
+
+    if(!user.isSuperAdmin) {
+      criteria.vendor = user.vendor;
     }
+    if(inputs.acceptanceStatus) {
+      criteria.restaurantAcceptanceStatus = inputs.acceptanceStatus;
+    }
+    if(inputs.timePeriod === 'upcoming') {
+      criteria.fulfilmentSlotTo = {
+        '>=': new Date()
+      };
+    }
+    if(inputs.timePeriod === 'past') {
+      // Sort by fulfilment time descending
+      sort = 'fulfilmentSlotFrom DESC';
+      criteria.fulfilmentSlotTo = {
+        '<': new Date()
+      };
+    }
+
+    orders = await Order.find(criteria)
+    .sort(sort)
+    .populate('fulfilmentMethod&items.product&optionValues&optionValues.option&optionValue');
 
     // Respond with view or JSON.
     if(this.req.wantsJSON) {
@@ -59,7 +74,7 @@ module.exports = {
         {orders}
       );
     } else {
-      return exits.success({acceptanceStatus: inputs.acceptanceStatus, orders});
+      return exits.success({acceptanceStatus: inputs.acceptanceStatus, timePeriod: inputs.timePeriod, orders});
     }
 
   }
