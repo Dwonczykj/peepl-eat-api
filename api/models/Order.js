@@ -99,12 +99,14 @@ module.exports = {
     },
     tipAmount: {
       type: 'number',
-      description: 'Amount of tip in pence'
+      description: 'Amount of tip in pence',
+      min: 0
     },
     restaurantAccepted: {
       type: 'boolean',
       defaultsTo: false
     },
+    // TODO: Courier Accepted
     rewardsIssued: {
       type: 'number',
       defaultsTo: 0
