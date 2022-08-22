@@ -42,6 +42,11 @@ module.exports = {
       min: 0,
       description: 'The required buffer time before booking a slot.'
     },
+    orderCutoff: {
+      type: 'ref',
+      columnType: 'time',
+      description: 'The time after which no new bookings can be made.'
+    },
     maxOrders: {
       type: 'number',
       description: 'The maximum number of orders allowed per slot.'
@@ -57,7 +62,9 @@ module.exports = {
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
     vendor: {
       model: 'vendor',
-      required: true
+    },
+    deliveryPartner:{
+      model: 'deliveryPartner',
     },
     openingHours: {
       collection: 'openingHours',
