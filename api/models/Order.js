@@ -71,7 +71,8 @@ module.exports = {
     },
     paymentStatus: {
       type: 'string',
-      defaultsTo: 'unpaid'
+      defaultsTo: 'unpaid',
+      isIn: ['unpaid', 'paid', 'failed'],
     },
     paymentIntentId: {
       type: 'string'

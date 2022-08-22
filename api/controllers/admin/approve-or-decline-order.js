@@ -35,6 +35,11 @@ module.exports = {
       throw new Error('Restaurant has already accepted or rejected this order.');
     }
 
+    if(order.paymentStatus !== 'paid') {
+      // Order is not paid
+      throw new Error('the order has not been paid for.');
+    }
+
     if(inputs.restaurantAccepted === true) {
       await Order.updateOne({publicId: inputs.orderId})
       .set({restaurantAcceptanceStatus: 'accepted'});
