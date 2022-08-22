@@ -37,7 +37,7 @@
       "name": "Logout"
     },
     {
-      "name": "View all orders"
+      "name": "View orders"
     },
     {
       "name": "View discount codes"
@@ -485,13 +485,13 @@
           },
           "restaurantAcceptanceStatus": {
             "type": "string",
-            "default": "unconfirmed",
+            "default": "pending",
             "enum": [
-              "unconfirmed",
+              "pending",
               "accepted",
-              "declined"
+              "rejected"
             ],
-            "example": "unconfirmed"
+            "example": "pending"
           },
           "rewardsIssued": {
             "type": "number",
@@ -1448,12 +1448,27 @@
     },
     "/admin/orders": {
       "get": {
-        "summary": "View all orders",
-        "description": "Display \"All orders\" page.",
+        "summary": "View orders",
+        "description": "Display \"orders\" page.",
         "tags": [
-          "View all orders"
+          "View orders"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "acceptanceStatus",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "accepted",
+                "rejected",
+                "pending"
+              ]
+            },
+            "description": "The acceptance status of the order"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -3255,7 +3270,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "The order to be approved or declined."
+            "description": "The order to be approved or rejected."
           }
         ],
         "responses": {

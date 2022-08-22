@@ -28,7 +28,7 @@ parasails.registerPage('approve-order', {
         if(isApproved){
           that.order.restaurantAcceptanceStatus = 'accepted';
         } else {
-          that.order.restaurantAcceptanceStatus = 'declined';
+          that.order.restaurantAcceptanceStatus = 'rejected';
         }
       });
     }

@@ -9,7 +9,7 @@ module.exports = {
   inputs:{
     orderId: {
       type: 'string',
-      description: 'The order to be approved or declined.',
+      description: 'The order to be approved or rejected.',
       required: true
     }
   },

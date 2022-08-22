@@ -30,9 +30,9 @@ module.exports = {
 
     var order = await Order.findOne({publicId: inputs.orderId});
 
-    if(order.restaurantAcceptanceStatus !== 'unconfirmed') {
+    if(order.restaurantAcceptanceStatus !== 'pending') {
       // Restaurant has previously accepted or declined the order, they cannot modify the order acceptance after this.
-      throw new Error('Restaurant has already accepted or declined this order.');
+      throw new Error('Restaurant has already accepted or rejected this order.');
     }
 
     if(inputs.restaurantAccepted === true) {
@@ -52,7 +52,7 @@ module.exports = {
       .set({rewardsIssued: rewardAmount});
     } else if (inputs.restaurantAccepted === false) {
       await Order.updateOne({publicId: inputs.orderId})
-      .set({restaurantAcceptanceStatus: 'declined'});
+      .set({restaurantAcceptanceStatus: 'rejected'});
     }
 
     // Send notification to customer that their order has been accepted/declined.

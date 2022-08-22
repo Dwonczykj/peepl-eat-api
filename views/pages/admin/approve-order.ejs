@@ -31,17 +31,15 @@
           <span>+ {{order.total}} PPL</span>
         </p> -->
       </div>
-      <div v-if="!order.restaurantAcceptanceStatus == 'accepted'">
+      <div v-if="order.restaurantAcceptanceStatus == 'pending'">
         <button class="btn btn-peepl-green" @click="clickApproveOrDeclineOrder(order.publicId, true)">Approve</button>
         <button class="btn btn-peepl-red" @click="clickApproveOrDeclineOrder(order.publicId, false)">Decline</button>
       </div>
       <div v-else>
-        <p>This order has been approved so it cannot be declined now.</p>
+        <p>This order has been approved or rejected so it cannot be modified now.</p>
       </div>
     </div>
   </div>
-  <!-- <h1>TODO: Implement this page.</h1> -->
-  <!-- <p>(See also <em>assets/styles/pages/admin/approve-order.less</em>, <em>assets/js/pages/admin/approve-order.page.js</em>, and <em>api/controllers/admin/view-approve-order.js</em>.)</p> -->
-
+  
 </div>
 <%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>

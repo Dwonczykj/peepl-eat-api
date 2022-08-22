@@ -104,8 +104,8 @@ module.exports = {
     },
     restaurantAcceptanceStatus: {
       type: 'string',
-      defaultsTo: 'unconfirmed',
-      isIn: ['unconfirmed', 'accepted', 'declined']
+      defaultsTo: 'pending',
+      isIn: ['pending', 'accepted', 'rejected']
     },
     // TODO: Courier Accepted
     rewardsIssued: {
