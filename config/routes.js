@@ -51,13 +51,20 @@ module.exports.routes = {
 
   // ADMIN
   'GET /admin/login': { action: 'admin/view-login' },
-  'GET /admin/account': { action: 'admin/view-account' },
-  // 'POST /admin/login': { action: 'admin/login' },
   'GET /api/v1/admin/login': { action: 'admin/view-login' },
-  // 'POST /api/v1/admin/login': { action: 'admin/login' },
-  'POST /api/v1/admin/login-with-firebase': { action: 'admin/login-with-firebase' },
+  'GET /admin/signup': { action: 'admin/view-signup' },
+  'GET /api/v1/admin/signup': { action: 'admin/view-signup' },
 
+  'GET /admin/account': { action: 'admin/view-account' },
+
+  // 'POST /admin/login': { action: 'admin/login' },
+  // 'POST /api/v1/admin/login': { action: 'admin/login' },
+  'POST /admin/signup': { action: 'admin/signup' },
   'POST /api/v1/admin/signup': { action: 'admin/signup' },
+  'POST /api/v1/admin/login-with-firebase': { action: 'admin/login-with-firebase' },
+  'POST /api/v1/admin/user-exists-for-email': { action: 'admin/user-exists-for-email' },
+  'POST /api/v1/admin/user-exists-for-phone': { action: 'admin/user-exists-for-phone' },
+
   'POST /api/v1/admin/update-user': { action: 'admin/update-user' },
 
   'GET /admin/logout': { action: 'admin/logout' },

@@ -222,7 +222,7 @@ module.exports = {
       // If frontend total is incorrect
       if(order.total !== calculatedOrderTotal.finalAmount) {
         // TODO: Log any instances of this, as it shouldn't happen (indicated frontend logic error)
-        sails.log('Order total mismatch');
+        sails.log.info('Order total mismatch');
 
         // Update with correct amount
         await Order.updateOne(order.id)

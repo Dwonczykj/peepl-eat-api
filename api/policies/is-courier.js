@@ -1,5 +1,5 @@
 /**
- * is-logged-in
+ * is-courier
  *
  *
  * For more about how to use policies, see:
@@ -16,7 +16,7 @@ module.exports = async function (req, res, proceed) {
     id: req.session.userId,
   });
 
-  if (user.role === 'courier') {
+  if (user.role === 'courier' || user.isSuperAdmin) {
     return proceed();
   }
 

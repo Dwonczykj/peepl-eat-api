@@ -15,27 +15,33 @@ module.exports = {
       required: false,
       isEmail: true,
     },
-    phone: {
-      type: 'string',
+    phoneNoCountry: {
+      type: 'number',
+      required: true,
+    },
+    phoneCountryCode: {
+      type: 'number',
       required: true,
     },
     name: {
       type: 'string',
     },
-    firebaseSessionToken: {
-      type: 'string',
-      required: true,
-    },
-    // password: {
-    //   type: 'string',
-    //   required: true,
-    // },
-    rememberMe: {
-      type: 'boolean',
-      defaultsTo: false,
-    },
     vendorId: {
       type: 'number',
+      allowNull: true,
+    },
+    courierId: {
+      type: 'number',
+      allowNull: true,
+    },
+    role: {
+      type: 'string',
+    },
+    vendorRole: {
+      type: 'string',
+    },
+    courierRole: {
+      type: 'string',
     },
   },
 
@@ -43,53 +49,46 @@ module.exports = {
   exits: {
     FirebaseError: {
       responseType: 'unauthorised',
+    },
+    userExists: {
+      responseType: 'unauthorised',
+      description: 'A user is already registered to the phone number requested'
+    },
+    success: {
+      outputDescription: 'The updated opening hours',
+      outputExample: {}
     }
   },
 
 
   fn: async function (inputs, exits) {
-    // * Remove the following firebase signup as we now do this client app side and then use the firebase session token from there
-    // const auth = getAuth();
-    // const user = await createUserWithEmailAndPassword(auth, inputs.emailAddress, inputs.password)
-    //   .then((userCredential) => {
-    //     // Signed in
-    //     const user = userCredential.user;
+    const existingUser = await User.findOne({
+      phoneNoCountry: inputs.phoneNoCountry,
+      phoneCountryCode: inputs.phoneCountryCode,
+    });
 
-    //     // * Create User Wrapper
-    //     return User.create({
-    //       email: user.email,
-    //       // password: 'Testing123!',
-    //       name: user.email,
-    //       vendor: null,
-    //       isSuperAdmin: false,
-    //       vendorRole: 'none',
-    //       role: ''
-    //     });
-    //   })
-    //   .then((newUser) => {
-    //     // Update the session
-    //     this.req.session.userId = newUser.id;
-
-    //     return newUser;
-    //   })
-    //   .catch((error) => {
-    //     throw { FirebaseError: [error.code, error.message] }; //https://firebase.google.com/docs/reference/js/auth#autherrorcodes
-    //   });
+    if(existingUser){
+      throw 'userExists';
+    }
 
     // * Create User Wrapper
     const user = await User.create({
+      phoneNoCountry: inputs.phoneNoCountry,
+      phoneCountryCode: inputs.phoneCountryCode,
       email: inputs.email,
-      phone: inputs.phone,
-      // password: 'Testing123!',
       name: inputs.name,
-      vendor: inputs.vendor,
+      // password: 'Testing123!',
+      vendor: inputs.vendorId,
+      courier: inputs.courierId,
+      vendorConfirmed: false,
       isSuperAdmin: false,
-      vendorRole: 'none',
-      role: '',
-      firebaseSessionToken: inputs.firebaseSessionToken,
+      vendorRole: inputs.vendorRole,
+      courierRole: inputs.courierRole,
+      role: inputs.role,
+      firebaseSessionToken: 'REGISTERING_USER',
     });
 
-    return user;
+    return exits.success(user);
   }
 
 

@@ -26,7 +26,7 @@ module.exports = {
     },
     role: {
       type: 'string',
-      isIn: ['owner', 'staff', 'courier'],
+      isIn: ['admin', 'vendor', 'courier'],
     },
   },
 

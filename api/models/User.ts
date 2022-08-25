@@ -21,9 +21,14 @@ module.exports = {
       // unique: true,
       required: false,
     }, //TODO: Run a clean on the db to make this
-    phone: {
-      type: 'string',
-      unique: true,
+    phoneNoCountry: {
+      type: 'number',
+      // unique: true,
+      required: true,
+    },
+    phoneCountryCode: {
+      type: 'number',
+      // unique: true,
       required: true,
     },
     // password: {
@@ -40,12 +45,35 @@ module.exports = {
     },
     role: {
       type: 'string',
-      isIn: ['owner', 'staff', 'courier'], // ! Not user anywhere at the moment
+      isIn: ['admin', 'vendor', 'courier'],
     },
     vendorRole: {
       type: 'string',
       isIn: ['owner', 'inventoryManager', 'salesManager', 'courier', 'none'],
       defaultsTo: 'none'
+    },
+    courierRole: {
+      type: 'string',
+      isIn: ['owner', 'deliveryManager', 'rider', 'none'],
+      defaultsTo: 'none'
+    },
+    roleConfirmedWithOwner: {
+      type: 'boolean',
+      defaultsTo: false, //TODO: Add API Endpoint to toggle this to true for admins and owners registered to that business.
+    },
+    vendorConfirmed: {
+      type: 'boolean',
+      defaultsTo: false,
+    },
+    // firebaseUser: { // https://sailsjs.com/documentation/concepts/models-and-orm/attributes#:~:text=%23-,Type,-%23
+    //   type: 'json', // https://sailsjs.com/documentation/concepts/models-and-orm/associations
+    // }
+    firebaseSessionToken: {
+      type: 'string',
+      required: true,
+    },
+    fbUid: {
+      type: 'string',
     },
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
@@ -56,17 +84,11 @@ module.exports = {
     //  ╠═╣╚═╗╚═╗║ ║║  ║╠═╣ ║ ║║ ║║║║╚═╗
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
     vendor: {
-      model: 'vendor',
-      // required: true,
+      model: 'vendor'
     },
-    // firebaseUser: { // https://sailsjs.com/documentation/concepts/models-and-orm/attributes#:~:text=%23-,Type,-%23
-    //   type: 'json', // https://sailsjs.com/documentation/concepts/models-and-orm/associations
-    // }
-    firebaseSessionToken: {
-      type: 'string',
-      required: true,
+    courier: {
+      model: 'courier'
     },
-
   },
   //} /*as { [K in keyof userModel]: any },
 
@@ -74,18 +96,76 @@ module.exports = {
   //   return _.omit(this, ['password']);
   // },
 
-  //Can remove as using Firebase Auth
-  // beforeCreate: async function(user, cb){
-  //   const saltRounds = sails.config.custom.passwordSaltRounds;
+  formatPhoneNumber: async function (opts) {
+    const user = await User.findOne({ id: opts.id });
 
-  //   try{
-  //     user.password = await bcrypt.hash(user.password, saltRounds);
-  //   } catch(err) {
-  //     throw err;
-  //   }
+    if (!user) {
+      throw require('flaverr')({
+        message: `Cannot find user with id=${opts.id}.`,
+        code: 'E_UNKNOWN_USER'
+      });
+    }
 
-  //   return cb();
-  // }
+    var x = user.phoneNoCountry.toString();
+    x = x.replace(/-/g, '').match(/(\d{1,10})/g)[0];
+    x = x.replace(/(\d{1,3})(\d{1,3})(\d{1,4})/g, '$1-$2-$3');
+    return `+${user.phoneCountryCode} ${x}`;
+  },
 
+  beforeCreate: async function(user, proceed) {
+
+    const existingUser = await User.findOne({
+      phoneNoCountry: user.phoneNoCountry,
+      phoneCountryCode: user.phoneCountryCode,
+    });
+
+    if(existingUser){
+      // throw new Error('userExists');
+      return undefined;
+    }
+
+    if(user.isSuperAdmin){
+      user.role = 'admin';
+    }
+
+    const nonNull = (val) => val !== null && val !== undefined && val !== -1;
+    const isNull = (val) => val === null || val === undefined || val === -1;
+
+    const setRoles = () => {
+      if(nonNull(user.courier) && nonNull(user.vendor)){
+        return undefined; //TODO: Throw Exception on creation here
+      } else if (nonNull(user.vendor) && (isNull(user.vendorRole) || !['owner', 'salesManager', 'inventoryManager'].includes(user.vendorRole)) ){
+        user.vendor = null;
+        return undefined; //todo throw
+      } else if (nonNull(user.courier) && (isNull(user.courierRole) || !['owner', 'deliveryManager', 'rider'].includes(user.courierRole)) ){
+        user.courier = null;
+        return undefined; //todo throw
+      }
+
+      if (nonNull(user.vendor)){
+        user.role = 'vendor';
+        user.courierRole = 'none';
+      } else if (nonNull(user.courier)){
+        user.role = 'courier';
+        user.vendorRole = 'none';
+      }
+      return user;
+    };
+
+    if(user.role === 'admin' && !user.isSuperAdmin){
+      user = setRoles();
+    }
+
+    if (user.role !== 'vendor'){
+      user.vendorRole = 'none';
+      user.vendor = null;
+    }
+    if (user.role !== 'courier'){
+      user.courierRole = 'none';
+      user.courier = null;
+    }
+    
+    return proceed();
+  }
 
 };

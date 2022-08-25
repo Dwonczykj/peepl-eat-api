@@ -11,11 +11,15 @@
             "name": "Launch Program",
             "skipFiles": [
                 "<node_internals>/**/*.js",
-                "assets/**"
+                // "assets/**"
             ],
             "program": "${workspaceFolder}/app.js",
             "args": [
-                "--verbose"
+                "--verbose",
+                "--hookTimeout=80000"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/out/**/*.js"
             ]
             // "preLaunchTask": "ngrok",
             // "serverReadyAction": {
@@ -23,6 +27,48 @@
             //     "uriFormat": "http://localhost:%s/vendors?wallet=test",
             //     "action": "openExternally"
             // }
-        }
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Mocha Tests",
+            "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+            "args": [
+                "-u",
+                "bdd",
+                "--timeout",
+                "999999",
+                "--colors",
+                "${workspaceRoot}/test/integration/controllers/**/*.test.js"
+            ],
+            // "outFiles": [
+            //     "${workspaceFolder}/test/integration/controllers/**/*.js"
+            // ],
+            // "sourceMaps": true,
+            "protocol": "inspector",
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Mocha Tests (2)",
+            "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+            "args": [
+                "--require",
+                "esm",
+                "--require",
+                "${workspaceFolder}/test/lifecycle.test.js",
+                "--reporter",
+                "dot",
+                "--slow",
+                "5000",
+                "--colors",
+                "${workspaceFolder}/test/integration/controllers/**/*.test.js",
+            ],
+            "internalConsoleOptions": "openOnSessionStart",
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
     ]
 }

@@ -42,7 +42,7 @@ module.exports = {
       // }
     })
     .catch((err) => {
-      sails.log(err);
+      sails.log.warn(err);
     });
   }
 

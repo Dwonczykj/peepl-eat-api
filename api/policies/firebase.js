@@ -36,11 +36,11 @@
 var admin = require('firebase-admin');
 var serviceAccount = require('../../config/vegiliverpool-firebase-adminsdk-4dfpz-8f01f888b3.json');
 admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
+  credential: admin.credential.cert(serviceAccount)
 });
 
 module.exports = async function (req, res, proceed) {
-    req.firebase = admin;
-    proceed();
+  req.firebase = admin;
+  proceed();
 };
 

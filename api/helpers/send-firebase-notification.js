@@ -58,7 +58,7 @@ module.exports = {
       .then((res) => {
         return res;
       }).catch((err) => {
-        sails.log(err);
+        sails.log.warn(err);
         throw new Error(err);
       });
 

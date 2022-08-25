@@ -20,7 +20,9 @@ module.exports = function(grunt) {
         {
           expand: true,
           cwd: '.tmp/public',
-          src: ['js/**/*.js'],
+          src: [
+            'js/**/*.js'
+          ],
           dest: '.tmp/public'
         }
       ]
@@ -31,6 +33,14 @@ module.exports = function(grunt) {
         // presets: [require('sails-hook-grunt/accessible/babel-preset-env')]
       },
       files: [
+        // {
+        //   expand: true,
+        //   cwd: 'api/',
+        //   src: ['**/*.modjs'],
+        //   dest: '.',
+        //   // dest: '.tmp/public/js/',
+        //   ext: '.js'
+        // },
         {
           expand: true,
           cwd: 'assets/js/',

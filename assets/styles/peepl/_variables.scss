@@ -9,17 +9,39 @@ $color-peepl-yellow: #FCCA0C;
 $color-peepl-green: #7EBD46;
 $color-peepl-teal: #46BDB1;
 $color-peepl-blue: #2B70DF;
-
+$color-peepl-purple: #601E69;
 $color-peepl-white: #FFFFFF;
+$color-vegi-black: #000000;
+$color-vegi-dark-grey: #28303D;
+$color-vegi-taupe: #A09F9E;
+$color-vegi-red: #FC0C1A;
+$color-vegi-orange: #FC870C;
+$color-vegi-yellow: #E5AA52;
+$color-vegi-green: #8AC479;
+$color-vegi-dark-green: #0D2A21;
+$color-vegi-purple: #601E69;
+$color-vegi-teal: #46BDB1;
+$color-vegi-blue: #2B70DF;
+$color-vegi-white: #FFFFFF;
 $color-peepl-pale-grey: #F2F2F2;
 $color-peepl-cream: #F5F2EB;
 $color-peepl-pale-red: #F7E9EA;
 $color-peepl-pale-orange: #F9EEE3;
 $color-peepl-pale-yellow: #FFF8DD;
 $color-peepl-pale-green: #EBF6E2;
+$color-peepl-pale-purple: #e0b0e6;
 $color-peepl-pale-teal: #E7F9F7;
 $color-peepl-pale-blue: #EDF3FC;
 
+$color-vegi-pale-grey: #F2F2F2;
+$color-vegi-cream: #F5F2EB;
+$color-vegi-pale-red: #F7E9EA;
+$color-vegi-pale-orange: #F9EEE3;
+$color-vegi-pale-yellow: #eed5b0;
+$color-vegi-pale-green: #d6f0cf;
+$color-vegi-pale-purple: #e0b0e6;
+$color-vegi-pale-teal: #E7F9F7;
+$color-vegi-pale-blue: #EDF3FC;
 $color-fuse-app-header: #fff;
 
 $theme-colors: (
@@ -41,14 +63,35 @@ $theme-colors: (
     "peepl-pale-green": $color-peepl-pale-green,
     "peepl-pale-teal": $color-peepl-pale-teal,
     "peepl-pale-blue": $color-peepl-pale-blue,
+    "vegi-black": $color-vegi-black,
+    "vegi-dark-grey": $color-vegi-dark-grey,
+    "vegi-taupe": $color-vegi-taupe,
+    "vegi-red": $color-vegi-red,
+    "vegi-orange": $color-vegi-orange,
+    "vegi-yellow": $color-vegi-yellow,
+    "vegi-green": $color-vegi-green,
+    "vegi-purple": $color-vegi-purple,
+    "vegi-teal": $color-vegi-teal,
+    "vegi-blue": $color-vegi-blue,
+    "vegi-white": $color-vegi-white,
+    "vegi-pale-grey": $color-vegi-pale-grey,
+    "vegi-cream": $color-vegi-cream,
+    "vegi-pale-red": $color-vegi-pale-red,
+    "vegi-pale-orange": $color-vegi-pale-orange,
+    "vegi-pale-yellow": $color-vegi-pale-yellow,
+    "vegi-pale-green": $color-vegi-pale-green,
+    "vegi-pale-purple": $color-vegi-pale-purple,
+    "vegi-pale-teal": $color-vegi-pale-teal,
+    "vegi-pale-blue": $color-vegi-pale-blue,
 );
 
-$blue: $color-peepl-blue;
-$red: $color-peepl-red;
-$orange: $color-peepl-orange;
-$yellow: $color-peepl-yellow;
-$green: $color-peepl-green;
-$teal: $color-peepl-teal;
+$blue: $color-vegi-blue;
+$red: $color-vegi-red;
+$orange: $color-vegi-orange;
+$yellow: $color-vegi-yellow;
+$green: $color-vegi-green;
+$purple: $color-vegi-purple;
+$teal: $color-vegi-teal;
 
 // Options
 

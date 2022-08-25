@@ -4,9 +4,10 @@
 //     export interface UserModel {
 //         email: string;
 //         name: string;
-//         phone: string;
+//         phoneCountryCode: number;
+//         phoneNoCountry: number;
 //         isSuperAdmin: boolean;
-//         role: 'owner' | 'staff' | 'courier' | '';
+//         role: 'admin' | 'vendor' | 'courier' | '';
 //         vendor?: any;
 //         vendorRole: 'owner' | 'inventoryManager' | 'salesManager' | 'courier' | 'none' | '';
 //         firebaseUser?: User;

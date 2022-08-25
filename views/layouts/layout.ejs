@@ -3,13 +3,16 @@
   <head>
     <title>vegi - Business</title>
     <!-- Viewport mobile tag for sensible mobile support -->
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1">
+
     <%/* If you want to discourage search engines from indexing this site, uncomment the following line: */%>
     <meta name="robots" content="noindex">
 
     <!--STYLES-->
     <link rel="stylesheet" href="/styles/importer.css">
     <!--STYLES END-->
+    <!-- <link rel="stylesheet" href="https://cdn.tutorialjinni.com/intl-tel-input/17.0.8/css/intlTelInput.css" />
+            <script src="https://cdn.tutorialjinni.com/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script> -->
 
     <!--
         Stylesheets and Preprocessors
@@ -35,8 +38,6 @@
 
   <body>
     <%- body %>
-
-    <div id="recaptcha-container" autofocus></div>
 
     <!--
         Client-side Templates
@@ -136,6 +137,7 @@
 <script src="/dependencies/popper.min.js"></script>
 <script src="/dependencies/bootstrap.min.js"></script>
 <script src="/dependencies/portal-vue.umd.min.js"></script>
+<script src="/dependencies/bootstrap-vue.js"></script>
 <script src="/dependencies/cloud.js"></script>
 <script src="/dependencies/moment.min.js"></script>
 <script src="/dependencies/parasails.js"></script>
@@ -150,6 +152,7 @@
 <script src="/js/components/edit-product.component.js"></script>
 <script src="/js/components/modal.component.js"></script>
 <script src="/js/components/opening-hours.component.js"></script>
+<script src="/js/components/phone-input.component.js"></script>
 <script src="/js/pages/admin/account.page.js"></script>
 <script src="/js/pages/admin/approve-order.page.js"></script>
 <script src="/js/pages/admin/discount-codes.page.js"></script>
@@ -157,6 +160,7 @@
 <script src="/js/pages/admin/ignore-login.page.js"></script>
 <script src="/js/pages/admin/login.page.js"></script>
 <script src="/js/pages/admin/postal-districts.page.js"></script>
+<script src="/js/pages/admin/signup.page.js"></script>
 <script src="/js/pages/admin/vendors.page.js"></script>
 <script src="/js/pages/couriers/approve-delivery-availability.page.js"></script>
 <script src="/js/pages/couriers/deliveries.page.js"></script>

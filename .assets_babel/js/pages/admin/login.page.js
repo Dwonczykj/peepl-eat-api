@@ -19,21 +19,28 @@ parasails.registerPage('login', {
   data: {
     syncing: false,
     cloudError: false,
-    formData: {
-      emailAddress: '',
-      phoneNumber: '',
-      password: '',
-      rememberMe: false
-    },
     formErrors: {},
-    formRules: {
-      phoneNumber: {
-        required: true,
-        regex: /^\+?\d{0,13}$/
-      },
-      status: {}
+    // phoneNoCountryNoFormat: '7905532512', //Moved to property getter
+    countryCode: '44',
+    phoneNoCountry: '790-553-2512',
+    //TODO: remove this from commit APIKEY
+    preventNextIteration: false,
+    verificationCode: '',
+    viewVerifyCodeForm: false,
+    rememberMe: false
+  },
+  computed: {
+    // * Getter -> a computed getter so that computed each time we access it
+    phoneNumber: function phoneNumber() {
+      return "+".concat(this.countryCode, " ").concat(this.phoneNoCountry);
     },
-    userPhoneNumber: ''
+    phoneNoCountryNoFormat: function phoneNoCountryNoFormat() {
+      return this.phoneNoCountry.replace(/-/g, '').match(/(\d{1,10})/g)[0];
+    },
+    phoneNoCountryFormatted: function phoneNoCountryFormatted() {
+      // Format display value based on calculated currencyValue
+      return this.phoneNoCountryNoFormat.replace(/(\d{1,3})(\d{1,3})(\d{1,4})/g, '$1-$2-$3');
+    }
   },
   //  ╦  ╦╔═╗╔═╗╔═╗╦ ╦╔═╗╦  ╔═╗
   //  ║  ║╠╣ ║╣ ║  ╚╦╝║  ║  ║╣
@@ -43,7 +50,7 @@ parasails.registerPage('login', {
   },
   mounted: function () {
     var _mounted = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-      var config, auth;
+      var config;
       return _regeneratorRuntime().wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
@@ -58,32 +65,10 @@ parasails.registerPage('login', {
                 appId: '1:526129377:web:a0e4d54396cbdebe70bfa0',
                 measurementId: 'G-YZCWVWRNKN'
               };
-              (0, _app.initializeApp)(config);
-              auth = (0, _auth.getAuth)(); // window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
-              //   'size': 'invisible', //TODO Set up fictional phone Numbers for testing
-              //   'callback': (response) => {
-              //     window.alert('repatcha  callback called -> call the getVerificationCode flow' + response.toString());
-              //     //unhide phone number form
-              //     document.getElementById('numberForm').removeAttribute('hidden');
-              //   },
-              //   'expired-callback': () => {
-              //     window.alert('repatcha expired callback called');
-              //   }
-              // }, auth);
+              (0, _app.initializeApp)(config); // this.createRecaptcha();
+              // this.$focus('[autofocus]');
 
-              window.recaptchaVerifier = new _auth.RecaptchaVerifier('recaptcha-container', {
-                'size': 'normal',
-                'callback': function callback(response) {
-                  window.alert('repatcha  callback called -> call the getVerificationCode flow' + response.toString()); //unhide phone number form
-
-                  document.getElementById('numberForm').removeAttribute('hidden');
-                },
-                'expired-callback': function expiredCallback() {
-                  window.alert('repatcha expired callback called');
-                }
-              }, auth); // this.$focus('[autofocus]');
-
-            case 4:
+            case 2:
             case "end":
               return _context.stop();
           }
@@ -97,191 +82,425 @@ parasails.registerPage('login', {
 
     return mounted;
   }(),
+  // exits: {
+  //   badPhoneNumberFormat: {
+  //     description: 'Please ensure number is of format: "+ 1 234-567-8910"'
+  //   },
+  //   badVerificationCode: {
+  //     description: 'Please ensure verification code is 6 digits: "123456"'
+  //   },
+  // },
   //  ╦╔╗╔╔╦╗╔═╗╦═╗╔═╗╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
   //  ║║║║ ║ ║╣ ╠╦╝╠═╣║   ║ ║║ ║║║║╚═╗
   //  ╩╝╚╝ ╩ ╚═╝╩╚═╩ ╩╚═╝ ╩ ╩╚═╝╝╚╝╚═╝
   methods: {
-    testButton: function testButton() {
-      window.alert('testing!');
-    },
-    changeUserPhoneNumber: function changeUserPhoneNumber(phoneNumber) {
-      this.userPhoneNumber = phoneNumber;
-    },
-    initFirebase: function initFirebase() {},
-    loadFirstCaptchaUser: function loadFirstCaptchaUser() {
-      window.recaptchaVerifier.render().then(function (widgetId) {});
-    },
-    clickVerifyPhoneNumber: function clickVerifyPhoneNumber() {
-      var phoneNumber = document.getElementById('phoneNumber').value;
-      var appVerifier = window.recaptchaVerifier;
+    createRecaptcha: function createRecaptcha() {
+      var _this = this;
 
-      var isValidPhoneNumber = function isValidPhoneNumber(phoneNumber) {
-        return !!phoneNumber;
+      var auth = (0, _auth.getAuth)(); //TODO: Switch to invisible?
+      // window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
+      //   'size': 'invisible',
+      //   'callback': (response) => {
+      //     window.alert('repatcha  callback called -> call the getVerificationCode flow' + response.toString());
+      //     //unhide phone number form
+      //     document.getElementById('numberForm').removeAttribute('hidden');
+      //   },
+      //   'expired-callback': () => {
+      //     window.alert('repatcha expired callback called');
+      //   }
+      // }, auth);
+
+      window.recaptchaVerifier = new _auth.RecaptchaVerifier('recaptcha-container', {
+        'size': 'normal',
+        'callback': function callback(response) {
+          // window.alert('repatcha  callback called -> call the getVerificationCode flow' + response.toString());
+          //unhide phone number form
+          document.getElementById('start-recaptcha').classList.remove('hidden');
+          _this.viewForm = 'numberForm';
+          document.getElementById('numberForm').classList.remove('hidden');
+        },
+        'expired-callback': function expiredCallback() {
+          window.alert('recatcha expired!');
+        }
+      }, auth);
+      var elements = document.querySelectorAll('[role="alert"]');
+
+      for (var el in elements) {
+        if (el && el.classList) {
+          el.classList.remove('hidden');
+        }
+      }
+    },
+    diplayErrorFields: function diplayErrorFields(hide) {
+      hide = !!hide;
+      var elements = document.querySelectorAll('[role="alert"]');
+
+      for (var el in elements) {
+        if (hide && el.classList) {
+          el.classList.add('hidden');
+        } else {
+          el.classList.remove('hidden');
+        }
+      }
+    },
+    phoneNumberFocusOut: function phoneNumberFocusOut(event) {
+      if (['Arrow', 'Backspace', 'Shift'].includes(event.key)) {
+        this.preventNextIteration = true;
+        return;
+      }
+
+      if (this.preventNextIteration) {
+        this.preventNextIteration = false;
+        return;
+      }
+
+      this.phoneNoCountry = this.phoneNoCountryFormatted;
+    },
+    loadFirstCaptchaUser: function loadFirstCaptchaUser() {
+      var _this2 = this;
+
+      this.syncing = true;
+
+      if (!window.recaptchaVerifier) {
+        this.createRecaptcha();
+      }
+
+      try {
+        if (this.phoneNumber && Object.keys(this.formErrors).length < 1) {
+          return window.recaptchaVerifier.render().then(function (widgetId) {
+            _this2.syncing = false; // document.getElementById('register').classList.add('hidden');
+            // document.getElementById('start-recaptcha').classList.add('hidden');
+
+            document.getElementById('login-button-container').classList.add('hidden');
+            return _this2.clickVerifyPhoneNumber(widgetId);
+          });
+        }
+      } catch (err) {
+        this.syncing = false;
+        return undefined;
+      }
+
+      this.syncing = false;
+      return undefined;
+    },
+    toRegister: function toRegister() {
+      window.location.replace('/admin/signup');
+    },
+    parseNumberInputsToArgIns: function parseNumberInputsToArgIns() {
+      // Clear out any pre-existing error messages.
+      this.formErrors = {};
+      var firebasePhoneRegex = /^\+\d{1,2} \d{3}-\d{3}-\d{4}$/;
+      var inputText = this.phoneNumber.trim();
+      var argins = {
+        'phoneNumber': inputText
       };
 
-      if (isValidPhoneNumber(phoneNumber)) {
-        var auth = (0, _auth.getAuth)();
-        (0, _auth.signInWithPhoneNumber)(auth, phoneNumber, appVerifier).then(function (confirmationResult) {
-          // SMS sent. Prompt user to type the code from the message, then sign the
-          // user in with confirmationResult.confirm(code).
-          window.confirmationResult = confirmationResult;
-          window.alert('Input verification code');
-          document.getElementById('numberForm').setAttribute('hidden', true);
-          document.getElementById('verificationForm').removeAttribute('hidden'); // ...
-        })["catch"](function (error) {
-          // Error; SMS not sent
-          // ...
-          window.alert('verify phone number failed' + error);
-          window.recaptchaVerifier.render().then(function (widgetId) {
-            debugger;
-            window.recaptchaVerifier.reset(widgetId);
-          });
-        });
-      }
-    },
-    // onSignInSubmit: function () {
-    //   signInWithPhoneNumber(document.getElementById("phoneNumber"), window.recaptchaVerifier)
-    //       .then((confirmationResult) => {
-    //         window.confirmationResult = confirmationResult;
-    //         window.alert(confirmationResult);
-    //         document.getElementById("numberForm").setAttribute("hidden", true);
-    //         document.getElementById("verificationForm").removeAttribute("hidden");
-    //       })
-    //       .catch((err) => {
-    //         window.alert(err);
-    //       });
-    // },
-    verifyCodeSubmit: function verifyCodeSubmit() {
-      var code = document.getElementById('verificationcode').value;
-
-      if (code) {
-        window.confirmationResult.confirm(code).then(function (result) {
-          // window.alert(result);
-          // User signed in successfully.
-          var user = result.user;
-          window.alert(user.phoneNumber); //TODO: send user cerdentials using Cloud.* to backend.
-        })["catch"](function (error) {
-          // User couldn't sign in (bad verification code?)
-          window.alert(error);
-        }); // Alternatively, can sign in by getting the credential
-        // var credential = PhoneAuthProvider.credential(confirmationResult.verificationId, code);
-        // signInWithCredential(credential);
+      if (inputText.match(firebasePhoneRegex)) {
+        this.phoneNumber = argins['phoneNumber'];
+        return argins;
       } else {
-        window.alert('Verification code was empty! Please add SMS Code!');
+        this.formErrors.phoneNumber = true; // throw new Error('badPhoneNumberFormat');
+
+        return undefined; //Cancel Submission
       }
     },
-    // clickInitFirebaseButton: async function () {
-    //   // https://firebaseopensource.com/projects/firebase/firebaseui-web/#using_firebaseui%20for%20authentication
-    //   // https://firebase.google.com/docs/auth/web/phone-auth
-    //   const auth = getAuth();
-    //   // // window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {}, auth);
-    //   // window.recaptchaVerifier = new RecaptchaVerifier('firebase-sign-in-button', {
-    //   //   'size': 'invisible',
-    //   //   'callback': (response) => {
-    //   //     // reCAPTCHA solved, allow signInWithPhoneNumber.
-    //   //     console.debug(response);
-    //   //     debugger;
-    //   //   }
-    //   // }, auth);
-    //   // FirebaseUI config.
-    //   // var uiConfig = {
-    //   //   signInSuccessUrl: '/admin',
-    //   //   signInOptions: [
-    //   //     // Leave the lines as is for the providers you want to offer your users.
-    //   //     // firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-    //   //     // firebase.auth.FacebookAuthProvider.PROVIDER_ID,
-    //   //     // firebase.auth.TwitterAuthProvider.PROVIDER_ID,
-    //   //     // firebase.auth.GithubAuthProvider.PROVIDER_ID,
-    //   //     // firebase.auth.EmailAuthProvider.PROVIDER_ID,
-    //   //     // eslint-disable-next-line no-undef
-    //   //     firebase.auth.PhoneAuthProvider.PROVIDER_ID,
-    //   //     // firebaseui.auth.AnonymousAuthProvider.PROVIDER_ID
-    //   //   ],
-    //   //   // tosUrl and privacyPolicyUrl accept either url string or a callback
-    //   //   // function.
-    //   //   // Terms of service url/callback.
-    //   //   tosUrl: 'https://vegiapp.co.uk/privacy',
-    //   //   // Privacy policy url/callback.
-    //   //   privacyPolicyUrl: function () {
-    //   //     window.location.assign('https://vegiapp.co.uk/privacy');
-    //   //   }
-    //   // };
-    //   // // Initialize the FirebaseUI Widget using Firebase.
-    //   // // eslint-disable-next-line no-undef
-    //   // var ui = new firebaseui.auth.AuthUI(firebase.auth());
-    //   // // The start method will wait until the DOM is loaded.
-    //   // ui.start('#firebaseui-auth-container', uiConfig);
-    // },
-    // fetch6DCode: async function () {
-    //   //TODO: show the iframe and wait for user to input the code.
-    // },
-    // handleSignInFirebase: async function () {
-    //   // const appVerifier = window.recaptchaVerifier;
-    //   // //TODO: Add RemememberMe like in login-with-firebase.ts api endpoint setPersistence f-wrap.
-    //   // const auth = getAuth();
-    //   // const rememberMe = this.formData.rememberMe;
-    //   // signInWithPhoneNumber(auth, this.formData.phoneNumber, appVerifier)
-    //   //     .then( async (confirmationResult) => {
-    //   //       // SMS sent. Prompt user to type the code from the message, then sign the
-    //   //       // user in with confirmationResult.confirm(code).
-    //   //       window.confirmationResult = confirmationResult;
-    //   //       const verify6DCode = await fetch6DCode(); //TODO: Workout how to implement this using the docs.
-    //   //       const userCredential = await confirmationResult.confirm(verify6DCode);
-    //   //       const firebaseSessionToken = await userCredential.user.getIdToken();
-    //   //       //TODO: Call the login-with-firebase api method with the token from this confirmationResult.
-    //   //       Cloud.loginWithFirebase(firebaseSessionToken, rememberMe)
-    //   //         .then(() => {
-    //   //           window.location = '/admin';
-    //   //         });
-    //   //       // ...
-    //   //     }).catch((error) => {
-    //   //       // Error; SMS not sent
-    //   //       // ...
-    //   //     });
-    // },
-    // handleParsingForm: function () {
-    //   // Clear out any pre-existing error messages.
-    //   this.formErrors = {};
-    //   var argins = this.formData;
-    //   // Validate email:
-    //   if (!argins.emailAddress) {
-    //     this.formErrors.emailAddress = true;
-    //   }
-    //   // Validate password:
-    //   if (!argins.password) {
-    //     this.formErrors.password = true;
-    //   }
-    //   // If there were any issues, they've already now been communicated to the user,
-    //   // so simply return undefined.  (This signifies that the submission should be
-    //   // cancelled.)
-    //   if (Object.keys(this.formErrors).length > 0) {
-    //     return;
-    //   }
-    //   return argins;
-    // },
-    // submittedForm: function () {
-    //   this.syncing = true;
-    //   location.replace('./admin');
-    // },
-    // handleParsingFormFirebase: function () {
-    //   // Clear out any pre-existing error messages.
-    //   this.formErrors = {};
-    //   var argins = this.formData;
-    //   // Validate email:
-    //   if (!argins.phoneNumber) {
-    //     this.formErrors.phoneNumber = true;
-    //   }
-    //   // If there were any issues, they've already now been communicated to the user,
-    //   // so simply return undefined.  (This signifies that the submission should be
-    //   // cancelled.)
-    //   if (Object.keys(this.formErrors).length > 0) {
-    //     return;
-    //   }
-    //   return argins;
-    // },
-    submittedFormFirebase: function submittedFormFirebase() {
-      this.syncing = true;
-      location.replace('./admin');
-    }
+    handleParsingFormFirebase: function handleParsingFormFirebase() {
+      // Clear out any pre-existing error messages.
+      this.formErrors = {};
+      var argins = this.formData; // Validate email:
+
+      if (!argins.phoneNumber) {
+        this.formErrors.phoneNumber = true;
+      } // If there were any issues, they've already now been communicated to the user,
+      // so simply return undefined.  (This signifies that the submission should be
+      // cancelled.)
+
+
+      if (Object.keys(this.formErrors).length > 0) {
+        return;
+      }
+
+      return argins;
+    },
+    submittedVerifyCodeForm: function submittedVerifyCodeForm() {
+      if (!this.cloudError) {
+        this.syncing = true;
+        location.replace('/admin');
+      } else {
+        this.cloudError = '';
+      }
+    },
+    parseVerificationCodeToArgIns: function parseVerificationCodeToArgIns() {
+      // Clear out any pre-existing error messages.
+      this.formErrors = {};
+      var firebaseVerifCodeRegex = /^\d{6}$/;
+      var inputText = this.verificationCode.trim();
+      var argins = {
+        'verificationCode': inputText
+      };
+
+      if (inputText.match(firebaseVerifCodeRegex)) {
+        return argins;
+      } else {
+        this.formErrors.verificationCode = true; // throw new Error('badVerificationCode');
+      }
+    },
+    clickVerifyPhoneNumber: function () {
+      var _clickVerifyPhoneNumber = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(widgetId) {
+        var _this3 = this;
+
+        var phoneNumber, appVerifier, userExists, auth, _signInToFirebase, user;
+
+        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                // const phoneNumber = document.getElementById('phoneNumber').value;
+                phoneNumber = this.phoneNumber;
+                appVerifier = window.recaptchaVerifier;
+                _context2.next = 4;
+                return Cloud.userExistsForPhone(this.countryCode, this.phoneNoCountryNoFormat);
+
+              case 4:
+                userExists = _context2.sent;
+
+                if (userExists) {
+                  _context2.next = 11;
+                  break;
+                }
+
+                this.syncing = false;
+                this.formErrors.phoneNumber = true;
+                this.formErrors.countryCode = true;
+                this.cloudError = 'userNotFound';
+                return _context2.abrupt("return");
+
+              case 11:
+                auth = (0, _auth.getAuth)();
+
+                _signInToFirebase = function _signInToFirebase() {
+                  return (0, _auth.signInWithPhoneNumber)(auth, phoneNumber, appVerifier).then(function (confirmationResult) {
+                    // SMS sent. Prompt user to type the code from the message, then sign the
+                    // user in with confirmationResult.confirm(code).
+                    window.confirmationResult = confirmationResult;
+                    document.getElementById('numberForm').classList.add('hidden');
+                    document.getElementById('verificationForm').classList.remove('hidden');
+                    _this3.syncing = false;
+                    return confirmationResult; // ...
+                  })["catch"](function (error) {
+                    // Error; SMS not sent
+                    // ...
+                    window.alert('verify phone number failed' + error);
+                    _this3.syncing = false;
+                    window.recaptchaVerifier.render().then(function (widgetId) {
+                      window.recaptchaVerifier._reset(widgetId); // document.getElementById('register').classList.add('hidden');
+                      // document.getElementById('start-recaptcha').classList.add('hidden');
+
+
+                      document.getElementById('login-button-container').classList.add('hidden');
+                      return _this3.clickVerifyPhoneNumber(widgetId);
+                    });
+                  });
+                };
+
+                if (!this.rememberMe) {
+                  _context2.next = 20;
+                  break;
+                }
+
+                _context2.next = 16;
+                return (0, _auth.setPersistence)(auth, _auth.browserSessionPersistence).then(function () {
+                  // Existing and futurd(auth, email, password);
+                  return _signInToFirebase();
+                });
+
+              case 16:
+                user = _context2.sent;
+                return _context2.abrupt("return", user);
+
+              case 20:
+                _context2.next = 22;
+                return _signInToFirebase();
+
+              case 22:
+                return _context2.abrupt("return", _context2.sent);
+
+              case 23:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function clickVerifyPhoneNumber(_x) {
+        return _clickVerifyPhoneNumber.apply(this, arguments);
+      }
+
+      return clickVerifyPhoneNumber;
+    }(),
+    clickCheckVerificationCode: function () {
+      var _clickCheckVerificationCode = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+        var code, token, confirmationResult, result, user;
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                code = this.verificationCode.trim();
+
+                if (!code) {
+                  _context3.next = 30;
+                  break;
+                }
+
+                token = '';
+                _context3.prev = 3;
+                _context3.next = 6;
+                return window.confirmationResult.confirm(code);
+
+              case 6:
+                confirmationResult = _context3.sent;
+                result = confirmationResult; //* https://firebase.google.com/docs/auth/admin/verify-id-tokens#retrieve_id_tokens_on_clients
+
+                _context3.next = 10;
+                return result.user.getIdToken(true);
+
+              case 10:
+                token = _context3.sent;
+                //* https://firebase.google.com/docs/auth/admin/verify-id-tokens#:~:text=Retrieve%20ID%20tokens%20on%20clients%20When%20a%20user,user%20or%20device%20on%20your%20custom%20backend%20server.
+                // var refreshToken = await result.user.getRefreshToken(true);
+                console.log(token);
+                _context3.next = 18;
+                break;
+
+              case 14:
+                _context3.prev = 14;
+                _context3.t0 = _context3["catch"](3);
+                window.alert('Firebase unable to confirm the verificationCode and threw');
+                return _context3.abrupt("return");
+
+              case 18:
+                _context3.prev = 18;
+                _context3.next = 21;
+                return Cloud.loginWithFirebase(this.phoneNumber, token);
+
+              case 21:
+                user = _context3.sent;
+                // BUG: Error: Invalid usage with serial arguments: Received unexpected third argument.
+                // var user = await Cloud.loginWithFirebase(this.phoneNumber, token, refreshToken); // BUG: Error: Invalid usage with serial arguments: Received unexpected third argument.
+                // window.alert('Logged in with firebase: ' + user.id);
+                window.location.replace('/admin');
+                _context3.next = 28;
+                break;
+
+              case 25:
+                _context3.prev = 25;
+                _context3.t1 = _context3["catch"](18);
+
+                // User couldn't sign in (bad verification code?)
+                if (_context3.t1.status === 404) {
+                  window.location.replace('/admin/signup');
+                } else {
+                  if (_context3.t1.name === 'FirebaseError') {
+                    console.log(_context3.t1);
+                  } else {
+                    console.log(_context3.t1);
+                  }
+
+                  window.alert('Cloud.loginWithFirebase threw:');
+                  window.alert(_context3.t1); // BUG: Cloud returned FirebaseError: Firebase: Error(auth / network - request - failed).
+                }
+
+              case 28:
+                _context3.next = 32;
+                break;
+
+              case 30:
+                window.alert('Verification code was empty! Please add SMS Code!');
+                throw new Error('badVerificationCode');
+
+              case 32:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this, [[3, 14], [18, 25]]);
+      }));
+
+      function clickCheckVerificationCode() {
+        return _clickCheckVerificationCode.apply(this, arguments);
+      }
+
+      return clickCheckVerificationCode;
+    }(),
+    test: function () {
+      var _test = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        var userExists, user;
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                _context4.prev = 0;
+                _context4.next = 3;
+                return Cloud.userExistsForEmail('joey@vegiapp.co.uk');
+
+              case 3:
+                userExists = _context4.sent;
+                window.alert('User exists ' + userExists);
+                _context4.next = 7;
+                return Cloud.userExistsForPhone(44, 7905532512);
+
+              case 7:
+                userExists = _context4.sent;
+                // eslint-disable-next-line no-debugger
+                window.alert('User exists ' + userExists);
+                _context4.next = 11;
+                return Cloud.loginWithFirebase(this.phoneNumber, 'DUMMY TOKEN');
+
+              case 11:
+                user = _context4.sent;
+                // BUG: Error: Invalid usage with serial arguments: Received unexpected third argument.
+                // var user = await Cloud.loginWithFirebase(this.phoneNumber, token, refreshToken); // BUG: Error: Invalid usage with serial arguments: Received unexpected third argument.
+                // eslint-disable-next-line no-debugger
+                debugger;
+                window.alert('Logged in with firebase: ' + user.id);
+                window.location.replace('/admin');
+                _context4.next = 21;
+                break;
+
+              case 17:
+                _context4.prev = 17;
+                _context4.t0 = _context4["catch"](0);
+                // User couldn't sign in (bad verification code?)
+                // eslint-disable-next-line no-debugger
+                debugger;
+
+                if (_context4.t0.status === 404) {
+                  window.location.replace('/admin/signup');
+                } else {
+                  if (_context4.t0.name === 'FirebaseError') {
+                    console.log(_context4.t0);
+                  } else {
+                    console.log(_context4.t0);
+                  }
+
+                  window.alert('Cloud.loginWithFirebase threw:');
+                  window.alert(_context4.t0); // BUG: Cloud returned FirebaseError: Firebase: Error(auth / network - request - failed).
+                }
+
+              case 21:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this, [[0, 17]]);
+      }));
+
+      function test() {
+        return _test.apply(this, arguments);
+      }
+
+      return test;
+    }()
   }
 });

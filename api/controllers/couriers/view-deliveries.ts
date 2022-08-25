@@ -32,7 +32,7 @@ module.exports = {
         {courierId: inputs.courierId},
         {courierId: -1, fulfilmentMethod: 1},
       ]})
-      .populate('deliveryId&vendor&fulfilmentSlotFrom&fulfilmentSlotTo&deliveryAddressLineOne&deliveryAddressLineTwo&deliveryAddressCity&deliveryAddressPostCode');
+      .populate('deliveryId&vendor&fulfilmentSlotFrom&fulfilmentSlotTo&deliveryAddressLineOne&deliveryAddressLineTwo&deliveryAddressCity&deliveryAddressPostCode'); // https://sailsjs.com/documentation/concepts/models-and-orm/associations#?associations-in-retrieved-records
 
     const yourOrders = orders.filter((order) => order.courierId === inputs.courierId);
     const otherOrders = orders.filter((order) => order.courierId === -1);

@@ -9,11 +9,12 @@
  * https://sailsjs.com/config/bootstrap
  */
 
-const PostalDistrict = require('../api/models/PostalDistrict');
+// Don't include as hides the sails hooks added below needed to create models, include types implicity using .d.ts files so don't need import statements as they are global to transpiler.
+// const PostalDistrict = require('../api/models/PostalDistrict');
 
 async function asyncForEach(array, callback) {
   for (let index = 0; index < array.length; index++) {
-    await callback(array[index], index, array);
+    return callback(array[index], index, array);
   }
 }
 
@@ -55,12 +56,13 @@ module.exports.bootstrap = async function() {
       outcode: 'L3'
     }
   ];
-  asyncForEach(createPostalDistricts, async (pd) => {
+  asyncForEach(createPostalDistricts, async (pd, ind, arr) => {
     var existingPd = await PostalDistrict.findOne(pd);
     if (existingPd) {
       PostalDistrict.removeFromCollection(pd);
     }
   });
+  // var postalDistricts = createPostalDistricts.map((pd) => PostalDistrict.create(pd).fetch());
   var postalDistricts = await PostalDistrict.createEach(createPostalDistricts).fetch();
 
   var delifonseca = await Vendor.create({
@@ -181,51 +183,59 @@ module.exports.bootstrap = async function() {
   await User.create({
     email: 'joey@vegi.com',
     // password: 'Testing123!',
-    phone: '11118887755',
+    phoneNoCountry: 7905532512,
+    phoneCountryCode: 44,
     name: 'Joey Dwonczyk',
     vendor: delifonseca.id,
+    vendorConfirmed: true,
     isSuperAdmin: true,
     vendorRole: 'none',
-    role: '',
+    role: 'admin',
     firebaseSessionToken: 'DUMMY_FIREBASE_TOKEN',
   });
 
-  // * Create consumer user
-  await User.create({
-    email: 'jdwonczyk.fit@gmail.com',
-    phone: '99998887766',
-    // password: 'Testing123!',
-    name: 'Consumer 1',
-    vendor: delifonseca.id,
-    isSuperAdmin: false,
-    vendorRole: 'none',
-    role: '',
-    firebaseSessionToken: 'DUMMY_FIREBASE_TOKEN',
-  });
+  // // * Create consumer user
+  // await User.create({
+  //   email: 'jdwonczyk.fit@gmail.com',
+  //   phoneNoCountry: 7905532512,
+  //   phoneCountryCode: 44,
+  //   // password: 'Testing123!',
+  //   name: 'Consumer 1',
+  //   vendor: delifonseca.id,
+  //   vendorConfirmed: true,
+  //   isSuperAdmin: false,
+  //   role: 'vendor',
+  //   vendorRole: 'salesManag'
+  //   firebaseSessionToken: 'DUMMY_FIREBASE_TOKEN',
+  // });
 
   // * Create sales Assistant
   await User.create({
     email: 'jdwonczyk@gmail.com',
-    phone: '99998887777',
+    phoneNoCountry: 9998887777,
+    phoneCountryCode: 1,
     // password: 'Testing123!',
     name: 'Sales Assistant 1',
     vendor: delifonseca.id,
+    vendorConfirmed: true,
     isSuperAdmin: false,
     vendorRole: 'salesManager',
-    role: 'staff',
+    role: 'vendor',
     firebaseSessionToken: 'DUMMY_FIREBASE_TOKEN',
   });
 
-  // * Create Courier
+  // * Create Courier (Manager)
   await User.create({
     email: 'jdwonczy.corpk@gmail.com',
-    phone: '99995557777',
+    phoneNoCountry: 9995557777,
+    phoneCountryCode: 1,
     // password: 'Testing123!',
     name: 'Courier 1',
     vendor: delifonseca.id,
+    vendorConfirmed: true,
     isSuperAdmin: false,
-    vendorRole: 'none',
     role: 'courier',
+    courierRole: 'deliveryManager',
     firebaseSessionToken: 'DUMMY_FIREBASE_TOKEN',
   });
 

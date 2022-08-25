@@ -67,36 +67,90 @@ module.exports = {
       return exits.error(new Error('You are not authorised to create products for this vendor.'));
     }
 
-    // Check that the file is not too big.
-    var imageInfo = await sails.uploadOne(inputs.image, {
-      adapter: require('skipper-s3'),
-      key: sails.config.custom.amazonS3AccessKey,
-      secret: sails.config.custom.amazonS3Secret,
-      bucket: sails.config.custom.amazonS3Bucket,
-      maxBytes: 30000000
-    })
-    .intercept('E_EXCEEDS_UPLOAD_LIMIT', 'tooBig')
-    .intercept((err) => new Error('The photo upload failed! ' + err.message));
+    var AWS = require('aws-sdk');
+    // const { S3Client, AbortMultipartUploadCommand } = require('@aws-sdk/client-s3');
+    const sharp = require('sharp');
 
-    if(!imageInfo) {
-      return exits.noFileAttached();
-    }
+    var fs = require('fs');
 
-    // Create the new product
-    var newProduct = await Product.create({
-      imageUrl: sails.config.custom.amazonS3BucketUrl + imageInfo.fd,
-      name: inputs.name,
-      description: inputs.description,
-      basePrice: inputs.basePrice,
-      isAvailable: inputs.isAvailable,
-      priority: inputs.priority,
-      vendor: inputs.vendor
-    }).fetch();
+    const original = inputs.image; //TODO: Test that inputs.image isn't already a stream
 
-    // All done.
-    return exits.success({
-      id: newProduct.id
+    // https://stackoverflow.com/a/32561731
+    sharp(original).resize(800).quality(90).toBuffer((err, outputBuffer) => {
+      if (err) {
+        return new Error('The image compression failed! ' + err.message);
+      } else {
+        const s3client = new AWS.S3({
+          accessKeyId: sails.config.custom.amazonS3AccessKey,
+          secretAccessKey: sails.config.custom.amazonS3Secret,
+          params : {
+            Bucket : sails.config.custom.amazonS3Bucket,
+            Key: `${inputs.name}_vendor${inputs.vendor}`
+          }
+        });
+
+        s3client.upload({ACL:'public-read', Body: outputBuffer}, async (err, result) => {
+          if(err) {
+            //handle error
+            return new Error('The photo upload failed! ' + err.message);
+          } else {
+            // continue, handle returned data
+            fs.unlinkSync(original); // delete original
+
+            if(!result){
+              return exits.noFileAttached();
+            }
+
+            // Create the new product
+            var newProduct = await Product.create({
+              imageUrl: sails.config.custom.amazonS3BucketUrl + result.fd,
+              name: inputs.name,
+              description: inputs.description,
+              basePrice: inputs.basePrice,
+              isAvailable: inputs.isAvailable,
+              priority: inputs.priority,
+              vendor: inputs.vendor
+            }).fetch();
+
+            // All done.
+            return exits.success({
+              id: newProduct.id
+            });
+          }
+        });
+      }
     });
+
+    // Check that the file is not too big.
+    // var imageInfo = await sails.uploadOne(inputs.image, {
+    //   adapter: require('skipper-s3'),
+    //   key: sails.config.custom.amazonS3AccessKey,
+    //   secret: sails.config.custom.amazonS3Secret,
+    //   bucket: sails.config.custom.amazonS3Bucket,
+    //   maxBytes: 30000000
+    // })
+    // .intercept('E_EXCEEDS_UPLOAD_LIMIT', 'tooBig')
+    // .intercept((err) => new Error('The photo upload failed! ' + err.message));
+
+    // if(!imageInfo) {
+    //   return exits.noFileAttached();
+    // }
+
+    // // Create the new product
+    // var newProduct = await Product.create({
+    //   imageUrl: sails.config.custom.amazonS3BucketUrl + imageInfo.fd,
+    //   name: inputs.name,
+    //   description: inputs.description,
+    //   basePrice: inputs.basePrice,
+    //   isAvailable: inputs.isAvailable,
+    //   priority: inputs.priority,
+    //   vendor: inputs.vendor
+    // }).fetch();
+
+    // // All done.
+    // return exits.success({
+    //   id: newProduct.id
+    // });
 
   }
 

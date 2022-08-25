@@ -160,7 +160,7 @@ export class CoopCycleCourier implements ICourier {
       }
     })
     .catch((err)=> {
-      sails.log(err);
+      sails.log.warn(err);
     });
 
     // Create HTTP client with new access token
@@ -200,8 +200,8 @@ export class CoopCycleCourier implements ICourier {
     // Send the delivery information to Coopcycle
     var response = await this.client.post(this._requestDeliveryAvailabilityUrl, requestBody)
     .catch((err) => {
-      sails.log('Error requesting delivery availability from ' + this.courierName + '.');
-      sails.log(err);
+      sails.log.info('Error requesting delivery availability from ' + this.courierName + '.');
+      sails.log.warn(err);
     });
 
     return new DeliveryAvailability(this.courierId, response.data.id);
@@ -218,8 +218,8 @@ export class CoopCycleCourier implements ICourier {
     // Send the delivery information to Coopcycle
     var response = await this.client.post(this._requestDeliveryAvailabilityUrl, requestBody)
       .catch((err) => {
-        sails.log('Error confirming the delivery from ' + this.courierName + '.');
-        sails.log(err);
+        sails.log.info('Error confirming the delivery from ' + this.courierName + '.');
+        sails.log.warn(err);
         return DeliveryConfirmation.failure;
       });
 
@@ -243,8 +243,8 @@ export class CoopCycleCourier implements ICourier {
     // Send the delivery information to Coopcycle
     var response = await this.client.post(this._requestDeliveryAvailabilityUrl, requestBody)
       .catch((err) => {
-        sails.log('Error cancelling the delivery from ' + this.courierName + '.');
-        sails.log(err);
+        sails.log.info('Error cancelling the delivery from ' + this.courierName + '.');
+        sails.log.warn(err);
         return RequestReceived.failed;
       });
 
@@ -263,8 +263,8 @@ export class CoopCycleCourier implements ICourier {
     // Send the delivery information to Coopcycle
     var response = await this.client.post(this._requestDeliveryAvailabilityUrl, requestBody)
       .catch((err) => {
-        sails.log('Error fetching the delivery.');
-        sails.log(err);
+        sails.log.info('Error fetching the delivery.');
+        sails.log.warn(err);
         return DeliveryStatus.unknown;
       });
 
@@ -332,8 +332,8 @@ export class AgileCourier implements ICourier {
         subject: requestBody.subject,
         layout: false,
       }).intercept('', (err) => {
-        sails.log('Error requesting delivery availability from ' + this.courierName + '.');
-        sails.log(err);
+        sails.log.info('Error requesting delivery availability from ' + this.courierName + '.');
+        sails.log.warn(err);
       });
     
 
@@ -385,8 +385,8 @@ export class AgileCourier implements ICourier {
         subject: requestBody.subject,
         layout: false,
       }).intercept('', (err) => {
-        sails.log('Error requesting delivery availability from ' + this.courierName + '.');
-        sails.log(err);
+        sails.log.info('Error requesting delivery availability from ' + this.courierName + '.');
+        sails.log.warn(err);
       });
 
     //TODO: We either need a button for Danny to login and click to accept Delivery Request for Availability or we need to have someone check for inbound emails.
@@ -438,8 +438,8 @@ export class AgileCourier implements ICourier {
         subject: requestBody.subject,
         layout: false,
       }).intercept('', (err) => {
-        sails.log('Error requesting delivery availability from ' + this.courierName + '.');
-        sails.log(err);
+        sails.log.info('Error requesting delivery availability from ' + this.courierName + '.');
+        sails.log.warn(err);
         return RequestReceived.failed;
       });
     return RequestReceived.received;
@@ -487,8 +487,8 @@ export class AgileCourier implements ICourier {
         subject: requestBody.subject,
         layout: false,
       }).intercept('', (err) => {
-        sails.log('Error requesting delivery availability from ' + this.courierName + '.');
-        sails.log(err);
+        sails.log.info('Error requesting delivery availability from ' + this.courierName + '.');
+        sails.log.warn(err);
         return RequestReceived.failed;
       });
 
