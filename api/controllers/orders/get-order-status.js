@@ -29,7 +29,7 @@ module.exports = {
       throw 'notFound';
     }
 
-    return {paymentStatus: order.paymentStatus};
+    return {paymentStatus: order.paymentStatus, restaurantAcceptanceStatus: order.restaurantAcceptanceStatus};
 
   }
 
