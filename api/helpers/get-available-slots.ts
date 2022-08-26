@@ -111,7 +111,7 @@ module.exports = {
       // Find orders for that fulfilment method between the start and end times.
       // var fulfilmentSlotFrom = moment(openTime, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DD HH:mm:ss');
       // var fulfilmentSlotTo = moment(closeTime, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DD HH:mm:ss');
-      var orders = await Order.find({fulfilmentMethod: inputs.fulfilmentMethodId, paymentStatus: true, restaurantAccepted: true, fulfilmentSlotFrom: {'>=': openTime}, fulfilmentSlotTo: {'<=': closeTime}});
+      var orders = await Order.find({fulfilmentMethod: inputs.fulfilmentMethodId, paymentStatus: 'paid', restaurantAcceptanceStatus: { '!=' : 'declined' }, fulfilmentSlotFrom: {'>=': openTime}, fulfilmentSlotTo: {'<=': closeTime}});
 
       /* var orders = [{
         fulfilmentSlotFrom: '17/02/2022 10:00',
@@ -140,7 +140,7 @@ module.exports = {
         // Is the time slot after current time plus fulfilment method buffer
         var isInFuture = moment.utc(slotI.startTime).isAfter(moment().add(fulfilmentMethod.bufferLength, 'minutes'));
 
-        if (!fulfilmentMethod.maxOrders || (relevantOrders.length <= fulfilmentMethod.maxOrders) && isInFuture) { // If there aren't too many orders in the slot
+        if ((!fulfilmentMethod.maxOrders || (relevantOrders.length <= fulfilmentMethod.maxOrders)) && isInFuture) { // If there aren't too many orders in the slot
           availableSlots.push(slotI); // Add slot to availableSlots array
         }
       }

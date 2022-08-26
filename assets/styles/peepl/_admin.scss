@@ -74,3 +74,7 @@
 .bg-grey {
   background-color: $gray-100 !important;
 }
+
+.nav-link.active {
+  font-weight: bold;
+}

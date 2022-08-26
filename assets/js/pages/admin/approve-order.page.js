@@ -25,7 +25,11 @@ parasails.registerPage('approve-order', {
 
       Cloud.approveOrDeclineOrder(orderId, isApproved)
       .then(() => {
-        that.order.restaurantAccepted = isApproved;
+        if(isApproved){
+          that.order.restaurantAcceptanceStatus = 'accepted';
+        } else {
+          that.order.restaurantAcceptanceStatus = 'rejected';
+        }
       });
     }
   }

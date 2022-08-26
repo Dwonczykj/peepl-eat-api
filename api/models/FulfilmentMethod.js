@@ -25,10 +25,6 @@ module.exports = {
       description: 'A positive or negative integer representing the amount of pence to adjust the base price by.'
     },
     // TODO: Change restrictions to dynamic based on vendor co-ords and radius
-    postCodeRestrictionRegex: {
-      type: 'string',
-      description: 'A regular expression specifying which postcodes are eligible for this delivery method.'
-    },
     methodType: {
       type: 'string',
       isIn: ['delivery', 'collection'],

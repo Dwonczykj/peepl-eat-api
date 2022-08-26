@@ -40,7 +40,7 @@
       "name": "Logout"
     },
     {
-      "name": "View all orders"
+      "name": "View orders"
     },
     {
       "name": "View discount codes"
@@ -137,9 +137,6 @@
     },
     {
       "name": "Edit product option value"
-    },
-    {
-      "name": "Archive order"
     },
     {
       "name": "Update product statuses"
@@ -420,10 +417,6 @@
             "format": "double",
             "description": "A positive or negative integer representing the amount of pence to adjust the base price by."
           },
-          "postCodeRestrictionRegex": {
-            "type": "string",
-            "description": "A regular expression specifying which postcodes are eligible for this delivery method."
-          },
           "methodType": {
             "type": "string",
             "default": "delivery",
@@ -628,10 +621,6 @@
           "paymentIntentId": {
             "type": "string"
           },
-          "isArchived": {
-            "type": "boolean",
-            "default": false
-          },
           "deliveryId": {
             "type": "string",
             "description": "The ID to identify the delivery in the logistics system"
@@ -663,11 +652,18 @@
           "tipAmount": {
             "type": "number",
             "format": "double",
-            "description": "Amount of tip in pence"
+            "description": "Amount of tip in pence",
+            "minimum": 0
           },
-          "restaurantAccepted": {
-            "type": "boolean",
-            "default": false
+          "restaurantAcceptanceStatus": {
+            "type": "string",
+            "default": "pending",
+            "enum": [
+              "pending",
+              "accepted",
+              "rejected"
+            ],
+            "example": "pending"
           },
           "rewardsIssued": {
             "type": "number",
@@ -19570,14 +19566,58 @@
           },
           {
             "in": "query",
+<<<<<<< HEAD
             "name": "size",
             "required": true,
+=======
+            "name": "basePrice",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "image",
+            "required": false,
+>>>>>>> upstream/main
             "schema": {}
           },
           {
             "in": "query",
+<<<<<<< HEAD
             "name": "age",
             "required": false,
+=======
+            "name": "isAvailable",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "priority",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "isFeatured",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vendor",
+            "required": true,
+>>>>>>> upstream/main
             "schema": {
               "type": "number",
               "format": "double"
@@ -19806,6 +19846,7 @@
             "description": "Internal server error"
           }
         }
+<<<<<<< HEAD
       },
       "put": {
         "summary": "Get fulfilment slots",
@@ -19844,553 +19885,564 @@
           }
         }
       },
+=======
+    }
+  },
+  "/api/v1/admin/update-product-status": {
+>>>>>>> upstream/main
       "post": {
-        "summary": "Get fulfilment slots",
-        "tags": [
-          "Get fulfilment slots"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "vendor",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            }
-          },
-          {
-            "in": "query",
-            "name": "date",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "pattern": "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$"
-            }
+      "summary": "Get fulfilment slots",
+      "tags": [
+        "Get fulfilment slots"
+      ],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "vendor",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "double"
           }
-        ],
-        "responses": {
-          "200": {
-            "description": "The requested resource"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "500": {
-            "description": "Internal server error"
+        },
+        {
+          "in": "query",
+          "name": "date",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$"
           }
         }
-      },
-      "delete": {
-        "summary": "Get fulfilment slots",
-        "tags": [
-          "Get fulfilment slots"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "vendor",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            }
-          },
-          {
-            "in": "query",
-            "name": "date",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "pattern": "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The requested resource"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Get fulfilment slots",
-        "tags": [
-          "Get fulfilment slots"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "vendor",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            }
-          },
-          {
-            "in": "query",
-            "name": "date",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "pattern": "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The requested resource"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
+      ],
+      "responses": {
+        "200": {
+          "description": "The requested resource"
+        },
+        "404": {
+          "description": "Resource not found"
+        },
+        "500": {
+          "description": "Internal server error"
         }
       }
     },
-    "/vendors/get-postal-districts": {
-      "get": {
-        "summary": "Get postal districts",
-        "tags": [
-          "Get postal districts"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "vendor",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            },
-            "description": "The id of the vendor."
+    "delete": {
+      "summary": "Get fulfilment slots",
+      "tags": [
+        "Get fulfilment slots"
+      ],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "vendor",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "double"
           }
-        ],
-        "responses": {
-          "200": {
-            "description": "The requested resource"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "500": {
-            "description": "Internal server error"
+        },
+        {
+          "in": "query",
+          "name": "date",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$"
           }
         }
-      },
-      "put": {
-        "summary": "Get postal districts",
-        "tags": [
-          "Get postal districts"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "vendor",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            },
-            "description": "The id of the vendor."
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The requested resource"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      },
-      "post": {
-        "summary": "Get postal districts",
-        "tags": [
-          "Get postal districts"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "vendor",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            },
-            "description": "The id of the vendor."
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The requested resource"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Get postal districts",
-        "tags": [
-          "Get postal districts"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "vendor",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            },
-            "description": "The id of the vendor."
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The requested resource"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Get postal districts",
-        "tags": [
-          "Get postal districts"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "vendor",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            },
-            "description": "The id of the vendor."
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The requested resource"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
+      ],
+      "responses": {
+        "200": {
+          "description": "The requested resource"
+        },
+        "404": {
+          "description": "Resource not found"
+        },
+        "500": {
+          "description": "Internal server error"
         }
       }
     },
-    "/vendors/view-all-vendors": {
-      "get": {
-        "summary": "View all vendors",
-        "description": "Display \"All vendors\" page.",
-        "tags": [
-          "View all vendors"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "outcode",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+    "patch": {
+      "summary": "Get fulfilment slots",
+      "tags": [
+        "Get fulfilment slots"
+      ],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "vendor",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "double"
           }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "500": {
-            "description": "Internal server error"
+        },
+        {
+          "in": "query",
+          "name": "date",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$"
           }
         }
-      },
-      "put": {
-        "summary": "View all vendors",
-        "description": "Display \"All vendors\" page.",
-        "tags": [
-          "View all vendors"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "outcode",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      },
-      "post": {
-        "summary": "View all vendors",
-        "description": "Display \"All vendors\" page.",
-        "tags": [
-          "View all vendors"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "outcode",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      },
-      "delete": {
-        "summary": "View all vendors",
-        "description": "Display \"All vendors\" page.",
-        "tags": [
-          "View all vendors"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "outcode",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      },
-      "patch": {
-        "summary": "View all vendors",
-        "description": "Display \"All vendors\" page.",
-        "tags": [
-          "View all vendors"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "outcode",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/vendors/view-vendor-menu": {
-      "get": {
-        "summary": "View vendor menu [DEPRECATED]",
-        "description": "Display \"Vendor menu\" page.",
-        "tags": [
-          "View vendor menu [DEPRECATED]"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "vendorid",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      },
-      "put": {
-        "summary": "View vendor menu [DEPRECATED]",
-        "description": "Display \"Vendor menu\" page.",
-        "tags": [
-          "View vendor menu [DEPRECATED]"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "vendorid",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      },
-      "post": {
-        "summary": "View vendor menu [DEPRECATED]",
-        "description": "Display \"Vendor menu\" page.",
-        "tags": [
-          "View vendor menu [DEPRECATED]"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "vendorid",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      },
-      "delete": {
-        "summary": "View vendor menu [DEPRECATED]",
-        "description": "Display \"Vendor menu\" page.",
-        "tags": [
-          "View vendor menu [DEPRECATED]"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "vendorid",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      },
-      "patch": {
-        "summary": "View vendor menu [DEPRECATED]",
-        "description": "Display \"Vendor menu\" page.",
-        "tags": [
-          "View vendor menu [DEPRECATED]"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "vendorid",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
+      ],
+      "responses": {
+        "200": {
+          "description": "The requested resource"
+        },
+        "404": {
+          "description": "Resource not found"
+        },
+        "500": {
+          "description": "Internal server error"
         }
       }
     }
+  },
+  "/vendors/get-postal-districts": {
+    "get": {
+      "summary": "Get postal districts",
+      "tags": [
+        "Get postal districts"
+      ],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "vendor",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "double"
+          },
+          "description": "The id of the vendor."
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "The requested resource"
+        },
+        "404": {
+          "description": "Resource not found"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    },
+    "put": {
+      "summary": "Get postal districts",
+      "tags": [
+        "Get postal districts"
+      ],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "vendor",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "double"
+          },
+          "description": "The id of the vendor."
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "The requested resource"
+        },
+        "404": {
+          "description": "Resource not found"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    },
+    "post": {
+      "summary": "Get postal districts",
+      "tags": [
+        "Get postal districts"
+      ],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "vendor",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "double"
+          },
+          "description": "The id of the vendor."
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "The requested resource"
+        },
+        "404": {
+          "description": "Resource not found"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    },
+    "delete": {
+      "summary": "Get postal districts",
+      "tags": [
+        "Get postal districts"
+      ],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "vendor",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "double"
+          },
+          "description": "The id of the vendor."
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "The requested resource"
+        },
+        "404": {
+          "description": "Resource not found"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    },
+    "patch": {
+      "summary": "Get postal districts",
+      "tags": [
+        "Get postal districts"
+      ],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "vendor",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "double"
+          },
+          "description": "The id of the vendor."
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "The requested resource"
+        },
+        "404": {
+          "description": "Resource not found"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    }
+  },
+  "/vendors/view-all-vendors": {
+    "get": {
+      "summary": "View all vendors",
+      "description": "Display \"All vendors\" page.",
+      "tags": [
+        "View all vendors"
+      ],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "outcode",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Success"
+        },
+        "404": {
+          "description": "Not found"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    },
+    "put": {
+      "summary": "View all vendors",
+      "description": "Display \"All vendors\" page.",
+      "tags": [
+        "View all vendors"
+      ],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "outcode",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Success"
+        },
+        "404": {
+          "description": "Not found"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    },
+    "post": {
+      "summary": "View all vendors",
+      "description": "Display \"All vendors\" page.",
+      "tags": [
+        "View all vendors"
+      ],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "outcode",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Success"
+        },
+        "404": {
+          "description": "Not found"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    },
+    "delete": {
+      "summary": "View all vendors",
+      "description": "Display \"All vendors\" page.",
+      "tags": [
+        "View all vendors"
+      ],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "outcode",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Success"
+        },
+        "404": {
+          "description": "Not found"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    },
+    "patch": {
+      "summary": "View all vendors",
+      "description": "Display \"All vendors\" page.",
+      "tags": [
+        "View all vendors"
+      ],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "outcode",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Success"
+        },
+        "404": {
+          "description": "Not found"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    }
+  },
+  "/vendors/view-vendor-menu": {
+    "get": {
+      "summary": "View vendor menu [DEPRECATED]",
+      "description": "Display \"Vendor menu\" page.",
+      "tags": [
+        "View vendor menu [DEPRECATED]"
+      ],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "vendorid",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Success"
+        },
+        "404": {
+          "description": "Not found"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    },
+    "put": {
+      "summary": "View vendor menu [DEPRECATED]",
+      "description": "Display \"Vendor menu\" page.",
+      "tags": [
+        "View vendor menu [DEPRECATED]"
+      ],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "vendorid",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Success"
+        },
+        "404": {
+          "description": "Not found"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    },
+    "post": {
+      "summary": "View vendor menu [DEPRECATED]",
+      "description": "Display \"Vendor menu\" page.",
+      "tags": [
+        "View vendor menu [DEPRECATED]"
+      ],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "vendorid",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Success"
+        },
+        "404": {
+          "description": "Not found"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    },
+    "delete": {
+      "summary": "View vendor menu [DEPRECATED]",
+      "description": "Display \"Vendor menu\" page.",
+      "tags": [
+        "View vendor menu [DEPRECATED]"
+      ],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "vendorid",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Success"
+        },
+        "404": {
+          "description": "Not found"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    },
+    "patch": {
+      "summary": "View vendor menu [DEPRECATED]",
+      "description": "Display \"Vendor menu\" page.",
+      "tags": [
+        "View vendor menu [DEPRECATED]"
+      ],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "vendorid",
+          "required": true,
+          "schema": {
+<<<<<<< HEAD
+              "type": "number",
+            "format": "double"
+          }
+=======
+              "type": "string"
+        },
+        "description": "The order to be approved or rejected."
+>>>>>>> upstream/main
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Success"
+      },
+      "404": {
+        "description": "Not found"
+      },
+      "500": {
+        "description": "Internal server error"
+      }
+    }
   }
+}
+}
 }

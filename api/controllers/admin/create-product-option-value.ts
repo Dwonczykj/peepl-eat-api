@@ -60,6 +60,7 @@ module.exports = {
     var newProductOptionValue = await ProductOptionValue.create({
       name: inputs.name,
       description: inputs.description,
+      priceModifier: inputs.priceModifier,
       isAvailable: inputs.isAvailable,
       option: inputs.productOption
     }).fetch();

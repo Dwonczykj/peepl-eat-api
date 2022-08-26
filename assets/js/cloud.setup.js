@@ -13,10 +13,20 @@
 Cloud.setup({
   /* eslint-disable */
   methods: {
+    getAllPostalDistricts: {
+      verb: "GET",
+      url: "/api/v1/postal-districts/get-all-postal-districts",
+      args: [],
+    },
     getFulfilmentSlots: {
       verb: "GET",
       url: "/api/v1/vendors/get-fulfilment-slots",
       args: ["vendor", "date"],
+    },
+    getPostalDistricts: {
+      verb: "GET",
+      url: "/api/v1/vendors/get-postal-districts",
+      args: ["vendor"],
     },
     getProductOptions: {
       verb: "GET",
@@ -87,7 +97,8 @@ Cloud.setup({
         "courierId",
         "role",
         "vendorRole",
-        "courierRole"],
+        "courierRole",
+      ],
     },
     // login: {
     //   verb: "POST",
@@ -99,6 +110,7 @@ Cloud.setup({
       url: "/api/v1/admin/user-exists-for-email",
       args: ["email"],
     },
+    logout: { verb: "GET", url: "/admin/logout", args: [] },
     userExistsForPhone: {
       verb: "POST",
       url: "/api/v1/admin/user-exists-for-phone",
@@ -123,6 +135,7 @@ Cloud.setup({
         "status",
         "costLevel",
         "rating",
+        "isVegan",
       ],
     },
     editVendor: {
@@ -139,6 +152,8 @@ Cloud.setup({
         "status",
         "costLevel",
         "rating",
+        "isVegan",
+        "minimumOrderAmount",
       ],
     },
     editProduct: {
@@ -152,6 +167,7 @@ Cloud.setup({
         "image",
         "isAvailable",
         "priority",
+        "isFeatured",
       ],
     },
     createProduct: {
@@ -164,6 +180,7 @@ Cloud.setup({
         "image",
         "isAvailable",
         "priority",
+        "isFeatured",
         "vendor",
       ],
     },

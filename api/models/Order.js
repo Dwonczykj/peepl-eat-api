@@ -71,15 +71,16 @@ module.exports = {
     },
     paymentStatus: {
       type: 'string',
-      defaultsTo: 'unpaid'
+      defaultsTo: 'unpaid',
+      isIn: ['unpaid', 'paid', 'failed'],
     },
     paymentIntentId: {
       type: 'string'
     },
-    isArchived: {
-      type: 'boolean',
-      defaultsTo: false
-    },
+    // isArchived: {
+    //   type: 'boolean',
+    //   defaultsTo: false
+    // },
     deliveryId: {
       type: 'string',
       description: 'The ID to identify the delivery in the logistics system'
@@ -110,12 +111,15 @@ module.exports = {
     },
     tipAmount: {
       type: 'number',
-      description: 'Amount of tip in pence'
+      description: 'Amount of tip in pence',
+      min: 0
     },
-    restaurantAccepted: {
-      type: 'boolean',
-      defaultsTo: false
+    restaurantAcceptanceStatus: {
+      type: 'string',
+      defaultsTo: 'pending',
+      isIn: ['pending', 'accepted', 'rejected']
     },
+    // TODO: Courier Accepted
     rewardsIssued: {
       type: 'number',
       defaultsTo: 0

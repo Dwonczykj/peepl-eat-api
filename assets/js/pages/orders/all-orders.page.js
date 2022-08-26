@@ -4,6 +4,8 @@ parasails.registerPage('all-orders', {
   //  ╩╝╚╝╩ ╩ ╩╩ ╩╩═╝  ╚═╝ ╩ ╩ ╩ ╩ ╚═╝
   data: {
     //…
+    timePeriod: '',
+    acceptanceStatus: '',
   },
 
   //  ╦  ╦╔═╗╔═╗╔═╗╦ ╦╔═╗╦  ╔═╗
@@ -20,18 +22,6 @@ parasails.registerPage('all-orders', {
   //  ║║║║ ║ ║╣ ╠╦╝╠═╣║   ║ ║║ ║║║║╚═╗
   //  ╩╝╚╝ ╩ ╚═╝╩╚═╩ ╩╚═╝ ╩ ╩╚═╝╝╚╝╚═╝
   methods: {
-    clickArchiveOrder: function(orderId){
-      var that = this;
-
-      Cloud.archiveOrder(orderId)
-      .then(() => {
-        var index = that.orders.map(x => {
-          return x.Id;
-        }).indexOf(orderId);
-
-        that.orders.splice(index, 1);
-      });
-    }
   },
 
   filters: {
@@ -39,6 +29,11 @@ parasails.registerPage('all-orders', {
       if (!unixtime) {return '';}
       unixtime = moment.unix(unixtime).calendar();
       return unixtime;
+    },
+    capitalise: function (value) {
+      if (!value) {return ''; }
+      value = value.toString();
+      return value.charAt(0).toUpperCase() + value.slice(1);
     }
   }
 });

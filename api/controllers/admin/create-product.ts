@@ -25,7 +25,6 @@ module.exports = {
     },
     image: {
       type: 'ref',
-      required: true
     },
     isAvailable: {
       type: 'boolean'
@@ -37,7 +36,8 @@ module.exports = {
       type: 'boolean'
     },
     vendor: {
-      type: 'number'
+      type: 'number',
+      required: true
     }
   },
 
@@ -76,7 +76,7 @@ module.exports = {
     const original = inputs.image; //TODO: Test that inputs.image isn't already a stream
 
     // https://stackoverflow.com/a/32561731
-    sharp(original).resize(800).quality(90).toBuffer((err, outputBuffer) => {
+    return sharp(original).resize(800).quality(90).toBuffer((err, outputBuffer) => {
       if (err) {
         return new Error('The image compression failed! ' + err.message);
       } else {
@@ -90,19 +90,24 @@ module.exports = {
         });
 
         s3client.upload({ACL:'public-read', Body: outputBuffer}, async (err, result) => {
-          if(err) {
+          var newProduct;
+          if(err || !result) {
             //handle error
-            return new Error('The photo upload failed! ' + err.message);
+            newProduct = await Product.create({
+              name: inputs.name,
+              description: inputs.description,
+              basePrice: inputs.basePrice,
+              isAvailable: inputs.isAvailable,
+              priority: inputs.priority,
+              vendor: inputs.vendor
+            }).fetch();
+            
           } else {
             // continue, handle returned data
             fs.unlinkSync(original); // delete original
-
-            if(!result){
-              return exits.noFileAttached();
-            }
-
+            
             // Create the new product
-            var newProduct = await Product.create({
+            newProduct = await Product.create({
               imageUrl: sails.config.custom.amazonS3BucketUrl + result.fd,
               name: inputs.name,
               description: inputs.description,
@@ -111,15 +116,52 @@ module.exports = {
               priority: inputs.priority,
               vendor: inputs.vendor
             }).fetch();
-
-            // All done.
-            return exits.success({
-              id: newProduct.id
-            });
           }
+          return exits.success({
+            id: newProduct.id
+          });
         });
       }
     });
+    // var newProduct;
+
+    // // Check that the file is not too big.
+    // var imageInfo = await sails.uploadOne(inputs.image, {
+    //   adapter: require('skipper-s3'),
+    //   key: sails.config.custom.amazonS3AccessKey,
+    //   secret: sails.config.custom.amazonS3Secret,
+    //   bucket: sails.config.custom.amazonS3Bucket,
+    //   maxBytes: 30000000
+    // })
+    // .intercept('E_EXCEEDS_UPLOAD_LIMIT', 'tooBig')
+    // .intercept((err) => new Error('The photo upload failed! ' + err.message));
+
+    // if(!imageInfo) {
+    //   // Create the new product
+    //   newProduct = await Product.create({
+    //     name: inputs.name,
+    //     description: inputs.description,
+    //     basePrice: inputs.basePrice,
+    //     isAvailable: inputs.isAvailable,
+    //     priority: inputs.priority,
+    //     vendor: inputs.vendor
+    //   }).fetch();
+    // } else {
+    //   newProduct = await Product.create({
+    //     imageUrl: sails.config.custom.amazonS3BucketUrl + imageInfo.fd,
+    //     name: inputs.name,
+    //     description: inputs.description,
+    //     basePrice: inputs.basePrice,
+    //     isAvailable: inputs.isAvailable,
+    //     priority: inputs.priority,
+    //     vendor: inputs.vendor
+    //   }).fetch();
+    // }
+
+    // All done.
+    // return exits.success({
+    //   id: newProduct.id
+    // });
 
     // Check that the file is not too big.
     // var imageInfo = await sails.uploadOne(inputs.image, {

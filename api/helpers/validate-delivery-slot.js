@@ -35,6 +35,7 @@ module.exports = {
   fn: async function (inputs) {
     var moment = require('moment');
 
+    // Strip time from inputted datetime
     var date = moment(inputs.fulfilmentSlotFrom, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD');
 
     var validSlots = await sails.helpers.getAvailableSlots.with({date, fulfilmentMethodId: inputs.fulfilmentMethodId});
