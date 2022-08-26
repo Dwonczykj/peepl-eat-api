@@ -12,7 +12,10 @@ parasails.registerPage('all-orders', {
   //  ╦╔╗╔╦╔╦╗╦╔═╗╦    ╔═╗╔╦╗╔═╗╔╦╗╔═╗
   //  ║║║║║ ║ ║╠═╣║    ╚═╗ ║ ╠═╣ ║ ║╣
   //  ╩╝╚╝╩ ╩ ╩╩ ╩╩═╝  ╚═╝ ╩ ╩ ╩ ╩ ╚═╝
-  data: {//…
+  data: {
+    //…
+    timePeriod: '',
+    acceptanceStatus: ''
   },
   //  ╦  ╦╔═╗╔═╗╔═╗╦ ╦╔═╗╦  ╔═╗
   //  ║  ║╠╣ ║╣ ║  ╚╦╝║  ║  ║╣
@@ -42,17 +45,7 @@ parasails.registerPage('all-orders', {
   //  ╦╔╗╔╔╦╗╔═╗╦═╗╔═╗╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
   //  ║║║║ ║ ║╣ ╠╦╝╠═╣║   ║ ║║ ║║║║╚═╗
   //  ╩╝╚╝ ╩ ╚═╝╩╚═╩ ╩╚═╝ ╩ ╩╚═╝╝╚╝╚═╝
-  methods: {
-    clickArchiveOrder: function clickArchiveOrder(orderId) {
-      var that = this;
-      Cloud.archiveOrder(orderId).then(function () {
-        var index = that.orders.map(function (x) {
-          return x.Id;
-        }).indexOf(orderId);
-        that.orders.splice(index, 1);
-      });
-    }
-  },
+  methods: {},
   filters: {
     formatDeliverySlot: function formatDeliverySlot(unixtime) {
       if (!unixtime) {
@@ -61,6 +54,14 @@ parasails.registerPage('all-orders', {
 
       unixtime = moment.unix(unixtime).calendar();
       return unixtime;
+    },
+    capitalise: function capitalise(value) {
+      if (!value) {
+        return '';
+      }
+
+      value = value.toString();
+      return value.charAt(0).toUpperCase() + value.slice(1);
     }
   }
 });

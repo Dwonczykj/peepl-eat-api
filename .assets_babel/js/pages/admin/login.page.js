@@ -258,14 +258,16 @@ parasails.registerPage('login', {
                 // const phoneNumber = document.getElementById('phoneNumber').value;
                 phoneNumber = this.phoneNumber;
                 appVerifier = window.recaptchaVerifier;
-                _context2.next = 4;
+                document.getElementById('verificationCode').focus();
+                document.getElementById('recaptcha-container').classList.add('hidden');
+                _context2.next = 6;
                 return Cloud.userExistsForPhone(this.countryCode, this.phoneNoCountryNoFormat);
 
-              case 4:
+              case 6:
                 userExists = _context2.sent;
 
                 if (userExists) {
-                  _context2.next = 11;
+                  _context2.next = 13;
                   break;
                 }
 
@@ -275,7 +277,7 @@ parasails.registerPage('login', {
                 this.cloudError = 'userNotFound';
                 return _context2.abrupt("return");
 
-              case 11:
+              case 13:
                 auth = (0, _auth.getAuth)();
 
                 _signInToFirebase = function _signInToFirebase() {
@@ -304,28 +306,28 @@ parasails.registerPage('login', {
                 };
 
                 if (!this.rememberMe) {
-                  _context2.next = 20;
+                  _context2.next = 22;
                   break;
                 }
 
-                _context2.next = 16;
+                _context2.next = 18;
                 return (0, _auth.setPersistence)(auth, _auth.browserSessionPersistence).then(function () {
                   // Existing and futurd(auth, email, password);
                   return _signInToFirebase();
                 });
 
-              case 16:
+              case 18:
                 user = _context2.sent;
                 return _context2.abrupt("return", user);
 
-              case 20:
-                _context2.next = 22;
+              case 22:
+                _context2.next = 24;
                 return _signInToFirebase();
 
-              case 22:
+              case 24:
                 return _context2.abrupt("return", _context2.sent);
 
-              case 23:
+              case 25:
               case "end":
                 return _context2.stop();
             }
@@ -386,9 +388,6 @@ parasails.registerPage('login', {
 
               case 21:
                 user = _context3.sent;
-                // BUG: Error: Invalid usage with serial arguments: Received unexpected third argument.
-                // var user = await Cloud.loginWithFirebase(this.phoneNumber, token, refreshToken); // BUG: Error: Invalid usage with serial arguments: Received unexpected third argument.
-                // window.alert('Logged in with firebase: ' + user.id);
                 window.location.replace('/admin');
                 _context3.next = 28;
                 break;
@@ -407,8 +406,7 @@ parasails.registerPage('login', {
                     console.log(_context3.t1);
                   }
 
-                  window.alert('Cloud.loginWithFirebase threw:');
-                  window.alert(_context3.t1); // BUG: Cloud returned FirebaseError: Firebase: Error(auth / network - request - failed).
+                  window.alert(_context3.t1);
                 }
 
               case 28:
@@ -432,75 +430,36 @@ parasails.registerPage('login', {
       }
 
       return clickCheckVerificationCode;
-    }(),
-    test: function () {
-      var _test = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        var userExists, user;
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-          while (1) {
-            switch (_context4.prev = _context4.next) {
-              case 0:
-                _context4.prev = 0;
-                _context4.next = 3;
-                return Cloud.userExistsForEmail('joey@vegiapp.co.uk');
+    }() // test: async function () {
+    //   try {
+    //     var userExists = await Cloud.userExistsForEmail('joey@vegiapp.co.uk');
+    //     window.alert('User exists ' + userExists);
+    //     var userExists = await Cloud.userExistsForPhone(44, 7905532512);
+    //     // eslint-disable-next-line no-debugger
+    //     window.alert('User exists ' + userExists);
+    //     var user = await Cloud.loginWithFirebase(this.phoneNumber, 'DUMMY TOKEN'); // BUG: Error: Invalid usage with serial arguments: Received unexpected third argument.
+    //     // var user = await Cloud.loginWithFirebase(this.phoneNumber, token, refreshToken); // BUG: Error: Invalid usage with serial arguments: Received unexpected third argument.
+    //     // eslint-disable-next-line no-debugger
+    //     debugger;
+    //     window.alert('Logged in with firebase: ' + user.id);
+    //     window.location.replace('/admin');
+    //   } catch (error) {
+    //     // User couldn't sign in (bad verification code?)
+    //     // eslint-disable-next-line no-debugger
+    //     debugger;
+    //     if (error.status === 404) {
+    //       window.location.replace('/admin/signup');
+    //     } else {
+    //       if (error.name === 'FirebaseError') {
+    //         console.log(error);
+    //       } else {
+    //         console.log(error);
+    //       }
+    //       window.alert('Cloud.loginWithFirebase threw:');
+    //       window.alert(error); // BUG: Cloud returned FirebaseError: Firebase: Error(auth / network - request - failed).
+    //     }
+    //   }
+    // }
 
-              case 3:
-                userExists = _context4.sent;
-                window.alert('User exists ' + userExists);
-                _context4.next = 7;
-                return Cloud.userExistsForPhone(44, 7905532512);
-
-              case 7:
-                userExists = _context4.sent;
-                // eslint-disable-next-line no-debugger
-                window.alert('User exists ' + userExists);
-                _context4.next = 11;
-                return Cloud.loginWithFirebase(this.phoneNumber, 'DUMMY TOKEN');
-
-              case 11:
-                user = _context4.sent;
-                // BUG: Error: Invalid usage with serial arguments: Received unexpected third argument.
-                // var user = await Cloud.loginWithFirebase(this.phoneNumber, token, refreshToken); // BUG: Error: Invalid usage with serial arguments: Received unexpected third argument.
-                // eslint-disable-next-line no-debugger
-                debugger;
-                window.alert('Logged in with firebase: ' + user.id);
-                window.location.replace('/admin');
-                _context4.next = 21;
-                break;
-
-              case 17:
-                _context4.prev = 17;
-                _context4.t0 = _context4["catch"](0);
-                // User couldn't sign in (bad verification code?)
-                // eslint-disable-next-line no-debugger
-                debugger;
-
-                if (_context4.t0.status === 404) {
-                  window.location.replace('/admin/signup');
-                } else {
-                  if (_context4.t0.name === 'FirebaseError') {
-                    console.log(_context4.t0);
-                  } else {
-                    console.log(_context4.t0);
-                  }
-
-                  window.alert('Cloud.loginWithFirebase threw:');
-                  window.alert(_context4.t0); // BUG: Cloud returned FirebaseError: Firebase: Error(auth / network - request - failed).
-                }
-
-              case 21:
-              case "end":
-                return _context4.stop();
-            }
-          }
-        }, _callee4, this, [[0, 17]]);
-      }));
-
-      function test() {
-        return _test.apply(this, arguments);
-      }
-
-      return test;
-    }()
   }
 });

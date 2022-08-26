@@ -145,7 +145,6 @@ parasails.registerPage('login', {
               // document.getElementById('register').classList.add('hidden');
               // document.getElementById('start-recaptcha').classList.add('hidden');
               document.getElementById('login-button-container').classList.add('hidden');
-              document.getElementById('recaptcha-container').classList.add('hidden');
               return this.clickVerifyPhoneNumber(widgetId);
             });
         }
@@ -228,6 +227,9 @@ parasails.registerPage('login', {
       // const phoneNumber = document.getElementById('phoneNumber').value;
       const phoneNumber = this.phoneNumber;
       const appVerifier = window.recaptchaVerifier;
+
+      document.getElementById('verificationCode').focus();
+      document.getElementById('recaptcha-container').classList.add('hidden');
 
       const userExists = await Cloud.userExistsForPhone(this.countryCode, this.phoneNoCountryNoFormat);
       if (!userExists) {

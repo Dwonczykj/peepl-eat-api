@@ -2,7 +2,7 @@ import { Exits, OngoingOrdersByWallet } from '../../interfaces';
 module.exports = {
   friendlyName: 'Ongoing Orders by Wallet',
   description: 'Fetch all ongoing orders from a wallet address',
-  inputs: sails.helpers.generateSchema('ongoingOrdersByWallet', 'OngoingOrdersByWallet'),
+  inputs: sails.helpers.generateSchema('orders/ongoing-orders-by-wallet-interface', 'OngoingOrdersByWallet'),
   exits: {
     error: {
       message: 'Error!'
@@ -13,7 +13,7 @@ module.exports = {
     }
   },
   fn: async function (inputs: OngoingOrdersByWallet, exits: Exits) {
-    
-    exits.success({ data: inputs });
+    const orders = await Order.find({customerWalletAddress: inputs.walletAddress});
+    exits.success({ data: orders });
   }
 };
