@@ -1,7 +1,13 @@
 <div id="approve-order" class="admin" v-cloak>
   <%- partial('../../partials/vendor-navbar.ejs') %>
 
-    <div class="container">
+  <div class="container">
+
+    <div class="mb-3">
       <order-card :order="order"></order-card>
     </div>
-    <%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>
+    
+  </div>
+  
+</div>
+<%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>

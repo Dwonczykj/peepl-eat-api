@@ -12,6 +12,7 @@
 
 Cloud.setup({
   /* eslint-disable */
+
   methods: {
     getAllPostalDistricts: {
       verb: "GET",
