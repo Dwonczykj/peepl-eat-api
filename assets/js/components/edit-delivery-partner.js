@@ -46,28 +46,28 @@ parasails.registerComponent('editDeliveryPartner', {
           <span class="action-card__checkbox">
             <input type="checkbox">
           </span>
-          <span :class="{'line-through': !discount.isEnabled }">{{ discount.code | capitalise }}</span> <div class="text-muted ml-1">[Used {{discount.timesUsed}} times]</div>
+          <span>{{ deliveryPartner.name | capitalise }}</span>
         </summary>
         <div class="action-card__content">
-          <ajax-form :cloud-error.sync="cloudError" :form-data="discount" :form-rules="formRules" :syncing.sync="syncing" :form-errors.sync="formErrors" @submitted="createdDiscount" :action="(discount.id) ?  'editDiscount' : 'createDiscount'">
+          <ajax-form :cloud-error.sync="cloudError" :form-data="discount" :form-rules="formRules" :syncing.sync="syncing" :form-errors.sync="formErrors" @submitted="createdDiscount" :action="(deliveryPartner.id) ?  'editDiscount' : 'createDiscount'">
             <div class="form-group mt-3">
               <label for="discountCode">Discount Code</label>
-              <input :class="{ 'is-invalid': formErrors.code }" maxlength="50" minlength="3" style="text-transform: uppercase; max-width: 10em" v-model.trim="discount.code" type="text" class="form-control" id="discountCode" required>
+              <input :class="{ 'is-invalid': formErrors.code }" maxlength="50" minlength="3" style="text-transform: uppercase; max-width: 10em" v-model.trim="deliveryPartner.code" type="text" class="form-control" id="discountCode" required>
             </div>
             <div class="form-group">
               <label for="percentage">Percentage</label>
-              <input :class="{ 'is-invalid': formErrors.percentage }" v-model="discount.percentage" type="number" class="form-control" id="percentage" required>
+              <input :class="{ 'is-invalid': formErrors.percentage }" v-model="deliveryPartner.percentage" type="number" class="form-control" id="percentage" required>
             </div>
             <div class="form-group">
               <label for="maxUses">Max Uses (or 0 for no limit)</label>
-              <input :class="{ 'is-invalid': formErrors.maxUses }" v-model="discount.maxUses" type="number" class="form-control" id="maxUses" required>
+              <input :class="{ 'is-invalid': formErrors.maxUses }" v-model="deliveryPartner.maxUses" type="number" class="form-control" id="maxUses" required>
             </div>
             <div class="form-group">
               <label for="expiryDateTime">End Date Time (or 0 for no limit)</label>
-              <input :class="{ 'is-invalid': formErrors.expiryDateTime }" v-model="discount.expiryDateTime" type="number" class="form-control" id="expiryDateTime" required>
+              <input :class="{ 'is-invalid': formErrors.expiryDateTime }" v-model="deliveryPartner.expiryDateTime" type="number" class="form-control" id="expiryDateTime" required>
             </div>
             <div class="form-group form-check">
-              <input v-model="discount.isEnabled" type="checkbox" class="form-check-input" id="enabled">
+              <input v-model="deliveryPartner.isEnabled" type="checkbox" class="form-check-input" id="enabled">
               <label :class="{ 'is-invalid': formErrors.isEnabled }" class="form-check-label" for="enabled">Is Enabled</label>
             </div>
   
@@ -76,7 +76,7 @@ parasails.registerComponent('editDeliveryPartner', {
               Discount not found.
             </div>
             <div v-else-if="cloudError" class="alert alert-danger mt-4" role="alert">
-              There has been an error updating the discount. Please try again.
+              There has been an error updating the deliveryPartner. Please try again.
             </div>
           </ajax-form>
         </div>
@@ -91,7 +91,7 @@ parasails.registerComponent('editDeliveryPartner', {
   },
   mounted: async function(){
     //…
-    this.discount.vendor = this.vendorid;
+    this.deliveryPartner.vendor = this.vendorid;
   },
   beforeDestroy: function() {
     //…

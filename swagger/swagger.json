@@ -46,6 +46,9 @@
       "name": "View postal districts"
     },
     {
+      "name": "View delivery partners"
+    },
+    {
       "name": "View all vendors"
     },
     {
@@ -1657,6 +1660,27 @@
         }
       }
     },
+    "/admin/delivery-partners": {
+      "get": {
+        "summary": "View delivery partners",
+        "description": "Display \"Delivery partners\" page.",
+        "tags": [
+          "View delivery partners"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/api/v1/vendors": {
       "get": {
         "summary": "View all vendors",
@@ -2296,6 +2320,15 @@
                 "active",
                 "inactive"
               ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "deliveryPartner",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "nullable": true
             }
           },
           {

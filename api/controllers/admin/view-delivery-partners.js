@@ -18,8 +18,12 @@ module.exports = {
 
   fn: async function () {
 
+    var deliveryPartners = await DeliveryPartner.find();
+
     // Respond with view.
-    return {};
+    return {
+      deliveryPartners: deliveryPartners
+    };
 
   }
 

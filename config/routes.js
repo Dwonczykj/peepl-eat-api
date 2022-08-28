@@ -56,6 +56,7 @@ module.exports.routes = {
   'GET /admin/discount-codes': { action: 'admin/view-discount-codes' },
   'GET /admin/approve-order/:orderId': { action: 'admin/view-approve-order' },
   'GET /admin/postal-districts': { action: 'admin/view-postal-districts' },
+  'GET /admin/delivery-partners': { action: 'admin/view-delivery-partners' },
 
   'POST /api/v1/admin/create-vendor': { action: 'admin/create-vendor' },
   'POST /api/v1/admin/edit-vendor': { action: 'admin/edit-vendor' },
