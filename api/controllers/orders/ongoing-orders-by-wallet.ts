@@ -2,7 +2,7 @@ import { Exits, OngoingOrdersByWallet } from '../../interfaces';
 module.exports = {
   friendlyName: 'Ongoing Orders by Wallet',
   description: 'Fetch all ongoing orders from a wallet address',
-  inputs: sails.helpers.generateSchema('orders/ongoing-orders-by-wallet-interface', 'OngoingOrdersByWallet'),
+  inputs: sails.helpers.generateSchema('orders/iOngoingOrdersByWallet', 'OngoingOrdersByWallet'),
   exits: {
     error: {
       message: 'Error!'

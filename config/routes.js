@@ -28,6 +28,7 @@ module.exports.routes = {
   'GET /api/v1/vendors': {action: 'vendors/view-all-vendors'},
   'GET /api/v1/vendors/:vendorid': { action: 'vendors/view-vendor-menu' },
   'GET /api/v1/vendors/get-fulfilment-slots': { action: 'vendors/get-fulfilment-slots' },
+  'GET /api/v1/vendors/get-eligible-order-dates': { action: 'vendors/get-eligible-order-dates' },
   'GET /api/v1/vendors/get-postal-districts': { action: 'vendors/get-postal-districts' },
 
   // PRODUCT OPTIONS

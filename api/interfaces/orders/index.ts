@@ -1,1 +1,1 @@
-export * from './ongoing-orders-by-wallet-interface';
+export * from './iOngoingOrdersByWallet';
