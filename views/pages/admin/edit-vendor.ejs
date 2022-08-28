@@ -26,10 +26,6 @@
         <label for="phoneNumber">Vendor Phone Number</label>
         <input type="text" :class="{ 'is-invalid': formErrors.phoneNumber }" v-model="vendor.phoneNumber" class="form-control" id="phoneNumber" >
       </div>
-      <!-- <div class="form-group">
-        <label for="vendorWallet">Delivery Restriction Details</label>
-        <input type="text" placeholder="Delivers to L1, L2, L3" :class="{ 'is-invalid': formErrors.deliveryRestrictionDetails }" v-model="vendor.deliveryRestrictionDetails" class="form-control" id="vendorWallet" >
-      </div> -->
       <div class="form-group">
         <label for="vendorType">Vendor Type</label>
         <select class="form-control" id="vendorType" v-model="vendor.type" :disabled="vendor.id">
@@ -37,6 +33,7 @@
           <option value="shop" disabled>Shop</option>
         </select>
       </div>
+
       <div class="form-group">
         <label for="status">Status</label>
         <select class="form-control" id="status" v-model="vendor.status" >
@@ -45,6 +42,15 @@
           <option value="active">Active</option>
         </select>
       </div>
+
+      <div class="form-group">
+        <label for="deliveryPartner">Delivery Partner</label>
+        <select class="form-control" id="deliveryPartner" v-model="vendor.deliveryPartner" >
+          <option value="null" selected>None</option>
+          <option v-for="deliveryPartner in deliveryPartners" :value="deliveryPartner.id">{{deliveryPartner.name}}</option>
+        </select>
+      </div>
+
       <div class="form-group">
         <label for="minimumOrderAmount">Minimum order amount (pence)</label>
         <input :class="{ 'is-invalid': formErrors.minimumOrderAmount }" v-model="vendor.minimumOrderAmount" type="number" class="form-control" id="minimumOrderAmount" required>
@@ -89,6 +95,7 @@
         <button class="btn btn-peepl btn-sm ml-auto" @click="clickAddProduct">Add a new product</button>
       </div>
     </fieldset>
+    
     <ajax-form :handle-parsing="updatePostalDistricts" :syncing.sync="syncing" :cloud-error.sync="cloudError" @submitted="syncing = false" :action="'editVendorPostalDistricts'">
       <fieldset v-if="vendor.id">
         <h2 class="h5 mt-5">Postal Districts</h2>
