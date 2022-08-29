@@ -121,7 +121,7 @@
       "name": "Edit discount"
     },
     {
-      "name": "Update Opening Hours"
+      "name": "Update Fulfilment Method"
     },
     {
       "name": "Approve or decline order"
@@ -3261,9 +3261,9 @@
     },
     "/api/v1/admin/create-update-openinghours": {
       "post": {
-        "summary": "Update Opening Hours",
+        "summary": "Update Fulfilment Method",
         "tags": [
-          "Update Opening Hours"
+          "Update Fulfilment Method"
         ],
         "parameters": [
           {
@@ -3272,6 +3272,164 @@
             "required": true,
             "schema": {},
             "description": "The opening hours to be added to the vendor"
+          },
+          {
+            "in": "query",
+            "name": "id",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "The id of the fulfilment method"
+          },
+          {
+            "in": "query",
+            "name": "priceModifier",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "A positive or negative integer representing the amount of pence to adjust the base price by."
+          },
+          {
+            "in": "query",
+            "name": "slotLength",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "maximum": 1440,
+              "minimum": 30
+            },
+            "description": "Slot length in minutes"
+          },
+          {
+            "in": "query",
+            "name": "bufferLength",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "minimum": 0
+            },
+            "description": "The required buffer time before booking a slot."
+          },
+          {
+            "in": "query",
+            "name": "orderCutoff",
+            "required": false,
+            "schema": {},
+            "description": "The time after which no new bookings can be made."
+          },
+          {
+            "in": "query",
+            "name": "maxOrders",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "The maximum number of orders allowed per slot."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {},
+                  "type": "object",
+                  "properties": {},
+                  "description": "Success"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/update-fulfilment-method": {
+      "post": {
+        "summary": "Update Fulfilment Method",
+        "tags": [
+          "Update Fulfilment Method"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "openingHours",
+            "required": true,
+            "schema": {},
+            "description": "The opening hours to be added to the vendor"
+          },
+          {
+            "in": "query",
+            "name": "id",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "The id of the fulfilment method"
+          },
+          {
+            "in": "query",
+            "name": "priceModifier",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "A positive or negative integer representing the amount of pence to adjust the base price by."
+          },
+          {
+            "in": "query",
+            "name": "slotLength",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "maximum": 1440,
+              "minimum": 30
+            },
+            "description": "Slot length in minutes"
+          },
+          {
+            "in": "query",
+            "name": "bufferLength",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "minimum": 0
+            },
+            "description": "The required buffer time before booking a slot."
+          },
+          {
+            "in": "query",
+            "name": "orderCutoff",
+            "required": false,
+            "schema": {},
+            "description": "The time after which no new bookings can be made."
+          },
+          {
+            "in": "query",
+            "name": "maxOrders",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "The maximum number of orders allowed per slot."
           }
         ],
         "responses": {

@@ -14,18 +14,22 @@
         <label for="vendorName">Vendor Name</label>
         <input type="text" :class="{ 'is-invalid': formErrors.name }" v-model="vendor.name" class="form-control" id="vendorName">
       </div>
+
       <div class="form-group">
         <label for="vendorDescription">Vendor Description</label>
         <textarea type="text" class="form-control" rows="3" :class="{ 'is-invalid': formErrors.description }" v-model="vendor.description" id="vendorDescription" ></textarea>
       </div>
+
       <div class="form-group">
         <label for="vendorWallet">Vendor Wallet Address</label>
         <input type="text" :class="{ 'is-invalid': formErrors.walletAddress }" v-model="vendor.walletAddress" class="form-control text-monospace" id="vendorWallet" >
       </div>
+
       <div class="form-group">
         <label for="phoneNumber">Vendor Phone Number</label>
         <input type="text" :class="{ 'is-invalid': formErrors.phoneNumber }" v-model="vendor.phoneNumber" class="form-control" id="phoneNumber" >
       </div>
+      
       <div class="form-group">
         <label for="vendorType">Vendor Type</label>
         <select class="form-control" id="vendorType" v-model="vendor.type" :disabled="vendor.id">
@@ -56,6 +60,7 @@
         <input :class="{ 'is-invalid': formErrors.minimumOrderAmount }" v-model="vendor.minimumOrderAmount" type="number" class="form-control" id="minimumOrderAmount" required>
         <p class="mt-2 text-muted">{{vendor.minimumOrderAmount | convertToPounds}}</p>
       </div>
+
       <div class="form-group form-check">
         <input v-model="vendor.isVegan" type="checkbox" class="form-check-input" id="vegan">
         <label :class="{ 'is-invalid': formErrors.isVegan }" class="form-check-label" for="vegan">Is Vegan</label>
@@ -111,7 +116,6 @@
       </fieldset>
     </ajax-form>
 
-    <!-- <ajax-form :form-data="openingHours" :syncing.sync="syncing" :form-rules="formRules" :form-errors.sync="formErrors" :cloud-error.sync="cloudError" @submitted="vendorSubmitted" :action="(vendor.id) ?  'editVendor' : 'createVendor'"></ajax-form> -->
     <fieldset v-if="vendor.id">
       <h2 class="h5 mt-3">Opening Hours</h2>
       <input type="radio" id="collection" value="col" v-model="fulfilmethod">
@@ -122,7 +126,6 @@
       
       <opening-hours :fulfilment-method="(fulfilmethod=='del') ? delFul : colFul"></opening-hours>
     </fieldset>
-    <!-- </ajax-form> -->
 
   </div>
 </div>
