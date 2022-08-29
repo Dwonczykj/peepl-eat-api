@@ -75,27 +75,20 @@ module.exports = {
     notFound: {
       responseType: 'notFound'
     },
+    badRequest: {
+      responseType: 'badRequest'
+    }
   },
 
 
   fn: async function (inputs, exits) {
-    // TODO: Validation (products belong to vendor, fulfilmentMethod belongs to vendor, options are related to products, optionvalues are valid for options)
-    var vendor = await Vendor.findOne(inputs.vendor);
-
-    if(!vendor) {
-      return exits.notFound();
+    try{
+      var orderValid = await sails.helpers.validateOrder.with(inputs);
+    } catch (err) {
+      return exits.badRequest(err);
     }
 
-    var slotsValid = await sails.helpers.validateDeliverySlot
-      .with({
-        fulfilmentMethodId: inputs.fulfilmentMethod,
-        fulfilmentSlotFrom: inputs.fulfilmentSlotFrom,
-        fulfilmentSlotTo: inputs.fulfilmentSlotTo
-      });
-
-    if(!slotsValid){
-      return exits.invalidSlot('Invalid delivery slot');
-    }
+    let vendor = await Vendor.findOne({id: inputs.vendor});
 
     var discountId: number;
     if(inputs.discountCode){
@@ -124,8 +117,6 @@ module.exports = {
         inputs.items[item].optionValues = newOrderItemOptionValues.map(({id: number}) => number);
       }
 
-      // TODO: Check if vendor delivers to that area
-      // TODO: Validate that fulfilment method belongs to vendor
       var order = await Order.create({
         total: inputs.total,
         orderedDateTime: Date.now(),

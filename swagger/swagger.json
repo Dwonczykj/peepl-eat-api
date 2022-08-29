@@ -962,6 +962,11 @@
             "type": "string",
             "description": "Name of the product options, for example \"colour\"."
           },
+          "isRequired": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether or not this option is required."
+          },
           "product": {
             "description": "The product for which the option applies. JSON dictionary representing the **product** instance or FK when creating / updating / not populated",
             "oneOf": [
@@ -2045,6 +2050,10 @@
                     {
                       "type": "string",
                       "description": "The minimum order amount was not met."
+                    },
+                    {
+                      "type": "string",
+                      "description": "Bad request"
                     }
                   ]
                 }

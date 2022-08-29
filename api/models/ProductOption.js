@@ -16,6 +16,11 @@ module.exports = {
       type: 'string',
       description: 'Name of the product options, for example "colour".'
     },
+    isRequired: {
+      type: 'boolean',
+      description: 'Whether or not this option is required.',
+      defaultsTo: false
+    },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
