@@ -133,3 +133,4 @@ lib-cov
 *.pid
 
 .sass-cache
+views/layouts/layout-email.ejs
