@@ -25,14 +25,14 @@
         <input type="text" :class="{ 'is-invalid': formErrors.email }" v-model="deliveryPartner.email" class="form-control" id="email" >
       </div>
 
-      <!-- <div class="form-group">
+      <div class="form-group">
         <label for="status">Status</label>
-        <select class="form-control" id="status" v-model="vendor.status" >
-          <option value="draft">Draft</option>
+        <select class="form-control" id="status" v-model="deliveryPartner.status" >
+          <!-- <option value="draft">Draft</option> -->
           <option value="inactive">Inactive</option>
           <option value="active">Active</option>
         </select>
-      </div> -->
+      </div>
 
       <ajax-button class="btn btn-peepl mt-4" type="submit" :syncing="syncing" v-bind:class="{ 'is-loading': syncing }">Save changes</ajax-button>
       <div v-if="cloudError === 'notFound'" class="alert alert-danger mt-4" role="alert">

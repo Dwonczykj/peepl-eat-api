@@ -12,6 +12,7 @@ parasails.registerPage('admin-edit-delivery-partner', {
       emailAddress: '',
       phoneNumber: '',
       deliveryFulfilmentMethod: {},
+      status: 'inactive',
     },
     formRules: {
       name: {
@@ -57,13 +58,10 @@ parasails.registerPage('admin-edit-delivery-partner', {
   //  ║║║║ ║ ║╣ ╠╦╝╠═╣║   ║ ║║ ║║║║╚═╗
   //  ╩╝╚╝ ╩ ╚═╝╩╚═╩ ╩╚═╝ ╩ ╩╚═╝╝╚╝╚═╝
   methods: {
-    deliveryPartnerSubmitted: function({id, deliveryFulfilmentMethod}) {
+    deliveryPartnerSubmitted: function({id}) {
       if (id) {
         this.deliveryPartner.id = id;
         window.history.pushState({}, '', '/admin/delivery-partners/' + id);
-      }
-      if(deliveryFulfilmentMethod){
-        this.deliveryPartner.deliveryFulfilmentMethod = deliveryFulfilmentMethod;
       }
     },
   },

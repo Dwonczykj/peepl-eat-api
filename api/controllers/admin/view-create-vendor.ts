@@ -20,7 +20,7 @@ module.exports = {
   fn: async function (inputs, exits) {
 
     // Get delivery partners
-    var deliveryPartners = await DeliveryPartner.find();
+    var deliveryPartners = await DeliveryPartner.find({status: 'active'});
 
     // Respond with view.
     return exits.success({deliveryPartners});

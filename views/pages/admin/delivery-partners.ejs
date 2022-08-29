@@ -10,7 +10,7 @@
         <tr>
           <th scope="col"><span class="sr-only">Select</span></th>
           <th scope="col">Name</th>
-          <!-- <th scope="col">Status</th> -->
+          <th scope="col">Status</th>
           <th scope="col"><span class="sr-only">Edit</span></th>
         </tr>
       </thead>
@@ -21,9 +21,9 @@
           <td>
             <a :href="'/admin/delivery-partners/' + deliveryPartner.id">{{deliveryPartner.name}}</a>
           </td>
-          <!-- <td>
+          <td>
             {{deliveryPartner.status}}
-          </td> -->
+          </td>
           <td class="action-table__shrink">
             <a :href="'/admin/delivery-partners/' + deliveryPartner.id">Edit</a>
           </td>

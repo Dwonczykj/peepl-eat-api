@@ -26,6 +26,11 @@ module.exports = {
       required: true,
       description: 'The phone number of the delivery partner',
       maxLength: 20
+    },
+    status: {
+      type: 'string',
+      isIn: ['active', 'inactive'],
+      defaultsTo: 'inactive'
     }
   },
 
@@ -42,7 +47,8 @@ module.exports = {
     var newDeliveryPartner = await DeliveryPartner.create({
       name: inputs.name,
       email: inputs.email,
-      phoneNumber: inputs.phoneNumber
+      phoneNumber: inputs.phoneNumber,
+      status: inputs.status
     }).fetch();
 
     // Return the new delivery partner

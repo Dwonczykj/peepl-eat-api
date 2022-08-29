@@ -43,6 +43,10 @@ module.exports = {
       type: 'string',
       isIn: ['draft', 'active', 'inactive']
     },
+    deliveryPartner:{
+      type: 'string',
+      allowNull: true
+    },
     costLevel: {
       type: 'number',
       min: 1,
@@ -74,6 +78,11 @@ module.exports = {
   },
 
   fn: async function (inputs, exits) {
+    // Fix errors to do with strings as association IDs
+    if(inputs.deliveryPartner && inputs.deliveryPartner === 'null') {
+      inputs.deliveryPartner = null;
+    }
+
     var imageInfo = await sails.uploadOne(inputs.image, {
       adapter: require('skipper-s3'),
       key: sails.config.custom.amazonS3AccessKey,
@@ -96,6 +105,7 @@ module.exports = {
       type: inputs.type,
       walletAddress: inputs.walletAddress,
       isVegan: inputs.isVegan,
+      deliveryPartner: inputs.deliveryPartner,
     }).fetch();
 
     // All done.

@@ -31,6 +31,11 @@ module.exports = {
       required: true,
       maxLength: 20
     },
+    status: {
+      type: 'string',
+      isIn: ['active', 'inactive'],
+      defaultsTo: 'inactive'
+    },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗

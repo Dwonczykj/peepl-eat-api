@@ -74,7 +74,7 @@ module.exports = {
     colFul = colFul.collectionFulfilmentMethod;
 
     // Get a list of delivery partners
-    var deliveryPartners = await DeliveryPartner.find();
+    var deliveryPartners = await DeliveryPartner.find({status: 'active'});
 
     // Respond with view or JSON.
     if(this.req.wantsJSON) {
