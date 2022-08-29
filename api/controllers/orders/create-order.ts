@@ -89,12 +89,10 @@ module.exports = {
     }
 
     let vendor = await Vendor.findOne({id: inputs.vendor});
+    let discount;
 
-    var discountId: number;
-    if(inputs.discountCode){
-      // TODO: Return error if discount code is invalid
-      var discount = await sails.helpers.checkDiscountCode(inputs.discountCode, inputs.vendor);
-      discountId = discount.id;
+    if(inputs.discountCode) {
+      discount = await Discount.findOne({code: inputs.discountCode});
     }
 
     await sails.getDatastore()
@@ -128,7 +126,7 @@ module.exports = {
         deliveryAddressPostCode: inputs.address.postCode,
         deliveryAddressInstructions: inputs.address.deliveryInstructions,
         customerWalletAddress: inputs.walletAddress,
-        discount: discountId,
+        discount: (discount) ? discount.id : undefined,
         vendor: vendor.id,
         fulfilmentMethod: inputs.fulfilmentMethod,
         fulfilmentSlotFrom: inputs.fulfilmentSlotFrom,
@@ -177,11 +175,11 @@ module.exports = {
         vendor.name
       )
       .catch(() => {
-        return exits.error('Error creating payment intent');
+        return exits.error(new Error('Error creating payment intent'));
       });
 
       if(!newPaymentIntent) {
-        return exits.error('Error creating payment intent');
+        return exits.error(new Error('Error creating payment intent'));
       }
 
       // Update order with payment intent

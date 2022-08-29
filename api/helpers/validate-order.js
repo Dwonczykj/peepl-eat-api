@@ -79,6 +79,9 @@ module.exports = {
     },
     invalidSlot: {
       description: 'The fulfilment slot is invalid.',
+    },
+    invalidDiscountCode: {
+      description: 'The discount code is invalid.',
     }
   },
 
@@ -168,6 +171,15 @@ module.exports = {
 
     if(!slotsValid){
       return exits.invalidSlot('Invalid delivery slot');
+    }
+
+    // Check discount code is valid
+    if(inputs.discountCode){
+      var discount = await sails.helpers.checkDiscountCode(inputs.discountCode, inputs.vendor);
+
+      if(!discount) {
+        return exits.invalidDiscountCode('Invalid discount code');
+      }
     }
 
     return exits.success();
