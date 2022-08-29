@@ -28,7 +28,8 @@ module.exports = {
     phoneNumber: {
       type: 'string',
       description: 'Phone number of the Delivery Partner.',
-      required: true
+      required: true,
+      maxLength: 20
     },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗

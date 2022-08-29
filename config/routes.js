@@ -57,9 +57,13 @@ module.exports.routes = {
   'GET /admin/approve-order/:orderId': { action: 'admin/view-approve-order' },
   'GET /admin/postal-districts': { action: 'admin/view-postal-districts' },
   'GET /admin/delivery-partners': { action: 'admin/view-delivery-partners' },
+  'GET /admin/delivery-partners/:deliveryPartnerId': { action: 'admin/view-edit-delivery-partner' },
+  'GET /admin/delivery-partners/new': { action: 'admin/view-create-delivery-partner' },
 
   'POST /api/v1/admin/create-vendor': { action: 'admin/create-vendor' },
   'POST /api/v1/admin/edit-vendor': { action: 'admin/edit-vendor' },
+  'POST /api/v1/admin/create-delivery-partner': { action: 'admin/create-delivery-partner' },
+  'POST /api/v1/admin/edit-delivery-partner': { action: 'admin/edit-delivery-partner' },
   'POST /api/v1/admin/edit-product': { action: 'admin/edit-product' },
   'POST /api/v1/admin/create-product': { action: 'admin/create-product' },
   'POST /api/v1/admin/create-product-option': { action: 'admin/create-product-option' },
