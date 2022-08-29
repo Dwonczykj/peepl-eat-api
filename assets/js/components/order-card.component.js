@@ -63,12 +63,17 @@ parasails.registerComponent('order-card', {
       <span class="mr-auto">Reward</span>
       <span>+ {{order.total / 100}} PPL</span>
     </p>
-    <div v-if="order.restaurantAcceptanceStatus == 'pending'">
+    <div v-if="order.restaurantAcceptanceStatus == 'pending' && isInFuture(order.fulfilmentSlotFrom)">
       <h2 class="h5 border-top pt-3 mt-3 mb-0 d-flex">
         <span class="mr-auto"></span>
       </h2>
       <button class="btn btn-peepl-green" @click="clickApproveOrDeclineOrder(true)">Approve</button>
       <button class="btn btn-peepl-red" @click="clickApproveOrDeclineOrder(false)">Decline</button>
+    </div>
+    <div v-else-if="order.restaurantAcceptanceStatus == 'pending' && !isInFuture(order.fulfilmentSlotFrom)">
+      <p class="border-top pt-3 mt-3 mb-0 d-flex">
+        This order has expired and can no longer be approved.
+      </p>
     </div>
 
   </div>
@@ -123,6 +128,11 @@ parasails.registerComponent('order-card', {
           that.order.restaurantAcceptanceStatus = 'rejected';
         }
       });
+    },
+    isInFuture: function(dateTimeString){
+      if (!dateTimeString) {return false;}
+      var dateTime = moment(dateTimeString);
+      return dateTime.isAfter(moment());
     }
   }
 });
