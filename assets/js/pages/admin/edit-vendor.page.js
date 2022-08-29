@@ -14,6 +14,7 @@ parasails.registerPage('admin-edit-vendor', {
       image: '',
       type: 'restaurant',
       walletAddress: '0x',
+      deliveryPartner: null,
       // deliveryRestrictionDetails: '',
       status: 'draft',
       products: [],
@@ -43,7 +44,8 @@ parasails.registerPage('admin-edit-vendor', {
       status: {
       }
     },
-    fulfilmethod: 'col'
+    fulfilmethod: 'col',
+    deliveryPartners: [],
   },
 
   //  ╦  ╦╔═╗╔═╗╔═╗╦ ╦╔═╗╦  ╔═╗

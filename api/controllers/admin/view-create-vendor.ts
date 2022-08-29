@@ -1,3 +1,4 @@
+declare var DeliveryPartner: any;
 module.exports = {
 
 
@@ -16,10 +17,13 @@ module.exports = {
   },
 
 
-  fn: async function () {
+  fn: async function (inputs, exits) {
+
+    // Get delivery partners
+    var deliveryPartners = await DeliveryPartner.find();
 
     // Respond with view.
-    return {};
+    return exits.success({deliveryPartners});
 
   }
 
