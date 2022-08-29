@@ -83,7 +83,7 @@ module.exports = {
     const newHoursIDsDel = newHoursDel.map(({ id }) => id);
     await FulfilmentMethod.addToCollection(del.id, 'openingHours').members(newHoursIDsDel);
 
-    if(inputs.type === 'vendor'){
+    if(inputs.vendor){
       const newHoursCol = await OpeningHours.createEach(openingHoursCol).fetch();
       const newHoursIDsCol = newHoursCol.map(({ id }) => id);
       await FulfilmentMethod.addToCollection(col.id, 'openingHours').members(newHoursIDsCol);
