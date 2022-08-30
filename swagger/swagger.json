@@ -49,9 +49,6 @@
       "name": "View postal districts"
     },
     {
-      "name": "View deliveries"
-    },
-    {
       "name": "View delivery partners"
     },
     {
@@ -196,45 +193,29 @@
       "name": "View approve order"
     },
     {
-      "name": "Get user details"
-    },
-    {
-      "name": "Ongoing Orders by Wallet"
-    },
-    {
-      "name": "View order confirmation [DEPRECATED]"
-    },
-    {
-      "name": "Api Status"
-    },
-    {
-      "name": "Sea Turtles!"
-    },
-    {
       "name": "View edit delivery partner"
     }
   ],
   "components": {
     "schemas": {
-      "courier": {
+      "deliverypartner": {
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/courier-without-required-constraint"
+            "$ref": "#/components/schemas/deliverypartner-without-required-constraint"
           },
           {
             "required": [
               "name",
-              "walletAddress",
-              "imageUrl",
-              "email"
+              "email",
+              "phoneNumber"
             ]
           }
         ]
       },
-      "courier-without-required-constraint": {
+      "deliverypartner-without-required-constraint": {
         "type": "object",
-        "description": "Sails ORM Model **Courier**",
+        "description": "Sails ORM Model **DeliveryPartner**",
         "properties": {
           "createdAt": {
             "type": "number",
@@ -252,71 +233,36 @@
           },
           "name": {
             "type": "string",
-            "description": "The name of the courier.",
-            "maxLength": 50,
-            "uniqueItems": true
+            "description": "The name of the Delivery Partner.",
+            "maxLength": 50
           },
-          "type": {
+          "email": {
             "type": "string",
-            "default": "bike",
-            "description": "The type of courier.",
-            "enum": [
-              "bike",
-              "electric"
-            ],
-            "example": "bike"
+            "format": "email",
+            "description": "The email of the Delivery Partner.",
+            "maxLength": 50
           },
-          "description": {
+          "phoneNumber": {
             "type": "string",
-            "description": "A brief description of the courier.",
-            "maxLength": 200
-          },
-          "walletAddress": {
-            "type": "string",
-            "pattern": "^0x[a-fA-F0-9]{40}$",
-            "description": "The blockchain wallet address for the courier. Used to distribute payments from vendors."
-          },
-          "imageUrl": {
-            "type": "string",
-            "description": "A description of where the featured image file can be found"
+            "description": "Phone number of the Delivery Partner.",
+            "maxLength": 20
           },
           "status": {
             "type": "string",
             "default": "inactive",
             "enum": [
               "active",
-              "draft",
               "inactive"
             ],
             "example": "inactive"
           },
-          "phoneNumber": {
-            "type": "string",
-            "description": "Phone number of the courier hq."
-          },
-          "email": {
-            "type": "string",
-            "description": "Email of the courier hq.",
-            "uniqueItems": true
-          },
-          "deliversToPostCodes": {
-            "type": "array",
-            "items": {},
-            "default": [],
-            "example": []
-          },
-          "rating": {
-            "type": "integer",
-            "format": "int64",
-            "maximum": 5,
-            "minimum": 0
-          },
-          "users": {
-            "description": "Array of **user**'s or array of FK's when creating / updating / not populated",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/user"
-            }
+          "deliveryFulfilmentMethod": {
+            "description": "JSON dictionary representing the **fulfilmentmethod** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/fulfilmentmethod"
+              }
+            ]
           }
         }
       },
@@ -648,21 +594,6 @@
             "example": "unpaid"
           },
           "paymentIntentId": {
-            "type": "string"
-          },
-          "deliveryId": {
-            "type": "string",
-            "description": "The ID to identify the delivery in the logistics system"
-          },
-          "courierAccepted": {
-            "type": "boolean",
-            "default": false
-          },
-          "courierConfirmed": {
-            "type": "boolean",
-            "default": false
-          },
-          "courierId": {
             "type": "string"
           },
           "fulfilmentSlotFrom": {
@@ -1088,6 +1019,11 @@
           "name": {
             "type": "string",
             "description": "Name of the product options, for example \"colour\"."
+          },
+          "isRequired": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether or not this option is required."
           },
           "product": {
             "description": "The product for which the option applies. JSON dictionary representing the **product** instance or FK when creating / updating / not populated",
@@ -1860,7 +1796,28 @@
         }
       }
     },
-    "/admin/signup": {
+    "/admin/delivery-partners": {
+      "get": {
+        "summary": "View delivery partners",
+        "description": "Display \"Delivery partners\" page.",
+        "tags": [
+          "View delivery partners"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/vendors": {
       "get": {
         "summary": "Registration",
         "description": "Registration administration.",
@@ -2002,7 +1959,28 @@
         }
       }
     },
-    "/admin/delivery-partners": {
+    "/admin/delivery-partners/new": {
+      "get": {
+        "summary": "View create delivery partner",
+        "description": "Display \"Create delivery partner\" page.",
+        "tags": [
+          "View create delivery partner"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/postal-districts/get-all-postal-districts": {
       "get": {
         "summary": "View delivery partners",
         "description": "Display \"Delivery partners\" page.",
@@ -2124,13 +2102,11 @@
                     },
                     {
                       "type": "string",
-                      "description": "A user is already registered to the phone number requested"
+                      "description": "The minimum order amount was not met."
                     },
                     {
-                      "example": {},
-                      "type": "object",
-                      "properties": {},
-                      "description": "Success"
+                      "type": "string",
+                      "description": "Bad request"
                     }
                   ]
                 }
@@ -2397,7 +2373,16 @@
           },
           {
             "in": "query",
-            "name": "role",
+            "name": "deliveryPartner",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            }
+          },
+          {
+            "in": "query",
+            "name": "costLevel",
             "required": false,
             "schema": {
               "type": "string"
@@ -2508,7 +2493,29 @@
           },
           {
             "in": "query",
-            "name": "courierId",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "draft",
+                "active",
+                "inactive"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "deliveryPartner",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            }
+          },
+          {
+            "in": "query",
+            "name": "costLevel",
             "required": false,
             "schema": {
               "type": "number",
@@ -2613,17 +2620,62 @@
         }
       }
     },
-    "/admin/logout": {
-      "get": {
-        "summary": "Logout",
-        "description": "Logout admin.",
+    "/api/v1/admin/create-delivery-partner": {
+      "post": {
+        "summary": "Create delivery partner",
         "tags": [
-          "Logout"
+          "Create delivery partner"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 50
+            },
+            "description": "The name of the delivery partner"
+          },
+          {
+            "in": "query",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email",
+              "maxLength": 50
+            },
+            "description": "The email address of the delivery partner"
+          },
+          {
+            "in": "query",
+            "name": "phoneNumber",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 20
+            },
+            "description": "The phone number of the delivery partner"
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "inactive",
+              "enum": [
+                "active",
+                "inactive"
+              ],
+              "example": "inactive"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "New delivery partner created."
           },
           "404": {
             "description": "Resource not found"
@@ -2632,26 +2684,101 @@
             "description": "Internal server error"
           }
         }
-      },
-      "put": {
-        "summary": "Logout",
-        "description": "Logout admin.",
+      }
+    },
+    "/api/v1/admin/edit-delivery-partner": {
+      "post": {
+        "summary": "Edit delivery partner",
         "tags": [
-          "Logout"
+          "Edit delivery partner"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "The id of the delivery partner to edit"
+          },
+          {
+            "in": "query",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 50
+            },
+            "description": "The name of the delivery partner"
+          },
+          {
+            "in": "query",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email",
+              "maxLength": 50
+            },
+            "description": "The email address of the delivery partner"
+          },
+          {
+            "in": "query",
+            "name": "phoneNumber",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 20
+            },
+            "description": "The phone number of the delivery partner"
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "inactive",
+              "enum": [
+                "active",
+                "inactive"
+              ],
+              "example": "inactive"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Delivery partner edited."
+                    },
+                    {
+                      "type": "string",
+                      "description": "You are not authorised to edit this vendor."
+                    }
+                  ]
+                }
+              }
+            }
           },
           "404": {
-            "description": "Resource not found"
+            "description": "There is no delivery partner with that ID!"
           },
           "500": {
             "description": "Internal server error"
           }
         }
-      },
+      }
+    },
+    "/api/v1/admin/logout": {
       "post": {
         "summary": "Logout",
         "description": "Logout admin.",
@@ -20362,27 +20489,93 @@
             "description": "Internal server error"
           }
         }
-      },
-      "patch": {
-        "summary": "Get postal districts",
+      }
+    },
+    "/api/v1/admin/update-fulfilment-method": {
+      "post": {
+        "summary": "Update Fulfilment Method",
         "tags": [
-          "Get postal districts"
+          "Update Fulfilment Method"
         ],
         "parameters": [
           {
             "in": "query",
             "name": "vendor",
             "required": true,
+            "schema": {},
+            "description": "The opening hours to be added to the vendor"
+          },
+          {
+            "in": "query",
+            "name": "id",
+            "required": false,
             "schema": {
               "type": "number",
               "format": "double"
             },
-            "description": "The id of the vendor."
+            "in": "query",
+            "name": "priceModifier",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "A positive or negative integer representing the amount of pence to adjust the base price by."
+          },
+          {
+            "in": "query",
+            "name": "slotLength",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "maximum": 1440,
+              "minimum": 30
+            },
+            "description": "Slot length in minutes"
+          },
+          {
+            "in": "query",
+            "name": "bufferLength",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "minimum": 0
+            },
+            "description": "The required buffer time before booking a slot."
+          },
+          {
+            "in": "query",
+            "name": "orderCutoff",
+            "required": false,
+            "schema": {},
+            "description": "The time after which no new bookings can be made."
+          },
+          {
+            "in": "query",
+            "name": "maxOrders",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "The maximum number of orders allowed per slot."
           }
         ],
         "responses": {
           "200": {
-            "description": "The requested resource"
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {},
+                  "type": "object",
+                  "properties": {},
+                  "description": "Success"
+                }
+              }
+            }
           },
           "404": {
             "description": "Resource not found"
@@ -20393,341 +20586,475 @@
         }
       }
     },
-    "/vendors/view-all-vendors": {
-      "get": {
-        "summary": "View all vendors",
-        "description": "Display \"All vendors\" page.",
-        "tags": [
-          "View all vendors"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "outcode",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      },
-      "put": {
-        "summary": "View all vendors",
-        "description": "Display \"All vendors\" page.",
-        "tags": [
-          "View all vendors"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "outcode",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      },
+    "/api/v1/admin/update-fulfilment-method": {
       "post": {
-        "summary": "View all vendors",
-        "description": "Display \"All vendors\" page.",
+        "summary": "Update Fulfilment Method",
         "tags": [
-          "View all vendors"
+          "Update Fulfilment Method"
         ],
         "parameters": [
           {
             "in": "query",
-            "name": "outcode",
+            "name": "openingHours",
             "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
+            "schema": {},
+            "description": "The opening hours to be added to the vendor"
           },
-          "404": {
-            "description": "Not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      },
-      "delete": {
-        "summary": "View all vendors",
-        "description": "Display \"All vendors\" page.",
-        "tags": [
-          "View all vendors"
-        ],
-        "parameters": [
           {
             "in": "query",
-            "name": "outcode",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      },
-      "patch": {
-        "summary": "View all vendors",
-        "description": "Display \"All vendors\" page.",
-        "tags": [
-          "View all vendors"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "outcode",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/vendors/view-vendor-menu": {
-      "get": {
-        "summary": "View vendor menu [DEPRECATED]",
-        "description": "Display \"Vendor menu\" page.",
-        "tags": [
-          "View vendor menu [DEPRECATED]"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "vendorid",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      },
-      "put": {
-        "summary": "View vendor menu [DEPRECATED]",
-        "description": "Display \"Vendor menu\" page.",
-        "tags": [
-          "View vendor menu [DEPRECATED]"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "vendorid",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      },
-      "post": {
-        "summary": "View vendor menu [DEPRECATED]",
-        "description": "Display \"Vendor menu\" page.",
-        "tags": [
-          "View vendor menu [DEPRECATED]"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "vendorid",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      },
-      "delete": {
-        "summary": "View vendor menu [DEPRECATED]",
-        "description": "Display \"Vendor menu\" page.",
-        "tags": [
-          "View vendor menu [DEPRECATED]"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "vendorid",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      },
-      "patch": {
-        "summary": "View vendor menu [DEPRECATED]",
-        "description": "Display \"Vendor menu\" page.",
-        "tags": [
-          "View vendor menu [DEPRECATED]"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "vendorid",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/admin/delivery-partners/{deliveryPartnerId}": {
-      "get": {
-        "summary": "View edit delivery partner",
-        "description": "Display \"Edit delivery partner\" page.",
-        "tags": [
-          "View edit delivery partner"
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "deliveryPartnerId",
+            "name": "id",
             "required": false,
             "schema": {
               "type": "number",
               "format": "double"
-            }
+            },
+            "description": "The id of the fulfilment method"
+          },
+          {
+            "in": "query",
+            "name": "priceModifier",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "A positive or negative integer representing the amount of pence to adjust the base price by."
+          },
+          {
+            "in": "query",
+            "name": "slotLength",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "maximum": 1440,
+              "minimum": 30
+            },
+            "description": "Slot length in minutes"
+          },
+          {
+            "in": "query",
+            "name": "bufferLength",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "minimum": 0
+            },
+            "description": "The required buffer time before booking a slot."
+          },
+          {
+            "in": "query",
+            "name": "orderCutoff",
+            "required": false,
+            "schema": {},
+            "description": "The time after which no new bookings can be made."
+          },
+          {
+            "in": "query",
+            "name": "maxOrders",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "The maximum number of orders allowed per slot."
           }
         ],
         "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "type": "string",
-                      "description": "Success"
-                    },
-                    {
-                      "type": "string",
-                      "description": "Success"
-                    }
-                  ]
-                }
+          "description": "The requested resource"
+        },
+        "404": {
+          "description": "Resource not found"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    }
+  },
+  "/vendors/view-all-vendors": {
+    "get": {
+      "summary": "View all vendors",
+      "description": "Display \"All vendors\" page.",
+      "tags": [
+        "View all vendors"
+      ],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "outcode",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Success"
+        },
+        "404": {
+          "description": "Not found"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    },
+    "put": {
+      "summary": "View all vendors",
+      "description": "Display \"All vendors\" page.",
+      "tags": [
+        "View all vendors"
+      ],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "outcode",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Success"
+        },
+        "404": {
+          "description": "Not found"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    },
+    "post": {
+      "summary": "View all vendors",
+      "description": "Display \"All vendors\" page.",
+      "tags": [
+        "View all vendors"
+      ],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "outcode",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Success"
+        },
+        "404": {
+          "description": "Not found"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    },
+    "delete": {
+      "summary": "View all vendors",
+      "description": "Display \"All vendors\" page.",
+      "tags": [
+        "View all vendors"
+      ],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "outcode",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Success"
+        },
+        "404": {
+          "description": "Not found"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    },
+    "patch": {
+      "summary": "View all vendors",
+      "description": "Display \"All vendors\" page.",
+      "tags": [
+        "View all vendors"
+      ],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "outcode",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Success"
+        },
+        "404": {
+          "description": "Not found"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    }
+  },
+  "/vendors/view-vendor-menu": {
+    "get": {
+      "summary": "View vendor menu [DEPRECATED]",
+      "description": "Display \"Vendor menu\" page.",
+      "tags": [
+        "View vendor menu [DEPRECATED]"
+      ],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "vendorid",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Success"
+        },
+        "404": {
+          "description": "Not found"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    },
+    "put": {
+      "summary": "View vendor menu [DEPRECATED]",
+      "description": "Display \"Vendor menu\" page.",
+      "tags": [
+        "View vendor menu [DEPRECATED]"
+      ],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "vendorid",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Success"
+        },
+        "404": {
+          "description": "Not found"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    },
+    "post": {
+      "summary": "View vendor menu [DEPRECATED]",
+      "description": "Display \"Vendor menu\" page.",
+      "tags": [
+        "View vendor menu [DEPRECATED]"
+      ],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "vendorid",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Success"
+        },
+        "404": {
+          "description": "Not found"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    },
+    "delete": {
+      "summary": "View vendor menu [DEPRECATED]",
+      "description": "Display \"Vendor menu\" page.",
+      "tags": [
+        "View vendor menu [DEPRECATED]"
+      ],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "vendorid",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Success"
+        },
+        "404": {
+          "description": "Not found"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    },
+    "patch": {
+      "summary": "View vendor menu [DEPRECATED]",
+      "description": "Display \"Vendor menu\" page.",
+      "tags": [
+        "View vendor menu [DEPRECATED]"
+      ],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "vendorid",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Success"
+        },
+        "404": {
+          "description": "Not found"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    }
+  },
+  "/admin/delivery-partners/{deliveryPartnerId}": {
+    "get": {
+      "summary": "View edit delivery partner",
+      "description": "Display \"Edit delivery partner\" page.",
+      "tags": [
+        "View edit delivery partner"
+      ],
+      "parameters": [
+        {
+          "in": "path",
+          "name": "deliveryPartnerId",
+          "required": false,
+          "schema": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Success",
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "description": "Success"
+                  },
+                  {
+                    "type": "string",
+                    "description": "Success"
+                  }
+                ]
               }
             }
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "500": {
-            "description": "Internal server error"
           }
+        },
+        "404": {
+          "description": "Not found"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    }
+  },
+  "/admin/delivery-partners/{deliveryPartnerId}": {
+    "get": {
+      "summary": "View edit delivery partner",
+      "description": "Display \"Edit delivery partner\" page.",
+      "tags": [
+        "View edit delivery partner"
+      ],
+      "parameters": [
+        {
+          "in": "path",
+          "name": "deliveryPartnerId",
+          "required": false,
+          "schema": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Success",
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "description": "Success"
+                  },
+                  {
+                    "type": "string",
+                    "description": "Success"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "Not found"
+        },
+        "500": {
+          "description": "Internal server error"
         }
       }
     }
   }
+}
 }

@@ -26,32 +26,39 @@ module.exports = {
 
 
   fn: async function (inputs) {
-    // TODO: Check if delivery slot is in future
+    var order = await Order.findOne({
+      publicId: inputs.orderId,
+      fulfilmentSlotFrom: {
+        '>=': new Date()
+      }
+    });
 
-    var order = await Order.findOne({ publicId: inputs.orderId });
+    if (!order) {
+      throw new Error('Order not found.');
+    }
 
-    if(order.restaurantAcceptanceStatus !== 'pending') {
+    if (order.restaurantAcceptanceStatus !== 'pending') {
 
       // Restaurant has previously accepted or declined the order, they cannot modify the order acceptance after this.
       throw new Error('Restaurant has already accepted or rejected this order.');
     }
 
 
-    if(order.paymentStatus !== 'paid') {
+    if (order.paymentStatus !== 'paid') {
 
       // Order is not paid
       throw new Error('the order has not been paid for.');
     }
 
 
-    if(inputs.restaurantAccepted === true) {
-      await Order.updateOne({publicId: inputs.orderId})
-      .set({restaurantAcceptanceStatus: 'accepted'});
+    if (inputs.restaurantAccepted === true) {
+      await Order.updateOne({ publicId: inputs.orderId })
+        .set({ restaurantAcceptanceStatus: 'accepted' });
 
 
       // Issue Peepl rewards
       // (5% order total in pence) / 10 pence (value of PPL token)
-      var rewardAmount = (order.total * 0.05) / 100;
+      var rewardAmount = (order.total * 0.05) / 10;
 
       await sails.helpers.issuePeeplReward.with({
         rewardAmount: rewardAmount,

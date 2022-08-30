@@ -93,49 +93,41 @@ module.exports = {
       statusCode: 400,
       responseType: 'notFound'
     },
+    badRequest: {
+      responseType: 'badRequest'
+    }
   },
 
 
   fn: async function (inputs, exits) {
     // TODO: Validation (products belong to vendor, fulfilmentMethod belongs to vendor, options are related to products, optionvalues are valid for options)
+    try{
+      var orderValid = await sails.helpers.validateOrder.with(inputs);
+    } catch (err) {
+      return exits.badRequest(err);
+    }
+
+    let vendor = await Vendor.findOne({id: inputs.vendor});
+    let discount;
+
+    if(inputs.discountCode) {
+      discount = await Discount.findOne({code: inputs.discountCode});
+    }
+    
     if (!inputs.items){
       return exits.noItemsFound();
     }
 
-    const firstItem = inputs.items[0];
-    
-    var vendor = await Vendor.findOne(inputs.vendor);
-
-    if(!vendor) {
-      return exits.notFound();
-    }
-
     const isDelivery = (inputs.fulfilmentMethod === 1); // 2 is Collection
 
-    var slotsValid = await sails.helpers.validateDeliverySlot
-      .with({
-        fulfilmentMethodId: inputs.fulfilmentMethod,
-        fulfilmentSlotFrom: inputs.fulfilmentSlotFrom,
-        fulfilmentSlotTo: inputs.fulfilmentSlotTo
-      });
-
-    if(!slotsValid){
-      return exits.invalidSlot('Invalid delivery slot');
-    }
-
-    var discountId: number;
-    if (inputs.discountCode) {
-      // TODO: Return error if discount code is invalid
-      var discount = await sails.helpers.checkDiscountCode(inputs.discountCode, inputs.vendor);
-      discountId = discount.id;
+    if(inputs.discountCode) {
+      discount = await Discount.findOne({code: inputs.discountCode});
     }
 
     const deliverAfter = moment(inputs.fulfilmentSlotFrom, 'YYYYMMdd hh:mm:ss'); //moment("01:15:00 PM", "h:mm:ss A")
     const deliverBefore = moment(inputs.fulfilmentSlotTo, 'YYYYMMdd hh:mm:ss'); //moment("01:15:00 PM", "h:mm:ss A")
 
     if(isDelivery){
-
-
       //TODO: Organise delivery with available courier
       const availableCourier: ICourier = await sails.helpers.getAvailableCourierFromPool
         .with({
@@ -181,8 +173,6 @@ module.exports = {
         inputs.items[item].optionValues = newOrderItemOptionValues.map(({id: number}) => number);
       }
 
-      // TODO: Check if vendor delivers to that area
-      // TODO: Validate that fulfilment method belongs to vendor
       var order = await Order.create({
         total: inputs.total,
         orderedDateTime: Date.now(),
@@ -194,7 +184,7 @@ module.exports = {
         deliveryAddressPostCode: inputs.address.postCode,
         deliveryAddressInstructions: inputs.address.deliveryInstructions,
         customerWalletAddress: inputs.walletAddress,
-        discount: discountId,
+        discount: (discount) ? discount.id : undefined,
         vendor: vendor.id,
         fulfilmentMethod: inputs.fulfilmentMethod,
         fulfilmentSlotFrom: inputs.fulfilmentSlotFrom,
@@ -243,11 +233,11 @@ module.exports = {
         vendor.name
       )
       .catch(() => {
-        return exits.error('Error creating payment intent');
+        return exits.error(new Error('Error creating payment intent'));
       });
 
       if(!newPaymentIntent) {
-        return exits.error('Error creating payment intent');
+        return exits.error(new Error('Error creating payment intent'));
       }
 
       // Update order with payment intent

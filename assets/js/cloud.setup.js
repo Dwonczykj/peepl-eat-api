@@ -12,7 +12,6 @@
 
 Cloud.setup({
   /* eslint-disable */
-
   methods: {
     getAllPostalDistricts: {
       verb: "GET",
@@ -139,6 +138,7 @@ Cloud.setup({
         "phoneNumber",
         "deliveryRestrictionDetails",
         "status",
+        "deliveryPartner",
         "costLevel",
         "rating",
         "isVegan",
@@ -156,11 +156,22 @@ Cloud.setup({
         "phoneNumber",
         "deliveryRestrictionDetails",
         "status",
+        "deliveryPartner",
         "costLevel",
         "rating",
         "isVegan",
         "minimumOrderAmount",
       ],
+    },
+    createDeliveryPartner: {
+      verb: "POST",
+      url: "/api/v1/admin/create-delivery-partner",
+      args: ["name", "email", "phoneNumber", "status"],
+    },
+    editDeliveryPartner: {
+      verb: "POST",
+      url: "/api/v1/admin/edit-delivery-partner",
+      args: ["id", "name", "email", "phoneNumber", "status"],
     },
     editProduct: {
       verb: "POST",
@@ -241,6 +252,19 @@ Cloud.setup({
         "expiryDateTime",
         "maxUses",
         "isEnabled",
+      ],
+    },
+    updateFulfilmentMethod: {
+      verb: "POST",
+      url: "/api/v1/admin/create-update-openinghours",
+      args: [
+        "openingHours",
+        "id",
+        "priceModifier",
+        "slotLength",
+        "bufferLength",
+        "orderCutoff",
+        "maxOrders",
       ],
     },
     updateOpeninghours: {
