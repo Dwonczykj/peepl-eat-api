@@ -1,0 +1,48 @@
+<div id="admin-delivery-partners" class="admin" v-cloak>
+
+  <%- partial('../../partials/admin-navbar.ejs') %>
+
+  <div class="container">
+    <h1 class="my-5">Delivery Partners</h1>
+
+    <table class="table action-table">
+      <thead>
+        <tr>
+          <th scope="col"><span class="sr-only">Select</span></th>
+          <th scope="col">Name</th>
+          <th scope="col">Status</th>
+          <th scope="col"><span class="sr-only">Edit</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="deliveryPartner in deliveryPartners">
+          <td class="action-table__shrink">
+            <input type="checkbox" name="deliveryPartners">
+          <td>
+            <a :href="'/admin/delivery-partners/' + deliveryPartner.id">{{deliveryPartner.name}}</a>
+          </td>
+          <td>
+            {{deliveryPartner.status}}
+          </td>
+          <td class="action-table__shrink">
+            <a :href="'/admin/delivery-partners/' + deliveryPartner.id">Edit</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="d-md-flex my-3 action-table-actions">
+      <!-- <select class="form-control mr-3" disabled>
+        <option>Mark as active</option>
+        <option>Mark as draft</option>
+        <option>Mark as inactive</option>
+        <option>Delete</option>
+      </select>
+      <br/>
+      <button class="btn btn-secondary" disabled>Apply</button> -->
+      <a href="/admin/delivery-partners/new" class="btn btn-peepl ml-auto">Add a new delivery partner</a>
+    </div>
+
+  </div>
+</div>
+<%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>

@@ -113,6 +113,9 @@ module.exports = {
     deliveryFulfilmentMethod: {
       model: 'fulfilmentmethod'
     },
+    deliveryPartner: {
+      model: 'deliverypartner'
+    },
     vendorCategories: {
       collection: 'vendorcategory',
       via: 'vendors'
@@ -132,7 +135,7 @@ module.exports = {
   },
 
   afterCreate: async function (newlyCreatedRecord, proceed) {
-    await sails.helpers.initialiseDeliveryMethods(newlyCreatedRecord.id);
+    await sails.helpers.initialiseDeliveryMethods.with({vendor: newlyCreatedRecord.id});
 
     return proceed();
   }

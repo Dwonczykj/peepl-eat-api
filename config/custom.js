@@ -29,7 +29,11 @@ module.exports.custom = {
   peeplPayUrl: 'https://pay.itsaboutpeepl.com/api/v1',
   amazonS3BucketUrl: 'https://vegiapp-1.s3.us-east-1.amazonaws.com/',
   amazonS3Bucket: 'vegiapp-1',
+<<<<<<< HEAD
 
   passwordSaltRounds: envConfig['saltrounds'],
   // firebaseAPIKey: envConfig['firebaseAPIKey'],
+=======
+  passwordSaltRounds: 10,
+>>>>>>> upstream/delivery-partners
 };

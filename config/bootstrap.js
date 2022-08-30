@@ -44,7 +44,7 @@ module.exports.bootstrap = async function() {
   } //•
 
   var vendorCategory = await VendorCategory.create({
-    name: 'Uncategorised',
+    name: 'Cafes',
   }).fetch();
 
   const createPostalDistricts = [
@@ -65,6 +65,13 @@ module.exports.bootstrap = async function() {
   // var postalDistricts = createPostalDistricts.map((pd) => PostalDistrict.create(pd).fetch());
   var postalDistricts = await PostalDistrict.createEach(createPostalDistricts).fetch();
 
+  var deliveryPartner = await DeliveryPartner.create({
+    name: 'Agile',
+    email: 'agile@example.com',
+    phoneNumber: '0123456789',
+    status: 'active',
+  }).fetch();
+
   var delifonseca = await Vendor.create({
     name: 'Delifonseca',
     type: 'restaurant',
@@ -74,7 +81,8 @@ module.exports.bootstrap = async function() {
     status: 'active',
     phoneNumber: '+447495995614',
     vendorCategories: [vendorCategory.id],
-    fulfilmentPostalDistricts: [postalDistricts[0].id, postalDistricts[1].id, postalDistricts[2].id]
+    fulfilmentPostalDistricts: [postalDistricts[0].id, postalDistricts[1].id, postalDistricts[2].id],
+    deliveryPartner: deliveryPartner.id,
   }).fetch();
 
   var productCategory = await ProductCategory.create({

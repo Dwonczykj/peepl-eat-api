@@ -10,7 +10,9 @@ module.exports = {
   inputs: {
     vendor: {
       type: 'number',
-      required: true
+    },
+    deliveryPartner: {
+      type: 'number',
     },
   },
 
@@ -28,14 +30,25 @@ module.exports = {
     // TODO: Do all this inside a transaction
 
     // Create FulfilmentMethods
-    const del = await FulfilmentMethod.create({vendor:inputs.vendor, methodType:'delivery'}).fetch();
-    const col = await FulfilmentMethod.create({vendor:inputs.vendor, methodType:'collection'}).fetch();
+    let del;
+    let col;
 
-    // Add FulfilmentMethods to Vendor
-    await Vendor.updateOne(inputs.vendor).set({
-      deliveryFulfilmentMethod: del.id,
-      collectionFulfilmentMethod: col.id
-    });
+    // Add FulfilmentMethods to Vendor/DeliveryPartner
+    if(inputs.vendor){
+      del = await FulfilmentMethod.create({vendor:inputs.vendor, methodType:'delivery'}).fetch();
+      col = await FulfilmentMethod.create({vendor:inputs.vendor, methodType:'collection'}).fetch();
+
+      await Vendor.updateOne(inputs.vendor).set({
+        deliveryFulfilmentMethod: del.id,
+        collectionFulfilmentMethod: col.id
+      });
+    } else if (inputs.deliveryPartner){
+      del = await FulfilmentMethod.create({deliveryPartner:inputs.deliveryPartner, methodType:'delivery'}).fetch();
+
+      await DeliveryPartner.updateOne(inputs.deliveryPartner).set({
+        deliveryFulfilmentMethod: del.id,
+      });
+    }
 
     // Generate collection/delivery blank opening hours
     var openingHoursDel = [];
@@ -53,14 +66,16 @@ module.exports = {
         fulfilmentMethod: del.id
       });
 
-      // Collection hours
-      openingHoursCol.push({
-        dayOfWeek: weekday,
-        isOpen: false,
-        openTime: '09:00',
-        closeTime: '17:00',
-        fulfilmentMethod: col.id
-      });
+      if(inputs.vendor){
+        // Collection hours
+        openingHoursCol.push({
+          dayOfWeek: weekday,
+          isOpen: false,
+          openTime: '09:00',
+          closeTime: '17:00',
+          fulfilmentMethod: col.id
+        });
+      }
     });
 
     // Add the opening hours to the database
@@ -68,9 +83,11 @@ module.exports = {
     const newHoursIDsDel = newHoursDel.map(({ id }) => id);
     await FulfilmentMethod.addToCollection(del.id, 'openingHours').members(newHoursIDsDel);
 
-    const newHoursCol = await OpeningHours.createEach(openingHoursCol).fetch();
-    const newHoursIDsCol = newHoursCol.map(({ id }) => id);
-    await FulfilmentMethod.addToCollection(col.id, 'openingHours').members(newHoursIDsCol);
+    if(inputs.vendor){
+      const newHoursCol = await OpeningHours.createEach(openingHoursCol).fetch();
+      const newHoursIDsCol = newHoursCol.map(({ id }) => id);
+      await FulfilmentMethod.addToCollection(col.id, 'openingHours').members(newHoursIDsCol);
+    }
 
     return;
   }

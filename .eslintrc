@@ -55,7 +55,8 @@
     "OpeningHours": true,
     "ProductCategory": true,
     "VendorCategory": true,
-    "PostalDistrict": true
+    "PostalDistrict": true,
+    "DeliveryPartner": true
     // …and any others (e.g. `"Organization": true`)
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   },

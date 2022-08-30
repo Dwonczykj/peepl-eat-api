@@ -33,9 +33,19 @@ module.exports = {
     var eligibleDeliveryDates = { availableDaysOfWeek: [], availableSpecialDates: [] };
 
     var vendor = await Vendor.findOne(inputs.vendor)
-    .populate('deliveryFulfilmentMethod&collectionFulfilmentMethod');
+    .populate('deliveryFulfilmentMethod&collectionFulfilmentMethod&deliveryPartner');
 
-    if(vendor.deliveryFulfilmentMethod){
+    let collectionFulfilmentMethod = vendor.collectionFulfilmentMethod;
+    let deliveryFulfilmentMethod = vendor.deliveryFulfilmentMethod;
+
+    // If the vendor has a delivery partner associated with it, then we need to get the delivery slots for that partner.
+    if(vendor.deliveryPartner && vendor.deliveryPartner.status === 'active') {
+      var deliveryPartner = await DeliveryPartner.findOne(vendor.deliveryPartner)
+      .populate('deliveryFulfilmentMethod');
+
+      deliverySlots = await sails.helpers.getAvailableSlots(inputs.date, deliveryPartner.deliveryFulfilmentMethod.id);
+      deliveryFulfilmentMethod = deliveryPartner.deliveryFulfilmentMethod;
+    } else if(vendor.deliveryFulfilmentMethod){
       deliverySlots = await sails.helpers.getAvailableSlots(inputs.date, vendor.deliveryFulfilmentMethod.id);
       eligibleDeliveryDates = await sails.helpers.getAvailableDates(vendor.deliveryFulfilmentMethod.id);
     }
@@ -46,8 +56,8 @@ module.exports = {
     }
 
     return {
-      collectionMethod: vendor.collectionFulfilmentMethod,
-      deliveryMethod: vendor.deliveryFulfilmentMethod,
+      collectionMethod: collectionFulfilmentMethod,
+      deliveryMethod: deliveryFulfilmentMethod,
       collectionSlots,
       deliverySlots,
       eligibleCollectionDates,

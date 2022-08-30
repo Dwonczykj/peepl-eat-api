@@ -52,6 +52,9 @@
       "name": "View deliveries"
     },
     {
+      "name": "View delivery partners"
+    },
+    {
       "name": "View all vendors"
     },
     {
@@ -59,6 +62,9 @@
     },
     {
       "name": "View create vendor"
+    },
+    {
+      "name": "View create delivery partner"
     },
     {
       "name": "Get all postal districts"
@@ -118,6 +124,12 @@
       "name": "Edit vendor"
     },
     {
+      "name": "Create delivery partner"
+    },
+    {
+      "name": "Edit delivery partner"
+    },
+    {
       "name": "Edit product"
     },
     {
@@ -148,7 +160,7 @@
       "name": "Edit discount"
     },
     {
-      "name": "Update Opening Hours"
+      "name": "Update Fulfilment Method"
     },
     {
       "name": "Approve or decline order"
@@ -197,6 +209,9 @@
     },
     {
       "name": "Sea Turtles!"
+    },
+    {
+      "name": "View edit delivery partner"
     }
   ],
   "components": {
@@ -381,11 +396,6 @@
         "allOf": [
           {
             "$ref": "#/components/schemas/fulfilmentmethod-without-required-constraint"
-          },
-          {
-            "required": [
-              "vendor"
-            ]
           }
         ]
       },
@@ -444,6 +454,9 @@
             "description": "The required buffer time before booking a slot.",
             "minimum": 0
           },
+          "orderCutoff": {
+            "description": "The time after which no new bookings can be made."
+          },
           "maxOrders": {
             "type": "number",
             "format": "double",
@@ -454,6 +467,14 @@
             "oneOf": [
               {
                 "$ref": "#/components/schemas/vendor"
+              }
+            ]
+          },
+          "deliveryPartner": {
+            "description": "JSON dictionary representing the **deliverypartner** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/deliverypartner"
               }
             ]
           },
@@ -677,6 +698,10 @@
             "type": "number",
             "format": "double",
             "default": 0
+          },
+          "sentToDeliveryPartner": {
+            "type": "boolean",
+            "default": false
           },
           "fulfilmentMethod": {
             "description": "JSON dictionary representing the **fulfilmentmethod** instance or FK when creating / updating / not populated",
@@ -1430,6 +1455,14 @@
               }
             ]
           },
+          "deliveryPartner": {
+            "description": "JSON dictionary representing the **deliverypartner** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/deliverypartner"
+              }
+            ]
+          },
           "vendorCategories": {
             "description": "Array of **vendorcategory**'s or array of FK's when creating / updating / not populated",
             "type": "array",
@@ -1953,7 +1986,49 @@
         "summary": "Registration",
         "description": "Registration administration.",
         "tags": [
-          "Registration"
+          "Registration""View postal districts"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/admin/delivery-partners": {
+      "get": {
+        "summary": "View delivery partners",
+        "description": "Display \"Delivery partners\" page.",
+        "tags": [
+          "View delivery partners"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/vendors": {
+      "get": {
+        "summary": "View all vendors",
+        "description": "Display \"All vendors\" page.",
+        "tags": [
+          "View all vendors"
         ],
         "parameters": [
           {
@@ -2194,6 +2269,73 @@
       "delete": {
         "summary": "Registration",
         "description": "Registration administration.",
+      }
+    },
+    "/admin/vendors/new": {
+      "get": {
+        "summary": "View create vendor",
+        "description": "Display \"Create vendor\" page.",
+        "tags": [
+          "View create vendor"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/admin/delivery-partners/new": {
+      "get": {
+        "summary": "View create delivery partner",
+        "description": "Display \"Create delivery partner\" page.",
+        "tags": [
+          "View create delivery partner"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/postal-districts/get-all-postal-districts": {
+      "get": {
+        "summary": "Get all postal districts",
+        "tags": [
+          "Get all postal districts"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The requested resource"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/vendors/get-fulfilment-slots": {
+      "get": {
+        "summary": "Get fulfilment slots",
         "tags": [
           "Registration"
         ],
@@ -20530,6 +20672,53 @@
         "responses": {
           "200": {
             "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/admin/delivery-partners/{deliveryPartnerId}": {
+      "get": {
+        "summary": "View edit delivery partner",
+        "description": "Display \"Edit delivery partner\" page.",
+        "tags": [
+          "View edit delivery partner"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "deliveryPartnerId",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
           },
           "404": {
             "description": "Not found"

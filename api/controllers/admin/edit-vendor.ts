@@ -36,6 +36,10 @@ module.exports = {
       type: 'string',
       isIn: ['draft', 'active', 'inactive']
     },
+    deliveryPartner:{
+      type: 'string',
+      allowNull: true
+    },
     costLevel: {
       type: 'number',
       min: 1,
@@ -82,6 +86,11 @@ module.exports = {
   },
 
   fn: async function (inputs) {
+    // Fix errors to do with strings as association IDs
+    if(inputs.deliveryPartner && inputs.deliveryPartner === 'null') {
+      inputs.deliveryPartner = null;
+    }
+
     let vendor = await Vendor.findOne({ id: inputs.id });
 
     if (!vendor) {

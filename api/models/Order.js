@@ -124,6 +124,10 @@ module.exports = {
       type: 'number',
       defaultsTo: 0
     },
+    sentToDeliveryPartner: {
+      type: 'boolean',
+      defaultsTo: false
+    },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
@@ -151,7 +155,7 @@ module.exports = {
 
   },
 
-  beforeCreate: function(valuesToSet, proceed) {
+  beforeCreate: function (valuesToSet, proceed) {
     valuesToSet.publicId = uuidv4();
     return proceed();
   }

@@ -34,8 +34,7 @@ module.exports = {
   fn: async function (inputs) {
     // TODO: Consider timezones
     // TODO: Account for overnight opening hours
-    // TODO: Generate IDs for slots to simplify logic (but must account for changes to opening hours and slot duration)
-    // TODO: Limit to 7 days in future
+    // TODO: Limit to ordering 7 days in future
 
     var availableSlots = [];
 
@@ -57,6 +56,12 @@ module.exports = {
       specialDate: inputs.date
     });
 
+    /* var openingHours = {
+        dayOfWeek: 'monday', // Monday
+        specificDate: null,
+        openTime: '09:00',
+        closeTime: '17:00'
+      }; */
     // If no special opening hours for this date
     if(!openingHours) {
       // Get regular opening hours for day of week
@@ -66,15 +71,25 @@ module.exports = {
       });
     }
 
-    /* var openingHours = {
-        dayOfWeek: 'monday', // Monday
-        specificDate: null,
-        openTime: '09:00',
-        closeTime: '17:00'
-      }; */
+
+    // If generating slots for tomorrow, check if it is before the cutoff time
+    let isAfterCutoff = false;
+    const cutoffTime = fulfilmentMethod.orderCutoff; // e.g. 15:00
+
+    if(cutoffTime){
+      const tomorrow = moment().add(1, 'days').endOf('day'); // End of day tomorrow
+
+      if(dt.isSameOrBefore(tomorrow) && cutoffTime) {
+        const cutoff = moment(cutoffTime, 'HH:mm'); // Moment version of cutoff time
+        // If the current time is after the cutoff time, set isAfterCutoff to true
+        if(moment().isAfter(cutoff)) {
+          isAfterCutoff = true;
+        }
+      }
+    }
 
     // If there are opening hours available
-    if(openingHours && openingHours.isOpen) {
+    if(openingHours && openingHours.isOpen && !isAfterCutoff) {
 
       var openTime = inputs.date + ' ' + openingHours.openTime; // e.g. 25/12/2022 09:00
       var closeTime = inputs.date + ' ' + openingHours.closeTime; // e.g. 25/12/2022 17:00

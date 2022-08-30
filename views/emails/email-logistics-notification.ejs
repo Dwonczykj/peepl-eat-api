@@ -1,0 +1,45 @@
+<h1>Vegi Orders</h1>
+<% if (orders.length > 0) { %>
+    <p>The following orders have been placed:</p>
+    <table border="1" cellpadding: 5>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Vendor Address</th>
+                <th>Customer Address</th>
+                <th>Delivery Instructions</th>
+                <th>Delivery Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% orders.forEach(function(order) { %>
+            <tr>
+                <td><%= order.id %></td>
+                <td>
+                    <b>Name: </b><%= order.vendor.name %><br/>
+                    <b>Phone: </b><%= order.vendor.phoneNumber %><br/>
+                    <b>Address Line One: </b> <%= order.vendor.pickupAddressLineOne %><br/>
+                    <b>Address Line Two: </b> <%= order.vendor.pickupAddressLineTwo %><br/>
+                    <b>City: </b> <%= order.vendor.pickupAddressCity %><br/>
+                    <b>Postcode: </b> <%= order.vendor.pickupAddressPostCode %><br/>
+                </td>
+                <td>
+                    <b>Name: </b><%= order.deliveryName %><br/>
+                    <b>Email: </b><%= order.deliveryEmail %><br/>
+                    <b>Phone: </b><%= order.deliveryPhoneNumber %><br/>
+                    <b>Address Line One: </b><%= order.deliveryAddressLineOne %><br/>
+                    <b>Address Line Two: </b><%= order.deliveryAddressLineTwo %><br/>
+                    <b>Postcode: </b> <%= order.deliveryAddressPostCode %><br/>
+                </td>
+                <td><%= order.deliveryAddressInstructions %></td>
+                <td>
+                    <b>From: </b><%= order.fulfilmentSlotFrom %><br/>
+                    <b>To: </b><%= order.fulfilmentSlotTo %>
+                </td>
+            </tr>
+            <% }); %>
+        </tbody>
+    </table>
+<% } else { %>
+    <p>No orders have been placed.</p>
+<% } %>

@@ -25,7 +25,7 @@ module.exports.routes = {
   'GET /api/v1/postal-districts/get-all-postal-districts': { action: 'postal-districts/get-all-postal-districts' },
 
   // VENDORS
-  'GET /api/v1/vendors': {action: 'vendors/view-all-vendors'},
+  'GET /api/v1/vendors': { action: 'vendors/view-all-vendors' },
   'GET /api/v1/vendors/:vendorid': { action: 'vendors/view-vendor-menu' },
   'GET /api/v1/vendors/get-fulfilment-slots': { action: 'vendors/get-fulfilment-slots' },
   'GET /api/v1/vendors/get-eligible-order-dates': { action: 'vendors/get-eligible-order-dates' },
@@ -84,9 +84,14 @@ module.exports.routes = {
   'GET /api/v1/admin/is-user-vendor-sales-manager/:vendorId': { action: 'admin/is-user-vendor-sales-manager' },
   'GET /api/v1/admin/is-user-vendor-owner/:vendorId': { action: 'admin/is-user-vendor-owner' },
   'GET /api/v1/admin/is-user-vendor-admin/:vendorId': { action: 'admin/is-user-vendor-admin' },
+  'GET /admin/delivery-partners': { action: 'admin/view-delivery-partners' },
+  'GET /admin/delivery-partners/:deliveryPartnerId': { action: 'admin/view-edit-delivery-partner' },
+  'GET /admin/delivery-partners/new': { action: 'admin/view-create-delivery-partner' },
 
   'POST /api/v1/admin/create-vendor': { action: 'admin/create-vendor' },
   'POST /api/v1/admin/edit-vendor': { action: 'admin/edit-vendor' },
+  'POST /api/v1/admin/create-delivery-partner': { action: 'admin/create-delivery-partner' },
+  'POST /api/v1/admin/edit-delivery-partner': { action: 'admin/edit-delivery-partner' },
   'POST /api/v1/admin/edit-product': { action: 'admin/edit-product' },
   'POST /api/v1/admin/create-product': { action: 'admin/create-product' },
   'POST /api/v1/admin/discontinue-product': { action: 'admin/discontinue-product' },
@@ -99,7 +104,8 @@ module.exports.routes = {
   'POST /api/v1/admin/update-product-status': { action: 'admin/update-product-status' },
   'POST /api/v1/admin/create-discount': { action: 'admin/create-discount' },
   'POST /api/v1/admin/edit-discount': { action: 'admin/edit-discount' },
-  'POST /api/v1/admin/create-update-openinghours': { action: 'admin/update-openinghours'},
+  'POST /api/v1/admin/create-update-openinghours': { action: 'admin/update-fulfilment-method' },
+  'POST /api/v1/admin/update-fulfilment-method': { action: 'admin/update-fulfilment-method' },
   'POST /api/v1/admin/approve-or-decline-order': { action: 'admin/approve-or-decline-order' },
   'POST /api/v1/admin/create-postal-district': { action: 'admin/create-postal-district' },
   'POST /api/v1/admin/edit-postal-district': { action: 'admin/edit-postal-district' },

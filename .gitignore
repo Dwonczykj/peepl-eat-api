@@ -137,3 +137,4 @@ lib-cov
 *.pid
 
 .sass-cache
+config/aws.json
