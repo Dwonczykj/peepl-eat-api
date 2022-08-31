@@ -101,7 +101,7 @@ parasails.registerComponent('order-card', {
     },
     formatDeliverySlot: function(dateTime) {
       if (!dateTime) {return '';}
-      dateTime = moment(dateTime).calendar();
+      dateTime = moment(dateTime).utc().calendar();
       return dateTime;
     },
     formatOrderedTime: function(unixtime) {
