@@ -145,20 +145,22 @@ module.exports = {
       }
     }
 
-    // Check if vendor delivers to postal district
-    const postcodeRegex = /^(((([A-Z][A-Z]{0,1})[0-9][A-Z0-9]{0,1}) {0,}[0-9])[A-Z]{2})$/;
+    if(fulfilmentMethod.methodType === 'delivery') {
+      // Check if vendor delivers to postal district
+      const postcodeRegex = /^(((([A-Z][A-Z]{0,1})[0-9][A-Z0-9]{0,1}) {0,}[0-9])[A-Z]{2})$/;
 
-    if ((m = postcodeRegex.exec(inputs.address.postCode)) !== null) {
-      let postalDistrict = m[3]; // 3rd match group is the postal district
-      let postalDistrictStringArray = vendor.fulfilmentPostalDistricts.map(postalDistrict => postalDistrict.outcode);
+      if ((m = postcodeRegex.exec(inputs.address.postCode)) !== null) {
+        let postalDistrict = m[3]; // 3rd match group is the postal district
+        let postalDistrictStringArray = vendor.fulfilmentPostalDistricts.map(postalDistrict => postalDistrict.outcode);
 
-      if (!postalDistrictStringArray.includes(postalDistrict)) {
-        // throw new Error('Vendor does not deliver to this postal district.');
+        if (!postalDistrictStringArray.includes(postalDistrict)) {
+          // throw new Error('Vendor does not deliver to this postal district.');
+          return exits.invalidPostalDistrict();
+        }
+      } else {
+        // Postcode is invalid
         return exits.invalidPostalDistrict();
       }
-    } else {
-      // Postcode is invalid
-      return exits.invalidPostalDistrict();
     }
 
     // Check if the delivery slots are valid
