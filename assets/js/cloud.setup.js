@@ -13,6 +13,11 @@
 Cloud.setup({
   /* eslint-disable */
   methods: {
+    loggedIn: {
+      verb: "GET",
+      url: "/api/v1/admin/logged-in",
+      args: [],
+    },
     getAllPostalDistricts: {
       verb: "GET",
       url: "/api/v1/postal-districts/get-all-postal-districts",

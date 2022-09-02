@@ -65,6 +65,11 @@ module.exports = {
       required: true
     }
   },
+  exits:{
+    success: {
+      description: 'success'
+    }
+  },
   fn: function (inputs: GeneratorInputs, exits: GeneratorExits) {
     try {
       const typePath = resolve(`./api/interfaces/${inputs.filePath}`);
@@ -80,3 +85,4 @@ module.exports = {
     }
   }
 };
+//todo: remove and branch the generated schema for now

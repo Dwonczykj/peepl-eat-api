@@ -19,6 +19,7 @@ parasails.registerPage('login', {
     verificationCode: '',
     viewVerifyCodeForm: false,
     rememberMe: false,
+    _hideRecaptcha: false,
   },
   computed: {
     // * Getter -> a computed getter so that computed each time we access it
@@ -81,6 +82,7 @@ parasails.registerPage('login', {
       //     window.alert('repatcha  callback called -> call the getVerificationCode flow' + response.toString());
       //     //unhide phone number form
       //     document.getElementById('numberForm').removeAttribute('hidden');
+      //     return this.clickVerifyPhoneNumber(widgetId);
       //   },
       //   'expired-callback': () => {
       //     window.alert('repatcha expired callback called');
@@ -95,6 +97,8 @@ parasails.registerPage('login', {
 
           this.viewForm = 'numberForm';
           document.getElementById('numberForm').classList.remove('hidden');
+
+          return this.clickVerifyPhoneNumber();
         },
         'expired-callback': () => {
           window.alert('recatcha expired!');
@@ -139,13 +143,18 @@ parasails.registerPage('login', {
 
       try {
         if (this.phoneNumber && Object.keys(this.formErrors).length < 1) {
+          document.getElementById('recaptcha-container').classList.remove('hidden');
           return window.recaptchaVerifier.render()
             .then((widgetId) => {
               this.syncing = false;
               // document.getElementById('register').classList.add('hidden');
               // document.getElementById('start-recaptcha').classList.add('hidden');
               document.getElementById('login-button-container').classList.add('hidden');
-              return this.clickVerifyPhoneNumber(widgetId);
+              if (this._hideRecaptcha) {
+                return this.clickVerifyPhoneNumber();
+              } else {
+                return;
+              }
             });
         }
       } catch (err) {
@@ -223,13 +232,14 @@ parasails.registerPage('login', {
         // throw new Error('badVerificationCode');
       }
     },
-    clickVerifyPhoneNumber: async function (widgetId) {
+    clickVerifyPhoneNumber: async function () {
       // const phoneNumber = document.getElementById('phoneNumber').value;
       const phoneNumber = this.phoneNumber;
       const appVerifier = window.recaptchaVerifier;
 
       document.getElementById('verificationCode').focus();
       document.getElementById('recaptcha-container').classList.add('hidden');
+      // document.getElementById('recaptcha-container').classList.remove('hidden');
 
       const userExists = await Cloud.userExistsForPhone(this.countryCode, this.phoneNoCountryNoFormat);
       if (!userExists) {

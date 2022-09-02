@@ -29,14 +29,7 @@ parasails.registerComponent('openingHours', {
   data: function data() {
     return {
       syncing: false,
-      formRules: {
-        code: {
-          required: true
-        },
-        percentage: {
-          required: true
-        }
-      },
+      formRules: {},
       formErrors: {},
       cloudError: ''
     };
@@ -44,7 +37,7 @@ parasails.registerComponent('openingHours', {
   //  ╦ ╦╔╦╗╔╦╗╦
   //  ╠═╣ ║ ║║║║
   //  ╩ ╩ ╩ ╩ ╩╩═╝
-  template: "\n    <ajax-form :form-data=\"fulfilmentMethod\" :syncing.sync=\"syncing\" :form-errors.sync=\"formErrors\" :cloud-error.sync=\"cloudError\" :action=\"'updateOpeninghours'\">\n        <div class=\"my-3 p-3 p-md-4 rounded action-card\" v-for=\"(hours, index) in fulfilmentMethod.openingHours\">\n            <details>\n            <summary class=\"action-card__summary\">\n                <span class=\"action-card__checkbox\">\n                <input type=\"checkbox\" :id=hours.dayOfWeek v-model=\"hours.isOpen\">\n                </span>\n                <span :class=\"{'line-through': !hours.isOpen }\">{{hours.dayOfWeek | capitalise}}</span> <div v-if=\"hours.isOpen\" class=\"text-muted ml-1\">{{hours.openTime}} - {{hours.closeTime}}</div>\n            </summary>\n            <div class=\"action-card__content\">\n                <br/>\n                <label for=\"appt\">Select opening time:</label>\n                <input type=\"time\" id=\"appt\" name=\"appt\" v-model=\"hours.openTime\" :disabled=\"!hours.isOpen\">\n                <label for=\"appt\">Select closing time:</label>\n                <input type=\"time\" id=\"appt\" name=\"appt\" v-model=\"hours.closeTime\" :disabled=\"!hours.isOpen\">\n            </div>\n            </details>\n        </div>\n        <ajax-button class=\"btn btn-peepl mt-4\" type=\"submit\" :syncing=\"syncing\" v-bind:class=\"{ 'is-loading': syncing }\">Save changes</ajax-button>\n    </ajax-form>\n    ",
+  template: "\n    <ajax-form :form-data=\"fulfilmentMethod\" :syncing.sync=\"syncing\" :form-errors.sync=\"formErrors\" :cloud-error.sync=\"cloudError\" :action=\"'updateFulfilmentMethod'\">\n        <div class=\"my-3 p-3 p-md-4 rounded action-card\" v-for=\"(hours, index) in fulfilmentMethod.openingHours\">\n            <details>\n            <summary class=\"action-card__summary\">\n                <span class=\"action-card__checkbox\">\n                <input type=\"checkbox\" :id=hours.dayOfWeek v-model=\"hours.isOpen\">\n                </span>\n                <span :class=\"{'line-through': !hours.isOpen }\">{{hours.dayOfWeek | capitalise}}</span> <div v-if=\"hours.isOpen\" class=\"text-muted ml-1\">{{hours.openTime}} - {{hours.closeTime}}</div>\n            </summary>\n            <div class=\"action-card__content\">\n                <br/>\n                <label for=\"appt\">Select opening time:</label>\n                <input type=\"time\" id=\"appt\" name=\"appt\" v-model=\"hours.openTime\" :disabled=\"!hours.isOpen\">\n                <label for=\"appt\">Select closing time:</label>\n                <input type=\"time\" id=\"appt\" name=\"appt\" v-model=\"hours.closeTime\" :disabled=\"!hours.isOpen\">\n            </div>\n            </details>\n        </div>\n        <div class=\"form-group\">\n          <label for=\"priceModifier\">Price Modifier</label>\n          <input :class=\"{ 'is-invalid': formErrors.priceModifier }\" v-model=\"fulfilmentMethod.priceModifier\" type=\"number\" class=\"form-control\" id=\"priceModifier\" required>\n          <p class=\"mt-2 text-muted\">{{fulfilmentMethod.priceModifier | convertToPounds}}</p>\n        </div>\n        <div class=\"form-group\">\n          <label for=\"slotLength\">Slot Length (mins)</label>\n          <input type=\"text\" :class=\"{ 'is-invalid': formErrors.slotLength }\" v-model=\"fulfilmentMethod.slotLength\" class=\"form-control\" id=\"slotLength\" >\n        </div>\n        <div class=\"form-group\">\n          <label for=\"bufferLength\">Buffer Length (mins)</label>\n          <input type=\"text\" :class=\"{ 'is-invalid': formErrors.bufferLength }\" v-model=\"fulfilmentMethod.bufferLength\" class=\"form-control\" id=\"bufferLength\" >\n        </div>\n        <div class=\"form-group\">\n          <label for=\"maxOrders\">Max Orders Per Slot</label>\n          <input type=\"number\" :class=\"{ 'is-invalid': formErrors.maxOrders }\" v-model=\"fulfilmentMethod.maxOrders\" class=\"form-control\" id=\"maxOrders\" >\n        </div>\n        <div class=\"form-group\">\n          <label for=\"orderCutoff\">Order Cutoff (on day prior)</label><br/>\n          <input type=\"time\" id=\"orderCutoff\" v-model=\"fulfilmentMethod.orderCutoff\">\n        </div>\n        <ajax-button class=\"btn btn-peepl mt-4\" type=\"submit\" :syncing=\"syncing\" v-bind:class=\"{ 'is-loading': syncing }\">Save changes</ajax-button>\n    </ajax-form>\n    ",
   //  ╦  ╦╔═╗╔═╗╔═╗╦ ╦╔═╗╦  ╔═╗
   //  ║  ║╠╣ ║╣ ║  ╚╦╝║  ║  ║╣
   //  ╩═╝╩╚  ╚═╝╚═╝ ╩ ╚═╝╩═╝╚═╝
@@ -79,6 +72,15 @@ parasails.registerComponent('openingHours', {
 
       value = value.toString();
       return value.charAt(0).toUpperCase() + value.slice(1);
+    },
+    convertToPounds: function convertToPounds(value) {
+      if (!value) {
+        return '£0';
+      }
+
+      value = '£' + (value / 100).toFixed(2);
+      value = value.toString();
+      return value;
     }
   },
   //  ╦╔╗╔╔╦╗╔═╗╦═╗╔═╗╔═╗╔╦╗╦╔═╗╔╗╔╔═╗

@@ -53,6 +53,7 @@ module.exports.routes = {
   // ADMIN
   'GET /admin/login': { action: 'admin/view-login' },
   'GET /api/v1/admin/login': { action: 'admin/view-login' },
+  'GET /api/v1/admin/logged-in': { action: 'admin/logged-in' },
   'GET /admin/signup': { action: 'admin/view-signup' },
   'GET /api/v1/admin/signup': { action: 'admin/view-signup' },
 

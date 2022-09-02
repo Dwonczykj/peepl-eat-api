@@ -63,8 +63,6 @@ module.exports = {
       description: 'All done.',
     },
     noItemsFound: {
-      statusCode: 400,
-      responseType: 'noItemsFound',
       description: 'No items in order'
     },
     invalidVendor: {
@@ -156,7 +154,7 @@ module.exports = {
 
     // Check if vendor delivers to postal district
     const postcodeRegex = /^(((([A-Z][A-Z]{0,1})[0-9][A-Z0-9]{0,1}) {0,}[0-9])[A-Z]{2})$/;
-
+    var m;
     if ((m = postcodeRegex.exec(inputs.address.postCode)) !== null) {
       let postalDistrict = m[3]; // 3rd match group is the postal district
       let postalDistrictStringArray = vendor.fulfilmentPostalDistricts.map(postalDistrict => postalDistrict.outcode);

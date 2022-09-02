@@ -18,15 +18,14 @@ module.exports = {
   description: 'Get eligible order dates',
 
 
-  // inputs: {
-  //   vendor: {
-  //     type: 'number',
-  //     required: true
-  //   }
-  // },
+  inputs: {
+    vendor: {
+      type: 'number',
+      required: true
+    }
+  },
 
-  inputs: sails.helpers.generateSchema('orders/iGetEligibleOrderUpdates', 'GetEligibleOrderUpdates'),
-
+  // inputs: sails.helpers.generateSchema('orders/iGetEligibleOrderUpdates', 'GetEligibleOrderUpdates'),
 
   exits: {
     success: {
@@ -36,7 +35,7 @@ module.exports = {
   },
 
 
-  fn: async function (inputs: GetEligibleOrderUpdates) {
+  fn: async function (inputs: GetEligibleOrderUpdates, exits) {
 
     var eligibleCollectionDates = { availableDaysOfWeek: [], availableSpecialDates: [] };
     var eligibleDeliveryDates = { availableDaysOfWeek: [], availableSpecialDates: [] };
@@ -52,12 +51,12 @@ module.exports = {
       eligibleCollectionDates = await sails.helpers.getAvailableDates(vendor.collectionFulfilmentMethod.id);
     }
 
-    return {
+    return exits.success({data: {
       collectionMethod: vendor.collectionFulfilmentMethod,
       deliveryMethod: vendor.deliveryFulfilmentMethod,
       eligibleCollectionDates,
       eligibleDeliveryDates
-    };
+    }});
   }
 
 

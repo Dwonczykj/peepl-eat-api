@@ -27,7 +27,8 @@ parasails.registerPage('login', {
     preventNextIteration: false,
     verificationCode: '',
     viewVerifyCodeForm: false,
-    rememberMe: false
+    rememberMe: false,
+    _hideRecaptcha: false
   },
   computed: {
     // * Getter -> a computed getter so that computed each time we access it
@@ -104,6 +105,7 @@ parasails.registerPage('login', {
       //     window.alert('repatcha  callback called -> call the getVerificationCode flow' + response.toString());
       //     //unhide phone number form
       //     document.getElementById('numberForm').removeAttribute('hidden');
+      //     return this.clickVerifyPhoneNumber(widgetId);
       //   },
       //   'expired-callback': () => {
       //     window.alert('repatcha expired callback called');
@@ -118,6 +120,7 @@ parasails.registerPage('login', {
           document.getElementById('start-recaptcha').classList.remove('hidden');
           _this.viewForm = 'numberForm';
           document.getElementById('numberForm').classList.remove('hidden');
+          return _this.clickVerifyPhoneNumber();
         },
         'expired-callback': function expiredCallback() {
           window.alert('recatcha expired!');
@@ -167,12 +170,18 @@ parasails.registerPage('login', {
 
       try {
         if (this.phoneNumber && Object.keys(this.formErrors).length < 1) {
+          document.getElementById('recaptcha-container').classList.remove('hidden');
           return window.recaptchaVerifier.render().then(function (widgetId) {
             _this2.syncing = false; // document.getElementById('register').classList.add('hidden');
             // document.getElementById('start-recaptcha').classList.add('hidden');
 
             document.getElementById('login-button-container').classList.add('hidden');
-            return _this2.clickVerifyPhoneNumber(widgetId);
+
+            if (_this2._hideRecaptcha) {
+              return _this2.clickVerifyPhoneNumber();
+            } else {
+              return;
+            }
           });
         }
       } catch (err) {
@@ -246,7 +255,7 @@ parasails.registerPage('login', {
       }
     },
     clickVerifyPhoneNumber: function () {
-      var _clickVerifyPhoneNumber = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(widgetId) {
+      var _clickVerifyPhoneNumber = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
         var _this3 = this;
 
         var phoneNumber, appVerifier, userExists, auth, _signInToFirebase, user;
@@ -259,7 +268,8 @@ parasails.registerPage('login', {
                 phoneNumber = this.phoneNumber;
                 appVerifier = window.recaptchaVerifier;
                 document.getElementById('verificationCode').focus();
-                document.getElementById('recaptcha-container').classList.add('hidden');
+                document.getElementById('recaptcha-container').classList.add('hidden'); // document.getElementById('recaptcha-container').classList.remove('hidden');
+
                 _context2.next = 6;
                 return Cloud.userExistsForPhone(this.countryCode, this.phoneNoCountryNoFormat);
 
@@ -335,7 +345,7 @@ parasails.registerPage('login', {
         }, _callee2, this);
       }));
 
-      function clickVerifyPhoneNumber(_x) {
+      function clickVerifyPhoneNumber() {
         return _clickVerifyPhoneNumber.apply(this, arguments);
       }
 

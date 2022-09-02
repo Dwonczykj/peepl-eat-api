@@ -16,7 +16,7 @@
             "program": "${workspaceFolder}/app.js",
             "args": [
                 "--verbose",
-                "--hookTimeout=80000"
+                "--hookTimeout=160000"
             ],
             "outFiles": [
                 "${workspaceFolder}/out/**/*.js"

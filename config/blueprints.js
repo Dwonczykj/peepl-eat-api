@@ -17,7 +17,7 @@ module.exports.blueprints = {
   *                                                                          *
   ***************************************************************************/
 
-  actions: true,
+  actions: false, //TODO: Investigate load time cost of this step
 
   /***************************************************************************
   *                                                                          *

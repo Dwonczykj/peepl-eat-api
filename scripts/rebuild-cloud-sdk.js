@@ -107,7 +107,7 @@ module.exports = {
 Cloud.setup({
 
   /* eslint-disable */
-  methods: ${JSON.stringify(endpointsByMethodName)}
+  methods: ${JSON.stringify(endpointsByMethodName, null, 2)}
   /* eslint-enable */
 
 });`+
