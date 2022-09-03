@@ -45,16 +45,17 @@ module.exports = {
     },
     role: {
       type: 'string',
-      isIn: ['admin', 'vendor', 'courier'],
+      isIn: ['admin', 'vendor', 'courier', 'consumer'],
+      required: true,
     },
     vendorRole: {
       type: 'string',
-      isIn: ['owner', 'inventoryManager', 'salesManager', 'courier', 'none'],
+      isIn: ['admin', 'owner', 'inventoryManager', 'salesManager', 'none'],
       defaultsTo: 'none'
     },
     courierRole: {
       type: 'string',
-      isIn: ['owner', 'deliveryManager', 'rider', 'none'],
+      isIn: ['admin', 'owner', 'deliveryManager', 'rider', 'none'],
       defaultsTo: 'none'
     },
     roleConfirmedWithOwner: {
@@ -124,10 +125,6 @@ module.exports = {
       return undefined;
     }
 
-    if(user.isSuperAdmin){
-      user.role = 'admin';
-    }
-
     const nonNull = (val) => val !== null && val !== undefined && val !== -1;
     const isNull = (val) => val === null || val === undefined || val === -1;
 
@@ -145,14 +142,26 @@ module.exports = {
       if (nonNull(user.vendor)){
         user.role = 'vendor';
         user.courierRole = 'none';
+        user.courier = null;
       } else if (nonNull(user.courier)){
         user.role = 'courier';
         user.vendorRole = 'none';
+        user.vendor = null;
+      } else if (!user.isSuperAdmin){
+        user.role = 'consumer';
+        user.vendorRole = 'none';
+        user.courierRole = 'none';
+        user.vendor = null;
+        user.courier = null;
       }
       return user;
     };
 
-    if(user.role === 'admin' && !user.isSuperAdmin){
+    if(user.isSuperAdmin){
+      user.role = 'admin';
+      user.vendorRole = 'admin';
+      user.courierRole = 'admin';
+    } else if(user.role === 'admin' && !user.isSuperAdmin){
       user = setRoles();
     }
 
@@ -164,7 +173,7 @@ module.exports = {
       user.courierRole = 'none';
       user.courier = null;
     }
-    
+
     return proceed();
   }
 

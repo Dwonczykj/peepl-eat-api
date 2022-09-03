@@ -8,7 +8,6 @@ parasails.registerPage('layout', {
     computed: {
         // * Getter -> a computed getter so that computed each time we access it
         isLoggedIn() {
-
             return this._loggedIn;
         },
 

@@ -246,11 +246,21 @@ module.exports.bootstrap = async function() {
     phoneCountryCode: 1,
     // password: 'Testing123!',
     name: 'Courier 1',
-    vendor: delifonseca.id,
-    vendorConfirmed: true,
     isSuperAdmin: false,
     role: 'courier',
     courierRole: 'deliveryManager',
+    firebaseSessionToken: 'DUMMY_FIREBASE_TOKEN',
+  });
+
+  // * Create Consumer
+  await User.create({
+    email: 'jdwonczy.corpk@gmail.com',
+    phoneNoCountry: 9995557777,
+    phoneCountryCode: 1,
+    // password: 'Testing123!',
+    name: 'Consumer 1',
+    isSuperAdmin: false,
+    role: 'consumer',
     firebaseSessionToken: 'DUMMY_FIREBASE_TOKEN',
   });
 

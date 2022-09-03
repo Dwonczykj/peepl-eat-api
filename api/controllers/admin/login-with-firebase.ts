@@ -107,23 +107,20 @@ module.exports = {
         }).set({ firebaseSessionToken: inputs.firebaseSessionToken, fbUid: decodedToken.uid });
 
         this.req.session.userId = user.id;
-        return exits.success({data: user});
+        exits.success({data: user});
+        return user;
       })
       .catch((error) => {
         sails.log.info(error); //BUG! Investigate why we are still seeing this bug auth / network error
         return exits.firebaseErrored({code: error.code, message: error.message, error: error}); //https://firebase.google.com/docs/reference/js/auth#autherrorcodes
       });
-      return user;
     } catch (error) {
       sails.log.info(error); //BUG! Investigate why we are still seeing this bug auth / network error
       return exits.firebaseErrored({ code: error.code, message: error.message, error: error });
     }
-      
+
 
     // const user = await signInWithEmailAndPassword(auth, inputs.email, inputs.password)
-    
-
-
     // if(!user){
     //   throw 'badCombo';
     // }

@@ -1,3 +1,4 @@
+declare var Courier: any;
 module.exports = {
 
 
@@ -20,6 +21,17 @@ module.exports = {
     vendorRole: {
       type: 'string',
       isIn: ['owner', 'inventoryManager', 'salesManager', 'courier', 'none'],
+    },
+    vendorConfirmed: {
+      type: 'boolean',
+    },
+    courierId: {
+      type: 'number',
+      required: true,
+    },
+    courierRole: {
+      type: 'string',
+      isIn: ['owner', 'deliveryManager', 'rider', 'none'],
     },
     name: {
       type: 'string',
@@ -83,12 +95,38 @@ module.exports = {
         throw 'unauthorised';
       }
 
-      if (!['owner', 'inventoryManager', 'salesManager', 'courier', 'none'].includes(inputs.vendorRole)) {
+      if (!['owner', 'inventoryManager', 'salesManager', 'none'].includes(inputs.vendorRole)) {
         throw 'badRequest';
       }
 
       updateUserObj['vendorRole'] = inputs.vendorRole;
       updateUserObj['vendor'] = vendor;
+
+    }
+
+    if (Object.keys(inputs).includes('courierId')) {
+      //TODO: Check that the user is registered to a courier and that it matches the courier in the inputs (request)
+      let courier = await Courier.findOne({ id: inputs.courierId });
+
+      if (!courier) {
+        throw 'notFound';
+      }
+      // Check if admin user is authorised to edit courier.
+      var isAuthorisedForCourier = await sails.helpers.isAuthorisedForCourier.with({
+        userId: this.req.session.userId,
+        courierId: courier.id
+      });
+
+      if (!isAuthorisedForCourier) {
+        throw 'unauthorised';
+      }
+
+      if (!['owner', 'deliveryManager', 'rider', 'none'].includes(inputs.courierRole)) {
+        throw 'badRequest';
+      }
+
+      updateUserObj['courierRole'] = inputs.courierRole;
+      updateUserObj['courier'] = courier;
 
     }
 

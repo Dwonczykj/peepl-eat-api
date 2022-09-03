@@ -18,6 +18,7 @@ Cloud.setup({
       url: "/api/v1/admin/logged-in",
       args: [],
     },
+
     getAllPostalDistricts: {
       verb: "GET",
       url: "/api/v1/postal-districts/get-all-postal-districts",
@@ -121,6 +122,8 @@ Cloud.setup({
       args: ["email"],
     },
     logout: { verb: "GET", url: "/admin/logout", args: [] },
+    deregisterUser: { verb: "POST", url: "/admin/deregister-user", args: ['id'] },
+    updateUser: { verb: "POST", url: "/admin/user", args: ['email', 'vendorId', 'vendorRole', 'vendorConfirmed', 'courierId', 'courierRole', 'name', 'role'] },
     userExistsForPhone: {
       verb: "POST",
       url: "/api/v1/admin/user-exists-for-phone",

@@ -56,10 +56,15 @@ module.exports = {
       if (!user) {
         throw 'notFound';
       }
-      userFB = await auth.getUserByEmail(user.email);
+      // userFB = await auth.getUserByEmail(user.email);
+      userFB = await auth.getUserByPhoneNumber(user.phoneNumber);
     } else {
       user = myUser;
-      userFB = await auth.getUserByEmail(myUser.email);
+      // userFB = await auth.getUserByEmail(myUser.email);
+      var x = user.phoneNoCountry.toString();
+      x = x.replace(/-/g, '').match(/(\d{1,10})/g)[0];
+      x = x.replace(/(\d{1,3})(\d{1,3})(\d{1,4})/g, '$1-$2-$3');
+      userFB = await auth.getUserByPhoneNumber(`+${user.phoneCountryCode} ${x}`);
     }
 
     delete this.req.session.userId;

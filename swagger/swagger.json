@@ -1236,6 +1236,7 @@
               "phoneNoCountry",
               "phoneCountryCode",
               "name",
+              "role",
               "firebaseSessionToken"
             ]
           }
@@ -1283,17 +1284,18 @@
             "enum": [
               "admin",
               "vendor",
-              "courier"
+              "courier",
+              "consumer"
             ]
           },
           "vendorRole": {
             "type": "string",
             "default": "none",
             "enum": [
+              "admin",
               "owner",
               "inventoryManager",
               "salesManager",
-              "courier",
               "none"
             ],
             "example": "none"
@@ -1302,6 +1304,7 @@
             "type": "string",
             "default": "none",
             "enum": [
+              "admin",
               "owner",
               "deliveryManager",
               "rider",
@@ -2086,7 +2089,23 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
           },
           "404": {
             "description": "Resource not found"
@@ -3206,6 +3225,37 @@
           },
           {
             "in": "query",
+            "name": "vendorConfirmed",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "courierId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "courierRole",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "owner",
+                "deliveryManager",
+                "rider",
+                "none"
+              ]
+            }
+          },
+          {
+            "in": "query",
             "name": "name",
             "required": false,
             "schema": {
@@ -3675,7 +3725,27 @@
         ],
         "responses": {
           "200": {
-            "description": "New delivery partner created."
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "New delivery partner created."
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "delivery partner already exists"
+                    }
+                  ]
+                }
+              }
+            }
           },
           "404": {
             "description": "Resource not found"
@@ -4698,7 +4768,23 @@
         ],
         "responses": {
           "200": {
-            "description": "The requested resource"
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Postal District already exists"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
           },
           "404": {
             "description": "Resource not found"

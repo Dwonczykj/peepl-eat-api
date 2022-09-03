@@ -39,10 +39,27 @@ module.exports = {
     success: {
       description: 'New delivery partner created.'
     },
+    successJSON: {
+      statusCode: 200,
+    },
+    alreadyExists: {
+      description: 'delivery partner already exists',
+      statuscode: 400,
+    }
   },
 
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
+    var exist = await DeliveryPartner.find([{
+      email: inputs.email,
+    }, {
+      name: inputs.name,
+    }]);
+
+    if (exist) {
+      return exits.alreadyExists();
+    }
+
     // Create a new delivery partner
     var newDeliveryPartner = await DeliveryPartner.create({
       name: inputs.name,
@@ -52,7 +69,15 @@ module.exports = {
     }).fetch();
 
     // Return the new delivery partner
-    return newDeliveryPartner;
+    // return newDeliveryPartner;
+    // Respond with view or JSON.
+    if (this.req.wantsJSON) {
+      return exits.successJSON(
+        { newDeliveryPartner }
+      );
+    } else {
+      return exits.success({ newDeliveryPartner });
+    }
   }
 
 

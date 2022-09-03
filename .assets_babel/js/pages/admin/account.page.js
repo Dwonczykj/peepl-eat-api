@@ -13,7 +13,12 @@ parasails.registerPage('account', {
   //  ║║║║║ ║ ║╠═╣║    ╚═╗ ║ ╠═╣ ║ ║╣
   //  ╩╝╚╝╩ ╩ ╩╩ ╩╩═╝  ╚═╝ ╩ ╩ ╩ ╩ ╚═╝
   data: {
-    user: {}
+    syncing: false,
+    cloudError: false,
+    formErrors: {},
+    user: {},
+    email: '',
+    name: ''
   },
   //  ╦  ╦╔═╗╔═╗╔═╗╦ ╦╔═╗╦  ╔═╗
   //  ║  ║╠╣ ║╣ ║  ╚╦╝║  ║  ║╣
@@ -45,5 +50,50 @@ parasails.registerPage('account', {
   //  ╦╔╗╔╔╦╗╔═╗╦═╗╔═╗╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
   //  ║║║║ ║ ║╣ ╠╦╝╠═╣║   ║ ║║ ║║║║╚═╗
   //  ╩╝╚╝ ╩ ╚═╝╩╚═╩ ╩╚═╝ ╩ ╩╚═╝╝╚╝╚═╝
-  methods: {}
+  methods: {
+    submittedAccountDetailsForm: function () {
+      var _submittedAccountDetailsForm = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                this.syncing = true;
+                Cloud.updateUser();
+
+              case 2:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function submittedAccountDetailsForm() {
+        return _submittedAccountDetailsForm.apply(this, arguments);
+      }
+
+      return submittedAccountDetailsForm;
+    }(),
+    parseAccountDetails: function parseAccountDetails() {},
+    clickUpdateAccountDetails: function clickUpdateAccountDetails() {},
+    userManagesCourier: function () {
+      var _userManagesCourier = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3);
+      }));
+
+      function userManagesCourier() {
+        return _userManagesCourier.apply(this, arguments);
+      }
+
+      return userManagesCourier;
+    }()
+  }
 });

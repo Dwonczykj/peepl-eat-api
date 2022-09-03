@@ -16,7 +16,6 @@ module.exports.policies = {
   * (`true` allows public access)                                            *
   *                                                                          *
   ***************************************************************************/
-  'admin/*': 'is-logged-in',
   'admin/view-login': true,
   'admin/view-account': ['localize', 'firebase', 'firebase-auth', 'is-logged-in'],
   'admin/user-exists-for-email': true,
@@ -40,6 +39,9 @@ module.exports.policies = {
   'admin/view-postal-districts': 'is-super-admin',
   'admin/view-approve-order': true, //TODO: add 'is-logged-in' and 'is-vendor' poligices to this
   'admin/approve-or-decline-order': true, //TODO: add 'is-logged-in' and 'is-vendor' poligices to this
+  'admin/*': 'is-logged-in',
+  'api/v1/*': 'is-logged-in',
+  'api/v1/admin/*': 'is-logged-in',
   'discounts/*': ['localize', 'firebase', 'firebase-auth', 'is-logged-in'],
   'orders/*': ['localize', 'firebase', 'firebase-auth', 'is-logged-in'],
   'products/*': ['localize', 'firebase', 'firebase-auth', 'is-logged-in'],
