@@ -13,12 +13,6 @@
 Cloud.setup({
   /* eslint-disable */
   methods: {
-    loggedIn: {
-      verb: "GET",
-      url: "/api/v1/admin/logged-in",
-      args: [],
-    },
-
     getAllPostalDistricts: {
       verb: "GET",
       url: "/api/v1/postal-districts/get-all-postal-districts",
@@ -121,7 +115,16 @@ Cloud.setup({
       url: "/api/v1/admin/user-exists-for-email",
       args: ["email"],
     },
-    logout: { verb: "GET", url: "/admin/logout", args: [] },
+    loggedIn: {
+      verb: "GET",
+      url: "/api/v1/admin/logged-in",
+      args: [],
+    },
+    logout: { 
+      verb: "GET",
+      url: "/admin/logout", 
+      args: []
+    },
     deregisterUser: { verb: "POST", url: "/admin/deregister-user", args: ['id'] },
     updateUser: { verb: "POST", url: "/admin/user", args: ['email', 'vendorId', 'vendorRole', 'vendorConfirmed', 'courierId', 'courierRole', 'name', 'role'] },
     userExistsForPhone: {
@@ -264,7 +267,7 @@ Cloud.setup({
     },
     updateFulfilmentMethod: {
       verb: "POST",
-      url: "/api/v1/admin/create-update-openinghours",
+      url: "/api/v1/admin/update-fulfilment-method",
       args: [
         "openingHours",
         "id",

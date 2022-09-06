@@ -46,10 +46,10 @@ module.exports = {
     };
 
     await client.post('admin/tokens/transfer?apiKey=pk_FDM9_lyd9leeOG4utgmzfr6h', data)
-    .catch((err) => {
-      sails.log.error(err);
-      throw new Error('Error issuing PPL token reward.');
-    });
+      .catch((err) => {
+        sails.log.error(err);
+        throw new Error('Error issuing PPL token reward.');
+      });
 
     return;
   }

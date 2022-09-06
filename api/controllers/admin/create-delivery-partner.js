@@ -14,7 +14,7 @@ module.exports = {
       description: 'The name of the delivery partner',
       maxLength: 50
     },
-    email:{
+    email: {
       type: 'string',
       required: true,
       description: 'The email address of the delivery partner',

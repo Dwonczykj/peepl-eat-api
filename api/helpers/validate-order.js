@@ -93,9 +93,9 @@ module.exports = {
     if (!inputs.items) {
       return exits.noItemsFound();
     }
-    
+
     // Check that the vendor exists
-    let vendor = await Vendor.findOne({id: inputs.vendor})
+    let vendor = await Vendor.findOne({ id: inputs.vendor })
       .populate('fulfilmentPostalDistricts');
 
     if (!vendor) {
@@ -119,7 +119,7 @@ module.exports = {
       id: inputs.items.map(item => item.id),
       vendor: vendor.id
     })
-    .populate('options&options.values');
+      .populate('options&options.values');
 
     // Iterate through the items in the order
     for (let item of inputs.items) {
@@ -137,7 +137,7 @@ module.exports = {
       }
 
       // Check that the product has the correct option values
-      for(var i = 0; i < Object.keys(item.options).length; i++) {
+      for (var i = 0; i < Object.keys(item.options).length; i++) {
         let option = product.options.find(option => option.id === parseInt(Object.keys(item.options)[i])); // Option is the actual option from DB
 
         // If option is not found
@@ -152,39 +152,41 @@ module.exports = {
       }
     }
 
-    // Check if vendor delivers to postal district
-    const postcodeRegex = /^(((([A-Z][A-Z]{0,1})[0-9][A-Z0-9]{0,1}) {0,}[0-9])[A-Z]{2})$/;
-    var m;
-    if ((m = postcodeRegex.exec(inputs.address.postCode)) !== null) {
-      let postalDistrict = m[3]; // 3rd match group is the postal district
-      let postalDistrictStringArray = vendor.fulfilmentPostalDistricts.map(postalDistrict => postalDistrict.outcode);
+    if (fulfilmentMethod.methodType === 'delivery') {
+      // Check if vendor delivers to postal district
+      const postcodeRegex = /^(((([A-Z][A-Z]{0,1})[0-9][A-Z0-9]{0,1}) {0,}[0-9])[A-Z]{2})$/;
+      const m = postcodeRegex.exec(inputs.address.postCode);
+      if (m !== null) {
+        let postalDistrict = m[3]; // 3rd match group is the postal district
+        let postalDistrictStringArray = vendor.fulfilmentPostalDistricts.map(postalDistrict => postalDistrict.outcode);
 
-      if (!postalDistrictStringArray.includes(postalDistrict)) {
-        // throw new Error('Vendor does not deliver to this postal district.');
+        if (!postalDistrictStringArray.includes(postalDistrict)) {
+          // throw new Error('Vendor does not deliver to this postal district.');
+          return exits.invalidPostalDistrict();
+        }
+      } else {
+        // Postcode is invalid
         return exits.invalidPostalDistrict();
       }
-    } else {
-      // Postcode is invalid
-      return exits.invalidPostalDistrict();
     }
 
     // Check if the delivery slots are valid
     var slotsValid = await sails.helpers.validateDeliverySlot
-    .with({
-      fulfilmentMethodId: inputs.fulfilmentMethod,
-      fulfilmentSlotFrom: inputs.fulfilmentSlotFrom,
-      fulfilmentSlotTo: inputs.fulfilmentSlotTo
-    });
+      .with({
+        fulfilmentMethodId: inputs.fulfilmentMethod,
+        fulfilmentSlotFrom: inputs.fulfilmentSlotFrom,
+        fulfilmentSlotTo: inputs.fulfilmentSlotTo
+      });
 
-    if(!slotsValid){
+    if (!slotsValid) {
       return exits.invalidSlot('Invalid delivery slot');
     }
 
     // Check discount code is valid
-    if(inputs.discountCode){
+    if (inputs.discountCode) {
       var discount = await sails.helpers.checkDiscountCode(inputs.discountCode, inputs.vendor);
 
-      if(!discount) {
+      if (!discount) {
         return exits.invalidDiscountCode('Invalid discount code');
       }
     }
