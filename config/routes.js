@@ -25,9 +25,10 @@ module.exports.routes = {
   'GET /api/v1/postal-districts/get-all-postal-districts': { action: 'postal-districts/get-all-postal-districts' },
 
   // VENDORS
-  'GET /api/v1/vendors': {action: 'vendors/view-all-vendors'},
+  'GET /api/v1/vendors': { action: 'vendors/view-all-vendors' },
   'GET /api/v1/vendors/:vendorid': { action: 'vendors/view-vendor-menu' },
   'GET /api/v1/vendors/get-fulfilment-slots': { action: 'vendors/get-fulfilment-slots' },
+  'GET /api/v1/vendors/get-eligible-order-dates': { action: 'vendors/get-eligible-order-dates' },
   'GET /api/v1/vendors/get-postal-districts': { action: 'vendors/get-postal-districts' },
 
   // PRODUCT OPTIONS
@@ -35,6 +36,12 @@ module.exports.routes = {
 
   // DISCOUNTS
   'GET /api/v1/discounts/check-discount-code/:discountCode': { action: 'discounts/check-discount-code' },
+
+  // COURIERS
+  'POST /api/v1/couriers/accept-reject-delivery-confirmation': { action: 'couriers/accept-reject-delivery-confirmation' },
+  'POST /api/v1/couriers/add-delivery-availability-for-order': { action: 'couriers/add-delivery-availability-for-order' },
+  'POST /api/v1/couriers/cancel-delivery': { action: 'couriers/cancel-delivery' },
+  'ALL /couriers/deliveries': { action: 'couriers/view-deliveries' },
 
   // ORDERS
   'GET /api/v1/orders': { action: 'orders/view-my-orders' },
@@ -45,8 +52,26 @@ module.exports.routes = {
 
   // ADMIN
   'GET /admin/login': { action: 'admin/view-login' },
-  'POST /admin/login': { action: 'admin/login' },
+  'GET /api/v1/admin/login': { action: 'admin/view-login' },
+  'GET /api/v1/admin/logged-in': { action: 'admin/logged-in' },
+  'GET /admin/signup': { action: 'admin/view-signup' },
+  'GET /api/v1/admin/signup': { action: 'admin/view-signup' },
+
+  'GET /admin/account': { action: 'admin/view-account' },
+
+  // 'POST /admin/login': { action: 'admin/login' },
+  // 'POST /api/v1/admin/login': { action: 'admin/login' },
+  'POST /admin/signup': { action: 'admin/signup' },
+  'POST /api/v1/admin/signup': { action: 'admin/signup' },
+  'POST /api/v1/admin/login-with-firebase': { action: 'admin/login-with-firebase' },
+  'POST /api/v1/admin/user-exists-for-email': { action: 'admin/user-exists-for-email' },
+  'POST /api/v1/admin/user-exists-for-phone': { action: 'admin/user-exists-for-phone' },
+
+  'POST /api/v1/admin/update-user': { action: 'admin/update-user' },
+
   'GET /admin/logout': { action: 'admin/logout' },
+  'ALL /api/v1/admin/logout': { action: 'admin/logout' },
+  'POST /api/v1/admin/deregister-user': { action: 'admin/deregister-user' },
 
   'GET /admin': { action: 'admin/view-vendors' },
   'GET /admin/vendors': { action: 'admin/view-vendors' },
@@ -56,6 +81,10 @@ module.exports.routes = {
   'GET /admin/discount-codes': { action: 'admin/view-discount-codes' },
   'GET /admin/approve-order/:orderId': { action: 'admin/view-approve-order' },
   'GET /admin/postal-districts': { action: 'admin/view-postal-districts' },
+  'GET /api/v1/admin/is-user-vendor-inventory-manager/:vendorId': { action: 'admin/is-user-vendor-inventory-manager' },
+  'GET /api/v1/admin/is-user-vendor-sales-manager/:vendorId': { action: 'admin/is-user-vendor-sales-manager' },
+  'GET /api/v1/admin/is-user-vendor-owner/:vendorId': { action: 'admin/is-user-vendor-owner' },
+  'GET /api/v1/admin/is-user-vendor-admin/:vendorId': { action: 'admin/is-user-vendor-admin' },
   'GET /admin/delivery-partners': { action: 'admin/view-delivery-partners' },
   'GET /admin/delivery-partners/:deliveryPartnerId': { action: 'admin/view-edit-delivery-partner' },
   'GET /admin/delivery-partners/new': { action: 'admin/view-create-delivery-partner' },
@@ -66,6 +95,8 @@ module.exports.routes = {
   'POST /api/v1/admin/edit-delivery-partner': { action: 'admin/edit-delivery-partner' },
   'POST /api/v1/admin/edit-product': { action: 'admin/edit-product' },
   'POST /api/v1/admin/create-product': { action: 'admin/create-product' },
+  'POST /api/v1/admin/discontinue-product': { action: 'admin/discontinue-product' },
+  'POST /api/v1/admin/update-user-vendor-role': { action: 'admin/update-user-vendor-role' },
   'POST /api/v1/admin/create-product-option': { action: 'admin/create-product-option' },
   'POST /api/v1/admin/edit-product-option': { action: 'admin/edit-product-option' },
   'POST /api/v1/admin/create-product-option-value': { action: 'admin/create-product-option-value' },
@@ -74,8 +105,8 @@ module.exports.routes = {
   'POST /api/v1/admin/update-product-status': { action: 'admin/update-product-status' },
   'POST /api/v1/admin/create-discount': { action: 'admin/create-discount' },
   'POST /api/v1/admin/edit-discount': { action: 'admin/edit-discount' },
-  'POST /api/v1/admin/create-update-openinghours': { action: 'admin/update-fulfilment-method'},
-  'POST /api/v1/admin/update-fulfilment-method': { action: 'admin/update-fulfilment-method'},
+  'POST /api/v1/admin/create-update-openinghours': { action: 'admin/create-update-openinghours' },
+  'POST /api/v1/admin/update-fulfilment-method': { action: 'admin/update-fulfilment-method' },
   'POST /api/v1/admin/approve-or-decline-order': { action: 'admin/approve-or-decline-order' },
   'POST /api/v1/admin/create-postal-district': { action: 'admin/create-postal-district' },
   'POST /api/v1/admin/edit-postal-district': { action: 'admin/edit-postal-district' },

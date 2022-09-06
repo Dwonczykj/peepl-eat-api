@@ -1,0 +1,124 @@
+<div id="account" class="admin" v-cloak>
+    <%- partial('../../partials/admin-navbar.ejs') %>
+    <div class="container">
+        <h1 class="h4 text-center my-4">Account</h1>
+        <p class="text-muted m-0">Phone: +{{user.phoneCountryCode}} {{user.phoneNoCountry}}</p>
+        <ajax-form id="accountDetailsForm" class="" :handle-parsing="parseAccountDetails" :syncing.sync="syncing"
+            :cloud-error.sync="cloudError" @submitted="submittedAccountDetailsForm()"
+            :handle-submitting="clickUpdateAccountDetails">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" v-model="email" placeholder="enter email"
+                    :class="{ 'is-invalid': formErrors.email }" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" v-model="name" placeholder="enter name" :class="{ 'is-invalid': formErrors.name }"
+                    class="form-control">
+            </div>
+            <ajax-button class="btn btn-peepl mt-4" :class="{ 'is-loading': syncing }" type="submit" :syncing="syncing">
+                Update Details</ajax-button>
+            <div v-if="cloudError === 'badVerificationCode'" class="alert alert-danger mt-4 hidden" role="alert">
+                Please ensure verification code is 6 digits: '123456'
+            </div>
+            <div v-else-if="cloudError === 'badEmail'" class="alert alert-danger mt-4 hidden" role="alert">
+                Please ensure email if formatted correctly
+            </div>
+            <div v-else-if="cloudError" class="alert alert-danger mt-4 hidden" role="alert">
+                There has been an error updating your account details.
+            </div>
+        </ajax-form>
+        </div>
+        <div v-if="user.isSuperAdmin">
+            <h1 class="h4 text-center my-4">Admin Panel</h1>
+            <div class="container">
+                <label for="superadmin">Super Admin</h3>
+                    <p class="text-muted m-0" id="superadmin">{{user.isSuperAdmin}}</p>
+            </div>
+        </div>
+        <div v-if="user.isSuperAdmin || user.role === 'vendor'">
+            <h1 class="h4 text-center my-4">Vendor Panel</h1>
+            <div class="container">
+                <label for="vendor-container">Vendor</h3>
+                    <div id="vendor-container">
+                        <p v-if="user.vendor" class="text-muted m-0" id="vendor">{{user.vendor.name}}</p>
+                        <p v-else class="text-muted m-0">No Vendor</p>
+                    </div>
+                    <label for="vendorrole">Role</h3>
+                        <p class="text-muted m-0" id="vendorrole">{{user.vendorRole}}</p>
+            </div>
+            <div v-if="user.isSuperAdmin || user.vendorRole === 'admin'">
+                <!-- <ajax-form id="accountDetailsForm" class="" :handle-parsing="parseAccountDetails" :syncing.sync="syncing"
+                                                                :cloud-error.sync="cloudError" @submitted="submittedAccountDetailsForm()"
+                                                                :handle-submitting="clickUpdateAccountDetails">
+                                                                <div class="form-group">
+                                                                    <label for="email">Email</label>
+                                                                    <input type="email" id="email" v-model="email" placeholder="enter email"
+                                                                        :class="{ 'is-invalid': formErrors.email }" class="form-control">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="name">Name</label>
+                                                                    <input type="text" id="name" v-model="name" placeholder="enter name" :class="{ 'is-invalid': formErrors.name }"
+                                                                        class="form-control">
+                                                                </div>
+                                                                <ajax-button class="btn btn-peepl mt-4" :class="{ 'is-loading': syncing }" type="submit" :syncing="syncing">
+                                                                    Update Details</ajax-button>
+                                                                <div v-if="cloudError === 'badVerificationCode'" class="alert alert-danger mt-4 hidden" role="alert">
+                                                                    Please ensure verification code is 6 digits: '123456'
+                                                                </div>
+                                                                <div v-else-if="cloudError === 'badEmail'" class="alert alert-danger mt-4 hidden" role="alert">
+                                                                    Please ensure email if formatted correctly
+                                                                </div>
+                                                                <div v-else-if="cloudError" class="alert alert-danger mt-4 hidden" role="alert">
+                                                                    There has been an error updating your account details.
+                                                                </div>
+                                                            </ajax-form> -->
+                <div>
+                    <p>Placeholder for managing users registered to this vendor.</p>
+                </div>
+            </div>
+        </div>
+        <div v-if="user.isSuperAdmin || user.role === 'courier'">
+            <h1 class="h4 text-center my-4">Courier Panel</h1>
+            <div class="container">
+                <label for="courier-container">Courier</h3>
+                    <div id="courier-container">
+                        <p v-if="user.courier" class="text-muted m-0">{{user.courier.name}}</p>
+                        <p v-else class="text-muted m-0">No Courier</p>
+                    </div>
+                    <label for="courierrole">Role</h3>
+                        <p class="text-muted m-0" id="courierrole">{{user.courierRole}}</p>
+            </div>
+            <div v-if="user.isSuperAdmin || user.courierRole === 'admin'">
+                <!-- <ajax-form id="accountDetailsForm" class="" :handle-parsing="parseAccountDetails" :syncing.sync="syncing"
+                                                        :cloud-error.sync="cloudError" @submitted="submittedAccountDetailsForm()"
+                                                        :handle-submitting="clickUpdateAccountDetails">
+                                                        <div class="form-group">
+                                                            <label for="email">Email</label>
+                                                            <input type="email" id="email" v-model="email" placeholder="enter email"
+                                                                :class="{ 'is-invalid': formErrors.email }" class="form-control">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="name">Name</label>
+                                                            <input type="text" id="name" v-model="name" placeholder="enter name" :class="{ 'is-invalid': formErrors.name }"
+                                                                class="form-control">
+                                                        </div>
+                                                        <ajax-button class="btn btn-peepl mt-4" :class="{ 'is-loading': syncing }" type="submit" :syncing="syncing">
+                                                            Update Details</ajax-button>
+                                                        <div v-if="cloudError === 'badVerificationCode'" class="alert alert-danger mt-4 hidden" role="alert">
+                                                            Please ensure verification code is 6 digits: '123456'
+                                                        </div>
+                                                        <div v-else-if="cloudError === 'badEmail'" class="alert alert-danger mt-4 hidden" role="alert">
+                                                            Please ensure email if formatted correctly
+                                                        </div>
+                                                        <div v-else-if="cloudError" class="alert alert-danger mt-4 hidden" role="alert">
+                                                            There has been an error updating your account details.
+                                                        </div>
+                                                    </ajax-form> -->
+                <div>
+                    <p>Placeholder for managing users registered to this courier.</p>
+                </div>
+            </div>
+    </div>
+</div>
+<%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>

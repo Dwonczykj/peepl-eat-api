@@ -1,7 +1,7 @@
 /**
- * <edit-discount>
+ * <opening-hours>
  * -----------------------------------------------------------------------------
- * Edit discount component used in the admin panel.
+ * Opening hours component used in the edit-vendor screen.
  *
  * @type {Component}
  *

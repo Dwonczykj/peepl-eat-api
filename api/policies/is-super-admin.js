@@ -1,5 +1,5 @@
 /**
- * is-logged-in
+ * is-super-admin
  *
  *
  * For more about how to use policies, see:

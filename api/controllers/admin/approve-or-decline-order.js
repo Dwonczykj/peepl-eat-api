@@ -37,19 +37,24 @@ module.exports = {
       throw new Error('Order not found.');
     }
 
-    if(order.restaurantAcceptanceStatus !== 'pending') {
+    if (order.restaurantAcceptanceStatus !== 'pending') {
+
       // Restaurant has previously accepted or declined the order, they cannot modify the order acceptance after this.
       throw new Error('Restaurant has already accepted or rejected this order.');
     }
 
-    if(order.paymentStatus !== 'paid') {
+
+    if (order.paymentStatus !== 'paid') {
+
       // Order is not paid
       throw new Error('the order has not been paid for.');
     }
 
-    if(inputs.restaurantAccepted === true) {
-      await Order.updateOne({publicId: inputs.orderId})
-      .set({restaurantAcceptanceStatus: 'accepted'});
+
+    if (inputs.restaurantAccepted === true) {
+      await Order.updateOne({ publicId: inputs.orderId })
+        .set({ restaurantAcceptanceStatus: 'accepted' });
+
 
       // Issue Peepl rewards
       // (5% order total in pence) / 10 pence (value of PPL token)
@@ -60,11 +65,14 @@ module.exports = {
         recipient: order.customerWalletAddress
       });
 
-      await Order.updateOne({publicId: inputs.orderId})
-      .set({rewardsIssued: rewardAmount});
+      await Order.updateOne({ publicId: inputs.orderId })
+        .set({ rewardsIssued: rewardAmount });
     } else if (inputs.restaurantAccepted === false) {
-      await Order.updateOne({publicId: inputs.orderId})
-      .set({restaurantAcceptanceStatus: 'rejected'});
+      await Order.updateOne({ publicId: inputs.orderId })
+        .set({ restaurantAcceptanceStatus: 'rejected' });
+    } else {
+      //TODO: Send a refund to the Customer account of amount order.total if the payment has already gone through. -> This should involve a peeplPay.revertTranasction(paymentId) rather than a new call
+      //TODO: If on the other hand, restaurantAccepted partialOrder, then we need to ensure that the payment to the vendor was only partial or that we refund the unavailable items.
     }
 
     // Send notification to customer that their order has been accepted/declined.

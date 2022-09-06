@@ -72,7 +72,7 @@ module.exports = {
       }
     })
     .catch((err)=> {
-      sails.log(err);
+      sails.log.warn(err);
     });
 
     // Create HTTP client with new access token
@@ -107,8 +107,8 @@ module.exports = {
     // Send the delivery information to Coopcycle
     var response = await client.post('/api/deliveries', requestBody)
     .catch((err) => {
-      sails.log('Error creating the delivery.');
-      sails.log(err);
+      sails.log.info('Error creating the delivery.');
+      sails.log.warn(err);
     });
 
     return {id: response.data.id};

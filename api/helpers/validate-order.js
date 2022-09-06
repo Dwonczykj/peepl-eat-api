@@ -62,6 +62,9 @@ module.exports = {
     success: {
       description: 'All done.',
     },
+    noItemsFound: {
+      description: 'No items in order'
+    },
     invalidVendor: {
       description: 'The vendor is invalid.',
     },
@@ -87,9 +90,13 @@ module.exports = {
 
 
   fn: async function (inputs, exits) {
+    if (!inputs.items) {
+      return exits.noItemsFound();
+    }
+    
     // Check that the vendor exists
     let vendor = await Vendor.findOne({id: inputs.vendor})
-    .populate('fulfilmentPostalDistricts');
+      .populate('fulfilmentPostalDistricts');
 
     if (!vendor) {
       return exits.invalidVendor();
@@ -145,22 +152,20 @@ module.exports = {
       }
     }
 
-    if(fulfilmentMethod.methodType === 'delivery') {
-      // Check if vendor delivers to postal district
-      const postcodeRegex = /^(((([A-Z][A-Z]{0,1})[0-9][A-Z0-9]{0,1}) {0,}[0-9])[A-Z]{2})$/;
+    // Check if vendor delivers to postal district
+    const postcodeRegex = /^(((([A-Z][A-Z]{0,1})[0-9][A-Z0-9]{0,1}) {0,}[0-9])[A-Z]{2})$/;
+    var m;
+    if ((m = postcodeRegex.exec(inputs.address.postCode)) !== null) {
+      let postalDistrict = m[3]; // 3rd match group is the postal district
+      let postalDistrictStringArray = vendor.fulfilmentPostalDistricts.map(postalDistrict => postalDistrict.outcode);
 
-      if ((m = postcodeRegex.exec(inputs.address.postCode)) !== null) {
-        let postalDistrict = m[3]; // 3rd match group is the postal district
-        let postalDistrictStringArray = vendor.fulfilmentPostalDistricts.map(postalDistrict => postalDistrict.outcode);
-
-        if (!postalDistrictStringArray.includes(postalDistrict)) {
-          // throw new Error('Vendor does not deliver to this postal district.');
-          return exits.invalidPostalDistrict();
-        }
-      } else {
-        // Postcode is invalid
+      if (!postalDistrictStringArray.includes(postalDistrict)) {
+        // throw new Error('Vendor does not deliver to this postal district.');
         return exits.invalidPostalDistrict();
       }
+    } else {
+      // Postcode is invalid
+      return exits.invalidPostalDistrict();
     }
 
     // Check if the delivery slots are valid

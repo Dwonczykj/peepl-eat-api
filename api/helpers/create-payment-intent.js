@@ -57,7 +57,7 @@ module.exports = {
       return exits.success({paymentIntentId});
     })
     .catch((err) => {
-      sails.log(err);
+      sails.log.warn(err);
       // TODO: Error handling in case this fails
       return exits.timedOut();
     });

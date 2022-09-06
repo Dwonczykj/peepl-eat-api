@@ -29,6 +29,17 @@ $gradient-directions: (
         );
     }
 
+        .bg-#{$slug}-gradient-green-purple {
+            @include gradient-directional($color-peepl-green,
+                $color-peepl-purple,
+                $angle );
+        }
+    
+        .bg-#{$slug}-gradient-green-yellow {
+            @include gradient-directional($color-peepl-green,
+                $color-peepl-yellow,
+                $angle );
+        }
     .bg-#{$slug}-gradient-yellow-orange {
         @include gradient-directional(
             $color-peepl-yellow,

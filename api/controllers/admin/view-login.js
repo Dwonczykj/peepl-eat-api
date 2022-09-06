@@ -19,7 +19,7 @@ module.exports = {
   fn: async function () {
 
     if(this.req.session.userId){
-      return this.res.redirect('/admin');
+      return this.res.redirect('/admin'); // Have to do this as view routes do not hit policies.
     }
 
     // Respond with view.

@@ -37,8 +37,10 @@ module.exports = {
 
   exits: {
     success: {
-      outputDescription: 'The newly updated `Vendor`.',
-      outputExample: {}
+      outputDescription: 'The newly updated `Product`.',
+      outputExample: {
+        id: 'old_product_id'
+      }
     },
     notFound: {
       description: 'There is no product with that ID!',

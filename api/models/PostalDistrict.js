@@ -15,6 +15,8 @@ module.exports = {
     outcode: {
       type: 'string',
       description: 'The outcode for any post codes within this district.',
+      required: true,
+      unique: true,
       example: 'L1'
       // TODO: Add regex for validation
     },

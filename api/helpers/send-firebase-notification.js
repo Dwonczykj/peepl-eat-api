@@ -1,8 +1,9 @@
-var admin = require('firebase-admin');
-var serviceAccount = require('../../config/vegiliverpool-firebase-adminsdk-4dfpz-8f01f888b3.json');
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
+// * Moved to api/policies/firebase.js
+// var admin = require('firebase-admin');
+// var serviceAccount = require('../../config/vegiliverpool-firebase-adminsdk-4dfpz-8f01f888b3.json');
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount)
+// });
 
 module.exports = {
 
@@ -51,15 +52,15 @@ module.exports = {
         body: inputs.body
       }
     };
-
+    const admin = this.req.firebase;
     admin.messaging()
-    .sendToTopic(inputs.topic, message)
-    .then((res)=> {
-      return res;
-    }).catch((err)=> {
-      sails.log(err);
-      throw new Error(err);
-    });
+      .sendToTopic(inputs.topic, message)
+      .then((res) => {
+        return res;
+      }).catch((err) => {
+        sails.log.warn(err);
+        throw new Error(err);
+      });
 
   }
 

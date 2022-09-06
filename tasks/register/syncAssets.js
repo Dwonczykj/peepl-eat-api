@@ -9,6 +9,9 @@
  */
 module.exports = function(grunt) {
   grunt.registerTask('syncAssets', [
+    'babel:dev',
+    'browserify:dev',
+    // 'browserify:devTest',
     'less:dev',
     'sass:dev',
     'sync:dev',

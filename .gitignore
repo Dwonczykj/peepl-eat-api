@@ -105,6 +105,8 @@ node_modules
 ################################################
 
 .tmp
+.assets_babel
+
 
 
 ################################################
@@ -124,6 +126,8 @@ nbproject
 #.vscode
 .node_history
 dump.rdb
+.env
+vegiliverpool-firebase-adminsdk-*.json
 
 npm-debug.log
 lib-cov

@@ -33,7 +33,7 @@ module.exports = {
     var client = axios.create({
       baseURL: sails.config.custom.fuseStudioBaseUrl,
       timeout: 20000,
-      headers: {'API-SECRET': 'sk_q8TiAxOSniziV6G4CPHY1Ql1'}
+      headers: { 'API-SECRET': 'sk_q8TiAxOSniziV6G4CPHY1Ql1' } //TODO: Move to .env
     });
 
     // Issue PPL token reward

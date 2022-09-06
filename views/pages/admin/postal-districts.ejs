@@ -3,12 +3,13 @@
   <%- partial('../../partials/admin-navbar.ejs') %>
 
   <div class="container">
-    <h1 class="my-5">Postal Districts</h1>
+    <h1 class="my-5">Postal Districts [{{postalDistricts.length}}]</h1>
 
     <div class="mb-3">
 
       <fieldset>  
-        <edit-postal-district v-for="postalDistrict in postalDistricts" :postaldistrict="postalDistrict">
+        <edit-postal-district v-bind:key="postalDistrict.outcode" v-for="postalDistrict in postalDistricts"
+          :postaldistrict="postalDistrict">
         </edit-postal-district>
    
         <div class="d-md-flex my-3 action-card-actions">

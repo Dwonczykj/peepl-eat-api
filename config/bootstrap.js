@@ -9,8 +9,19 @@
  * https://sailsjs.com/config/bootstrap
  */
 
+// Don't include as hides the sails hooks added below needed to create models, include types implicity using .d.ts files so don't need import statements as they are global to transpiler.
+// const PostalDistrict = require('../api/models/PostalDistrict');
+
+async function asyncForEach(array, callback) {
+  for (let index = 0; index < array.length; index++) {
+    return callback(array[index], index, array);
+  }
+}
+
+
 module.exports.bootstrap = async function() {
   _.extend(sails.hooks.http.app.locals, sails.config.http.locals);
+
 
   // Import dependencies
   var path = require('path');
@@ -36,7 +47,7 @@ module.exports.bootstrap = async function() {
     name: 'Cafes',
   }).fetch();
 
-  var postalDistricts = await PostalDistrict.createEach([
+  const createPostalDistricts = [
     {
       outcode: 'L1'
     }, {
@@ -44,7 +55,29 @@ module.exports.bootstrap = async function() {
     }, {
       outcode: 'L3'
     }
-  ]).fetch();
+  ];
+  asyncForEach(createPostalDistricts, async (pd, ind, arr) => {
+    var existingPd = await PostalDistrict.findOne(pd);
+    if (existingPd) {
+      PostalDistrict.removeFromCollection(pd);
+    }
+  });
+  // var postalDistricts = createPostalDistricts.map((pd) => PostalDistrict.create(pd).fetch());
+  var postalDistricts = await PostalDistrict.createEach(createPostalDistricts).fetch();
+
+  var deliveryPartner = await DeliveryPartner.create({
+    name: 'Agile',
+    email: 'agile@example.com',
+    phoneNumber: '0123456789',
+    status: 'active',
+  }).fetch();
+
+  var deliveryPartner = await DeliveryPartner.create({
+    name: 'Agile',
+    email: 'agile@example.com',
+    phoneNumber: '0123456789',
+    status: 'active',
+  }).fetch();
 
   var deliveryPartner = await DeliveryPartner.create({
     name: 'Agile',
@@ -162,19 +195,80 @@ module.exports.bootstrap = async function() {
     option: dessertOption.id
   }]);
 
-  await Discount.create({
-    code: 'DELI10',
-    percentage: 10,
-    isEnabled: true
+  // await Discount.create({
+  //   code: 'DELI10',
+  //   percentage: 10,
+  //   isEnabled: true
+  // });
+
+  // * Create admin-user
+  await User.create({
+    email: 'joey@vegi.com',
+    // password: 'Testing123!',
+    phoneNoCountry: 7905532512,
+    phoneCountryCode: 44,
+    name: 'Joey Dwonczyk',
+    vendor: delifonseca.id,
+    vendorConfirmed: true,
+    isSuperAdmin: true,
+    vendorRole: 'none',
+    role: 'admin',
+    firebaseSessionToken: 'DUMMY_FIREBASE_TOKEN',
   });
 
-  // TODO: Create user
+  // // * Create consumer user
+  // await User.create({
+  //   email: 'jdwonczyk.fit@gmail.com',
+  //   phoneNoCountry: 7905532512,
+  //   phoneCountryCode: 44,
+  //   // password: 'Testing123!',
+  //   name: 'Consumer 1',
+  //   vendor: delifonseca.id,
+  //   vendorConfirmed: true,
+  //   isSuperAdmin: false,
+  //   role: 'vendor',
+  //   vendorRole: 'salesManag'
+  //   firebaseSessionToken: 'DUMMY_FIREBASE_TOKEN',
+  // });
+
+  // * Create sales Assistant
   await User.create({
-    email: 'adam@itsaboutpeepl.com',
-    password: 'Testing123!',
-    name: 'Adam Galloway',
+    email: 'jdwonczyk@gmail.com',
+    phoneNoCountry: 9998887777,
+    phoneCountryCode: 1,
+    // password: 'Testing123!',
+    name: 'Sales Assistant 1',
     vendor: delifonseca.id,
-    isSuperAdmin: true
+    vendorConfirmed: true,
+    isSuperAdmin: false,
+    vendorRole: 'salesManager',
+    role: 'vendor',
+    firebaseSessionToken: 'DUMMY_FIREBASE_TOKEN',
+  });
+
+  // * Create Courier (Manager)
+  await User.create({
+    email: 'jdwonczy.corpk@gmail.com',
+    phoneNoCountry: 9995557777,
+    phoneCountryCode: 1,
+    // password: 'Testing123!',
+    name: 'Courier 1',
+    isSuperAdmin: false,
+    role: 'courier',
+    courierRole: 'deliveryManager',
+    firebaseSessionToken: 'DUMMY_FIREBASE_TOKEN',
+  });
+
+  // * Create Consumer
+  await User.create({
+    email: 'jdwonczy.corpk@gmail.com',
+    phoneNoCountry: 9995557777,
+    phoneCountryCode: 1,
+    // password: 'Testing123!',
+    name: 'Consumer 1',
+    isSuperAdmin: false,
+    role: 'consumer',
+    firebaseSessionToken: 'DUMMY_FIREBASE_TOKEN',
   });
 
   // Save new bootstrap version

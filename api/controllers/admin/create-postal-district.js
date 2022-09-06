@@ -16,17 +16,32 @@ module.exports = {
 
 
   exits: {
-
+    postalDistrictAlreadyExists: {
+      statuscode: 401,
+      description: 'Postal District already exists'
+    },
+    success: {
+      data: null,
+      statuscode: 200,
+    }
   },
 
 
-  fn: async function (inputs) {
-    var postalDistrict = await PostalDistrict.create({
+  fn: async function (inputs, exits) {
+    var existingPostalDistrict = await PostalDistrict.find({
+      outcode: inputs.outcode
+    });
+
+    if (existingPostalDistrict) {
+      exits.postalDistrictAlreadyExists();
+    }
+
+    var postalDistrict = await PostalDistrict.findOrCreate({
       outcode: inputs.outcode
     }).fetch();
 
     // All done.
-    return postalDistrict;
+    return exits.success({ data: postalDistrict });
 
   }
 

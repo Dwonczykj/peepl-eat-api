@@ -77,7 +77,8 @@ module.exports = {
     rating: {
       type: 'number',
       min: 0,
-      max: 5
+      max: 5,
+      columnType: 'INT'
     },
     isVegan: {
       type: 'boolean',

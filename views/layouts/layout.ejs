@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Vegi Backend</title>
-    <!-- Viewport mobile tag for sensible mobile support -->
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <%/* If you want to discourage search engines from indexing this site, uncomment the following line: */%>
+
+<head>
+  <title>vegi - Business</title>
+  <!-- Viewport mobile tag for sensible mobile support -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1">
+
+  <% /* If you want to discourage search engines from indexing this site, uncomment the following line: */%>
     <meta name="robots" content="noindex">
 
+    <!-- <link rel="stylesheet" href="https://cdn.tutorialjinni.com/intl-tel-input/17.0.8/css/intlTelInput.css" />
+            <script src="https://cdn.tutorialjinni.com/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script> -->
 
     <!--
         Stylesheets and Preprocessors
@@ -28,16 +32,13 @@
             + Import stylesheets from other directories
             + Use a different or additional preprocessor, like SASS, SCSS or Stylus
     -->
-
     <!--STYLES-->
     <link rel="stylesheet" href="/styles/importer.css">
     <!--STYLES END-->
-  </head>
+</head>
 
-  <body>
-    <%- body %>
-
-
+<body>
+  <%- body %>
 
     <!--
         Client-side Templates
@@ -111,59 +112,67 @@
       const params = new URLSearchParams(queryString);
       const walletAddress = params.get('wallet');
 
-      if(walletAddress){
+      if (walletAddress) {
         _paq.push(['setUserId', walletAddress]);
       }
 
       _paq.push(['trackPageView']);
       _paq.push(['enableLinkTracking']);
-      (function() {
-        var u="https://analytics.itsaboutpeepl.com/";
-        _paq.push(['setTrackerUrl', u+'matomo.php']);
+      (function () {
+        var u = "https://analytics.itsaboutpeepl.com/";
+        _paq.push(['setTrackerUrl', u + 'matomo.php']);
         _paq.push(['setSiteId', '2']);
-        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-        g.type='text/javascript'; g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+        var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+        g.type = 'text/javascript'; g.async = true; g.src = u + 'matomo.js'; s.parentNode.insertBefore(g, s);
       })();
     </script>
     <!-- End Matomo Code -->
 
-<!--SCRIPTS-->
-<script src="/dependencies/sails.io.js"></script>
-<script src="/js/io.socket.config.js"></script>
-<script src="/dependencies/lodash.js"></script>
-<script src="/dependencies/jquery.min.js"></script>
-<script src="/dependencies/vue.js"></script>
-<script src="/dependencies/vue-router.js"></script>
-<script src="/dependencies/popper.min.js"></script>
-<script src="/dependencies/bootstrap.min.js"></script>
-<script src="/dependencies/portal-vue.umd.min.js"></script>
-<script src="/dependencies/cloud.js"></script>
-<script src="/dependencies/moment.min.js"></script>
-<script src="/dependencies/parasails.js"></script>
-<script src="/js/cloud.setup.js"></script>
-<script src="/js/components/ajax-button.component.js"></script>
-<script src="/js/components/ajax-form.component.js"></script>
-<script src="/js/components/edit-delivery-partner.js"></script>
-<script src="/js/components/edit-discount.component.js"></script>
-<script src="/js/components/edit-postal-district.component.js"></script>
-<script src="/js/components/edit-product-option-value.component.js"></script>
-<script src="/js/components/edit-product-option.component.js"></script>
-<script src="/js/components/edit-product.component.js"></script>
-<script src="/js/components/modal.component.js"></script>
-<script src="/js/components/opening-hours.component.js"></script>
-<script src="/js/components/order-card.component.js"></script>
-<script src="/js/pages/admin/approve-order.page.js"></script>
-<script src="/js/pages/admin/delivery-partners.page.js"></script>
-<script src="/js/pages/admin/discount-codes.page.js"></script>
-<script src="/js/pages/admin/edit-delivery-partner.page.js"></script>
-<script src="/js/pages/admin/edit-vendor.page.js"></script>
-<script src="/js/pages/admin/login.page.js"></script>
-<script src="/js/pages/admin/postal-districts.page.js"></script>
-<script src="/js/pages/admin/vendors.page.js"></script>
-<script src="/js/pages/orders/all-orders.page.js"></script>
-<script src="/js/pages/orders/my-orders.page.js"></script>
-<script src="/js/pages/orders/order-confirmation.page.js"></script>
-<script src="/js/pages/vendors/all-vendors.page.js"></script>
-<!--SCRIPTS END-->
-  </body>
+    <!--SCRIPTS-->
+    <script src="/dependencies/sails.io.js"></script>
+    <script src="/js/io.socket.config.js"></script>
+    <script src="/dependencies/lodash.js"></script>
+    <script src="/dependencies/jquery.min.js"></script>
+    <script src="/dependencies/vue.js"></script>
+    <script src="/dependencies/vue-router.js"></script>
+    <script src="/dependencies/popper.min.js"></script>
+    <script src="/dependencies/bootstrap.min.js"></script>
+    <script src="/dependencies/portal-vue.umd.min.js"></script>
+    <script src="/dependencies/bootstrap-vue.js"></script>
+    <script src="/dependencies/cloud.js"></script>
+    <script src="/dependencies/moment.min.js"></script>
+    <script src="/dependencies/parasails.js"></script>
+    <script src="/js/cloud.setup.js"></script>
+    <script src="/js/components/ajax-button.component.js"></script>
+    <script src="/js/components/ajax-form.component.js"></script>
+    <script src="/js/components/edit-discount.component.js"></script>
+    <script src="/js/components/edit-postal-district.component.js"></script>
+    <script src="/js/components/edit-product-option-value.component.js"></script>
+    <script src="/js/components/edit-product-option.component.js"></script>
+    <script src="/js/components/edit-product.component.js"></script>
+    <script src="/js/components/modal.component.js"></script>
+    <script src="/js/components/opening-hours.component.js"></script>
+    <script src="/js/components/order-card.component.js"></script>
+    <script src="/js/components/phone-input.component.js"></script>
+    <script src="/js/pages/admin/account.page.js"></script>
+    <script src="/js/pages/admin/admin-navbar.page.js"></script>
+    <script src="/js/pages/admin/approve-order.page.js"></script>
+    <script src="/js/pages/admin/delivery-partners.page.js"></script>
+    <script src="/js/pages/admin/discount-codes.page.js"></script>
+    <script src="/js/pages/admin/edit-delivery-partner.page.js"></script>
+    <script src="/js/pages/admin/edit-vendor.page.js"></script>
+    <script src="/js/pages/admin/ignore-login.page.js"></script>
+    <script src="/js/pages/admin/login.page.js"></script>
+    <script src="/js/pages/admin/postal-districts.page.js"></script>
+    <script src="/js/pages/admin/signup.page.js"></script>
+    <script src="/js/pages/admin/vendors.page.js"></script>
+    <script src="/js/pages/couriers/approve-delivery-availability.page.js"></script>
+    <script src="/js/pages/couriers/deliveries.page.js"></script>
+    <script src="/js/pages/orders/all-orders.page.js"></script>
+    <script src="/js/pages/orders/my-orders.page.js"></script>
+    <script src="/js/pages/orders/order-confirmation.page.js"></script>
+    <script src="/js/pages/vendors/all-vendors.page.js"></script>
+    <!--SCRIPTS END-->
+</body>
+
 </html>

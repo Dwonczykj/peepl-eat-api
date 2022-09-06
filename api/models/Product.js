@@ -46,6 +46,12 @@ module.exports = {
       type: 'boolean',
       description: 'Boolean to represent whether the product is featured or not.'
     },
+    status: {
+      type: 'string',
+      isIn: ['active', 'inactive'],
+      defaultsTo: 'inactive',
+      description: 'string active|inactive to represent whether product is discontinued or not'
+    },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗

@@ -81,10 +81,21 @@ module.exports = {
     //   type: 'boolean',
     //   defaultsTo: false
     // },
-    // deliveryId: {
-    //   type: 'string',
-    //   description: 'The ID to identify the delivery in the logistics system'
-    // },
+    deliveryId: {
+      type: 'string',
+      description: 'The ID to identify the delivery in the logistics system'
+    },
+    courierAccepted: {
+      type: 'boolean',
+      defaultsTo: false
+    },
+    courierConfirmed: {
+      type: 'boolean',
+      defaultsTo: false
+    },
+    courierId: {
+      type: 'string',
+    },
     fulfilmentSlotFrom: {
       type: 'ref',
       columnType: 'datetime',
@@ -144,7 +155,7 @@ module.exports = {
 
   },
 
-  beforeCreate: function(valuesToSet, proceed) {
+  beforeCreate: function (valuesToSet, proceed) {
     valuesToSet.publicId = uuidv4();
     return proceed();
   }

@@ -37,12 +37,12 @@ module.exports = {
       email: inputs.emailAddress,
     });
 
-    if(!user){
+    if (!user) {
       throw 'badCombo';
     }
 
     const isValidPassword = await bcrypt.compare(inputs.password, user.password);
-    if(!isValidPassword){
+    if (!isValidPassword) {
       throw 'badCombo';
     }
 

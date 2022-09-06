@@ -31,7 +31,13 @@
       "name": "View login"
     },
     {
-      "name": "Login"
+      "name": "View signup"
+    },
+    {
+      "name": "Registration"
+    },
+    {
+      "name": "View account"
     },
     {
       "name": "Logout"
@@ -47,6 +53,9 @@
     },
     {
       "name": "View delivery partners"
+    },
+    {
+      "name": "View deliveries"
     },
     {
       "name": "View all vendors"
@@ -67,7 +76,19 @@
       "name": "Get fulfilment slots"
     },
     {
+      "name": "Get eligible order dates"
+    },
+    {
       "name": "Get postal districts"
+    },
+    {
+      "name": "Accept / Reject Delivery Confirmation"
+    },
+    {
+      "name": "Add delivery availability to order"
+    },
+    {
+      "name": "Cancel delivery"
     },
     {
       "name": "Create order"
@@ -80,6 +101,24 @@
     },
     {
       "name": "Get order details"
+    },
+    {
+      "name": "Logged in"
+    },
+    {
+      "name": "Login With Firebase"
+    },
+    {
+      "name": "Check user for email"
+    },
+    {
+      "name": "Check user for phone"
+    },
+    {
+      "name": "Update User Vendor Role"
+    },
+    {
+      "name": "Deregister User Vendor Role"
     },
     {
       "name": "Create vendor"
@@ -98,6 +137,9 @@
     },
     {
       "name": "Create product"
+    },
+    {
+      "name": "Discontinue product"
     },
     {
       "name": "Create product option"
@@ -142,6 +184,12 @@
       "name": "Check discount code"
     },
     {
+      "name": "Is user inventory manager"
+    },
+    {
+      "name": "Is user sales manager"
+    },
+    {
       "name": "View vendor menu [DEPRECATED]"
     },
     {
@@ -156,6 +204,110 @@
   ],
   "components": {
     "schemas": {
+      "courier": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/courier-without-required-constraint"
+          },
+          {
+            "required": [
+              "name",
+              "walletAddress",
+              "imageUrl",
+              "email"
+            ]
+          }
+        ]
+      },
+      "courier-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **Courier**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the courier.",
+            "maxLength": 50,
+            "uniqueItems": true
+          },
+          "type": {
+            "type": "string",
+            "default": "bike",
+            "description": "The type of courier.",
+            "enum": [
+              "bike",
+              "electric"
+            ],
+            "example": "bike"
+          },
+          "description": {
+            "type": "string",
+            "description": "A brief description of the courier.",
+            "maxLength": 200
+          },
+          "walletAddress": {
+            "type": "string",
+            "pattern": "^0x[a-fA-F0-9]{40}$",
+            "description": "The blockchain wallet address for the courier. Used to distribute payments from vendors."
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "A description of where the featured image file can be found"
+          },
+          "status": {
+            "type": "string",
+            "default": "inactive",
+            "enum": [
+              "active",
+              "draft",
+              "inactive"
+            ],
+            "example": "inactive"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "description": "Phone number of the courier hq."
+          },
+          "email": {
+            "type": "string",
+            "description": "Email of the courier hq.",
+            "uniqueItems": true
+          },
+          "deliversToPostCodes": {
+            "type": "array",
+            "items": {},
+            "default": [],
+            "example": []
+          },
+          "rating": {
+            "type": "integer",
+            "format": "int64",
+            "maximum": 5,
+            "minimum": 0
+          },
+          "users": {
+            "description": "Array of **user**'s or array of FK's when creating / updating / not populated",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/user"
+            }
+          }
+        }
+      },
       "deliverypartner": {
         "type": "object",
         "allOf": [
@@ -554,6 +706,21 @@
           "paymentIntentId": {
             "type": "string"
           },
+          "deliveryId": {
+            "type": "string",
+            "description": "The ID to identify the delivery in the logistics system"
+          },
+          "courierAccepted": {
+            "type": "boolean",
+            "default": false
+          },
+          "courierConfirmed": {
+            "type": "boolean",
+            "default": false
+          },
+          "courierId": {
+            "type": "string"
+          },
           "fulfilmentSlotFrom": {
             "type": "string",
             "format": "date-time",
@@ -745,6 +912,11 @@
         "allOf": [
           {
             "$ref": "#/components/schemas/postaldistrict-without-required-constraint"
+          },
+          {
+            "required": [
+              "outcode"
+            ]
           }
         ]
       },
@@ -769,7 +941,8 @@
           "outcode": {
             "type": "string",
             "description": "The outcode for any post codes within this district.",
-            "example": "L1"
+            "example": "L1",
+            "uniqueItems": true
           },
           "vendors": {
             "description": "Array of **vendor**'s or array of FK's when creating / updating / not populated",
@@ -844,6 +1017,16 @@
           "isFeatured": {
             "type": "boolean",
             "description": "Boolean to represent whether the product is featured or not."
+          },
+          "status": {
+            "type": "string",
+            "default": "inactive",
+            "description": "string active|inactive to represent whether product is discontinued or not",
+            "enum": [
+              "active",
+              "inactive"
+            ],
+            "example": "inactive"
           },
           "vendor": {
             "description": "The seller of the product. JSON dictionary representing the **vendor** instance or FK when creating / updating / not populated",
@@ -1050,9 +1233,11 @@
           },
           {
             "required": [
-              "email",
-              "password",
-              "name"
+              "phoneNoCountry",
+              "phoneCountryCode",
+              "name",
+              "role",
+              "firebaseSessionToken"
             ]
           }
         ]
@@ -1077,11 +1262,15 @@
           },
           "email": {
             "type": "string",
-            "format": "email",
-            "uniqueItems": true
+            "format": "email"
           },
-          "password": {
-            "type": "string"
+          "phoneNoCountry": {
+            "type": "number",
+            "format": "double"
+          },
+          "phoneCountryCode": {
+            "type": "number",
+            "format": "double"
           },
           "name": {
             "type": "string"
@@ -1093,10 +1282,49 @@
           "role": {
             "type": "string",
             "enum": [
-              "owner",
-              "staff",
-              "courier"
+              "admin",
+              "vendor",
+              "courier",
+              "consumer"
             ]
+          },
+          "vendorRole": {
+            "type": "string",
+            "default": "none",
+            "enum": [
+              "admin",
+              "owner",
+              "inventoryManager",
+              "salesManager",
+              "none"
+            ],
+            "example": "none"
+          },
+          "courierRole": {
+            "type": "string",
+            "default": "none",
+            "enum": [
+              "admin",
+              "owner",
+              "deliveryManager",
+              "rider",
+              "none"
+            ],
+            "example": "none"
+          },
+          "roleConfirmedWithOwner": {
+            "type": "boolean",
+            "default": false
+          },
+          "vendorConfirmed": {
+            "type": "boolean",
+            "default": false
+          },
+          "firebaseSessionToken": {
+            "type": "string"
+          },
+          "fbUid": {
+            "type": "string"
           },
           "vendor": {
             "description": "JSON dictionary representing the **vendor** instance or FK when creating / updating / not populated",
@@ -1105,6 +1333,42 @@
                 "$ref": "#/components/schemas/vendor"
               }
             ]
+          },
+          "courier": {
+            "description": "JSON dictionary representing the **courier** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/courier"
+              }
+            ]
+          }
+        }
+      },
+      "usermodel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/usermodel-without-required-constraint"
+          }
+        ]
+      },
+      "usermodel-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **UserModel**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
           }
         }
       },
@@ -1210,8 +1474,8 @@
             "minimum": 1
           },
           "rating": {
-            "type": "number",
-            "format": "double",
+            "type": "integer",
+            "format": "int64",
             "maximum": 5,
             "minimum": 0
           },
@@ -1447,18 +1711,39 @@
             "description": "Internal server error"
           }
         }
+      }
+    },
+    "/admin/signup": {
+      "get": {
+        "summary": "View signup",
+        "description": "Display \"Signup\" page.",
+        "tags": [
+          "View signup"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
       },
       "post": {
-        "summary": "Login",
-        "description": "Login admin.",
+        "summary": "Registration",
+        "description": "Registration administration.",
         "tags": [
-          "Login"
+          "Registration"
         ],
         "parameters": [
           {
             "in": "query",
             "name": "emailAddress",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string",
               "format": "email"
@@ -1466,25 +1751,137 @@
           },
           {
             "in": "query",
-            "name": "password",
+            "name": "phoneNoCountry",
             "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "phoneCountryCode",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "name",
+            "required": false,
             "schema": {
               "type": "string"
             }
           },
           {
             "in": "query",
-            "name": "rememberMe",
+            "name": "vendorId",
             "required": false,
             "schema": {
-              "type": "boolean",
-              "default": false
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            }
+          },
+          {
+            "in": "query",
+            "name": "courierId",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            }
+          },
+          {
+            "in": "query",
+            "name": "role",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vendorRole",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "courierRole",
+            "required": false,
+            "schema": {
+              "type": "string"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "A user is already registered to the phone number requested"
+                    },
+                    {
+                      "example": {},
+                      "type": "object",
+                      "properties": {},
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/admin/account": {
+      "get": {
+        "summary": "View account",
+        "description": "Display \"Account Details\" page.",
+        "tags": [
+          "View account"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
           },
           "404": {
             "description": "Resource not found"
@@ -1505,7 +1902,23 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "The requested resource"
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
           },
           "404": {
             "description": "Resource not found"
@@ -1676,7 +2089,23 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
           },
           "404": {
             "description": "Resource not found"
@@ -1708,17 +2137,17 @@
         }
       }
     },
-    "/api/v1/vendors": {
-      "get": {
-        "summary": "View all vendors",
-        "description": "Display \"All vendors\" page.",
+    "/couriers/deliveries": {
+      "all": {
+        "summary": "View deliveries",
+        "description": "Display \"Courier Deliveries\" page.",
         "tags": [
-          "View all vendors"
+          "View deliveries"
         ],
         "parameters": [
           {
             "in": "query",
-            "name": "outcode",
+            "name": "courierId",
             "required": true,
             "schema": {
               "type": "string"
@@ -1744,6 +2173,36 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/vendors": {
+      "get": {
+        "summary": "View all vendors",
+        "description": "Display \"All vendors\" page.",
+        "tags": [
+          "View all vendors"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "outcode",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
           },
           "404": {
             "description": "Not found"
@@ -1901,6 +2360,37 @@
         }
       }
     },
+    "/api/v1/vendors/get-eligible-order-dates": {
+      "get": {
+        "summary": "Get eligible order dates",
+        "description": "Get eligible order dates",
+        "tags": [
+          "Get eligible order dates"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "vendor",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/api/v1/vendors/get-postal-districts": {
       "get": {
         "summary": "Get postal districts",
@@ -1917,6 +2407,169 @@
               "format": "double"
             },
             "description": "The id of the vendor."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested resource"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/couriers/accept-reject-delivery-confirmation": {
+      "post": {
+        "summary": "Accept / Reject Delivery Confirmation",
+        "tags": [
+          "Accept / Reject Delivery Confirmation"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "deliveryId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The delivery id generated by the courier"
+          },
+          {
+            "in": "query",
+            "name": "courierConfirmed",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested resource"
+          },
+          "401": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Courier has already confirmed this order."
+                    },
+                    {
+                      "type": "string",
+                      "description": "Order is registered to another courier!"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No order found for courier delivery id"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/couriers/add-delivery-availability-for-order": {
+      "post": {
+        "summary": "Add delivery availability to order",
+        "description": "For couriers to verify that they have riders available to service an order before the order has been sent to the vendor to be confirmed.",
+        "tags": [
+          "Add delivery availability to order"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "vegiOrderId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The Public id relating to the order in the vegi db"
+          },
+          {
+            "in": "query",
+            "name": "deliveryId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The delivery id generated by the courier to be added here so that it can be added to the order for tracking."
+          },
+          {
+            "in": "query",
+            "name": "courierAccepted",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested resource"
+          },
+          "401": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "A courier has already accepted this order"
+                    },
+                    {
+                      "type": "string",
+                      "description": "A courier has already accepted this order"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No order found for order id"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/couriers/cancel-delivery": {
+      "post": {
+        "summary": "Cancel delivery",
+        "tags": [
+          "Cancel delivery"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "vegiOrderId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The public id relating to the order in the vegi db"
+          },
+          {
+            "in": "query",
+            "name": "deliveryId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The delivery id generated by the courier"
           }
         ],
         "responses": {
@@ -2004,7 +2657,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Delivery after this time if delivery, collection from vendor after this time if collection"
           },
           {
             "in": "query",
@@ -2012,7 +2666,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Delivery before this time if delivery, collection from vendor before this time if collection"
           },
           {
             "in": "query",
@@ -2049,7 +2704,23 @@
                     },
                     {
                       "type": "string",
+                      "description": "No courier available."
+                    },
+                    {
+                      "type": "string",
+                      "description": "All items are unavailable from merchant."
+                    },
+                    {
+                      "type": "string",
                       "description": "The minimum order amount was not met."
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Not found"
                     },
                     {
                       "type": "string",
@@ -2061,7 +2732,7 @@
             }
           },
           "404": {
-            "description": "Not found"
+            "description": "Resource not found"
           },
           "500": {
             "description": "Internal server error"
@@ -2159,6 +2830,530 @@
           },
           "404": {
             "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/login": {
+      "get": {
+        "summary": "View login",
+        "description": "Display \"Login\" page.",
+        "tags": [
+          "View login"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/logged-in": {
+      "get": {
+        "summary": "Logged in",
+        "description": "Logged in",
+        "tags": [
+          "Logged in"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/signup": {
+      "get": {
+        "summary": "View signup",
+        "description": "Display \"Signup\" page.",
+        "tags": [
+          "View signup"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "post": {
+        "summary": "Registration",
+        "description": "Registration administration.",
+        "tags": [
+          "Registration"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "emailAddress",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          },
+          {
+            "in": "query",
+            "name": "phoneNoCountry",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "phoneCountryCode",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "name",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vendorId",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            }
+          },
+          {
+            "in": "query",
+            "name": "courierId",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            }
+          },
+          {
+            "in": "query",
+            "name": "role",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vendorRole",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "courierRole",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "A user is already registered to the phone number requested"
+                    },
+                    {
+                      "example": {},
+                      "type": "object",
+                      "properties": {},
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/login-with-firebase": {
+      "post": {
+        "summary": "Login With Firebase",
+        "description": "Firebase Login admin.",
+        "tags": [
+          "Login With Firebase"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "phoneNumber",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "firebaseSessionToken",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "firebase errored on verifying the user token"
+          },
+          "404": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/user-exists-for-email": {
+      "post": {
+        "summary": "Check user for email",
+        "description": "Check whether a user exists for a email",
+        "tags": [
+          "Check user for email"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "example": true,
+                      "type": "boolean",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/user-exists-for-phone": {
+      "post": {
+        "summary": "Check user for phone",
+        "description": "Check whether a user exists for a phone number",
+        "tags": [
+          "Check user for phone"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "countryCodeNoFormat",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "phoneNoCountryNoFormat",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "example": true,
+                      "type": "boolean",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/update-user": {
+      "post": {
+        "summary": "Update User Vendor Role",
+        "description": "Update the role of the user at the vendor they are registered to",
+        "tags": [
+          "Update User Vendor Role"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vendorId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vendorRole",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "owner",
+                "inventoryManager",
+                "salesManager",
+                "courier",
+                "none"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "vendorConfirmed",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "courierId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "courierRole",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "owner",
+                "deliveryManager",
+                "rider",
+                "none"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "name",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "role",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "admin",
+                "vendor",
+                "courier"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "example": {},
+                      "type": "object",
+                      "properties": {},
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "You are not authorised to have a role with this vendor."
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VendorRole passed does not exist."
+          },
+          "404": {
+            "description": "There is no vendor with that ID!"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/deregister-user": {
+      "post": {
+        "summary": "Deregister User Vendor Role",
+        "description": "Deregister the role of the user at the vendor they are registered to",
+        "tags": [
+          "Deregister User Vendor Role"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "example": {},
+                      "type": "object",
+                      "properties": {},
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "You are not authorised to have a role with this vendor."
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "User id passed does not exist."
+          },
+          "404": {
+            "description": "There is no user with that ID!"
           },
           "500": {
             "description": "Internal server error"
@@ -2530,6 +3725,184 @@
         ],
         "responses": {
           "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "New delivery partner created."
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "delivery partner already exists"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/edit-delivery-partner": {
+      "post": {
+        "summary": "Edit delivery partner",
+        "tags": [
+          "Edit delivery partner"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "The id of the delivery partner to edit"
+          },
+          {
+            "in": "query",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 50
+            },
+            "description": "The name of the delivery partner"
+          },
+          {
+            "in": "query",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email",
+              "maxLength": 50
+            },
+            "description": "The email address of the delivery partner"
+          },
+          {
+            "in": "query",
+            "name": "phoneNumber",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 20
+            },
+            "description": "The phone number of the delivery partner"
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "inactive",
+              "enum": [
+                "active",
+                "inactive"
+              ],
+              "example": "inactive"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Delivery partner edited."
+                    },
+                    {
+                      "type": "string",
+                      "description": "You are not authorised to edit this vendor."
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "There is no delivery partner with that ID!"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/create-delivery-partner": {
+      "post": {
+        "summary": "Create delivery partner",
+        "tags": [
+          "Create delivery partner"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 50
+            },
+            "description": "The name of the delivery partner"
+          },
+          {
+            "in": "query",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email",
+              "maxLength": 50
+            },
+            "description": "The email address of the delivery partner"
+          },
+          {
+            "in": "query",
+            "name": "phoneNumber",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 20
+            },
+            "description": "The phone number of the delivery partner"
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "inactive",
+              "enum": [
+                "active",
+                "inactive"
+              ],
+              "example": "inactive"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
             "description": "New delivery partner created."
           },
           "404": {
@@ -2713,9 +4086,16 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "example": {},
+                  "example": {
+                    "id": "old_product_id"
+                  },
                   "type": "object",
-                  "properties": {},
+                  "properties": {
+                    "id": {
+                      "example": "old_product_id",
+                      "type": "string"
+                    }
+                  },
                   "description": "Success"
                 }
               }
@@ -2832,6 +4212,130 @@
           },
           "404": {
             "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/discontinue-product": {
+      "post": {
+        "summary": "Discontinue product",
+        "description": "Voids a product item so that it still exists for future data analytics but is no longer available to be sold by a vendor.",
+        "tags": [
+          "Discontinue product"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vendor",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": "old_product_id"
+                  },
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "example": "old_product_id",
+                      "type": "string"
+                    }
+                  },
+                  "description": "Success"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/update-user-vendor-role": {
+      "post": {
+        "summary": "Update User Vendor Role",
+        "description": "Update the role of the user at the vendor they are registered to",
+        "tags": [
+          "Update User Vendor Role"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "vendorId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vendorRole",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "owner",
+                "inventoryManager",
+                "salesManager",
+                "courier",
+                "none"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "example": {},
+                      "type": "object",
+                      "properties": {},
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "You are not authorised to have a role with this vendor."
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VendorRole passed does not exist."
+          },
+          "404": {
+            "description": "There is no vendor with that ID!"
           },
           "500": {
             "description": "Internal server error"
@@ -3268,104 +4772,6 @@
         }
       }
     },
-    "/api/v1/admin/create-update-openinghours": {
-      "post": {
-        "summary": "Update Fulfilment Method",
-        "tags": [
-          "Update Fulfilment Method"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "openingHours",
-            "required": true,
-            "schema": {},
-            "description": "The opening hours to be added to the vendor"
-          },
-          {
-            "in": "query",
-            "name": "id",
-            "required": false,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            },
-            "description": "The id of the fulfilment method"
-          },
-          {
-            "in": "query",
-            "name": "priceModifier",
-            "required": false,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            },
-            "description": "A positive or negative integer representing the amount of pence to adjust the base price by."
-          },
-          {
-            "in": "query",
-            "name": "slotLength",
-            "required": false,
-            "schema": {
-              "type": "number",
-              "format": "double",
-              "maximum": 1440,
-              "minimum": 30
-            },
-            "description": "Slot length in minutes"
-          },
-          {
-            "in": "query",
-            "name": "bufferLength",
-            "required": false,
-            "schema": {
-              "type": "number",
-              "format": "double",
-              "minimum": 0
-            },
-            "description": "The required buffer time before booking a slot."
-          },
-          {
-            "in": "query",
-            "name": "orderCutoff",
-            "required": false,
-            "schema": {},
-            "description": "The time after which no new bookings can be made."
-          },
-          {
-            "in": "query",
-            "name": "maxOrders",
-            "required": false,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            },
-            "description": "The maximum number of orders allowed per slot."
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "example": {},
-                  "type": "object",
-                  "properties": {},
-                  "description": "Success"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
     "/api/v1/admin/update-fulfilment-method": {
       "post": {
         "summary": "Update Fulfilment Method",
@@ -3520,7 +4926,23 @@
         ],
         "responses": {
           "200": {
-            "description": "The requested resource"
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Postal District already exists"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
           },
           "404": {
             "description": "Resource not found"
@@ -3607,6 +5029,43 @@
         }
       }
     },
+    "/api/v1/admin/logout": {
+      "all": {
+        "summary": "Logout",
+        "description": "Logout admin.",
+        "tags": [
+          "Logout"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/api/v1/products/get-product-options/{productId}": {
       "get": {
         "summary": "Get product options",
@@ -3671,6 +5130,254 @@
           },
           "404": {
             "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/is-user-vendor-inventory-manager/{vendorId}": {
+      "get": {
+        "summary": "Is user inventory manager",
+        "tags": [
+          "Is user inventory manager"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "vendorId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "example": {
+                        "isInventoryManager": false,
+                        "vendorID": 0
+                      },
+                      "type": "object",
+                      "properties": {
+                        "isInventoryManager": {
+                          "example": false,
+                          "type": "boolean"
+                        },
+                        "vendorID": {
+                          "example": 0,
+                          "type": "integer",
+                          "format": "int64"
+                        }
+                      },
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "You are not authenticated"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/is-user-vendor-sales-manager/{vendorId}": {
+      "get": {
+        "summary": "Is user sales manager",
+        "tags": [
+          "Is user sales manager"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "vendorId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "example": {
+                        "isSalesManager": false,
+                        "vendorID": 0
+                      },
+                      "type": "object",
+                      "properties": {
+                        "isSalesManager": {
+                          "example": false,
+                          "type": "boolean"
+                        },
+                        "vendorID": {
+                          "example": 0,
+                          "type": "integer",
+                          "format": "int64"
+                        }
+                      },
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "You are not authenticated"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/is-user-vendor-owner/{vendorId}": {
+      "get": {
+        "summary": "Is user inventory manager",
+        "tags": [
+          "Is user inventory manager"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "vendorId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "example": {
+                        "isOwner": false,
+                        "vendorID": 0
+                      },
+                      "type": "object",
+                      "properties": {
+                        "isOwner": {
+                          "example": false,
+                          "type": "boolean"
+                        },
+                        "vendorID": {
+                          "example": 0,
+                          "type": "integer",
+                          "format": "int64"
+                        }
+                      },
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "You are not authenticated"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/is-user-vendor-admin/{vendorId}": {
+      "get": {
+        "summary": "Is user inventory manager",
+        "tags": [
+          "Is user inventory manager"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "vendorId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "example": {
+                        "isAdmin": false,
+                        "vendorID": 0
+                      },
+                      "type": "object",
+                      "properties": {
+                        "isAdmin": {
+                          "example": false,
+                          "type": "boolean"
+                        },
+                        "vendorID": {
+                          "example": 0,
+                          "type": "integer",
+                          "format": "int64"
+                        }
+                      },
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "You are not authenticated"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
           },
           "500": {
             "description": "Internal server error"
