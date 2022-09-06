@@ -100,7 +100,6 @@ module.exports = {
 
 
   fn: async function (inputs, exits) {
-    // TODO: Validation (products belong to vendor, fulfilmentMethod belongs to vendor, options are related to products, optionvalues are valid for options)
     try{
       var orderValid = await sails.helpers.validateOrder.with(inputs);
     } catch (err) {
@@ -112,10 +111,6 @@ module.exports = {
 
     if(inputs.discountCode) {
       discount = await Discount.findOne({code: inputs.discountCode});
-    }
-    
-    if (!inputs.items){
-      return exits.noItemsFound();
     }
 
     const isDelivery = (inputs.fulfilmentMethod === 1); // 2 is Collection

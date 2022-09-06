@@ -3848,6 +3848,164 @@
         }
       }
     },
+    "/api/v1/admin/create-delivery-partner": {
+      "post": {
+        "summary": "Create delivery partner",
+        "tags": [
+          "Create delivery partner"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 50
+            },
+            "description": "The name of the delivery partner"
+          },
+          {
+            "in": "query",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email",
+              "maxLength": 50
+            },
+            "description": "The email address of the delivery partner"
+          },
+          {
+            "in": "query",
+            "name": "phoneNumber",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 20
+            },
+            "description": "The phone number of the delivery partner"
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "inactive",
+              "enum": [
+                "active",
+                "inactive"
+              ],
+              "example": "inactive"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "New delivery partner created."
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/edit-delivery-partner": {
+      "post": {
+        "summary": "Edit delivery partner",
+        "tags": [
+          "Edit delivery partner"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "The id of the delivery partner to edit"
+          },
+          {
+            "in": "query",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 50
+            },
+            "description": "The name of the delivery partner"
+          },
+          {
+            "in": "query",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email",
+              "maxLength": 50
+            },
+            "description": "The email address of the delivery partner"
+          },
+          {
+            "in": "query",
+            "name": "phoneNumber",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 20
+            },
+            "description": "The phone number of the delivery partner"
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "inactive",
+              "enum": [
+                "active",
+                "inactive"
+              ],
+              "example": "inactive"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Delivery partner edited."
+                    },
+                    {
+                      "type": "string",
+                      "description": "You are not authorised to edit this vendor."
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "There is no delivery partner with that ID!"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/api/v1/admin/edit-product": {
       "post": {
         "summary": "Edit product",

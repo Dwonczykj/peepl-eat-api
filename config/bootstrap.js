@@ -79,6 +79,13 @@ module.exports.bootstrap = async function() {
     status: 'active',
   }).fetch();
 
+  var deliveryPartner = await DeliveryPartner.create({
+    name: 'Agile',
+    email: 'agile@example.com',
+    phoneNumber: '0123456789',
+    status: 'active',
+  }).fetch();
+
   var delifonseca = await Vendor.create({
     name: 'Delifonseca',
     type: 'restaurant',
