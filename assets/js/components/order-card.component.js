@@ -41,7 +41,9 @@ parasails.registerComponent('order-card', {
     <div v-for="item in order.items">
       <h2 class="h5 border-top pt-3 mt-3 mb-0">{{item.product.name}}</h2>
       <ol v-if="item.optionValues && item.optionValues.length" class="order-confirmation__option-values">
-        <li v-for="optionValue in item.optionValues"><b>{{optionValue.option.name}}</b>: {{optionValue.optionValue.name}}</li>
+        <li v-for="optionValue in item.optionValues">
+          <b>{{optionValue.option.name}}</b>: {{optionValue.optionValue.name}} ({{optionValue.optionValue.description}})
+        </li>
       </ol>
     </div>
 
