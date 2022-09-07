@@ -126,7 +126,7 @@ module.exports = {
       // Find orders for that fulfilment method between the start and end times.
       // var fulfilmentSlotFrom = moment(openTime, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DD HH:mm:ss');
       // var fulfilmentSlotTo = moment(closeTime, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DD HH:mm:ss');
-      var orders = await Order.find({fulfilmentMethod: inputs.fulfilmentMethodId, paymentStatus: 'paid', restaurantAcceptanceStatus: { '!=' : 'declined' }, fulfilmentSlotFrom: {'>=': openTime}, fulfilmentSlotTo: {'<=': closeTime}});
+      var orders = await Order.find({fulfilmentMethod: inputs.fulfilmentMethodId, paymentStatus: 'paid', restaurantAcceptanceStatus: { '!=' : 'rejected' }, fulfilmentSlotFrom: {'>=': openTime}, fulfilmentSlotTo: {'<=': closeTime}});
 
       /* var orders = [{
         fulfilmentSlotFrom: '17/02/2022 10:00',
