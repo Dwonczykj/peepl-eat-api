@@ -85,6 +85,10 @@ module.exports = {
     },
     invalidDiscountCode: {
       description: 'The discount code is invalid.',
+    },
+    invalidUserAddress: {
+      description: 'The address of the user given in the order is invalid.',
+      data: null,
     }
   },
 
@@ -152,9 +156,9 @@ module.exports = {
       }
     }
 
+    const postcodeRegex = /^(((([A-Z][A-Z]{0,1})[0-9][A-Z0-9]{0,1}) {0,}[0-9])[A-Z]{2})$/;
     if (fulfilmentMethod.methodType === 'delivery') {
       // Check if vendor delivers to postal district
-      const postcodeRegex = /^(((([A-Z][A-Z]{0,1})[0-9][A-Z0-9]{0,1}) {0,}[0-9])[A-Z]{2})$/;
       const m = postcodeRegex.exec(inputs.address.postCode);
       if (m !== null) {
         let postalDistrict = m[3]; // 3rd match group is the postal district
@@ -169,6 +173,22 @@ module.exports = {
         return exits.invalidPostalDistrict();
       }
     }
+    if (fulfilmentMethod.methodType === 'collection') {
+      // require user to submit their name and address for identification purposes on collection
+      if(!inputs.address){
+        return exits.invalidUserAddress({data: 'address object required'});
+      }
+      if(!inputs.address.name){
+        return exits.invalidUserAddress({data: 'address.name required'});
+      }
+      if(!inputs.address.email){
+        return exits.invalidUserAddress({data: 'address.email required'});
+      }
+      if(!inputs.address.phoneNumber){
+        return exits.invalidUserAddress({data: 'address.phoneNumber required'});
+      }
+    }
+
 
     // Check if the delivery slots are valid
     var slotsValid = await sails.helpers.validateDeliverySlot
