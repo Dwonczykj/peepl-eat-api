@@ -68,8 +68,9 @@ parasails.registerComponent('order-card', {
       <h2 class="h5 border-top pt-3 mt-3 mb-0 d-flex">
         <span class="mr-auto"></span>
       </h2>
-      <button class="btn btn-peepl-green" @click="clickApproveOrDeclineOrder(true)">Approve</button>
-      <button class="btn btn-peepl-red" @click="clickApproveOrDeclineOrder(false)">Decline</button>
+      <button class="btn btn-peepl-green" @click="clickApproveOrDeclineOrder('accept')">Approve</button>
+      <button class="btn btn-peepl-red" @click="clickApproveOrDeclineOrder('reject')">Decline</button>
+      <button class="btn btn-peepl-red" @click="clickApproveOrDeclineOrder('partial')">Partially fulfil</button>
     </div>
     <div v-else-if="order.restaurantAcceptanceStatus == 'pending' && !isInFuture(order.fulfilmentSlotFrom)">
       <p class="border-top pt-3 mt-3 mb-0 d-flex">
@@ -119,16 +120,19 @@ parasails.registerComponent('order-card', {
     click: async function(){
       this.$emit('click');
     },
-    clickApproveOrDeclineOrder: function(isApproved){
+    clickApproveOrDeclineOrder: function (orderFulfilled) {
       var that = this;
-      Cloud.approveOrDeclineOrder(this.order.publicId, isApproved)
-      .then(() => {
-        if(isApproved){
-          that.order.restaurantAcceptanceStatus = 'accepted';
-        } else {
-          that.order.restaurantAcceptanceStatus = 'rejected';
-        }
-      });
+
+      Cloud.approveOrDeclineOrder(this.order.publicId, orderFulfilled)
+        .then(() => {
+          if (orderFulfilled === 'accept') {
+            that.order.restaurantAcceptanceStatus = 'accepted';
+          } else if (orderFulfilled === 'reject') {
+            that.order.restaurantAcceptanceStatus = 'rejected';
+          } else if (orderFulfilled === 'partial') {
+            that.order.restaurantAcceptanceStatus = 'rejected';
+          }
+        });
     },
     isInFuture: function(dateTimeString){
       if (!dateTimeString) {return false;}

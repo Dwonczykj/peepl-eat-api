@@ -20,6 +20,7 @@ module.exports.custom = {
   ***************************************************************************/
   baseUrl: 'https://vegi.itsaboutpeepl.com',
   internalEmailAddress: 'support@itsaboutpeepl.com',
+  internalPhoneNumber: envConfig['internalPhone'],
   buildNumber: 1,
   peeplWebhookAddress: 'https://vegi.itsaboutpeepl.com/api/v1/orders/peepl-pay-webhook',
   fuseStudioBaseUrl: 'https://api.chargeweb3.com/api/v0/',
@@ -29,5 +30,5 @@ module.exports.custom = {
   peeplPayUrl: 'https://pay.itsaboutpeepl.com/api/v1',
   amazonS3BucketUrl: 'https://vegiapp-1.s3.us-east-1.amazonaws.com/',
   amazonS3Bucket: 'vegiapp-1',
-  passwordSaltRounds: 10,
+  passwordSaltRounds: envConfig['saltRounds'],
 };

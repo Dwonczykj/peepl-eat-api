@@ -46,7 +46,10 @@ module.exports = {
 
     // Method protected by config/policies.js
 
-    var order = await Order.findOne({id: inputs.vegiOrderId});
+    var order = await Order.findOne({
+      publicId: inputs.vegiOrderId,
+      completedFlag: '',
+    });
 
     if (!order){
       throw 'notFound';

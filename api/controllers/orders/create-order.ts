@@ -224,7 +224,7 @@ module.exports = {
       // TODO: error handling
       var newPaymentIntent = await sails.helpers.createPaymentIntent(
         calculatedOrderTotal.finalAmount,
-        vendor.walletAddress,
+        vendor.walletAddress, //pushes an update to user via firebase when order has comnpleted via peeplPay posting back to peeplEatWebHook
         vendor.name
       )
       .catch(() => {

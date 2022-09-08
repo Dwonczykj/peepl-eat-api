@@ -12,7 +12,7 @@ module.exports = {
   inputs: {
     orderId: {
       type: 'number',
-      description: 'The ID of the order',
+      description: 'The INTERNAL ID of the order',
       required: true
     }
   },

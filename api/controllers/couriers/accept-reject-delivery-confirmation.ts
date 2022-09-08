@@ -38,7 +38,10 @@ module.exports = {
 
   fn: async function (inputs) {
 
-    var order = await Order.findOne({deliveryId: inputs.deliveryId});
+    var order = await Order.findOne({
+      deliveryId: inputs.deliveryId,
+      completedFlag: ''
+    });
 
     if (!order){
       throw 'notFound';
@@ -59,10 +62,10 @@ module.exports = {
           courierConfirmed: inputs.courierConfirmed,
         });
 
-    // No need to send notification to customer about courier accepted/declined as waiting for vendor.
+    //! No need to send notification to customer about courier accepted/declined as waiting for vendor.
     //TODO: Replace SMS after vendor accepts with an SMS after the courier then confirms its delivery.
     // await sails.helpers.sendFirebaseNotification.with({
-    //   topic: 'order-' + order.id,
+    //   topic: 'order-' + order.publicId,
     //   title: 'Order update',
     //   body: 'Your order has been ' + (inputs.courierAccepted ? 'accepted 😎' : 'declined 😔') + '.'
     // });

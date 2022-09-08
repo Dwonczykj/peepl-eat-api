@@ -24,7 +24,11 @@ module.exports = {
   },
 
   fn: async function (inputs, exits) {
-    var orders = await Order.find({customerWalletAddress: inputs.walletId, paidDateTime: {'>': 0}})
+    var orders = await Order.find({
+      customerWalletAddress: inputs.walletId,
+      paidDateTime: {'>': 0},
+      completedFlag: '',
+    })
     .populate('vendor&items.product&optionValues&optionValues.option&optionValue');
 
     // Respond with view or JSON.

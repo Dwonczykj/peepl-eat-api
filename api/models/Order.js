@@ -128,7 +128,32 @@ module.exports = {
       type: 'boolean',
       defaultsTo: false
     },
-
+    completedFlag: {
+      type: 'string',
+      defaultsTo: '',
+      isIn: ['', 'completed', 'cancelled']
+    },
+    completedOrderFeedback: {
+      type: 'string',
+      defaultsTo: null,
+      allowNull: true,
+    },
+    deliveryPunctuality: {
+      type: 'number',
+      columnType: 'int',
+      min: 0,
+      max: 5,
+      defaultsTo: null,
+      allowNull: true,
+    },
+    orderCondition: {
+      type: 'number',
+      columnType: 'int',
+      min: 0,
+      max: 5,
+      defaultsTo: null,
+      allowNull: true,
+    },
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
     //  ╚═╝╩ ╩╚═╝╚═╝═╩╝╚═╝
@@ -145,6 +170,10 @@ module.exports = {
       model: 'discount'
     },
     items: {
+      collection: 'orderitem',
+      via: 'order'
+    },
+    unfulfilledItems: {
       collection: 'orderitem',
       via: 'order'
     },

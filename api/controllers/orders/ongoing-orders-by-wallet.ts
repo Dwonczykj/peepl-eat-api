@@ -19,7 +19,10 @@ module.exports = {
     }
   },
   fn: async function (inputs: OngoingOrdersByWallet, exits: Exits) {
-    const orders = await Order.find({customerWalletAddress: inputs.walletAddress});
+    const orders = await Order.find({
+      customerWalletAddress: inputs.walletAddress,
+      completedFlag: ''
+    });
     exits.success({ data: orders });
   }
 };

@@ -12,6 +12,16 @@ module.exports = {
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
     //  ╩  ╩╚═╩╩ ╩╩ ╩ ╩ ╚╝ ╚═╝╚═╝
+    unfulfilled: {
+      type: 'boolean',
+      defaultsTo: false,
+      description: 'flag to show that item was unfulfilled from an order'
+    },
+    unfulfilledOnOrderId: {
+      type: 'string',
+      required: false,
+      defaultsTo: '',
+    },
 
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗

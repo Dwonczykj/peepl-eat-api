@@ -286,7 +286,22 @@ Cloud.setup({
     approveOrDeclineOrder: {
       verb: "POST",
       url: "/api/v1/admin/approve-or-decline-order",
-      args: ["orderId", "restaurantAccepted"],
+      args: ["orderId", "orderFulfilled", "retainItems", "removeItems"],
+    },
+    customerUpdateOrder: {
+      verb: "POST",
+      url: "/api/v1/admin/customer-update-order",
+      args: ["orderId", "orderFulfilled", "retainItems", "removeItems"],
+    },
+    customerCancelOrder: {
+      verb: "POST",
+      url: "/api/v1/admin/customer-cancel-order",
+      args: ["orderId", "retainItems", "removeItems"],
+    },
+    customerReceivedOrder: {
+      verb: "POST",
+      url: "/api/v1/admin/customer-received-order",
+      args: ["orderId", "orderReceived", "orderCondition", "deliveryPunctuality", "feedback"],
     },
     createPostalDistrict: {
       verb: "POST",

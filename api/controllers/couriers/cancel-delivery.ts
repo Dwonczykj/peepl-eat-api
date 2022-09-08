@@ -28,7 +28,10 @@ module.exports = {
 
   fn: async function (inputs) {
 
-    var order = await Order.findOne({deliveryId: inputs.deliveryId});
+    var order = await Order.findOne({
+      deliveryId: inputs.deliveryId,
+      completedFlag: ''
+    });
 
     if (!order){
       throw 'notFound';
@@ -51,7 +54,7 @@ module.exports = {
         });
 
     await sails.helpers.sendFirebaseNotification.with({
-      topic: 'order-' + order.id,
+      topic: 'order-' + order.publicId,
       title: 'Rider Cancelled! 🚨',
       body: 'Your order has been cancelled by the rider. \nWe will find a new rider and notify you again when we do. \n\nAlternatively open vegi to manage to your order.'
     });

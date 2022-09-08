@@ -40,6 +40,7 @@ module.exports = {
       vendor: undefined,
       fulfilmentSlotFrom: undefined,
       fulfilmentSlotTo: undefined,
+      completedFlag: '',
     };
 
     // Sort by fulfilment time ascending

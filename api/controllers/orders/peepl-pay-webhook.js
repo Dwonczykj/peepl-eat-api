@@ -32,10 +32,16 @@ module.exports = {
       paidDateTime: unixtime
     });
 
-    var order = await Order.findOne({paymentIntentId: inputs.publicId})
+    var order = await Order.findOne({
+      paymentIntentId: inputs.publicId,
+      completedFlag: '',
+    })
     .populate('vendor');
 
-    await sails.helpers.sendSmsNotification.with({body: 'You have received a new order from Vegi for delivery between ' + order.fulfilmentSlotFrom + ' and ' + order.fulfilmentSlotTo + '. To accept or decline: ' + sails.config.custom.baseUrl + '/admin/approve-order/' + order.publicId, to: order.vendor.phoneNumber});
+    await sails.helpers.sendSmsNotification.with({
+      to: order.vendor.phoneNumber,
+      body: 'You have received a new order from vegi for delivery between ' + order.fulfilmentSlotFrom + ' and ' + order.fulfilmentSlotTo + '. To accept or decline: ' + sails.config.custom.baseUrl + '/admin/approve-order/' + order.publicId
+    });
 
     // // Send order confirmation email
     // await sails.helpers.sendTemplateEmail.with({
