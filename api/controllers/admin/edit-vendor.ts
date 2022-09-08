@@ -32,6 +32,22 @@ module.exports = {
       type: 'string',
       allowNull: true
     },
+    pickupAddressLineOne: {
+      type: 'string',
+      allowNull: true
+    },
+    pickupAddressLineTwo: {
+      type: 'string',
+      allowNull: true
+    },
+    pickupAddressCity: {
+      type: 'string',
+      allowNull: true
+    },
+    pickupAddressPostCode: {
+      type: 'string',
+      allowNull: true
+    },
     status: {
       type: 'string',
       isIn: ['draft', 'active', 'inactive']
@@ -122,6 +138,8 @@ module.exports = {
         inputs.imageUrl = sails.config.custom.amazonS3BucketUrl + imageInfo.fd;
       }
     }
+
+    //TODO: Validate the address input and use google maps service to validate the postcode using google services
 
     var newVendor = await Vendor.updateOne(inputs.id).set(inputs);
 
