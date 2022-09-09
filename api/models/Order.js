@@ -27,6 +27,12 @@ module.exports = {
       description: 'The unixtime when the order payment was confirmed (if at all).',
       required: false
     },
+    refundDateTime: {
+      type: 'number',
+      description: 'The unixtime when the order payment was confirmed (if at all).',
+      required: false,
+      allowNull: true,
+    },
     deliveryName: {
       type: 'string',
       description: 'The name for the delivery.',
@@ -51,6 +57,10 @@ module.exports = {
     deliveryAddressLineTwo: {
       type: 'string',
       description: 'The second line of the delivery address.',
+    },
+    deliveryAddressCity: {
+      type: 'string',
+      description: 'The city of the delivery address.',
     },
     deliveryAddressPostCode: {
       type: 'string',
@@ -131,7 +141,7 @@ module.exports = {
     completedFlag: {
       type: 'string',
       defaultsTo: '',
-      isIn: ['', 'completed', 'cancelled']
+      isIn: ['', 'completed', 'cancelled', 'refunded', 'void']
     },
     completedOrderFeedback: {
       type: 'string',
@@ -181,7 +191,12 @@ module.exports = {
       model: 'vendor',
       required: true
     },
-
+    parentOrder: {
+      model: 'order',
+      required: false,
+      allowNull: true,
+      defaultsTo: null,
+    }
   },
 
   beforeCreate: function (valuesToSet, proceed) {

@@ -72,7 +72,8 @@ module.exports = {
       //TODO: Implement the below helper method
       await sails.helpers.revertPeeplRewardIssue.with({
         peeplPayPaymentIntentId: order.paymentIntentId,
-        recipient: order.customerWalletAddress
+        recipient: order.customerWalletAddress,
+        paymentAmountBeingRefunded: order.total
       });
 
       await sails.helpers.sendFirebaseNotification.with({

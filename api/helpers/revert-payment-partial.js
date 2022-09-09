@@ -15,9 +15,14 @@ module.exports = {
       description: 'The paymentIntentId of the original transaction',
       required: true,
     },
-    refundAmount: {
+    refundRequestGBPx: {
       type: 'number',
-      description: 'The total to be transacted.',
+      description: 'The total GBPx to be refunded.',
+      required: true
+    },
+    refundRequestPPL: {
+      type: 'number',
+      description: 'The total PPL to be refunded.',
       required: true
     },
     refundRecipientWalletAddress: {
@@ -61,7 +66,7 @@ module.exports = {
       amount: inputs.paymentAmount,
       recipientWalletAddress: inputs.refundRecipientWalletAddress,
       vendorDisplayName: inputs.refundFromName,
-      webhookAddress: sails.config.custom.peeplWebhookAddress //TODO: Add another peeplWebhook for partial refunds for peeplPay service to post back to
+      webhookAddress: sails.config.custom.peeplPayRefundWebhookAddress
     })
       .then(async (response) => {
         // TODO: Check whether request for refund was accepted and can be fulfilled by the peeplPay service.

@@ -61,7 +61,7 @@ module.exports = {
       amount: inputs.paymentAmount,
       recipientWalletAddress: inputs.refundRecipientWalletAddress,
       vendorDisplayName: inputs.refundFromName,
-      webhookAddress: sails.config.custom.peeplWebhookAddress //TODO: Add another peeplWebhook for full refunds for peeplPay service to post back to and confirm when the refund has been completed
+      webhookAddress: sails.config.custom.peeplPayRefundWebhookAddress
     })
       .then(async (response) => {
         // TODO: Check whether request for refund was accepted and can be fulfilled by the peeplPay service.

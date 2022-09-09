@@ -1,5 +1,6 @@
 declare var Order: any;
 declare var OrderItem: any;
+declare var Cloud: any;
 
 module.exports = {
 
@@ -13,15 +14,19 @@ module.exports = {
       description: 'Public ID for the order.',
       required: true
     },
+    customerWalletAddress: {
+      type: 'string',
+      required: true
+    },
     retainItems: {
       type: 'ref',
       required: true,
-      description: 'array of publicIds for the items'
+      description: 'array of internal ids for the items'
     },
     removeItems: {
       type: 'ref',
       required: true,
-      description: 'array of publicIds for the items'
+      description: 'array of internal ids for the items'
     },
   },
 
@@ -50,7 +55,13 @@ module.exports = {
 
 
   fn: async function (inputs, exits) {
-    const order = await Order.findOne({publicId: inputs.orderId, completedFlag: ''});
+    const findOrderCriteria = {
+      publicId: inputs.orderId,
+      paymentStatus: 'paid',
+      customerWalletAddress: inputs.customerWalletAddress,
+      completedFlag: ''
+    };
+    const originalOrder = await Order.findOne(findOrderCriteria);
 
     if (!inputs.retainItems || !inputs.removeItems ||
       !Array.isArray(inputs.retainItems) ||
@@ -63,6 +74,7 @@ module.exports = {
       if (a === b) {
         return true;
       }
+      // eslint-disable-next-line eqeqeq
       if (a == null || b == null) {
         return false;
       }
@@ -81,33 +93,89 @@ module.exports = {
       return true;
     };
 
-    const orderIds = order.items.map(item => item.id);
+    const orderIds = originalOrder.items.map(item => item.id);
     const partialFulfilCheckItems = inputs.retainItems + inputs.removeItems;
 
     if (!arraysEqual(orderIds, partialFulfilCheckItems)) {
       return exits.complete({data: {validRequest: false}});
     }
 
-    await Order.updateOne({ publicId: inputs.orderId, completedFlag: '' })
-      .set({
-        restaurantAcceptanceStatus: 'partially fulfilled',
-      });
-
-    // Remove items from order that were not fulfilled by vendor
-    await OrderItem
-      .update({ order: order.id })
-      .set({ order: null, unfulfilled: true, unfulfilledOnOrderId: order.id })
+    // Create the copy of the order object now before removing items on th new order
+    await sails.getDatastore()
+    .transaction(async (db: any)=> {
+      // TODO: Error handling here.
+      const newOrder = await Order.create({
+        total: 0.0, // * Set later!
+        orderedDateTime: originalOrder.orderedDateTime,
+        paidDateTime: originalOrder.paidDateTime,
+        paymentStatus: originalOrder.paymentStatus,
+        paymentIntentId: originalOrder.paymentIntentId,
+        deliveryName: originalOrder.deliveryName,
+        deliveryEmail: originalOrder.deliveryEmail,
+        deliveryPhoneNumber: originalOrder.deliveryPhoneNumber,
+        deliveryAddressLineOne: originalOrder.deliveryAddressLineOne,
+        deliveryAddressLineTwo: originalOrder.deliveryAddressLineTwo,
+        deliveryAddressCity: originalOrder.deliveryAddressCity,
+        deliveryAddressPostCode: originalOrder.deliveryAddressPostCode,
+        deliveryAddressInstructions: originalOrder.address.deliveryInstructions,
+        customerWalletAddress: originalOrder.walletAddress,
+        discount: originalOrder.discount.id,
+        vendor: originalOrder.vendor.id,
+        fulfilmentMethod: originalOrder.fulfilmentMethod,
+        fulfilmentSlotFrom: originalOrder.fulfilmentSlotFrom,
+        fulfilmentSlotTo: originalOrder.fulfilmentSlotTo,
+        tipAmount: originalOrder.tipAmount
+      })
       .fetch();
 
-    // Recalculate the order total
-    var calculatedOrderTotal = await sails.helpers.calculateOrderTotal.with({ orderId: order.id });
+      // Strip unneccesary data from order items
+      //TODO Is this necessary?
+      const retainedItems = originalOrder.items.filter(item => inputs.retainItems.included(item.id));
+      var updatedItems = _.map(retainedItems, (object) => {
+        object.order = newOrder.id;
+        object.product = object.id;
 
-    // Update with correct amount
-    await Order.updateOne(order.id)
-      .set({ total: calculatedOrderTotal.finalAmount });
+        return _.pick(object, ['order', 'product', 'optionValues']);
+      });
 
-    return exits.complete({data: {validRequest: true, calculatedOrderTotal: calculatedOrderTotal.finalAmount}});
+      // Create each order item
+      await OrderItem.createEach(updatedItems)
+        .usingConnection(db);
 
+      // Calculate the order total on the backend
+      var calculatedOrderTotal = await sails.helpers.calculateOrderTotal.with({orderId: newOrder.id});
+
+      // Update with correct amount
+      await Order.updateOne(newOrder.id)
+        .set({ total: calculatedOrderTotal.finalAmount })
+        .usingConnection(db);
+
+      // Return error if vendor minimum order value not met
+      if(calculatedOrderTotal.withoutFees < originalOrder.vendor.minimumOrderAmount) {
+        return exits.minimumOrderAmount('Vendor minimum order value not met on partially fulfilled updated order');
+      }
+
+      await Order.updateOne(findOrderCriteria)
+      .set({
+        restaurantAcceptanceStatus: 'partially fulfilled',
+        completedFlag: 'void',
+      })
+      .usingConnection(db);
+
+      // Remove items from order that were not fulfilled by vendor
+      await OrderItem
+        .update({ order: newOrder.id, id: [...inputs.removeItems] })
+        .set({ unfulfilled: true, unfulfilledOnOrderId: originalOrder.id })
+        .usingConnection(db)
+        .fetch();
+
+      return exits.complete({data: {
+        validRequest: true, 
+        calculatedOrderTotal: calculatedOrderTotal.finalAmount,
+        orderID: newOrder.id,
+        paymentIntentID: newOrder.paymentIntentId
+      }});
+    });
   }
 
 };

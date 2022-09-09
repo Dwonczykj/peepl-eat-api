@@ -1,4 +1,12 @@
-const OrderItem = require("../../models/OrderItem");
+const OrderItem = require('../../models/OrderItem');
+
+const OrderTypeEnum = {
+  vegiEats: 'vegiEats',
+  vegiPays: 'vegiPays',
+};
+
+Object.freeze(OrderTypeEnum);
+
 
 module.exports = {
 
@@ -91,8 +99,10 @@ module.exports = {
 
 
       // Issue Peepl rewards
-      // (5% order total in pence) / 10 pence (value of PPL token)
-      var rewardAmount = (order.total * 0.05) / 10;
+      var rewardAmount = await sails.helpers.calculatePPLReward.with({
+        amount: order.total,
+        orderType: OrderTypeEnum.vegiEats
+      });
 
       await sails.helpers.issuePeeplReward.with({
         rewardAmount: rewardAmount,

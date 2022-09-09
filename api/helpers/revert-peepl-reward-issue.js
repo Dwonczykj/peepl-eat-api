@@ -1,5 +1,12 @@
 const axios = require('axios').default;
 
+const OrderTypeEnum = {
+  vegiEats: 'vegiEats',
+  vegiPays: 'vegiPays',
+};
+
+Object.freeze(OrderTypeEnum);
+
 module.exports = {
 
 
@@ -19,6 +26,10 @@ module.exports = {
       type: 'string',
       description: 'The name of the recipient.'
     },
+    paymentAmountBeingRefunded: {
+      type: 'number',
+      required: true,
+    }
   },
 
 
@@ -41,13 +52,16 @@ module.exports = {
       headers: { 'Authorization': 'Basic ' + sails.config.custom.peeplAPIKey }
     });
 
-    //TODO: request refund for full amount of order from peeplPay community manager wallet address back to the customer.
-    //TODO: Assert that the paymentAmount == the sum of value of the items (+ % of service charge?) - discount
+    const revertRewardAmount = await sails.helpers.calculatePPLReward.with({
+      amount: inputs.paymentAmountBeingRefunded,
+      orderType: OrderTypeEnum.vegiEats
+    });
+
+    //request refund for full amount of order from peeplPay community manager wallet address back to the customer.
     instance.post('/revert_reward_issue', { //Check Stripe API and aim to keep peeplPay requests inline with stripAPI 
-      amount: inputs.paymentAmount,
+      amount: revertRewardAmount,
       recipientWalletAddress: inputs.refundRecipientWalletAddress,
-      vendorDisplayName: inputs.refundFromName,
-      webhookAddress: sails.config.custom.peeplWebhookAddress //TODO: Add another peeplWebhook for full refunds for peeplPay service to post back to
+      webhookAddress: null //! no callback required for now as reward sent back to vegi. We can track this elsewhere.
     })
       .then(async (response) => {
         // TODO: Check whether request for refund was accepted and can be fulfilled by the peeplPay service.

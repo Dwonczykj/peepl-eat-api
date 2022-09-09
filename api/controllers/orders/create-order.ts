@@ -176,6 +176,7 @@ module.exports = {
         deliveryPhoneNumber: inputs.address.phoneNumber,
         deliveryAddressLineOne: inputs.address.lineOne,
         deliveryAddressLineTwo: inputs.address.lineTwo,
+        deliveryAddressCity: inputs.address.city,
         deliveryAddressPostCode: inputs.address.postCode,
         deliveryAddressInstructions: inputs.address.deliveryInstructions,
         customerWalletAddress: inputs.walletAddress,
@@ -237,8 +238,8 @@ module.exports = {
 
       // Update order with payment intent
       await Order.updateOne(order.id)
-      .set({paymentIntentId: newPaymentIntent.paymentIntentId})
-      .usingConnection(db);
+        .set({paymentIntentId: newPaymentIntent.paymentIntentId})
+        .usingConnection(db);
 
       // All done.
       return exits.success({orderID: order.id, paymentIntentID: newPaymentIntent.paymentIntentId});

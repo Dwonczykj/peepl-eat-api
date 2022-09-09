@@ -23,6 +23,8 @@ module.exports.custom = {
   internalPhoneNumber: envConfig['internalPhone'],
   buildNumber: 1,
   peeplWebhookAddress: 'https://vegi.itsaboutpeepl.com/api/v1/orders/peepl-pay-webhook',
+  peeplPayRefundWebhookAddress: 'https://vegi.itsaboutpeepl.com/api/v1/orders/peepl-pay-refund-webhook',
+  peeplWebhookAddressCustomerUpdatePaidOrder: 'https://vegi.itsaboutpeepl.com/api/v1/orders/peepl-pay-update-paid-order-webhook',
   fuseStudioBaseUrl: 'https://api.chargeweb3.com/api/v0/',
   pplTokenAddress: '0xa2C7CdB72d177f6259cD12a9A06Fdfd9625419D4',
   pplRewardsPoolAddress: '0x29249e06e8D3e4933cc403AB73136e698a08c38b',
@@ -31,4 +33,7 @@ module.exports.custom = {
   amazonS3BucketUrl: 'https://vegiapp-1.s3.us-east-1.amazonaws.com/',
   amazonS3Bucket: 'vegiapp-1',
   passwordSaltRounds: envConfig['saltRounds'],
+  vegiEatsRewardPcnt: 0.05,
+  vegiPayRewardPcnt: 0.005, // TODO v2.0: To be 0 <= x <= 0.01 based on ESC measure value
+  PPLTokenValueInPence: 10, // TODO: GET this value from the PeeplPay API @TheAdamGalloway
 };

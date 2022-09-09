@@ -288,15 +288,15 @@ Cloud.setup({
       url: "/api/v1/admin/approve-or-decline-order",
       args: ["orderId", "orderFulfilled", "retainItems", "removeItems"],
     },
-    customerUpdateOrder: {
+    customerUpdatePaidOrder: {
       verb: "POST",
-      url: "/api/v1/admin/customer-update-order",
-      args: ["orderId", "orderFulfilled", "retainItems", "removeItems"],
+      url: "/api/v1/admin/customer-update-paid-order",
+      args: ["orderId", "customerWalletAddress", "orderFulfilled", "retainItems", "removeItems", "refundRequestGBPx", "refundRequestPPL"],
     },
     customerCancelOrder: {
       verb: "POST",
       url: "/api/v1/admin/customer-cancel-order",
-      args: ["orderId", "retainItems", "removeItems"],
+      args: ["orderId", "customerWalletAddress"],
     },
     customerReceivedOrder: {
       verb: "POST",
