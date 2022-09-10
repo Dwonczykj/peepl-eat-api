@@ -2527,6 +2527,10 @@
                     },
                     {
                       "type": "string",
+                      "description": "Postal Code didnt match regex formatter in action"
+                    },
+                    {
+                      "type": "string",
                       "description": "You are not authorised to edit this vendor."
                     },
                     {
