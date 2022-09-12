@@ -1,5 +1,3 @@
-import { exits } from "./approve-or-decline-order";
-
 module.exports = {
 
   friendlyName: 'Edit vendor',
@@ -107,7 +105,7 @@ module.exports = {
     },
   },
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
     // Fix errors to do with strings as association IDs
     if(inputs.deliveryPartner && inputs.deliveryPartner === 'null') {
       inputs.deliveryPartner = null;
