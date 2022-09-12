@@ -63,6 +63,7 @@ module.exports = {
       await Order.updateOne({publicId: inputs.orderId})
       .set({rewardsIssued: rewardAmount});
     } else if (inputs.restaurantAccepted === false) {
+      // TODO: Isssue refund to customer
       await Order.updateOne({publicId: inputs.orderId})
       .set({restaurantAcceptanceStatus: 'rejected'});
     }

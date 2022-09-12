@@ -15,7 +15,8 @@ module.exports = {
     },
     recipient: {
       type: 'string',
-      regex: /^0x[a-fA-F0-9]{40}$/
+      regex: /^0x[a-fA-F0-9]{40}$/,
+      required: true
     }
   },
 
@@ -29,29 +30,27 @@ module.exports = {
   },
 
 
-  fn: async function (inputs) {
-    var client = axios.create({
-      baseURL: sails.config.custom.fuseStudioBaseUrl,
-      timeout: 20000,
-      headers: {'API-SECRET': 'sk_q8TiAxOSniziV6G4CPHY1Ql1'}
+  fn: async function (inputs, exits) {
+    const instance = axios.create({
+      baseURL: sails.config.custom.peeplPayUrl,
+      timeout: 2000,
+      headers: {'Authorization': 'Basic ' + sails.config.custom.peeplAPIKey}
     });
 
-    // Issue PPL token reward
     var data = {
-      tokenAddress: sails.config.custom.pplTokenAddress,
-      networkType: 'fuse',
-      amount: inputs.rewardAmount.toString(),
-      from: sails.config.custom.pplRewardsPoolAddress,
-      to: inputs.recipient
+      rewardAmount: inputs.rewardAmount.toString(),
+      recipientWallet: inputs.recipient,
     };
 
-    await client.post('admin/tokens/transfer?apiKey=pk_FDM9_lyd9leeOG4utgmzfr6h', data)
+    instance.post('/reward/issue-reward', data)
+    .then(async () => {
+      return exits.success({});
+    })
     .catch((err) => {
-      sails.log.error(err);
-      throw new Error('Error issuing PPL token reward.');
+      sails.log(err);
+      // TODO: Error handling in case this fails
+      return exits.error();
     });
-
-    return;
   }
 
 
