@@ -1,6 +1,7 @@
+/* eslint-disable no-undef */
 // ./test/integration/models/User.test.js
 
-/* var util = require('util');
+var util = require('util');
 
 describe('User (model)', () => {
 
@@ -22,4 +23,3 @@ describe('User (model)', () => {
   });
 
 });
- */

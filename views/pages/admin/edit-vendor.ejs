@@ -29,7 +29,24 @@
         <label for="phoneNumber">Vendor Phone Number</label>
         <input type="text" :class="{ 'is-invalid': formErrors.phoneNumber }" v-model="vendor.phoneNumber" class="form-control" id="phoneNumber" >
       </div>
+
+      <div class="form-group">
+        <label for="pickupAddressLineOne">Vendor Address Line 1</label>
+        <input type="text" :class="{ 'is-invalid': formErrors.pickupAddressLineOne }" v-model="vendor.pickupAddressLineOne"
+          class="form-control" id="pickupAddressLineOne">
       
+        <label for="pickupAddressLineTwo">Vendor Address Line 2</label>
+        <input type="text" :class="{ 'is-invalid': formErrors.pickupAddressLineTwo }" v-model="vendor.pickupAddressLineTwo"
+          class="form-control" id="pickupAddressLineTwo">
+      
+        <label for="pickupAddressCity">Vendor Address City</label>
+        <input type="text" :class="{ 'is-invalid': formErrors.pickupAddressCity }" v-model="vendor.pickupAddressCity"
+          class="form-control" id="pickupAddressCity">
+      
+        <label for="pickupAddressPostCode">Vendor Address Post Code</label>
+        <input type="text" :class="{ 'is-invalid': formErrors.pickupAddressPostCode }" v-model="vendor.pickupAddressPostCode"
+          class="form-control" id="pickupAddressPostCode" oninput="this.value = this.value.toUpperCase()">
+      </div>
       <div class="form-group">
         <label for="vendorType">Vendor Type</label>
         <select class="form-control" id="vendorType" v-model="vendor.type" :disabled="vendor.id">

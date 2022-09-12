@@ -32,6 +32,22 @@ module.exports = {
       type: 'string',
       allowNull: true
     },
+    pickupAddressLineOne: {
+      type: 'string',
+      allowNull: true
+    },
+    pickupAddressLineTwo: {
+      type: 'string',
+      allowNull: true
+    },
+    pickupAddressCity: {
+      type: 'string',
+      allowNull: true
+    },
+    pickupAddressPostCode: {
+      type: 'string',
+      allowNull: true
+    },
     status: {
       type: 'string',
       isIn: ['draft', 'active', 'inactive']
@@ -71,6 +87,10 @@ module.exports = {
       description: 'No file was attached.',
       responseType: 'badRequest'
     },
+    badPostalCode: {
+      description: 'Postal Code didnt match regex formatter in action',
+      responseType: 'badRequest'
+    },
     notFound: {
       description: 'There is no vendor with that ID!',
       responseType: 'notFound'
@@ -82,10 +102,10 @@ module.exports = {
     tooBig: {
       description: 'The file attached is too big.',
       responseType: 'badRequest'
-    }
+    },
   },
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
     // Fix errors to do with strings as association IDs
     if(inputs.deliveryPartner && inputs.deliveryPartner === 'null') {
       inputs.deliveryPartner = null;
@@ -121,6 +141,17 @@ module.exports = {
       if(imageInfo) {
         inputs.imageUrl = sails.config.custom.amazonS3BucketUrl + imageInfo.fd;
       }
+      delete inputs.image;
+    }
+
+    if(inputs.pickupAddressPostCode){
+      inputs.pickupAddressPostCode = inputs.pickupAddressPostCode.toLocaleUpperCase();
+    }
+    var regPostcode = '/^([a-zA-Z]){1}([0-9][0-9]|[0-9]|[a-zA-Z][0-9][a-zA-Z]|[a-zA-Z][0-9][0-9]|[a-zA-Z][0-9]){1}([ ])([0-9][a-zA-z][a-zA-z]){1}$/';
+    //TODO: Validate the address input and use google maps service to validate the postcode using google services
+    if (!inputs.pickupAddressPostCode || !inputs.pickupAddressPostCode.match(regPostcode))
+    {
+      return exits.badPostalCode();
     }
 
     var newVendor = await Vendor.updateOne(inputs.id).set(inputs);

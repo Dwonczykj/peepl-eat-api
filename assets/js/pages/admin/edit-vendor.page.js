@@ -120,8 +120,6 @@ parasails.registerPage('admin-edit-vendor', {
         image: '',
         options: []
       };
-
-
       this.vendor.products.push(newProduct);
     },
     updatePostalDistricts: function() {
