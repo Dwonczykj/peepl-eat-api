@@ -1,6 +1,9 @@
-declare var OpeningHours: any;
-declare var FulfilmentMethod: any;
-var moment = require('moment');
+export { }; //SOLVED TypeScript Cannot Redeclare Block Scoped Variable Name https://backbencher.dev/articles/typescript-solved-cannot-redeclare-block-scoped-variable-name
+declare let OpeningHours: any;
+declare let FulfilmentMethod: any;
+// const moment = require('moment');
+import moment from 'moment';
+
 module.exports = {
 
 
@@ -36,10 +39,10 @@ module.exports = {
     // TODO: Account for overnight opening hours
     // TODO: Limit to ordering 7 days in future
 
-    var availableSlots = [];
+    let availableSlots = [];
 
-    var fulfilmentMethod = await FulfilmentMethod.findOne(inputs.fulfilmentMethodId);
-    /* var fulfilmentMethod = {
+    let fulfilmentMethod = await FulfilmentMethod.findOne(inputs.fulfilmentMethodId);
+    /* let fulfilmentMethod = {
       fulfilmentType: 'delivery',
       slotLength: 60,
       bufferLength: 15,
@@ -47,16 +50,16 @@ module.exports = {
       ordersPerSlot: 1
     }; */
 
-    var dt = new moment(inputs.date, 'YYYY-MM-DD'); // Moment version of date
-    var dayOfWeek = dt.format('dddd').toLowerCase(); // e.g. monday
+    let dt = moment(inputs.date, 'YYYY-MM-DD'); // Moment version of date
+    let dayOfWeek = dt.format('dddd').toLowerCase(); // e.g. monday
 
     // Get special opening hours from DB (for specific date)
-    var openingHours = await OpeningHours.findOne({
+    let openingHours = await OpeningHours.findOne({
       fulfilmentMethod: inputs.fulfilmentMethodId,
       specialDate: inputs.date
     });
 
-    /* var openingHours = {
+    /* let openingHours = {
         dayOfWeek: 'monday', // Monday
         specificDate: null,
         openTime: '09:00',
@@ -91,17 +94,17 @@ module.exports = {
     // If there are opening hours available
     if(openingHours && openingHours.isOpen && !isAfterCutoff) {
 
-      var openTime = inputs.date + ' ' + openingHours.openTime; // e.g. 25/12/2022 09:00
-      var closeTime = inputs.date + ' ' + openingHours.closeTime; // e.g. 25/12/2022 17:00
+      let openTime = inputs.date + ' ' + openingHours.openTime; // e.g. 25/12/2022 09:00
+      let closeTime = inputs.date + ' ' + openingHours.closeTime; // e.g. 25/12/2022 17:00
 
-      var startTime = moment.utc(openTime, 'YYYY-MM-DD HH:mm'); // Start time for creating slots.
-      var endTime = moment.utc(closeTime, 'YYYY-MM-DD HH:mm'); // End time for creating slots.
+      let startTime = moment.utc(openTime, 'YYYY-MM-DD HH:mm'); // Start time for creating slots.
+      let endTime = moment.utc(closeTime, 'YYYY-MM-DD HH:mm'); // End time for creating slots.
 
-      var slots = [];
+      let slots = [];
 
       // Generate slots based on slotLength within opening hours.
       while (startTime < endTime) {
-        var slot = {
+        let slot:{ [Key: string]: (string|moment.Moment); } = {
           startTime: '',
           endTime: ''
         };
@@ -113,7 +116,7 @@ module.exports = {
         slots.push(slot);
       }
 
-      /* var slots = [{
+      /* let slots = [{
         startTime: '25/12/2022 09:00',
         endTime: '25/12/2022 10:00'
       }, {
@@ -124,9 +127,9 @@ module.exports = {
       ]; */
 
       // Find orders for that fulfilment method between the start and end times.
-      // var fulfilmentSlotFrom = moment(openTime, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DD HH:mm:ss');
-      // var fulfilmentSlotTo = moment(closeTime, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DD HH:mm:ss');
-      var orders = await Order.find({
+      // let fulfilmentSlotFrom = moment(openTime, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DD HH:mm:ss');
+      // let fulfilmentSlotTo = moment(closeTime, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DD HH:mm:ss');
+      let orders = await Order.find({
         fulfilmentMethod: inputs.fulfilmentMethodId,
         paymentStatus: 'paid',
         restaurantAcceptanceStatus: { '!=' : 'declined' },
@@ -135,7 +138,7 @@ module.exports = {
         completedFlag: ''
       });
 
-      /* var orders = [{
+      /* let orders = [{
         fulfilmentSlotFrom: '17/02/2022 10:00',
         fulfilmentSlotTo: '17/02/2022 11:00',
         // ...
@@ -146,11 +149,11 @@ module.exports = {
       }]; */
 
       // Loop through possible slots and determine if number of orders is greater than ordersPerSlot
-      for(var slotI of slots) {
+      for(let slotI of slots) {
         // Filter out orders between start and end of slot.
-        var relevantOrders = orders.filter(order => {
-          var mSlotFrom = moment.utc(order.fulfilmentSlotFrom);
-          var mSlotTo = moment.utc(order.fulfilmentSlotTo);
+        let relevantOrders = orders.filter(order => {
+          let mSlotFrom = moment.utc(order.fulfilmentSlotFrom);
+          let mSlotTo = moment.utc(order.fulfilmentSlotTo);
 
           if(mSlotFrom.isSameOrAfter(slotI.startTime) && mSlotTo.isSameOrBefore(slotI.endTime)) {
             return true;
@@ -160,7 +163,7 @@ module.exports = {
         });
 
         // Is the time slot after current time plus fulfilment method buffer
-        var isInFuture = moment.utc(slotI.startTime).isAfter(moment().add(fulfilmentMethod.bufferLength, 'minutes'));
+        let isInFuture = moment.utc(slotI.startTime).isAfter(moment().add(fulfilmentMethod.bufferLength, 'minutes'));
 
         if ((!fulfilmentMethod.maxOrders || (relevantOrders.length <= fulfilmentMethod.maxOrders)) && isInFuture) { // If there aren't too many orders in the slot
           availableSlots.push(slotI); // Add slot to availableSlots array

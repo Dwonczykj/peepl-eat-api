@@ -1,6 +1,5 @@
 declare var OpeningHours: any;
 declare var FulfilmentMethod: any;
-var moment = require('moment');
 
 module.exports = {
 

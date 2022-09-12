@@ -2,8 +2,10 @@
     "compilerOptions": {
         "target": "es6",
         "allowJs": true,
+        "allowSyntheticDefaultImports": true,
         "skipLibCheck": true,
         "strict": false,
+        "strictNullChecks": false,
         "forceConsistentCasingInFileNames": true,
         "noEmit": true,
         "esModuleInterop": true,
@@ -11,15 +13,14 @@
         "moduleResolution": "node",
         "resolveJsonModule": true,
         "isolatedModules": false,
-        "jsx": "preserve",
         "lib": [
             "es2018",
             "DOM",
             "ESNext"
         ],
         "sourceMap": true,
-        "baseUrl": "./",
         "outDir": "./build",
+        "baseUrl": "./",
         "rootDir": "./"
     },
     "exclude": [

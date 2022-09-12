@@ -145,7 +145,6 @@ module.exports = {
     },
     completedOrderFeedback: {
       type: 'string',
-      defaultsTo: null,
       allowNull: true,
     },
     deliveryPunctuality: {
@@ -153,7 +152,6 @@ module.exports = {
       columnType: 'int',
       min: 0,
       max: 5,
-      defaultsTo: null,
       allowNull: true,
     },
     orderCondition: {
@@ -161,7 +159,6 @@ module.exports = {
       columnType: 'int',
       min: 0,
       max: 5,
-      defaultsTo: null,
       allowNull: true,
     },
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
@@ -194,8 +191,6 @@ module.exports = {
     parentOrder: {
       model: 'order',
       required: false,
-      allowNull: true,
-      defaultsTo: null,
     }
   },
 

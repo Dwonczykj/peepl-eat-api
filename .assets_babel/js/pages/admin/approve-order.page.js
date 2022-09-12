@@ -43,12 +43,14 @@ parasails.registerPage('approve-order', {
   //  ║║║║ ║ ║╣ ╠╦╝╠═╣║   ║ ║║ ║║║║╚═╗
   //  ╩╝╚╝ ╩ ╚═╝╩╚═╩ ╩╚═╝ ╩ ╩╚═╝╝╚╝╚═╝
   methods: {
-    clickApproveOrDeclineOrder: function clickApproveOrDeclineOrder(orderId, isApproved) {
+    clickApproveOrDeclineOrder: function clickApproveOrDeclineOrder(orderId, orderFulfilled) {
       var that = this;
-      Cloud.approveOrDeclineOrder(orderId, isApproved).then(function () {
-        if (isApproved) {
+      Cloud.approveOrDeclineOrder(orderId, orderFulfilled).then(function () {
+        if (orderFulfilled === 'accept') {
           that.order.restaurantAcceptanceStatus = 'accepted';
-        } else {
+        } else if (orderFulfilled === 'reject') {
+          that.order.restaurantAcceptanceStatus = 'rejected';
+        } else if (orderFulfilled === 'partial') {
           that.order.restaurantAcceptanceStatus = 'rejected';
         }
       });

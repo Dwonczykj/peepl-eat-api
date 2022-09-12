@@ -33,22 +33,17 @@ module.exports = {
 
   exits: {
     badPartialFulfilmentRequest: {
-      statuscode: 401,
     },
     orderNotFound: {
-      statuscode: 404,
       description: 'Order not found'
     },
     orderNotPaidFor: {
-      statuscode: 401,
       description: 'the order has not been paid for.',
     },
     orderNotPending: {
-      statuscode: 401,
       description: 'Restaurant has already accepted or rejected this order.',
     },
     complete: {
-      statusCode: 200,
       data: null
     }
   },

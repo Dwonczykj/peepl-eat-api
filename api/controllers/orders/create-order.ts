@@ -1,5 +1,5 @@
+const moment = require('moment');
 import { ICourier } from '../../helpers/get-available-courier-from-pool';
-var moment = require('moment');
 
 /* eslint-disable camelcase */
 declare var OrderItemOptionValue: any;

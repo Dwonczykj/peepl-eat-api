@@ -109,6 +109,9 @@
       "name": "Login With Firebase"
     },
     {
+      "name": "Login With Secret"
+    },
+    {
       "name": "Check user for email"
     },
     {
@@ -119,6 +122,15 @@
     },
     {
       "name": "Deregister User Vendor Role"
+    },
+    {
+      "name": "Customer cancel order"
+    },
+    {
+      "name": "Customer update paid order"
+    },
+    {
+      "name": "Customer received order"
     },
     {
       "name": "Create vendor"
@@ -657,6 +669,12 @@
             "format": "double",
             "description": "The unixtime when the order payment was confirmed (if at all)."
           },
+          "refundDateTime": {
+            "type": "number",
+            "format": "double",
+            "nullable": true,
+            "description": "The unixtime when the order payment was confirmed (if at all)."
+          },
           "deliveryName": {
             "type": "string",
             "description": "The name for the delivery."
@@ -677,6 +695,10 @@
           "deliveryAddressLineTwo": {
             "type": "string",
             "description": "The second line of the delivery address."
+          },
+          "deliveryAddressCity": {
+            "type": "string",
+            "description": "The city of the delivery address."
           },
           "deliveryAddressPostCode": {
             "type": "string",
@@ -759,6 +781,35 @@
             "type": "boolean",
             "default": false
           },
+          "completedFlag": {
+            "type": "string",
+            "default": "",
+            "enum": [
+              "",
+              "completed",
+              "cancelled",
+              "refunded",
+              "void"
+            ]
+          },
+          "completedOrderFeedback": {
+            "type": "string",
+            "nullable": true
+          },
+          "deliveryPunctuality": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true,
+            "maximum": 5,
+            "minimum": 0
+          },
+          "orderCondition": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true,
+            "maximum": 5,
+            "minimum": 0
+          },
           "fulfilmentMethod": {
             "description": "JSON dictionary representing the **fulfilmentmethod** instance or FK when creating / updating / not populated",
             "oneOf": [
@@ -782,11 +833,26 @@
               "$ref": "#/components/schemas/orderitem"
             }
           },
+          "unfulfilledItems": {
+            "description": "Array of **orderitem**'s or array of FK's when creating / updating / not populated",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/orderitem"
+            }
+          },
           "vendor": {
             "description": "JSON dictionary representing the **vendor** instance or FK when creating / updating / not populated",
             "oneOf": [
               {
                 "$ref": "#/components/schemas/vendor"
+              }
+            ]
+          },
+          "parentOrder": {
+            "description": "JSON dictionary representing the **order** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/order"
               }
             ]
           }
@@ -823,6 +889,15 @@
             "format": "int64",
             "uniqueItems": true,
             "description": "Note Sails special attributes: autoIncrement"
+          },
+          "unfulfilled": {
+            "type": "boolean",
+            "default": false,
+            "description": "flag to show that item was unfulfilled from an order"
+          },
+          "unfulfilledOnOrderId": {
+            "type": "string",
+            "default": ""
           },
           "order": {
             "description": "The order to which the item belongs JSON dictionary representing the **order** instance or FK when creating / updating / not populated",
@@ -3044,6 +3119,15 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "in": "query",
+            "name": "rememberMe",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Whether to extend the lifetime of the user's session."
           }
         ],
         "responses": {
@@ -3051,9 +3135,6 @@
             "description": "Success"
           },
           "401": {
-            "description": "firebase errored on verifying the user token"
-          },
-          "404": {
             "description": "Success",
             "content": {
               "application/json": {
@@ -3061,7 +3142,7 @@
                   "oneOf": [
                     {
                       "type": "string",
-                      "description": "Success"
+                      "description": "firebase errored on verifying the user token"
                     },
                     {
                       "type": "string",
@@ -3071,6 +3152,50 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Success"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/login-with-secret": {
+      "put": {
+        "summary": "Login With Secret",
+        "description": "Endpoint for service accounts and tests to login to without requiring firebase",
+        "tags": [
+          "Login With Secret"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "secret",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "The provided service name and secret combination does not\n      match any service account."
+          },
+          "404": {
+            "description": "Resource not found"
           },
           "500": {
             "description": "Internal server error"
@@ -3354,6 +3479,240 @@
           },
           "404": {
             "description": "There is no user with that ID!"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/customer-cancel-order": {
+      "post": {
+        "summary": "Customer cancel order",
+        "description": "A handle for customers to repond to requests to cancel their order when a vendor was unable to service parts or all of an order.",
+        "tags": [
+          "Customer cancel order"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "orderId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Public ID for the order."
+          },
+          {
+            "in": "query",
+            "name": "customerWalletAddress",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Order not found either because publicId does not exist or because the customerWalletAddress does not agree or because the order has already been flagged as completed."
+                    },
+                    {
+                      "type": "string",
+                      "description": "Order has already been flagged as completed."
+                    },
+                    {
+                      "type": "string",
+                      "description": "order has not yet been paid for so no refund needs to be processed"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/customer-update-paid-order": {
+      "post": {
+        "summary": "Customer update paid order",
+        "description": "A handle for customers to repond to requests to update their order when a vendor was unable to service an entire order.",
+        "tags": [
+          "Customer update paid order"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "orderId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Public ID for the order."
+          },
+          {
+            "in": "query",
+            "name": "customerWalletAddress",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "retainItems",
+            "required": true,
+            "schema": {},
+            "description": "array of internal ids for the items"
+          },
+          {
+            "in": "query",
+            "name": "removeItems",
+            "required": true,
+            "schema": {},
+            "description": "array of internal ids for the items"
+          },
+          {
+            "in": "query",
+            "name": "refundRequestGBPx",
+            "required": true,
+            "schema": {},
+            "description": "specification of how refund recipient would like their refund to be made from GBPx (GBP*100)"
+          },
+          {
+            "in": "query",
+            "name": "refundRequestPPL",
+            "required": true,
+            "schema": {},
+            "description": "specification of how refund recipient would like their refund to be made from PPL"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "likely caused by no items retained in the request"
+                    },
+                    {
+                      "type": "string",
+                      "description": "thrown when the updated order has a larger total than the new order."
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Success"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/customer-received-order": {
+      "post": {
+        "summary": "Customer received order",
+        "description": "A handle for customers to confirm completion of an order",
+        "tags": [
+          "Customer received order"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "orderId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Public ID for the order."
+          },
+          {
+            "in": "query",
+            "name": "orderReceived",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "orderCondition",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "maximum": 5,
+              "minimum": 0,
+              "enum": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "deliveryPunctuality",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "maximum": 5,
+              "minimum": 0,
+              "enum": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "feedback",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "likely caused by no items retained in the request"
+          },
+          "404": {
+            "description": "Order not found"
           },
           "500": {
             "description": "Internal server error"
@@ -3746,164 +4105,6 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/api/v1/admin/edit-delivery-partner": {
-      "post": {
-        "summary": "Edit delivery partner",
-        "tags": [
-          "Edit delivery partner"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            },
-            "description": "The id of the delivery partner to edit"
-          },
-          {
-            "in": "query",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "maxLength": 50
-            },
-            "description": "The name of the delivery partner"
-          },
-          {
-            "in": "query",
-            "name": "email",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "email",
-              "maxLength": 50
-            },
-            "description": "The email address of the delivery partner"
-          },
-          {
-            "in": "query",
-            "name": "phoneNumber",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "maxLength": 20
-            },
-            "description": "The phone number of the delivery partner"
-          },
-          {
-            "in": "query",
-            "name": "status",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "inactive",
-              "enum": [
-                "active",
-                "inactive"
-              ],
-              "example": "inactive"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "type": "string",
-                      "description": "Delivery partner edited."
-                    },
-                    {
-                      "type": "string",
-                      "description": "You are not authorised to edit this vendor."
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "There is no delivery partner with that ID!"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/api/v1/admin/create-delivery-partner": {
-      "post": {
-        "summary": "Create delivery partner",
-        "tags": [
-          "Create delivery partner"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "maxLength": 50
-            },
-            "description": "The name of the delivery partner"
-          },
-          {
-            "in": "query",
-            "name": "email",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "email",
-              "maxLength": 50
-            },
-            "description": "The email address of the delivery partner"
-          },
-          {
-            "in": "query",
-            "name": "phoneNumber",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "maxLength": 20
-            },
-            "description": "The phone number of the delivery partner"
-          },
-          {
-            "in": "query",
-            "name": "status",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "inactive",
-              "enum": [
-                "active",
-                "inactive"
-              ],
-              "example": "inactive"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "New delivery partner created."
           },
           "404": {
             "description": "Resource not found"
@@ -4888,16 +5089,63 @@
           },
           {
             "in": "query",
-            "name": "restaurantAccepted",
+            "name": "orderFulfilled",
             "required": true,
             "schema": {
-              "type": "boolean"
+              "type": "string",
+              "enum": [
+                "accept",
+                "reject",
+                "partial"
+              ]
             }
+          },
+          {
+            "in": "query",
+            "name": "retainItems",
+            "required": true,
+            "schema": {},
+            "description": "array of publicIds for the items"
+          },
+          {
+            "in": "query",
+            "name": "removeItems",
+            "required": true,
+            "schema": {},
+            "description": "array of publicIds for the items"
           }
         ],
         "responses": {
           "200": {
-            "description": "The requested resource"
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Order not found"
+                    },
+                    {
+                      "type": "string",
+                      "description": "the order has not been paid for."
+                    },
+                    {
+                      "type": "string",
+                      "description": "Restaurant has already accepted or rejected this order."
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
           },
           "404": {
             "description": "Resource not found"

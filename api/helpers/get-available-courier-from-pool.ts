@@ -1,6 +1,6 @@
 declare var OpeningHours: any;
 declare var FulfilmentMethod: any;
-var moment = require('moment');
+const moment = require('moment');
 
 
 const DELIVERY_AVAIL_PENDING = -1;

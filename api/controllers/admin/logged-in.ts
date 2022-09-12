@@ -15,6 +15,7 @@ module.exports = {
   exits: {
     success: {
       data: false,
+      statusCode: 200,
       exampleOutput: {
         'data': true
       }

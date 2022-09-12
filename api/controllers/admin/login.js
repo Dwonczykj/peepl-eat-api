@@ -28,28 +28,32 @@ module.exports = {
   exits: {
     badCombo: {
       responseType: 'unauthorised',
+    },
+    notFound: {
+      statusCode: 404,
     }
   },
 
 
-  fn: async function (inputs) {
-    const user = await User.findOne({
-      email: inputs.emailAddress,
-    });
+  fn: async function (inputs, exits) {
+    return exits.notFound(); // Login.js remove from app for firebase.
+    // const user = await User.findOne({
+    //   email: inputs.emailAddress,
+    // });
 
-    if (!user) {
-      throw 'badCombo';
-    }
+    // if (!user) {
+    //   throw 'badCombo';
+    // }
 
-    const isValidPassword = await bcrypt.compare(inputs.password, user.password);
-    if (!isValidPassword) {
-      throw 'badCombo';
-    }
+    // const isValidPassword = await bcrypt.compare(inputs.password, user.password);
+    // if (!isValidPassword) {
+    //   throw 'badCombo';
+    // }
 
-    // Update the session
-    this.req.session.userId = user.id;
+    // // Update the session
+    // this.req.session.userId = user.id;
 
-    return user;
+    // return user;
   }
 
 

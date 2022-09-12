@@ -1,10 +1,52 @@
 /* eslint-disable no-undef */
 
-var sails = require('sails');
-// var sinon = require('sinon'); // Mocking/stubbing/spying
-var assert = require('chai').assert; // Assertions
-var nock = require('nock'); // HTTP Request Mocking
+// var sails = require('sails');
+// // var sinon = require('sinon'); // Mocking/stubbing/spying
+// var assert = require('chai').assert; // Assertions
+// var nock = require('nock'); // HTTP Request Mocking
 
+// require('ts-node/register');
+
+// var supertest = require('supertest');
+// // var assert = require('assert');
+
+
+// describe('AdminController', () => {
+//   var app;
+
+//   // // Global before hook
+//   // before((done) => {
+//   //   try {
+//   //     // Lift Sails and start the server
+//   //     sails.lift({
+
+//   //       log: {
+//   //         level: 'error'
+//   //       }
+
+//   //     }, (err, sails) => {
+//   //       app = sails;
+//   //       done(err, sails);
+//   //     });
+//   //   } catch (err) {
+//   //     return done(err);
+//   //   }
+//   // });
+
+//   // // Global after hook
+//   // after((done) => {
+//   //   app.lower(done);
+//   // });
+
+//   describe('loginWithFirebase()', () => {
+//     it('should return success', (done) => {
+//       supertest(sails.hooks.http.app)
+//         .post('/api/v1/admin/login-with-firebase')
+//         .send({ phoneNumber: '+44 790-553-2512', firebaseSessionToken: 'DUMMY_FIREBASE_TOKEN' })
+//         .expect(401, done);
+//     });
+//   });
+// });
 
 // var constants = require('../constants/externalSystemsConstants');
 // var Battlefield4Service = require('./battlefield4Service');
@@ -91,45 +133,4 @@ var nock = require('nock'); // HTTP Request Mocking
 //   });
 // });
 
-require('ts-node/register');
 
-var supertest = require('supertest');
-// var assert = require('assert');
-
-
-describe('AdminController', () => {
-  var app;
-
-  // Global before hook
-  before((done) => {
-    try {
-      // Lift Sails and start the server
-      sails.lift({
-
-        log: {
-          level: 'error'
-        }
-
-      }, (err, sails) => {
-        app = sails;
-        done(err, sails);
-      });
-    } catch (err) {
-      return done(err);
-    }
-  });
-
-  // Global after hook
-  after((done) => {
-    app.lower(done);
-  });
-
-  describe('loginWithFirebase()', () => {
-    it('should return success', (done) => {
-      supertest(sails.hooks.http.app)
-        .post('/api/v1/admin/login-with-firebase')
-        .send({ phoneNumber: '+44 790-553-2512', token: 'DUMMY' })
-        .expect(401, done);
-    });
-  });
-});

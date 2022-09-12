@@ -2,6 +2,7 @@ declare var Order: any;
 declare var Vendor: any;
 declare var FulfilmentMethod: any;
 declare var Discount: any;
+declare var sails: any;
 
 const OrderTypeEnum = {
   vegiEats: 'vegiEats',

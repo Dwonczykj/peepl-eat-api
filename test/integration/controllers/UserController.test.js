@@ -1,14 +1,42 @@
-// /* eslint-disable no-undef */
-// // test/integration/controllers/UserController.test.js
-// var supertest = require('supertest');
+// test/integration/controllers/UserController.test.js
+var request = require('supertest');
+const assert = require('assert');
+const dotenv = require('dotenv');//.load('./env'); // alias of .config()
+// const envConfig = dotenv.load().parsed;
+const envConfig = dotenv.config('./env').parsed;
 
-// describe('AdminController', () => {
-//   describe('login()', () => {
-//     it('should return success', (done) => {
-//       supertest(sails.hooks.http.app)
-//       .post('/admin/login')
-//       .send({ emailAddress: 'adam@itsaboutpeepl.com', password: 'Testing123!' })
-//       .expect(200, done);
-//     });
-//   });
-// });
+describe('Login Controllers', () => {
+
+    describe('login-with-secret', () => {
+        it('/api/v1/admin/login-with-secret should return 302', function (done) {
+            // console.log(sails);
+            // ? Use CSRF?
+            //   request(sails.hooks.http.app)
+            //             .get('/csrfToken')
+            //             .set('Accept', 'application/json')
+            //             // .expect('Content-Type', /json/)
+            //             .expect(200)
+            //             .then(response => {
+            //               this._csrf = response.body._csrf;
+            //               request(sails.hooks.http.app)
+            //                     .put('/api/v1/admin/login-with-secret')
+            //                     // .set('X-CSRF-Token', response.body._csrf)
+            //                     .send({
+            //                       name: 'TEST_SERVICE',
+            //                       secret: envConfig['test_secret'],
+            //                       _csrf: response.body._csrf
+            //                     })
+            //                     .expect(302, done);
+            //             })
+            //             .catch(err => done(err));
+            request(sails.hooks.http.app)
+                .put('/api/v1/admin/login-with-secret')
+                .send({
+                    name: 'TEST_SERVICE',
+                    secret: envConfig['test_secret'],
+                })
+                .expect(302, done);
+        });
+    });
+
+});
