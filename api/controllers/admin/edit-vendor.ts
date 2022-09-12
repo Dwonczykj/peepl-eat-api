@@ -127,7 +127,7 @@ module.exports = {
       throw 'unauthorised';
     }
 
-    if(inputs.image){
+    if(inputs.image /*&& sails.config.custom.amazonS3Secret && sails.config.custom.amazonS3AccessKey*/){
       var imageInfo = await sails.uploadOne(inputs.image, {
         adapter: require('skipper-s3'),
         key: sails.config.custom.amazonS3AccessKey,
@@ -143,11 +143,15 @@ module.exports = {
       }
       delete inputs.image;
     }
+    // else {
+    //   delete inputs.image;
+    //   inputs.imageUrl = vendor.imageUrl;
+    // }
 
     if(inputs.pickupAddressPostCode){
       inputs.pickupAddressPostCode = inputs.pickupAddressPostCode.toLocaleUpperCase();
     }
-    var regPostcode = '/^([a-zA-Z]){1}([0-9][0-9]|[0-9]|[a-zA-Z][0-9][a-zA-Z]|[a-zA-Z][0-9][0-9]|[a-zA-Z][0-9]){1}([ ])([0-9][a-zA-z][a-zA-z]){1}$/';
+    var regPostcode = '^([a-zA-Z]){1}([0-9][0-9]|[0-9]|[a-zA-Z][0-9][a-zA-Z]|[a-zA-Z][0-9][0-9]|[a-zA-Z][0-9]){1}([ ])([0-9][a-zA-z][a-zA-z]){1}$';
     //TODO: Validate the address input and use google maps service to validate the postcode using google services
     if (!inputs.pickupAddressPostCode || !inputs.pickupAddressPostCode.match(regPostcode))
     {
