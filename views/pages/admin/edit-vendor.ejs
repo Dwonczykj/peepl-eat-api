@@ -46,6 +46,11 @@
         <label for="pickupAddressPostCode">Vendor Address Post Code</label>
         <input type="text" :class="{ 'is-invalid': formErrors.pickupAddressPostCode }" v-model="vendor.pickupAddressPostCode"
           class="form-control" id="pickupAddressPostCode" oninput="this.value = this.value.toUpperCase()">
+        <label for="pickupAddressGeocoordinate">Vendor Address Geocoordinate</label>
+        <input type="number" :class="{ 'is-invalid': formErrors.pickupAddressLatitude }" v-model="vendor.pickupAddressLatitude"
+          class="form-control" id="pickupAddressLatitude">
+        <input type="number" :class="{ 'is-invalid': formErrors.pickupAddressLongitude }"
+          v-model="vendor.pickupAddressLongitude" class="form-control" id="pickupAddressLongitude">
       </div>
       <div class="form-group">
         <label for="vendorType">Vendor Type</label>
