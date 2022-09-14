@@ -57,6 +57,13 @@ parasails.registerComponent('order-card', {
       <br><b>Post Code:</b> {{order.deliveryAddressPostCode}}
       <br><b>Notes:</b> {{order.deliveryAddressInstructions}}</p>
     </div>
+    <div v-else>
+      <h2 class="h5 border-top pt-3 mt-3 mb-0">Collection details:</h2>
+      <p><b>Name:</b> {{order.deliveryName}}
+      <br><b>Email:</b> {{order.deliveryEmail}}
+      <br><b>Number:</b> <a :href="'tel:'+order.deliveryPhoneNumber">{{order.deliveryPhoneNumber}}</a>
+      <br><b>Notes:</b> {{order.deliveryAddressInstructions}}</p>
+    </div>
     <h2 class="h5 border-top pt-3 mt-3 mb-0 d-flex">
       <span class="mr-auto">Total</span>
       <span>£{{order.total / 100}}</span>
