@@ -74,18 +74,21 @@ module.exports = {
 
     // If generating slots for tomorrow, check if it is before the cutoff time
     let isAfterCutoff = false;
-    const cutoffTime = fulfilmentMethod.orderCutoff; // e.g. 15:00
+    const cutoffTime = fulfilmentMethod.orderCutoff; // e.g. 22:00
 
     if(cutoffTime){
-      const tomorrow = moment().add(1, 'days').endOf('day'); // End of day tomorrow
+      const tomorrow = moment().add(1, 'days').startOf('day'); // End of day tomorrow
 
-      if(dt.isSameOrBefore(tomorrow) && cutoffTime) {
+      // If dt is today
+      if(dt.isSame(moment(), 'day')){
+        isAfterCutoff = true;
+      } else if(dt.isSameOrBefore(tomorrow) && cutoffTime) {
         const cutoff = moment(cutoffTime, 'HH:mm'); // Moment version of cutoff time
         // If the current time is after the cutoff time, set isAfterCutoff to true
         if(moment().isAfter(cutoff)) {
           isAfterCutoff = true;
         }
-      }
+      } // else nothing (too far in the future)
     }
 
     // If there are opening hours available
