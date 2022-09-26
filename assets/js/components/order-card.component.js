@@ -77,6 +77,16 @@ parasails.registerComponent('order-card', {
         This order has expired and can no longer be approved.
       </p>
     </div>
+    <div v-else-if="order.restaurantAcceptanceStatus == 'accepted' && isInFuture(order.fulfilmentSlotFrom)">
+      <p class="border-top pt-3 mt-3 mb-0 d-flex">
+        This order has been accepted and can no longer be rejected.
+      </p>
+    </div>
+    <div v-else-if="order.restaurantAcceptanceStatus == 'rejected' && isInFuture(order.fulfilmentSlotFrom)">
+      <p class="border-top pt-3 mt-3 mb-0 d-flex">
+        This order has been rejected.
+      </p>
+    </div>
 
   </div>
 </div>

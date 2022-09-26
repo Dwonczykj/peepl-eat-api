@@ -115,7 +115,7 @@ before(function (done) {
                     console.log('Sails lifted!');
                     return done();
                 })
-                .catch(err => done(err))
+                .catch(err => done(err));
         });
     } catch (err) {
         return done(err);

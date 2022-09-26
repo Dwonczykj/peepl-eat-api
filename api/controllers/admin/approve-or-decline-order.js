@@ -157,7 +157,7 @@ module.exports = {
         return exits.badPartialFulfilmentRequest();
       }
 
-      await sails.helpers.requestUpdateFromConsumer.with({
+      await sails.helpers.requestUpdateFromConsumer.with({// todo: dont need to revert peepl tokens as only sent in accept clause above.
         customerWalletAddress: order.customerWalletAddress,
         orderPublicId: order.publicId,
       });

@@ -4,7 +4,7 @@ module.exports = {
   friendlyName: 'Is authorised for vendor',
 
 
-  description: 'Check if the user is authorised for the vendor.',
+  description: 'Check if the user is a vendor User registered to this vendor or is a superadmin',
 
 
   inputs: {

@@ -90,6 +90,4 @@ module.exports = {
 
     return exits.success(user);
   }
-
-
 };

@@ -1,7 +1,10 @@
+/* eslint-disable no-console */
 declare var OpeningHours: any;
 declare var FulfilmentMethod: any;
 const moment = require('moment');
+declare var sails: any;
 
+const request_delivery_availability = !!sails.config.custom.requestDeliveryAvailability;
 
 const DELIVERY_AVAIL_PENDING = -1;
 
@@ -128,11 +131,39 @@ export interface ICourier {
   checkDeliveryStatus: (provisionalDeliveryId: number, deliveryInfo: DeliveryInformation) => Promise<DeliveryStatus>;
 }
 
+class DummyAxiosClient {
+  get: (url:string) => Promise<any> = (url:string) => {
+    console.info(`DUMMY GET -> ${url}`);
+    
+    return Promise.resolve({statusCode: 200});
+  }
+
+  put: (url:string, data) => Promise<any> = (url:string) => {
+    console.info(`DUMMY PUT -> ${url}`);
+    
+    return Promise.resolve({statusCode: 200});
+  }
+
+  post: (url:string, data) => Promise<any> = (url:string) => {
+    console.info(`DUMMY POST -> ${url}`);
+    if(url === '/api/deliveries/availability'){
+      return Promise.resolve({
+        statusCode: 200,
+        data: {status: 'confirmed'}
+      });
+    }
+    return Promise.resolve({statusCode: 200});
+  }
+
+  static create = (config:{}) => new DummyAxiosClient();
+}
+
 export class CoopCycleCourier implements ICourier {
   courierName = 'CoopCycle';
   courierId = 1;
   client?:any;
 
+  // * These are the CoopCycle Endpoints, they could be moved to a config file?
   private _requestDeliveryAvailabilityUrl = '/api/deliveries/availability'; //! Does not exist
   private _requestDeliveryConfirmationUrl = '/api/deliveries/confirmation'; //! Does not exist
   private _requestDeliveryCancellationUrl = '/api/deliveries/cancellation'; //! Does not exist
@@ -175,6 +206,9 @@ export class CoopCycleCourier implements ICourier {
     inputs: DeliveryInformation,
   ): Promise<DeliveryAvailability> {
     
+    if (!request_delivery_availability){
+      return Promise.resolve(new DeliveryAvailability(this.courierId, 999))
+    }
 
     var deliverBefore = moment.unix(inputs.deliverBefore).calendar();
     var deliverAfter = moment.unix(inputs.deliverAfter).calendar();
@@ -241,7 +275,7 @@ export class CoopCycleCourier implements ICourier {
     };
 
     // Send the delivery information to Coopcycle
-    var response = await this.client.post(this._requestDeliveryAvailabilityUrl, requestBody)
+    var response = await this.client.post(this._requestDeliveryCancellationUrl, requestBody)
       .catch((err) => {
         sails.log.info('Error cancelling the delivery from ' + this.courierName + '.');
         sails.log.warn(err);
@@ -292,7 +326,10 @@ export class AgileCourier implements ICourier {
   async requestProvisionalDeliveryAvailability(
     deliveryInformation: DeliveryInformation,
   ): Promise<DeliveryAvailability> {
-    
+
+    if (!request_delivery_availability){
+      return Promise.resolve(new DeliveryAvailability(this.courierId, 999))
+    }
 
     var deliverBefore = moment.unix(deliveryInformation.deliverBefore).calendar(); // TODO: Correct the formatting for this line to Today if today, 14:34 (16/08/2022 14:34 +00)
     var deliverAfter = moment.unix(deliveryInformation.deliverAfter).calendar();
@@ -621,32 +658,34 @@ module.exports = {
 
     const n = couriers.length;
     var chosenCourier:ICourier = null;
-    for(var i = 0; i < n; i += 1) {
-      const courier: ICourier = couriers[i];
-      const deliveryAvailability = await courier.requestProvisionalDeliveryAvailability(new DeliveryInformation(
-        deliverBefore,
-        deliverAfter,
-        vendor.pickupAddressLineOne,
-        vendor.pickupAddressLineTwo,
-        vendor.pickupAddressCity,
-        vendor.pickupAddressPostCode,
-        vendor.name,
-        inputs.deliveryContactName,
-        inputs.deliveryPhoneNumber,
-        inputs.deliveryComments,
-        inputs.deliveryAddressLineOne,
-        inputs.deliveryAddressLineTwo,
-        inputs.deliveryAddressCity,
-        inputs.deliveryAddressPostCode,
-        inputs.vegiOrderId
-      ));
-      if(deliveryAvailability.status === 'accepted'){
-        chosenCourier = courier;
-        break;
-      } else if(deliveryAvailability.status === 'pending' && chosenCourier === null) {
-        chosenCourier = courier;
-      }
+    // for(var i = 0; i < n; i += 1) {
+
+      // const courier: ICourier = couriers[i];
+    const courier: ICourier = new AgileCourier();
+    const deliveryAvailability = await courier.requestProvisionalDeliveryAvailability(new DeliveryInformation(
+      deliverBefore,
+      deliverAfter,
+      vendor.pickupAddressLineOne,
+      vendor.pickupAddressLineTwo,
+      vendor.pickupAddressCity,
+      vendor.pickupAddressPostCode,
+      vendor.name,
+      inputs.deliveryContactName,
+      inputs.deliveryPhoneNumber,
+      inputs.deliveryComments,
+      inputs.deliveryAddressLineOne,
+      inputs.deliveryAddressLineTwo,
+      inputs.deliveryAddressCity,
+      inputs.deliveryAddressPostCode,
+      inputs.vegiOrderId
+    ));
+    if(deliveryAvailability.status === 'accepted'){
+      chosenCourier = courier;
+        // break;
+    } else if(deliveryAvailability.status === 'pending' && chosenCourier === null) {
+      chosenCourier = courier;
     }
+    // }
     return chosenCourier;
   }
 };

@@ -1,5 +1,7 @@
 declare var OpeningHours: any;
 declare var FulfilmentMethod: any;
+import { DaysOfWeek } from 'api/interfaces/vendors/slot';
+import moment from 'moment';
 
 // const moment = require('moment');
 module.exports = {
@@ -32,8 +34,8 @@ module.exports = {
     // TODO: Generate IDs for slots to simplify logic (but must account for changes to opening hours and slot duration)
     // TODO: Limit to 7 days in future
 
-    var availableDaysOfWeek:Array<string> = [];
-    var availableSpecialDates:Array<Date> = [];
+    var availableDaysOfWeek:Array<DaysOfWeek> = [];
+    var availableSpecialDates:Array<moment.Moment> = [];
 
     const monthDiff = (d1, d2) => {
       let months;
@@ -84,7 +86,7 @@ module.exports = {
         } else {
           const specialDate = new Date(Date.parse(openingHours.specialDate.toString()));
           if(monthDiff(Date.now(), specialDate) < 4){
-            availableSpecialDates.push(specialDate);
+            availableSpecialDates.push(moment(specialDate));
           }
         }
       }

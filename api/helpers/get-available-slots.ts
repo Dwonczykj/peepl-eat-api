@@ -39,7 +39,7 @@ module.exports = {
     // TODO: Account for overnight opening hours
     // TODO: Limit to ordering 7 days in future
 
-    let availableSlots = [];
+    let availableSlots:{ startTime: (string|moment.Moment); endTime: (string|moment.Moment); }[] = [];
 
     let fulfilmentMethod = await FulfilmentMethod.findOne(inputs.fulfilmentMethodId);
     /* let fulfilmentMethod = {
@@ -100,11 +100,11 @@ module.exports = {
       let startTime = moment.utc(openTime, 'YYYY-MM-DD HH:mm'); // Start time for creating slots.
       let endTime = moment.utc(closeTime, 'YYYY-MM-DD HH:mm'); // End time for creating slots.
 
-      let slots = [];
+      let slots:{ startTime: (string|moment.Moment); endTime: (string|moment.Moment); }[] = [];
 
       // Generate slots based on slotLength within opening hours.
       while (startTime < endTime) {
-        let slot:{ [Key: string]: (string|moment.Moment); } = {
+        let slot:{ startTime: (string|moment.Moment); endTime: (string|moment.Moment); } = {
           startTime: '',
           endTime: ''
         };

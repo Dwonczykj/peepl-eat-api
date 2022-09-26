@@ -6,7 +6,7 @@
     "configurations": [
         {
             "type": "node",
-            "runtimeExecutable": "/Users/joeyd/.nvm/versions/node/v17.1.0/bin/node",
+            // "runtimeExecutable": "/Users/joeyd/.nvm/versions/node/v17.1.0/bin/node",
             "request": "launch",
             "name": "Launch Program",
             "skipFiles": [
@@ -28,6 +28,22 @@
             //     "action": "openExternally"
             // }
         },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Program (2)",
+            "skipFiles": [
+                "<node_internals>/**/*.js",
+                "assets/**"
+            ],
+            "program": "${workspaceFolder}/app.js",
+            // "preLaunchTask": "ngrok",
+            // "serverReadyAction": {
+            //     "pattern": "debug: Port        : ([0-9]+)",
+            //     "uriFormat": "http://localhost:%s/vendors?wallet=test",
+            //     "action": "openExternally"
+            // }
+        }
         {
             "type": "node",
             "request": "launch",

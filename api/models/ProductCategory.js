@@ -35,6 +35,11 @@ module.exports = {
       description: 'The category owner.',
       required: true
     },
+    categoryGroup: {
+      model: 'CategoryGroup',
+      description: 'The category group shared between vendors.',
+      required: true
+    },
     products: {
       collection: 'product',
       via: 'category'

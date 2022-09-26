@@ -211,11 +211,62 @@
       "name": "View approve order"
     },
     {
+      "name": "View order"
+    },
+    {
       "name": "View edit delivery partner"
     }
   ],
   "components": {
     "schemas": {
+      "categorygroup": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/categorygroup-without-required-constraint"
+          },
+          {
+            "required": [
+              "name",
+              "forRestaurantItem"
+            ]
+          }
+        ]
+      },
+      "categorygroup-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **CategoryGroup**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the cross vendor category group.",
+            "maxLength": 50,
+            "uniqueItems": true
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "The URL of the cross vendor category group image."
+          },
+          "forRestaurantItem": {
+            "type": "boolean",
+            "description": "Group of products only contains restaurant prepared items (takeaway, order-in and delivery)"
+          }
+        }
+      },
       "courier": {
         "type": "object",
         "allOf": [
@@ -1137,7 +1188,8 @@
           {
             "required": [
               "name",
-              "vendor"
+              "vendor",
+              "categoryGroup"
             ]
           }
         ]
@@ -1173,6 +1225,14 @@
             "oneOf": [
               {
                 "$ref": "#/components/schemas/vendor"
+              }
+            ]
+          },
+          "categoryGroup": {
+            "description": "The category group shared between vendors. JSON dictionary representing the **categorygroup** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/categorygroup"
               }
             ]
           },
@@ -5732,6 +5792,56 @@
         "responses": {
           "200": {
             "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/admin/order/{orderId}": {
+      "get": {
+        "summary": "View order",
+        "description": "Display \"order\" page.",
+        "tags": [
+          "View order"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "orderId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The order to view."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "user not allowed to see vendor or vendor orders"
           },
           "404": {
             "description": "Resource not found"

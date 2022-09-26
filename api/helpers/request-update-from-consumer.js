@@ -55,10 +55,12 @@ module.exports = {
       sails.log.warn('Order vendor does not exist');
     }
 
+    // Intention is for users to then 
     return await sails.helpers.sendFirebaseNotification.with({
       topic: 'order-' + inputs.orderPublicId,
       title: 'Order update - (Response required)',
       body: 'Some items could not be fulfilled' + vendorName + '. Please update your order in the app.'
+      //TODO: Add an x-path that opens the flutter app with the view shown ready to hit the action: /admin/
     });
 
   }

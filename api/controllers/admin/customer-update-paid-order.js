@@ -1,5 +1,7 @@
 const OrderItem = require("../../models/OrderItem");
 
+// const peeplPay = require('../../interfaces/peeplPay');
+
 const OrderTypeEnum = {
   vegiEats: 'vegiEats',
   vegiPays: 'vegiPays',
@@ -120,8 +122,7 @@ module.exports = {
       return exits.orderNotAuthorised();
     }
 
-    //TODO: implement checkRefundRequestAmounts helper method -> how as would need to know value of a PPL token which needs a peeplPay GET request.
-    //i.e.
+    //TODO: Mock the below endpoints using the hardcoded token values in custom.js
     var gbpxPortion = await peeplPay.getAmountInCurrency.with({
       amount: inputs.refundRequestGBPx,
       fromCurrency: 'GBPx',
@@ -137,6 +138,19 @@ module.exports = {
       return exits.badRequest();
     }
 
+    var say;
+    if (newOrder.fulfilmentMethod.methodType === 'delivery') {
+      say = `Your vegi order for delivery between ${order.fulfilmentSlotFrom} and ${order.fulfilmentSlotTo} has bene updated. To view: ${sails.config.custom.baseUrl}/admin/order/${order.publicId}`;
+    } else {
+      say = `Your vegi order for collection between ${order.fulfilmentSlotFrom} and ${order.fulfilmentSlotTo} has bene updated. To view: ${sails.config.custom.baseUrl}/admin/order/${order.publicId}`;
+    }
+    await sails.helpers.sendSmsNotification.with({
+      to: newOrder.vendor.phoneNumber,
+      body: say
+    });
+
+    return exits.success({ orderID: newOrder.id });
+
     // revert the token issuance
     //TODO: Remove this as this is done by walletAPI of consumer app - get the acmount calc form in here and check it vs the inputs.
     // await sails.helpers.revertPeeplRewardIssue.with({
@@ -145,31 +159,33 @@ module.exports = {
     //   paymentAmountBeingRefunded: oldOrder.total - newOrder.total //! this part calls sails.helpers.calculatePPLReward internally
     // });
 
-    const revertRewardPPLAmount = await sails.helpers.calculatePPLReward.with({
-      amount: (oldOrder.total - newOrder.total),
-      orderType: OrderTypeEnum.vegiEats
-    });
+    // ! Do NOT NEED TO REVERT The the PPL reward as it is only issued once the
+    // ! order has been accepted by the vendor in approve-or-decline-order.js
+    // const revertRewardPPLAmount = await sails.helpers.calculatePPLReward.with({
+    //   amount: (oldOrder.total - newOrder.total),
+    //   orderType: OrderTypeEnum.vegiEats
+    // });
 
-    // Create PaymentIntent on Peepl Pay
-    var newPaymentIntent = await sails.helpers.createPaymentIntentForSendingPPLPoints(
-      revertRewardPPLAmount,
-      sails.config.custom.vegiCommunityManagerAddress, //pushes an update to user via firebase when order has comnpleted via peeplPay posting back to peeplEatWebHook
-      'vegi'
-    )
-      .catch(() => {
-        return exits.error(new Error('Error creating payment intent'));
-      });
+    // // Create PaymentIntent on Peepl Pay
+    // var newPaymentIntent = await sails.helpers.createPaymentIntentForSendingPPLPoints(
+    //   revertRewardPPLAmount,
+    //   sails.config.custom.vegiCommunityManagerAddress, //pushes an update to user via firebase when order has comnpleted via peeplPay posting back to peeplEatWebHook
+    //   'vegi'
+    // )
+    //   .catch(() => {
+    //     return exits.error(new Error('Error creating payment intent'));
+    //   });
 
-    if (!newPaymentIntent) {
-      return exits.error(new Error('Error creating payment intent'));
-    }
+    // if (!newPaymentIntent) {
+    //   return exits.error(new Error('Error creating payment intent'));
+    // }
 
-    // Update order with payment intent
-    await Refund.updateOne(newOrder.id)
-      .set({ paymentIntentId: newPaymentIntent.paymentIntentId });
+    // // Update order with payment intent
+    // await Refund.updateOne(newOrder.id)
+    //   .set({ paymentIntentId: newPaymentIntent.paymentIntentId });
 
     // All done.
-    return exits.success({ orderID: newOrder.id, paymentIntentID: newPaymentIntent.paymentIntentId });
+    // return exits.success({ orderID: newOrder.id, paymentIntentID: newPaymentIntent.paymentIntentId });
     //TODO: Store the above info against the refund in the db, could have a new refunds object, then add the below to the webhook once receival of reverted rewards tokens has been confirmed / completed by peeplPay
 
 
