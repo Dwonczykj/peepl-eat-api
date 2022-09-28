@@ -52,6 +52,7 @@ module.exports.routes = {
 
   // ADMIN
   'GET /admin/login': { action: 'admin/view-login' },
+  'GET /admin/login-with-password': { action: 'admin/view-login-with-password' },
   'GET /api/v1/admin/login': { action: 'admin/view-login' },
   'GET /api/v1/admin/logged-in': { action: 'admin/logged-in' },
   'GET /admin/signup': { action: 'admin/view-signup' },
@@ -64,7 +65,8 @@ module.exports.routes = {
   'POST /admin/signup': { action: 'admin/signup' },
   'POST /api/v1/admin/signup': { action: 'admin/signup' },
   'POST /api/v1/admin/login-with-firebase': { action: 'admin/login-with-firebase' },
-  'PUT /api/v1/admin/login-with-secret': { action: 'admin/login-with-secret' },
+  'POST /api/v1/admin/login-with-secret': { action: 'admin/login-with-secret' },
+  'POST /api/v1/admin/login-with-password': { action: 'admin/login-with-password' },
   'POST /api/v1/admin/user-exists-for-email': { action: 'admin/user-exists-for-email' },
   'POST /api/v1/admin/user-exists-for-phone': { action: 'admin/user-exists-for-phone' },
 
@@ -93,6 +95,9 @@ module.exports.routes = {
   'GET /admin/delivery-partners': { action: 'admin/view-delivery-partners' },
   'GET /admin/delivery-partners/:deliveryPartnerId': { action: 'admin/view-edit-delivery-partner' },
   'GET /admin/delivery-partners/new': { action: 'admin/view-create-delivery-partner' },
+  'GET /admin/category-groups': { action: 'admin/view-category-groups' },
+  'GET /admin/category-groups/:categoryGroupId': { action: 'admin/view-edit-category-group' },
+  'GET /admin/category-groups/new': { action: 'admin/view-create-category-group' },
 
   'POST /api/v1/admin/create-vendor': { action: 'admin/create-vendor' },
   'POST /api/v1/admin/edit-vendor': { action: 'admin/edit-vendor' },

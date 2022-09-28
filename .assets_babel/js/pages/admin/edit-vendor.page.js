@@ -30,6 +30,7 @@ parasails.registerPage('admin-edit-vendor', {
       isVegan: false,
       minimumOrderAmount: false
     },
+    categoryGroups: [],
     colFul: {},
     delFul: {},
     postalDistricts: [],
@@ -154,6 +155,14 @@ parasails.registerPage('admin-edit-vendor', {
         options: []
       };
       this.vendor.products.push(newProduct);
+    },
+    clickAddProductCategory: function clickAddProductCategory() {
+      var newCategory = {
+        name: '',
+        imageUrl: '',
+        categoryGroup: ''
+      };
+      this.vendor.productCategories.push(newCategory);
     },
     updatePostalDistricts: function updatePostalDistricts() {
       var postalDistricts = this.postalDistricts.filter(function (district) {

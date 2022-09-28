@@ -32,6 +32,10 @@ module.exports = {
     },
     isFeatured: {
       type: 'boolean'
+    },
+    category: {
+      type: 'string',
+      required: true,
     }
   },
 

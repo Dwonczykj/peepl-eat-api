@@ -1,4 +1,4 @@
-// const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt');
 /**
  * User.js
  *
@@ -9,118 +9,135 @@
 // import userModel = require('./UserModel');
 
 module.exports = {
-
   attributes: {
-
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
     //  ╩  ╩╚═╩╩ ╩╩ ╩ ╩ ╚╝ ╚═╝╚═╝
     email: {
-      type: 'string',
+      type: "string",
       isEmail: true,
       // unique: true,
       required: false,
     }, //TODO: Run a clean on the db to make this
     phoneNoCountry: {
-      type: 'number',
+      type: "number",
       // unique: true,
       required: true,
     },
     phoneCountryCode: {
-      type: 'number',
+      type: "number",
       // unique: true,
       required: true,
     },
     // password: {
-    //   type: 'string',
+    //   type: "string",
     //   required: true,
+    //   description:
+    //     "Securely hashed representation of the user's login password.",
+    //   protect: true,
+    //   example: "2$28a8eabna301089103-13948134nad",
     // },
     name: {
-      type: 'string',
+      type: "string",
       required: true,
     },
     isSuperAdmin: {
-      type: 'boolean',
+      type: "boolean",
       defaultsTo: false,
     },
     role: {
-      type: 'string',
-      isIn: ['admin', 'vendor', 'courier', 'consumer'],
+      type: "string",
+      isIn: ["admin", "vendor", "courier", "consumer"],
       required: true,
     },
     vendorRole: {
-      type: 'string',
-      isIn: ['admin', 'owner', 'inventoryManager', 'salesManager', 'none'],
-      defaultsTo: 'none'
+      type: "string",
+      isIn: ["admin", "owner", "inventoryManager", "salesManager", "none"],
+      defaultsTo: "none",
     },
     courierRole: {
-      type: 'string',
-      isIn: ['admin', 'owner', 'deliveryManager', 'rider', 'none'],
-      defaultsTo: 'none'
+      type: "string",
+      isIn: ["admin", "owner", "deliveryManager", "rider", "none"],
+      defaultsTo: "none",
     },
     roleConfirmedWithOwner: {
-      type: 'boolean',
+      type: "boolean",
       defaultsTo: false, //TODO: Add API Endpoint to toggle this to true for admins and owners registered to that business.
     },
     vendorConfirmed: {
-      type: 'boolean',
+      type: "boolean",
       defaultsTo: false,
     },
     // firebaseUser: { // https://sailsjs.com/documentation/concepts/models-and-orm/attributes#:~:text=%23-,Type,-%23
     //   type: 'json', // https://sailsjs.com/documentation/concepts/models-and-orm/associations
     // }
     firebaseSessionToken: {
-      type: 'string',
+      type: "string",
       required: true,
     },
+    secret: {
+      type: "string",
+      required: false,
+      description:
+        "Securely hashed representation of the service account's secret.",
+      protect: true,
+      example: "2$28a8eabna301089103-13948134nad",
+    },
     fbUid: {
-      type: 'string',
+      type: "string",
     },
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
     //  ╚═╝╩ ╩╚═╝╚═╝═╩╝╚═╝
 
-
     //  ╔═╗╔═╗╔═╗╔═╗╔═╗╦╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
     //  ╠═╣╚═╗╚═╗║ ║║  ║╠═╣ ║ ║║ ║║║║╚═╗
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
     vendor: {
-      model: 'vendor'
+      model: "vendor",
     },
     courier: {
-      model: 'courier'
+      model: "courier",
     },
   },
   //} /*as { [K in keyof userModel]: any },
 
-  // customToJSON: function() {
-  //   return _.omit(this, ['password']);
-  // },
+  customToJSON: function () {
+    sails.log.info("firebaseSessionToken, secret & password token removed from user JSON");
+    return _.omit(this, ["firebaseSessionToken", "secret", "password"]);
+  },
 
   formatPhoneNumber: async function (opts) {
     const user = await User.findOne({ id: opts.id });
 
     if (!user) {
-      throw require('flaverr')({
+      throw require("flaverr")({
         message: `Cannot find user with id=${opts.id}.`,
-        code: 'E_UNKNOWN_USER'
+        code: "E_UNKNOWN_USER",
       });
     }
 
     var x = user.phoneNoCountry.toString();
-    x = x.replace(/-/g, '').match(/(\d{1,10})/g)[0];
-    x = x.replace(/(\d{1,3})(\d{1,3})(\d{1,4})/g, '$1-$2-$3');
+    x = x.replace(/-/g, "").match(/(\d{1,10})/g)[0];
+    x = x.replace(/(\d{1,3})(\d{1,3})(\d{1,4})/g, "$1-$2-$3");
     return `+${user.phoneCountryCode} ${x}`;
   },
 
-  beforeCreate: async function(user, proceed) {
+  beforeCreate: async function (user, proceed) {
+    // const saltRounds = sails.config.custom.passwordSaltRounds;
+
+    // try {
+    //   user.firebaseSessionToken = await bcrypt.hash(user.firebaseSessionToken, saltRounds);
+    // } catch (err) {
+    //   throw err;
+    // }
 
     const existingUser = await User.findOne({
       phoneNoCountry: user.phoneNoCountry,
       phoneCountryCode: user.phoneCountryCode,
     });
 
-    if(existingUser){
+    if (existingUser) {
       // throw new Error('userExists');
       return undefined;
     }
@@ -129,52 +146,61 @@ module.exports = {
     const isNull = (val) => val === null || val === undefined || val === -1;
 
     const setRoles = () => {
-      if(nonNull(user.courier) && nonNull(user.vendor)){
+      if (nonNull(user.courier) && nonNull(user.vendor)) {
         return undefined; //TODO: Throw Exception on creation here
-      } else if (nonNull(user.vendor) && (isNull(user.vendorRole) || !['owner', 'salesManager', 'inventoryManager'].includes(user.vendorRole)) ){
+      } else if (
+        nonNull(user.vendor) &&
+        (isNull(user.vendorRole) ||
+          !["owner", "salesManager", "inventoryManager"].includes(
+            user.vendorRole
+          ))
+      ) {
         user.vendor = null;
         return undefined; //todo throw
-      } else if (nonNull(user.courier) && (isNull(user.courierRole) || !['owner', 'deliveryManager', 'rider'].includes(user.courierRole)) ){
+      } else if (
+        nonNull(user.courier) &&
+        (isNull(user.courierRole) ||
+          !["owner", "deliveryManager", "rider"].includes(user.courierRole))
+      ) {
         user.courier = null;
         return undefined; //todo throw
       }
 
-      if (nonNull(user.vendor)){
-        user.role = 'vendor';
-        user.courierRole = 'none';
+      if (nonNull(user.vendor)) {
+        user.role = "vendor";
+        user.courierRole = "none";
         user.courier = null;
-      } else if (nonNull(user.courier)){
-        user.role = 'courier';
-        user.vendorRole = 'none';
+      } else if (nonNull(user.courier)) {
+        user.role = "courier";
+        user.vendorRole = "none";
         user.vendor = null;
-      } else if (!user.isSuperAdmin){
-        user.role = 'consumer';
-        user.vendorRole = 'none';
-        user.courierRole = 'none';
+      } else if (!user.isSuperAdmin) {
+        user.role = "consumer";
+        user.vendorRole = "none";
+        user.courierRole = "none";
         user.vendor = null;
         user.courier = null;
       }
       return user;
     };
 
-    if(user.isSuperAdmin){
-      user.role = 'admin';
-      user.vendorRole = 'admin';
-      user.courierRole = 'admin';
-    } else if(user.role === 'admin' && !user.isSuperAdmin){
+    if (user.isSuperAdmin) {
+      user.role = "admin";
+      user.vendorRole = "admin";
+      user.courierRole = "admin";
+    } else if (user.role === "admin" && !user.isSuperAdmin) {
       user = setRoles();
     }
 
-    if (user.role !== 'vendor'){
-      user.vendorRole = 'none';
+    if (user.role !== "vendor") {
+      user.vendorRole = "none";
       user.vendor = null;
     }
-    if (user.role !== 'courier'){
-      user.courierRole = 'none';
+    if (user.role !== "courier") {
+      user.courierRole = "none";
       user.courier = null;
     }
 
     return proceed();
-  }
-
+  },
 };

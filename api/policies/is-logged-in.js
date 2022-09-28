@@ -9,9 +9,14 @@
  */
 module.exports = async function (req, res, proceed) {
   if (!req.session.userId) {
-    return res.redirect('/admin/login');
+    sails.log('Policy:<is-logged-in> -> redirect to login as no active session');
+    // Respond with view or JSON.
+    if (req.wantsJSON) {
+      return res.forbidden();
+    } else {
+      return res.redirect('/admin/login-with-password');
+    }
   }
-  // TODO: Handle case that user doesn't exist
 
   return proceed();
 };

@@ -8,7 +8,7 @@ const envConfig = dotenv.config('./env').parsed;
 describe('Login Controllers', () => {
 
     describe('login-with-secret', () => {
-        it('/api/v1/admin/login-with-secret should return 302', function (done) {
+        it('/api/v1/admin/login-with-secret should return 200', function (done) {
             // console.log(sails);
             // ? Use CSRF?
             //   request(sails.hooks.http.app)
@@ -30,12 +30,18 @@ describe('Login Controllers', () => {
             //             })
             //             .catch(err => done(err));
             request(sails.hooks.http.app)
-                .put('/api/v1/admin/login-with-secret')
+                .post('/api/v1/admin/login-with-secret')
                 .send({
                     name: 'TEST_SERVICE',
                     secret: envConfig['test_secret'],
                 })
-                .expect(302, done);
+                .expect(200, (response) => {
+                    return done();
+                });
+                // .catch((err) => {
+                //     if (err)
+                //         return done(err);
+                // })
         });
     });
 

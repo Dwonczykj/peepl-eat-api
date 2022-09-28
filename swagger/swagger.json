@@ -31,6 +31,9 @@
       "name": "View login"
     },
     {
+      "name": "View login with password"
+    },
+    {
       "name": "View signup"
     },
     {
@@ -55,6 +58,9 @@
       "name": "View delivery partners"
     },
     {
+      "name": "View category groups"
+    },
+    {
       "name": "View deliveries"
     },
     {
@@ -68,6 +74,9 @@
     },
     {
       "name": "View create delivery partner"
+    },
+    {
+      "name": "View create category group"
     },
     {
       "name": "Get all postal districts"
@@ -110,6 +119,9 @@
     },
     {
       "name": "Login With Secret"
+    },
+    {
+      "name": "Login with Password"
     },
     {
       "name": "Check user for email"
@@ -215,6 +227,9 @@
     },
     {
       "name": "View edit delivery partner"
+    },
+    {
+      "name": "View edit category group"
     }
   ],
   "components": {
@@ -1458,6 +1473,11 @@
           "firebaseSessionToken": {
             "type": "string"
           },
+          "secret": {
+            "type": "string",
+            "description": "Securely hashed representation of the service account's secret.",
+            "example": "2$28a8eabna301089103-13948134nad"
+          },
           "fbUid": {
             "type": "string"
           },
@@ -1725,11 +1745,11 @@
           },
           "name": {
             "type": "string",
-            "description": "The name of the product category."
+            "description": "The name of the vendor category (i.e. a cafe)."
           },
           "imageUrl": {
             "type": "string",
-            "description": "The URL of the product category image."
+            "description": "The URL of the vendor category image."
           },
           "vendors": {
             "description": "Array of **vendor**'s or array of FK's when creating / updating / not populated",
@@ -1833,6 +1853,27 @@
         "description": "Display \"Login\" page.",
         "tags": [
           "View login"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/admin/login-with-password": {
+      "get": {
+        "summary": "View login with password",
+        "description": "Display \"Login\" page.",
+        "tags": [
+          "View login with password"
         ],
         "parameters": [],
         "responses": {
@@ -2272,6 +2313,43 @@
         }
       }
     },
+    "/admin/category-groups": {
+      "get": {
+        "summary": "View category groups",
+        "description": "Display \"Category Groups\" page.",
+        "tags": [
+          "View category groups"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/couriers/deliveries": {
       "all": {
         "summary": "View deliveries",
@@ -2421,6 +2499,27 @@
         "description": "Display \"Create delivery partner\" page.",
         "tags": [
           "View create delivery partner"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/admin/category-groups/new": {
+      "get": {
+        "summary": "View create category group",
+        "description": "Display \"Create category group\" page.",
+        "tags": [
+          "View create category group"
         ],
         "parameters": [],
         "responses": {
@@ -3223,7 +3322,7 @@
       }
     },
     "/api/v1/admin/login-with-secret": {
-      "put": {
+      "post": {
         "summary": "Login With Secret",
         "description": "Endpoint for service accounts and tests to login to without requiring firebase",
         "tags": [
@@ -3253,6 +3352,70 @@
           },
           "401": {
             "description": "The provided service name and secret combination does not\n      match any service account."
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/login-with-password": {
+      "post": {
+        "summary": "Login with Password",
+        "description": "Login admin.",
+        "tags": [
+          "Login with Password"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "emailAddress",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          },
+          {
+            "in": "query",
+            "name": "password",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "rememberMe",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
           },
           "404": {
             "description": "Resource not found"
@@ -4338,6 +4501,14 @@
             "required": false,
             "schema": {
               "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "category",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -5863,6 +6034,53 @@
           {
             "in": "path",
             "name": "deliveryPartnerId",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/admin/category-groups/{categoryGroupId}": {
+      "get": {
+        "summary": "View edit category group",
+        "description": "Display \"Edit category group\" page.",
+        "tags": [
+          "View edit category group"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "categoryGroupId",
             "required": false,
             "schema": {
               "type": "number",

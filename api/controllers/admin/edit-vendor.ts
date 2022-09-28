@@ -121,6 +121,8 @@ module.exports = {
       if(imageInfo) {
         inputs.imageUrl = sails.config.custom.amazonS3BucketUrl + imageInfo.fd;
       }
+
+      delete inputs.image;
     }
 
     var newVendor = await Vendor.updateOne(inputs.id).set(inputs);

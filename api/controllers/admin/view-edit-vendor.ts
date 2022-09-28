@@ -1,6 +1,7 @@
 declare var Vendor: any;
 declare var PostalDistrict: any;
 declare var DeliveryPartner: any;
+declare var CategoryGroup: any;
 module.exports = {
 
 
@@ -38,7 +39,7 @@ module.exports = {
     }
 
     var vendor = await Vendor.findOne(vendorid)
-    .populate('products&products.options&options.values');
+      .populate('productCategories&products&products.options&options.values');
 
     if(!vendor) {
       return exits.notFound();
@@ -76,13 +77,15 @@ module.exports = {
     // Get a list of delivery partners
     var deliveryPartners = await DeliveryPartner.find({status: 'active'});
 
+    var categoryGroups = await CategoryGroup.find();
+
     // Respond with view or JSON.
     if(this.req.wantsJSON) {
       return exits.successJSON(
-        {vendor, delFul, colFul, postalDistricts, deliveryPartners}
+        { vendor, delFul, colFul, postalDistricts, deliveryPartners, categoryGroups }
       );
     } else {
-      return exits.success({vendor, delFul, colFul, postalDistricts, deliveryPartners});
+      return exits.success({ vendor, delFul, colFul, postalDistricts, deliveryPartners, categoryGroups });
     }
 
   }

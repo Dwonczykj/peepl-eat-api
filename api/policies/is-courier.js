@@ -9,7 +9,12 @@
  */
 module.exports = async function (req, res, proceed) {
   if (!req.session.userId) {
-    return res.redirect('/admin/login');
+    sails.log('Policy:<is-courier> -> redirect to admin as not logged in');
+    if (req.wantsJSON) {
+      return res.forbidden();
+    } else {
+      return res.redirect('/admin/login');
+    }
   }
 
   const user = await User.findOne({
@@ -20,5 +25,10 @@ module.exports = async function (req, res, proceed) {
     return proceed();
   }
 
-  return res.redirect('/admin/login/');
+  sails.log('Policy:<is-courier> -> redirect to admin as not a courier');
+  if (req.wantsJSON) {
+    return res.forbidden();
+  } else {
+    return res.redirect('/admin/login');
+  }
 };

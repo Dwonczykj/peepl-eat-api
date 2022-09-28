@@ -9,7 +9,12 @@
  */
 module.exports = async function (req, res, proceed) {
   if (!req.session.userId) {
-    return res.redirect('/admin/login');
+    sails.log('Policy:<is-super-admin> -> redirect to login as no active session');
+    if (req.wantsJSON) {
+      return res.forbidden();
+    } else {
+      return res.redirect('/admin/login-with-password');
+    }
   }
 
   const user = await User.findOne({
@@ -20,5 +25,10 @@ module.exports = async function (req, res, proceed) {
     return proceed();
   }
 
-  return res.redirect('/admin/vendors/' + user.vendor);
+  sails.log('Policy:<is-super-admin> -> redirect to login as user is not an admin');
+  if (req.wantsJSON) {
+    return res.forbidden();
+  } else {
+    return res.redirect('/admin/login');
+  }
 };

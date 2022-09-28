@@ -41,22 +41,28 @@ module.exports = {
     // (note that we lowercase it to ensure the lookup is always case-insensitive,
     // regardless of which database we're using)
     var userRecord = await User.findOne({
-      name: inputs.name.toLowerCase(),
+      name: inputs.name,
     });
 
 
     // If there was no matching user, respond thru the "badCombo" exit.
     if (!userRecord) {
-      throw 'badCombo';
+      return exits.badCombo();
     }
 
     sails.log.info('Service User record located for ' + inputs.name);
 
+    // Check secret matches the secret stored against the user
     // If the password doesn't match, then also exit thru "badCombo".
-    await sails.helpers.passwords.checkPassword(inputs.secret, userRecord.firebaseSessionToken)
-      .intercept('incorrect', 'badCombo');
+    // await sails.helpers.passwords.checkPassword(inputs.secret, userRecord.secret)
+    //   .intercept('incorrect', 'badCombo');
+    if(inputs.secret !== userRecord.secret){
+      return exits.badCombo();
+    }
 
     this.req.session.userId = userRecord.id;
+
+    return exits.success({ data: true });
 
     // const user = await signInWithEmailAndPassword(auth, inputs.email, inputs.password)
     // if(!user){

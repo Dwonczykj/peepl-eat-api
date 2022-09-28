@@ -15,6 +15,7 @@ parasails.registerComponent('editProduct', {
   //  ╩  ╩╚═╚═╝╩  ╚═╝
   props: [
     'product',
+    'productcategories',
     'vendorid'
   ],
   //  ╦╔╗╔╦╔╦╗╦╔═╗╦    ╔═╗╔╦╗╔═╗╔╦╗╔═╗
@@ -57,6 +58,13 @@ parasails.registerComponent('editProduct', {
           <div class="form-group">
             <label for="productDescription">Product Description</label>
             <textarea :class="{ 'is-invalid': formErrors.description }" v-model="product.description" class="form-control" id="productDescription" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="productCategory">Category</label>
+            <select class="form-control" id="productCategory" v-model="product.productCategory" >
+              <!-- TODO: Add image urls to dropdown  options as leading icon -->
+              <option v-for="productCategory in productcategories" :value="productCategory.id">{{productCategory.name}}</option> 
+            </select>
           </div>
           <div class="form-group">
             <label for="basePrice">Base Price (in pence)</label>

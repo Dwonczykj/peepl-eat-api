@@ -13,12 +13,12 @@ module.exports = {
     //  ╩  ╩╚═╩╩ ╩╩ ╩ ╩ ╚╝ ╚═╝╚═╝
     name: {
       type: 'string',
-      description: 'The name of the product category.',
+      description: 'The name of the vendor category (i.e. a cafe).',
       required: true
     },
     imageUrl: {
       type: 'string',
-      description: 'The URL of the product category image.'
+      description: 'The URL of the vendor category image.'
     },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗

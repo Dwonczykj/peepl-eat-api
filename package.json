@@ -77,8 +77,8 @@
     "lift": "$(npm bin)/sails lift",
     "lint": "./node_modules/eslint/bin/eslint.js . --max-warnings=0 --report-unused-disable-directives && echo '✔  Your .js files look good.'",
     "test": "clear && npm run lint && npm run custom-tests && echo 'Done.'",
-    "test-interfaces": "clear && node ./node_modules/mocha/bin/mocha --require ts-node/register test/units/**/*.test.ts",
-    "custom-tests": "clear && node ./node_modules/mocha/bin/mocha test/lifecycle.test.js test/integration/**/*.test.js",
+    "test-interfaces": "clear && node ./node_modules/mocha/bin/mocha --exit --require ts-node/register test/units/**/*.test.ts",
+    "custom-tests": "clear && node ./node_modules/mocha/bin/mocha --exit test/lifecycle.test.js test/integration/**/*.test.js",
     "clean": "rm -rf .tmp/bootstrap-version.json && node app.js --drop"
   },
   "main": "app.js",

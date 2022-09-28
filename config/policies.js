@@ -17,11 +17,16 @@ module.exports.policies = {
   *                                                                          *
   ***************************************************************************/
   'admin/view-login': true,
+  'admin/login-with-firebase': true,
+  'admin/view-login-with-password': true,
+  'admin/login-with-secret': true,
+  'admin/login-with-password': true,
+  'admin/login': true,
+  'admin/logout': true,
+  'admin/logged-in': true,
   'admin/view-account': ['localize', 'firebase', 'firebase-auth', 'is-logged-in'],
   'admin/user-exists-for-email': true,
   'admin/user-exists-for-phone': true,
-  'admin/login-with-firebase': true,
-  'admin/login': true,
   'admin/signup': true,
   'admin/view-signup': true,
   'admin/view-create-vendor': 'is-super-admin',
@@ -42,6 +47,6 @@ module.exports.policies = {
   'products/*': ['localize', 'firebase', 'firebase-auth', 'is-logged-in'],
   'vendors/*': ['localize', 'firebase', 'firebase-auth', 'is-logged-in', 'is-vendor'],
   'couriers/*': ['is-logged-in', 'is-courier'],
-  '*': true,
+  '*': 'is-logged-in',
 
 };

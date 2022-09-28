@@ -1,6 +1,8 @@
 // ./test/integration/models/User.test.js
 
 var util = require('util');
+var chai = require('chai');
+var assert = chai.assert;
 
 describe('api/policies', () => {
 

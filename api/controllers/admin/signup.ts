@@ -55,7 +55,7 @@ module.exports = {
       description: 'A user is already registered to the phone number requested'
     },
     success: {
-      outputDescription: 'The updated opening hours',
+      outputDescription: '',
       outputExample: {}
     }
   },

@@ -137,6 +137,16 @@ Cloud.setup({
       url: "/api/v1/admin/login-with-firebase",
       args: ["phoneNumber", "firebaseSessionToken"],
     }, // NOTE: Manually added as sails run rebuild-cloud-sdk fails with typescript files where any variable contains an annotation or declare
+    loginWithSecret: {
+      verb: "POST",
+      url: "/api/v1/admin/login-with-secret",
+      args: ["name", "secret"],
+    },
+    loginWithPassword: {
+      verb: "POST",
+      url: "/api/v1/admin/login-with-password",
+      args: ["emailAddress", "password", "rememberMe"],
+    }, 
     createVendor: {
       verb: "POST",
       url: "/api/v1/admin/create-vendor",
@@ -183,6 +193,16 @@ Cloud.setup({
       verb: "POST",
       url: "/api/v1/admin/edit-delivery-partner",
       args: ["id", "name", "email", "phoneNumber", "status"],
+    },
+    createCategoryGroup: {
+      verb: "POST",
+      url: "/api/v1/admin/create-category-group",
+      args: ["name", "imageUrl", "forRestaurantItem"],
+    },
+    editCategoryGroup: {
+      verb: "POST",
+      url: "/api/v1/admin/edit-category-group",
+      args: ["id", "name", "imageUrl", "forRestaurantItem"],
     },
     editProduct: {
       verb: "POST",

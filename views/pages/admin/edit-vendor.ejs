@@ -85,9 +85,33 @@
     </ajax-form>
 
     <fieldset v-if="vendor.id">
+      <h2 class="h5 mt-5">Product Categories</h2>
+
+      <edit-product-category v-for="category in vendor.productCategories" 
+        :category="category"
+        :categorygroups="categoryGroups"
+        :vendorid="vendor.id">
+      </edit-product-category>
+
+      <div class="d-md-flex my-3 action-card-actions">
+        <!-- <select class="form-control form-control-sm mr-3">
+          <option value="true">Set as available</option>
+          <option value="false">Set as unavailable</option>
+        </select>
+        <br/>
+        <button class="btn btn-peepl btn-sm">Apply</button> -->
+        <button class="btn btn-peepl btn-sm ml-auto" @click="clickAddProductCategory">Add a new product category</button>
+      </div>
+    </fieldset>
+    
+    <fieldset v-if="vendor.id">
       <h2 class="h5 mt-5">Products</h2>
 
-      <edit-product v-for="product in vendor.products" :product="product" :vendorid="vendor.id">
+      <edit-product 
+        v-for="product in vendor.products" 
+        :product="product" 
+        :productcategories="vendor.productCategories" 
+        :vendorid="vendor.id">
       </edit-product>
 
       <div class="d-md-flex my-3 action-card-actions">

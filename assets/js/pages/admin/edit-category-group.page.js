@@ -1,4 +1,4 @@
-parasails.registerPage('admin-edit-vendor', {
+parasails.registerPage('edit-category-group', {
   //  ╦╔╗╔╦╔╦╗╦╔═╗╦    ╔═╗╔╦╗╔═╗╔╦╗╔═╗
   //  ║║║║║ ║ ║╠═╣║    ╚═╗ ║ ╠═╣ ║ ║╣
   //  ╩╝╚╝╩ ╩ ╩╩ ╩╩═╝  ╚═╝ ╩ ╩ ╩ ╩ ╚═╝
@@ -7,59 +7,30 @@ parasails.registerPage('admin-edit-vendor', {
     cloudError: '',
     formErrors: {
     },
-    imageName: 'Choose image',
-    vendor: {
-      name: '',
-      description: '',
-      image: '',
-      type: 'restaurant',
-      walletAddress: '0x',
-      deliveryPartner: null,
-      // deliveryRestrictionDetails: '',
-      status: 'draft',
-      products: [],
-      isVegan: false,
-      minimumOrderAmount: false,
-    },
-    categoryGroups: [],
-    colFul: {},
-    delFul: {},
-    postalDistricts: [],
     previewImageSrc: '',
+    imageName: 'Choose image',
+    categoryGroup: {
+      name: '',
+      forRestaurantItem: false,
+      imageUrl: '',
+    },
     formRules: {
       name: {
         required: true,
-        maxLength: 50
       },
-      description: {
-        maxLength: 400,
-        required: true
-      },
-      type: {
-      },
-      walletAddress: {
-        required: true,
-        maxLength: 100,
-        regex: /^0x[a-fA-F0-9]{40}$/
-      },
-      status: {
-      }
     },
-    fulfilmethod: 'col',
-    deliveryPartners: [],
   },
 
   //  ╦  ╦╔═╗╔═╗╔═╗╦ ╦╔═╗╦  ╔═╗
   //  ║  ║╠╣ ║╣ ║  ╚╦╝║  ║  ║╣
   //  ╩═╝╩╚  ╚═╝╚═╝ ╩ ╚═╝╩═╝╚═╝
-  beforeMount: function() {
+  beforeMount: function () {
   },
-  mounted: async function() {
+  mounted: async function () {
     _.extend(this, SAILS_LOCALS);
-    this.vendor.image = '';
   },
   filters: {
-    capitalise: function(value) {
+    capitalise: function (value) {
       if (!value) {
         return '';
       }
@@ -67,8 +38,8 @@ parasails.registerPage('admin-edit-vendor', {
       return value.charAt(0).toUpperCase() + value.slice(1);
     },
     convertToPounds: function (value) {
-      if (!value) {return '£0';}
-      value = '£' + (value/100).toFixed(2);
+      if (!value) { return '£0'; }
+      value = '£' + (value / 100).toFixed(2);
       value = value.toString();
       return value;
     }
@@ -78,8 +49,14 @@ parasails.registerPage('admin-edit-vendor', {
   //  ║║║║ ║ ║╣ ╠╦╝╠═╣║   ║ ║║ ║║║║╚═╗
   //  ╩╝╚╝ ╩ ╚═╝╩╚═╩ ╩╚═╝ ╩ ╩╚═╝╝╚╝╚═╝
   methods: {
-    changeVendorImageInput: function(files) {
-      if (files.length !== 1 && !this.vendor.image) {
+    categoryGroupSubmitted: function ({ id }) {
+      if (id) {
+        this.categoryGroup.id = id;
+        window.history.pushState({}, '', '/admin/category-groups/' + id);
+      }
+    },
+    changeProductImageInput: function (files) {
+      if (files.length !== 1 && !this.categoryGroup.image) {
         throw new Error('Consistency violation: `changeFileInput` was somehow called with an empty array of files, or with more than one file in the array!  This should never happen unless there is already an uploaded file tracked.');
       }
       var selectedFile = files[0];
@@ -87,17 +64,17 @@ parasails.registerPage('admin-edit-vendor', {
       // If you cancel from the native upload window when you already
       // have a photo tracked, then we just avast (return early).
       // In this case, we just leave whatever you had there before.
-      if (!selectedFile && this.vendor.image) {
+      if (!selectedFile && this.categoryGroup.image) {
         return;
       }
 
       this.imageName = selectedFile.name; // Used to show user which image is selected
-      this.vendor.image = selectedFile;
+      this.categoryGroup.image = selectedFile;
       this.formErrors.image = '';
 
       // Set up the file preview for the UI:
       var reader = new FileReader();
-      reader.onload = (event)=>{
+      reader.onload = (event) => {
         this.previewImageSrc = event.target.result;
 
         // Unbind this "onload" event.
@@ -106,38 +83,5 @@ parasails.registerPage('admin-edit-vendor', {
       // Clear out any error messages about not providing an image.
       reader.readAsDataURL(selectedFile);
     },
-    vendorSubmitted: function({id}) {
-      if (id) {
-        this.vendor.id = id;
-        window.history.pushState({}, '', '/admin/vendors/' + id);
-      }
-    },
-    clickAddProduct: function(){
-      var newProduct = {
-        name: '[Draft]',
-        description: '',
-        basePrice: '',
-        isAvailable: false,
-        image: '',
-        options: []
-      };
-
-
-      this.vendor.products.push(newProduct);
-    },
-    clickAddProductCategory: function () {
-      var newCategory = {
-        name: '',
-        imageUrl: '',
-        categoryGroup: '',
-      };
-
-
-      this.vendor.productCategories.push(newCategory);
-    },
-    updatePostalDistricts: function() {
-      var postalDistricts = this.postalDistricts.filter(district => district.checked).map((a)=>{return a.id;});
-      return {districts: postalDistricts, vendorId: this.vendor.id};
-    }
   },
 });

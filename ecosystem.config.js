@@ -1,6 +1,6 @@
 module.exports = {
   apps : [{
-    name: 'Peepl Wallet App Backend',
+    name: 'vegi Backend',
     script: 'app.js',
     watch: false,
     env: {
@@ -15,11 +15,11 @@ module.exports = {
   deploy : {
     production : {
       user : 'ubuntu',
-      host : '52.48.132.138',
-      key : 'C:/Users/Adam/.ssh/peepl-app.pem',
+      host : '54.80.225.99',
+      key : '~/.ssh/vegi-server-keyvaluepair.pem',
+      repo : 'https://github.com/Dwonczykj/peepl-eat-api.git',
       ref  : 'origin/main',
-      repo : 'https://github.com/itsaboutpeepl/peepl-app-sails.git',
-      path : '/home/ubuntu/peepl-app-sails',
+      path : '/home/ubuntu/peepl-eat-api',
       'pre-deploy-local': 'sails run rebuild-cloud-sdk.js',
       'post-deploy' : 'npm install && pm2 reload ecosystem.config.js --env production',
       'pre-setup': '',

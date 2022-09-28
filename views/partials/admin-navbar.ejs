@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-md navbar-dark bg-peepl-green mb-3">
   <div class="container">
 
-    <a class="navbar-brand" href="/admin/vendors">Vegi Admin</a>
+    <a class="navbar-brand" href="/admin/vendors">vegi Admin</a>
 
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -20,6 +20,9 @@
         </li>
         <li class="nav-item">
           <a class="nav-link" :class="(pageName == 'admin-delivery-partners') ? 'active' : ''" href="/admin/delivery-partners">Delivery Partners</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" :class="(pageName == 'category-groups') ? 'active' : ''" href="/admin/category-groups">Category Groups</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" :class="(pageName == 'all-orders') ? 'active' : ''" href="/admin/orders?acceptanceStatus=accepted&timePeriod=upcoming">Orders</a>
