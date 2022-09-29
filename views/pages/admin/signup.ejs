@@ -4,12 +4,12 @@
     <div class="container">
       <div class="row">
         <div class="col-md-6 mx-auto">
-          <div class="login-panel panel panel-default">
+          <div id="registrationPhoneContainer" class="login-panel panel panel-default">
             <div class="panel-heading">
-              <h2 class="panel-title">Register</h2>
+              <h2 class="panel-title">Register with Phone</h2>
             </div>
             <div class="panel-body">
-              <ajax-form id="registrationForm" :handle-parsing="parseRegistrationForm" :syncing.sync="syncing"
+              <ajax-form id="registrationPhoneForm" :handle-parsing="parseRegistrationForm" :syncing.sync="syncing"
                 :cloud-error.sync="cloudError" @submitted="submittedRegistrationForm()"
                 :handle-submitting="clickRegisterUserWithPhone">
                 <div class="form-group">
@@ -245,6 +245,9 @@
                 <div v-if="cloudError === 'badPhoneNumberFormat'" class="alert alert-danger mt-4" role="alert">
                   Please ensure number is of format: '+1 234-567-8910'
                 </div>
+                <div v-if="cloudError === 'userExists'" class="alert alert-danger mt-4" role="alert">
+                  A user already exists for this number. Please check!
+                </div>
                 <div class="form-group">
                   <label for="email">Email</label>
                   <input type="email" id="email" v-model="email" value="" placeholder="email"
@@ -268,15 +271,17 @@
                 </div>
                 <div class="form-group">
                   <label for="business">Business</label>
-                  <select class="form-control" id="business" v-model="business">
+                  <select class="form-control" id="business" v-model="businessId">
                     <option v-if="role !== 'courier'" v-for="vendor in vendors" :value="vendor.id">{{vendor.name}} -
                       {{vendor.type}}</option>
                     <option v-if="role === 'courier'" v-for="vendor in couriers" :value="vendor.id">{{vendor.name}} -
                       {{vendor.type}}</option>
                   </select>
-                  <!-- <b-form-select class="mb-2 mr-sm-2 mb-sm-0" v-model="vendor" id="business"
-                    :options="filteredBusinesses">
-                  </b-form-select> -->
+                  <!-- <input type="text" id="business" v-model="business" value="" hint="(Business name if known)" :class="{ 'is-invalid': formErrors.name }"
+                    class="form-control"> -->
+                </div>
+                <div v-if="cloudError === 'badBusinessName'" class="alert alert-danger mt-4" role="alert">
+                  <p>Please ensure business name is correct. Alternatively submit empty and ask to be added by <a href="https://vegiapp.co.uk/">support@vegiapp.co.uk</a></p>
                 </div>
 
                 <div id="vendorRoleContainer" class="form-group" :class="!isVendor ? 'hidden' : ''">
@@ -304,27 +309,34 @@
                     :options="filteredCourierRoles">
                   </b-form-select>
                 </div>
-
-                <ajax-button class="btn btn-peepl mt-6" type="submit" :syncing="syncing"
+                <ajax-button 
+                  class="btn btn-peepl mt-6" 
+                  id="registerUserSubmitButton"
+                  type="submit" 
+                  @click="clickRegisterUserWithPhone()"
+                  :syncing="syncing"
                   :class="{ 'is-loading': syncing }">
                   Register</ajax-button>
-                <div v-if="cloudError === 'userExists'" class="alert alert-danger mt-4" role="alert">
-                  A user already exists for this number. Please check!
-                </div>
                 <div v-if="cloudError" class="alert alert-danger mt-4" role="alert">
                   There has been an error submitting your registration. Please try again.
                 </div>
               </ajax-form>
+            </div>
+          </div>
+          <div id="registrationEmailPasswordContainer" class="hidden login-panel panel panel-default">
+            <div class="panel-heading">
+              <h2 class="panel-title">Register with Email & Password</h2>
+            </div>
+            <div class="panel-body">
               <ajax-form id="registrationEmailPasswordForm" :handle-parsing="parseRegistrationForm" :syncing.sync="syncing"
                 :cloud-error.sync="cloudError" @submitted="submittedRegistrationForm()"
-                class="hidden"
                 :handle-submitting="clickRegisterUserWithEmailPassword">
                 <div class="form-group">
-                  <label for="phoneNumber">Phone Number</label>
+                  <label for="phoneNumberEP">Phone Number</label>
                   <!-- country codes (ISO 3166) and Dial codes. -->
                   <div class="d-flex justify-content-around">
                     <select class="form-control col-md-3" :class="{ 'is-invalid': formErrors.countryCode }"
-                      name="countryCode" v-model="countryCode" id="phoneNumber-country-code">
+                      name="countryCode" v-model="countryCode" id="phoneNumber-country-code-EP">
                       <option data-countryCode="GB" value="44" Selected>UK (+44)</option>
                       <option data-countryCode="US" value="1">USA (+1)</option>
                       <optgroup label="Other countries">
@@ -544,7 +556,7 @@
                         <option data-countryCode="ZW" value="263">Zimbabwe (+263)</option>
                       </optgroup>
                     </select>
-                    <input type="tel" id="phoneNumber" v-model="phoneNoCountry" placeholder="234-567-8910"
+                    <input type="tel" id="phoneNumberEP" v-model="phoneNoCountry" placeholder="234-567-8910"
                       :class="{ 'is-invalid': formErrors.phoneNumber }" class="form-control"
                       @keyup="phoneNumberFocusOut" @blur="phoneNumberFocusOut">
                   </div>
@@ -552,88 +564,95 @@
                 <div v-if="cloudError === 'badPhoneNumberFormat'" class="alert alert-danger mt-4" role="alert">
                   Please ensure number is of format: '+1 234-567-8910'
                 </div>
+                <div v-if="cloudError === 'userExists'" class="alert alert-danger mt-4" role="alert">
+                  A user already exists for this number. Please check!
+                </div>
                 <div class="form-group">
-                  <label for="email">Email</label>
-                  <input type="email" id="email" v-model="email" value="" placeholder="email"
+                  <label for="emailEP">Email</label>
+                  <input type="email" id="emailEP" v-model="email" value="" placeholder="email"
                     :class="{ 'is-invalid': formErrors.email }" class="form-control">
                 </div>
                 <div v-if="cloudError === 'badEmailFormat'" class="alert alert-danger mt-4" role="alert">
                   Please ensure email is correctly formatted: 'example@email.com'
                 </div>
                 <div class="form-group">
-                  <label for="password">Password</label>
-                  <input id="password" type="password" v-model="password" class="form-control" placeholder="Password" :class="[formErrors.password ? 'is-invalid' : '']">
+                  <label for="passwordEP">Password</label>
+                  <input id="passwordEP" type="password" v-model="password" class="form-control" placeholder="Password" :class="[formErrors.password ? 'is-invalid' : '']">
                   <div class="invalid-feedback" v-if="formErrors.password">Please enter your password.</div>
                 </div>
                 <div class="form-group">
-                  <label for="name">Name</label>
-                  <input type="text" id="name" v-model="name" value="" :class="{ 'is-invalid': formErrors.name }"
+                  <label for="nameEP">Name</label>
+                  <input type="text" id="nameEP" v-model="name" value="" :class="{ 'is-invalid': formErrors.name }"
                     class="form-control">
                 </div>
                 <div class="form-group">
-                  <label for="role">Role</label>
-                  <select class="form-control" id="role" @change="roleOnChange($event)" v-model="role">
+                  <label for="roleEP">Role</label>
+                  <select class="form-control" id="roleEP" @change="roleOnChange($event)" v-model="role">
                     <!-- <option value="admin">Vegi Admin</option> -->
                     <option value="vendor">Merchant</option>
                     <option value="courier">Courier</option>
                   </select>
                 </div>
                 <div class="form-group">
-                  <label for="business">Business</label>
-                  <select class="form-control" id="business" v-model="business">
+                  <label for="businessEP">Business</label>
+                  <select class="form-control" id="businessEP" v-model="businessId">
                     <option v-if="role !== 'courier'" v-for="vendor in vendors" :value="vendor.id">{{vendor.name}} -
                       {{vendor.type}}</option>
                     <option v-if="role === 'courier'" v-for="vendor in couriers" :value="vendor.id">{{vendor.name}} -
                       {{vendor.type}}</option>
                   </select>
-                  <!-- <b-form-select class="mb-2 mr-sm-2 mb-sm-0" v-model="vendor" id="business"
-                    :options="filteredBusinesses">
-                  </b-form-select> -->
+                  <!-- <input type="text" id="businessEP" v-model="business" value="" hint="(Business name if known)" :class="{ 'is-invalid': formErrors.name }"
+                    class="form-control"> -->
+                </div>
+                <div v-if="cloudError === 'badBusinessName'" class="alert alert-danger mt-4" role="alert">
+                  <p>Please ensure business name is correct. Alternatively submit empty and ask to be added by <a href="https://vegiapp.co.uk/">support@vegiapp.co.uk</a></p>
                 </div>
 
-                <div id="vendorRoleContainer" class="form-group" :class="!isVendor ? 'hidden' : ''">
-                  <label for="vendorRole">Vendor Role</label>
+                <div id="vendorRoleContainerEP" class="form-group" :class="!isVendor ? 'hidden' : ''">
+                  <label for="vendorRoleEP">Vendor Role</label>
                   <!-- <select class="form-control" id="vendorRole" v-model="vendorRole">
                     <option v-if="!isCourier" value="owner">Merchant Owner</option>
                     <option v-if="!isCourier" value="inventoryManager">Inventory manager</option>
                     <option v-if="!isCourier" value="salesManager">Sales manager</option>
                     <option v-if="isCourier" value="courier">Courier</option>
                   </select> -->
-                  <b-form-select class="form-control" v-model="vendorRole" id="vendorRole"
+                  <b-form-select class="form-control" v-model="vendorRole" id="vendorRoleEP"
                     :options="filteredVendorRoles">
                   </b-form-select>
                 </div>
 
-                <div id="courierRoleContainer" class="form-group" :class="!isCourier ? 'hidden' : ''">
-                  <label for="courierRole">Courier Role</label>
+                <div id="courierRoleContainerEP" class="form-group" :class="!isCourier ? 'hidden' : ''">
+                  <label for="courierRoleEP">Courier Role</label>
                   <!-- <select class="form-control" id="courierRole" v-model="courierRole">
                     <option v-if="!isCourier" value="owner">Merchant Owner</option>
                     <option v-if="!isCourier" value="inventoryManager">Inventory manager</option>
                     <option v-if="!isCourier" value="salesManager">Sales manager</option>
                     <option v-if="isCourier" value="courier">Courier</option>
                   </select> -->
-                  <b-form-select class="form-control" v-model="courierRole" id="courierRole"
+                  <b-form-select class="form-control" v-model="courierRole" id="courierRoleEP"
                     :options="filteredCourierRoles">
                   </b-form-select>
                 </div>
 
-                <ajax-button class="btn btn-peepl mt-6" type="submit" :syncing="syncing"
+                <ajax-button 
+                  class="btn btn-peepl mt-6" 
+                  id="registerUserSubmitButtonEP"
+                  type="submit" 
+                  @click="clickRegisterUserWithEmailPassword()"
+                  :syncing="syncing"
                   :class="{ 'is-loading': syncing }">
                   Register</ajax-button>
-                <div v-if="cloudError === 'userExists'" class="alert alert-danger mt-4" role="alert">
-                  A user already exists for this number. Please check!
-                </div>
                 <div v-if="cloudError" class="alert alert-danger mt-4" role="alert">
                   There has been an error submitting your registration. Please try again.
                 </div>
               </ajax-form>
-              <div id="signupWithPhoneButton" style="width: 50%; padding: 0.25em;">
-                <button @click="hideSignupWithPassword" id="register" class="btn-lg btn-block">Register with Phone</button>
-              </div>
-              <div id="signupWithPasswordButton" style="width: 50%; padding: 0.25em;">
-                <button @click="hideSignupWithPhone" id="register" class="btn-lg btn-block">Register with Email & Password</button>
-              </div>
             </div>
+          </div>
+          <div id="signupWithPhoneButton" style="width: 50%; padding: 0.25em;" class="hidden">
+            <button @click="hideSignupWithPassword" id="register" class="btn-sm">Register with Phone</button>
+          </div>
+          <div id="signupWithPasswordButton" style="width: 50%; padding: 0.25em;">
+            <button @click="hideSignupWithPhone" id="register" class="btn-sm">Register with Email & Password</button>
           </div>
         </div>
       </div>

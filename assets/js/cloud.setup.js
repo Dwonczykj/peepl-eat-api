@@ -105,6 +105,22 @@ Cloud.setup({
         "courierRole",
       ],
     },
+    signupWithPassword: {
+      verb: "POST",
+      url: "/api/v1/admin/signup-with-password",
+      args: [
+        "emailAddress",
+        "password",
+        "phoneNoCountry",
+        "phoneCountryCode",
+        "name",
+        "vendorId",
+        "courierId",
+        "role",
+        "vendorRole",
+        "courierRole",
+      ],
+    },
     // login: {
     //   verb: "POST",
     //   url: "/api/v1/admin/login",

@@ -89,7 +89,7 @@ const callAuthActionWithCookie = async (cb) =>
   login()
     .then((response) => {
       expect(response.statusCode).to.equal(200);
-      expect(Object.keys(response.headers)).to.include("set-cookie");
+      expect(Object.keys(response.headers)).to.deep.include("set-cookie");
       expect(response.body).to.deep.equal({ data: true });
       const sessionCookie = response.headers["set-cookie"];
       console.log('SESSION COOKIE: "' + sessionCookie + '"');

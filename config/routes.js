@@ -64,6 +64,7 @@ module.exports.routes = {
   // 'POST /api/v1/admin/login': { action: 'admin/login' },
   'POST /admin/signup': { action: 'admin/signup' },
   'POST /api/v1/admin/signup': { action: 'admin/signup' },
+  'POST /api/v1/admin/signup-with-password': { action: 'admin/signup-with-password' },
   'POST /api/v1/admin/login-with-firebase': { action: 'admin/login-with-firebase' },
   'POST /api/v1/admin/login-with-secret': { action: 'admin/login-with-secret' },
   'POST /api/v1/admin/login-with-password': { action: 'admin/login-with-password' },

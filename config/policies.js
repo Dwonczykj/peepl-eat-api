@@ -28,6 +28,7 @@ module.exports.policies = {
   'admin/user-exists-for-email': true,
   'admin/user-exists-for-phone': true,
   'admin/signup': true,
+  'admin/signup-with-password': true,
   'admin/view-signup': true,
   'admin/view-create-vendor': 'is-super-admin',
   'admin/view-vendors': 'is-super-admin',

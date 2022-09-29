@@ -7,6 +7,7 @@ const { login, callAuthActionWithCookie } = require("../../../utils");
 
 // ~ https://www.chaijs.com/api/bdd/
 
+
 describe("Authentication Tests", () => {
   describe("Login Tests", () => {
     it("GET view-login", (done) => {
@@ -30,7 +31,7 @@ describe("Authentication Tests", () => {
       login()
         .then((response) => {
           expect(response.statusCode).to.equal(200);
-          expect(Object.keys(response.headers)).to.include("set-cookie");
+          expect(Object.keys(response.headers)).to.deep.include("set-cookie");
           expect(response.body).to.deep.equal({ data: true });
           return done();
         })
@@ -53,7 +54,7 @@ describe("Authentication Tests", () => {
       // login()
       //   .then((response) => {
       //     expect(response.statusCode).to.equal(200);
-      //     expect(Object.keys(response.headers)).to.include("set-cookie");
+      //     expect(Object.keys(response.headers)).to.deep.include("set-cookie");
       //     expect(response.body).to.deep.equal({ data: true });
       //     const sessionCookie = response.headers["set-cookie"];
       //     return cb(sessionCookie);

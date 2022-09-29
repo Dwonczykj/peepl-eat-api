@@ -1,16 +1,15 @@
-parasails.registerPage('login-with-password', {
+parasails.registerPage("login-with-password", {
   //  ╦╔╗╔╦╔╦╗╦╔═╗╦    ╔═╗╔╦╗╔═╗╔╦╗╔═╗
   //  ║║║║║ ║ ║╠═╣║    ╚═╗ ║ ╠═╣ ║ ║╣
   //  ╩╝╚╝╩ ╩ ╩╩ ╩╩═╝  ╚═╝ ╩ ╩ ╩ ╩ ╚═╝
   data: {
     syncing: false,
     cloudError: false,
-    formErrors: {
-    },
+    formErrors: {},
     formData: {
-      emailAddress: '',
-      password: '',
-      rememberMe: false
+      emailAddress: "",
+      password: "",
+      rememberMe: false,
     },
   },
 
@@ -21,7 +20,7 @@ parasails.registerPage('login-with-password', {
     _.extend(this, SAILS_LOCALS);
   },
   mounted: async function () {
-    this.$focus('[autofocus]');
+    this.$focus("[autofocus]");
   },
 
   //  ╦╔╗╔╔╦╗╔═╗╦═╗╔═╗╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
@@ -53,9 +52,19 @@ parasails.registerPage('login-with-password', {
 
       return argins;
     },
+
+    // *Form submitted style functions
     submittedForm: function () {
       this.syncing = true;
-      window.location = '/admin';
-    }
-  }
+      window.location = "/admin";
+    },
+
+    // * navigation functions
+    toRegister: function () {
+      window.location.replace("/admin/signup");
+    },
+    toLoginWithPassword: function () {
+      window.location.replace("/admin/login-with-password");
+    },
+  },
 });

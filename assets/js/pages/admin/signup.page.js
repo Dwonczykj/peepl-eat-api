@@ -24,15 +24,16 @@ parasails.registerPage('signup', {
       status: {
       }
     },
-    countryCode: '1',
+    countryCode: '44',
     preventNextIteration: false,
-    phoneNoCountryNoFormat: '2345669420',
-    phoneNoCountry: '234-566-9420', //TODO: remove this from commit APIKEY
+    phoneNoCountryNoFormat: '',
+    phoneNoCountry: '', //TODO: remove this from commit APIKEY
     // phoneNumber: '+1 234-566-9420', 
     email: '',
     password: '',
     name: '',
     business: '',
+    businessId: -1,
     role: 'vendor',
     vendorRole: 'salesManager',
     courierRole: '',
@@ -183,8 +184,8 @@ parasails.registerPage('signup', {
         'phoneNumber': this.phoneNumber,
         'email': this.email.toString().trim(),
         'name': this.name.toString().trim(),
-        'vendor': this.isVendor ? this.business : null,
-        'courier': this.isCourier ? this.business : null,
+        'vendor': this.isVendor ? this.businessId : null,
+        'courier': this.isCourier ? this.businessId : null,
         'role': this.role,
         'vendorRole': this.vendorRole,
         'courierRole': this.courierRole,
@@ -219,18 +220,9 @@ parasails.registerPage('signup', {
     },
     clickRegisterUserWithEmailPassword: async function () {
 
+      window.replace('/admin/login');
 
-
-      // argins = {
-      //   'phoneNumber': document.getElementById('phoneNumber').value.toString().trim(),
-      //   'email': document.getElementById('email').value.toString().trim(),
-      //   'name': document.getElementById('name').value.toString().trim(),
-      //   'role': document.getElementById('role').options[document.getElementById('role').selectedIndex].value,
-      //   'vendorId': this.isVendor ? document.getElementById('business').options[document.getElementById('business').selectedIndex].value : '',
-      //   'courierId': this.isCourier ? document.getElementById('business').options[document.getElementById('business').selectedIndex].value : '',
-      //   'vendorRole': document.getElementById('vendorRole').options[document.getElementById('vendorRole').selectedIndex].value,
-      //   'courierRole': document.getElementById('courierRole').options[document.getElementById('courierRole').selectedIndex].value,
-      // };
+      return;
 
       var argins = {
         'phoneNoCountry': Number.parseInt(this.phoneNoCountry.trim().replace(/[^0-9]/g, '')),
@@ -238,8 +230,8 @@ parasails.registerPage('signup', {
         'email': this.email.toString().trim(),
         'password': this.password.toString().trim(),
         'name': this.name.toString().trim(),
-        'vendor': this.isVendor ? this.business : null,
-        'courier': this.isCourier ? this.business : null,
+        'vendor': this.isVendor ? this.businessId : null,
+        'courier': this.isCourier ? this.businessId : null,
         'role': this.role,
         'vendorRole': this.vendorRole,
         'courierRole': this.courierRole,
@@ -263,6 +255,7 @@ parasails.registerPage('signup', {
         if (response.status) {
           this.formErrors.email = true;
           this.formErrors.password = true;
+          this.formErrors.business = true;
         }
 
         return this.submittedEmailPasswordRegistrationForm();
@@ -275,6 +268,7 @@ parasails.registerPage('signup', {
       }
     },
     clickRegisterUserWithPhone: async function () {
+      console.log("registering user using phone");
       // argins = {
       //   'phoneNumber': document.getElementById('phoneNumber').value.toString().trim(),
       //   'email': document.getElementById('email').value.toString().trim(),
@@ -291,8 +285,8 @@ parasails.registerPage('signup', {
         'phoneCountryCode': Number.parseInt(this.countryCode.trim().replace(/[^0-9]/g, '')),
         'email': this.email.toString().trim(),
         'name': this.name.toString().trim(),
-        'vendor': this.isVendor ? this.business : null,
-        'courier': this.isCourier ? this.business : null,
+        'vendor': this.isVendor ? this.businessId : null,
+        'courier': this.isCourier ? this.businessId : null,
         'role': this.role,
         'vendorRole': this.vendorRole,
         'courierRole': this.courierRole,
@@ -315,6 +309,7 @@ parasails.registerPage('signup', {
         if (response.status) {
           this.formErrors.phoneNumber = true;
           this.formErrors.countryCode = true;
+          this.formErrors.business = true;
         }
 
         return this.submittedRegistrationForm();
@@ -335,16 +330,16 @@ parasails.registerPage('signup', {
       location.replace('./admin/login-with-password');
     },
     hideSignupWithPassword: function () {
-      document.getElementById('signupWithPhoneButton').classList.remove('hidden');
-      document.getElementById('signupWithPasswordButton').classList.add('hidden');
-      document.getElementById('registrationForm').classList.remove('hidden');
-      document.getElementById('registrationEmailPasswordForm').classList.add('hidden');
-    },
-    hideSignupWithPhone: function () {
       document.getElementById('signupWithPhoneButton').classList.add('hidden');
       document.getElementById('signupWithPasswordButton').classList.remove('hidden');
-      document.getElementById('registrationForm').classList.add('hidden');
-      document.getElementById('registrationEmailPasswordForm').classList.remove('hidden');
+      document.getElementById('registrationPhoneContainer').classList.remove('hidden');
+      document.getElementById('registrationEmailPasswordContainer').classList.add('hidden');
+    },
+    hideSignupWithPhone: function () {
+      document.getElementById('signupWithPhoneButton').classList.remove('hidden');
+      document.getElementById('signupWithPasswordButton').classList.add('hidden');
+      document.getElementById('registrationPhoneContainer').classList.add('hidden');
+      document.getElementById('registrationEmailPasswordContainer').classList.remove('hidden');
     },
   }
 });

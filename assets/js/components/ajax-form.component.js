@@ -131,6 +131,7 @@ parasails.registerComponent('ajaxForm', {
     if(typeof bowser !== 'undefined' && !bowser.mobile && this.$find('[focus-first]').length > 0) {
       this.$focus('[focus-first]');
     }
+    // console.log("ajax-form mounted with " + (this.action ? 'action' : (this.handleSubmitting ? 'handleSubmitting' : 'no')) + ' handler');
   },
   beforeDestroy: function() {
     //…
@@ -164,6 +165,7 @@ parasails.registerComponent('ajaxForm', {
 
       // Determine the argins that will be sent to the server in our request.
       var argins;
+      debugger;
       if (this.handleParsing) {
         // Run the provided "handle-parsing" logic.
         // > This should clear out any pre-existing error messages, perform any additional
@@ -323,6 +325,7 @@ parasails.registerComponent('ajaxForm', {
         }//•
       }//ﬁ  (determining argins)
 
+      debugger;
 
       // Set syncing state to `true` on userland "syncing" prop.
       this.$emit('update:syncing', true);
@@ -338,6 +341,8 @@ parasails.registerComponent('ajaxForm', {
           // FUTURE: Consider cloning the argins ahead of time to prevent accidental mutation of form data.
           // (but remember argins could contain File instances that might not be clone-able)
           // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+          // eslint-disable-next-line no-console
+          console.log('handleSubmitting handle called on form');
           result = await this.handleSubmitting(argins);
         } catch (err) {
           rawErrorFromCloudSDK = err;
