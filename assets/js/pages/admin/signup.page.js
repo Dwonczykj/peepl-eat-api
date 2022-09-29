@@ -1,7 +1,7 @@
 // import { initializeApp } from 'firebase/app';
 // import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 
-parasails.registerPage('signup', {
+parasails.registerPage("signup", {
   //  ╦╔╗╔╦╔╦╗╦╔═╗╦    ╔═╗╔╦╗╔═╗╔╦╗╔═╗
   //  ║║║║║ ║ ║╠═╣║    ╚═╗ ║ ╠═╣ ║ ║╣
   //  ╩╝╚╝╩ ╩ ╩╩ ╩╩═╝  ╚═╝ ╩ ╩ ╩ ╩ ╚═╝
@@ -9,72 +9,54 @@ parasails.registerPage('signup', {
     syncing: false,
     cloudError: false,
     formData: {
-      emailAddress: '',
-      phoneNumber: '',
+      emailAddress: "",
+      phoneNumber: "",
       rememberMe: false,
-      password: '',
+      password: "",
     },
-    formErrors: {
-    },
+    formErrors: {},
     formRules: {
       phoneNumber: {
         required: true,
-        regex: /^\+?\d{0,13}$/
+        regex: /^\+?\d{0,13}$/,
       },
-      status: {
-      }
+      status: {},
     },
-    countryCode: '44',
+    countryCode: "44",
     preventNextIteration: false,
-    phoneNoCountryNoFormat: '',
-    phoneNoCountry: '', //TODO: remove this from commit APIKEY
-    // phoneNumber: '+1 234-566-9420', 
-    email: '',
-    password: '',
-    name: '',
-    business: '',
+    phoneNoCountryNoFormat: "",
+    phoneNoCountry: "", //TODO: remove this from commit APIKEY
+    // phoneNumber: '+1 234-566-9420',
+    email: "",
+    password: "",
+    name: "",
+    business: "",
     businessId: -1,
-    role: 'vendor',
-    vendorRole: 'salesManager',
-    courierRole: '',
+    role: "vendor",
+    vendorRole: "salesManager",
+    courierRole: "none",
     options: {
-      role: [
-        'admin',
-        'vendor',
-        'courier'
-      ],
-      vendorRole: [
-        'owner',
-        'inventoryManager',
-        'salesManager'
-      ],
-      courierRole: [
-        'owner',
-        'deliveryManager',
-        'rider'
-      ]
+      role: ["admin", "vendor", "courier"],
+      vendorRole: ["owner", "inventoryManager", "salesManager", "none"],
+      courierRole: ["owner", "deliveryManager", "rider", "none"],
     },
     vendors: [],
-    couriers: []
+    couriers: [],
   },
   computed: {
     // * Getter -> a computed getter so that computed each time we access it
     filteredBusinesses() {
       if (this.isCourier) {
         return this.couriers;
-      }
-      else if (this.isVendor) {
+      } else if (this.isVendor) {
         return this.vendors;
       }
-      return [
-        ...this.vendors,
-        ...this.couriers
-      ];
+      return [...this.vendors, ...this.couriers];
     },
     filteredVendorRoles() {
       // `this` points to the component instance
       if (this.isVendor) {
-        return this.options.vendorRole.filter(t => t !== 'owner');
+        return this.options.vendorRole.filter((t) => t !== "owner");
       } else if (this.isCourier) {
         return [];
       }
@@ -85,23 +67,23 @@ parasails.registerPage('signup', {
       if (this.isVendor) {
         return [];
       } else if (this.isCourier) {
-        return this.options.courierRole.filter(t => t !== 'owner');
+        return this.options.courierRole.filter((t) => t !== "owner");
       }
       return [];
     },
     isCourier() {
-      return this.role === 'courier';
+      return this.role === "courier";
     },
     isVendor() {
-      return this.role === 'vendor';
+      return this.role === "vendor";
     },
     phoneNumber() {
       return `+${this.countryCode} ${this.phoneNoCountry}`;
     },
     phoneNumberFormatted() {
       var x = this.phoneNoCountryNoFormat;
-      x = x.replace(/-/g, '').match(/(\d{1,10})/g)[0];
-      x = x.replace(/(\d{1,3})(\d{1,3})(\d{1,4})/g, '$1-$2-$3');
+      x = x.replace(/-/g, "").match(/(\d{1,10})/g)[0];
+      x = x.replace(/(\d{1,3})(\d{1,3})(\d{1,4})/g, "$1-$2-$3");
       return `+${this.countryCode} ${x}`;
     },
   },
@@ -112,17 +94,25 @@ parasails.registerPage('signup', {
     role(newVal, oldVal) {
       if (newVal !== oldVal) {
         if (!this.isVendor) {
-          document.getElementById('courierRoleContainer').classList.remove('hidden');
-          document.getElementById('vendorRoleContainer').classList.add('hidden');
+          document
+            .getElementById("courierRoleContainer")
+            .classList.remove("hidden");
+          document
+            .getElementById("vendorRoleContainer")
+            .classList.add("hidden");
         }
         if (!this.isCourier) {
-          document.getElementById('courierRoleContainer').classList.add('hidden');
-          document.getElementById('vendorRoleContainer').classList.remove('hidden');
+          document
+            .getElementById("courierRoleContainer")
+            .classList.add("hidden");
+          document
+            .getElementById("vendorRoleContainer")
+            .classList.remove("hidden");
         }
 
-        document.getElementById('business').selectedIndex = -1;
-        document.getElementById('vendorRole').selectedIndex = -1;
-        document.getElementById('courierRole').selectedIndex = -1;
+        document.getElementById("business").selectedIndex = -1;
+        document.getElementById("vendorRole").selectedIndex = -1;
+        document.getElementById("courierRole").selectedIndex = -1;
       }
     },
   },
@@ -141,7 +131,7 @@ parasails.registerPage('signup', {
   //  ╩╝╚╝ ╩ ╚═╝╩╚═╩ ╩╚═╝ ╩ ╩╚═╝╝╚╝╚═╝
   methods: {
     phoneNumberFocusOut: function (event) {
-      if (['Arrow', 'Backspace', 'Shift'].includes(event.key)) {
+      if (["Arrow", "Backspace", "Shift"].includes(event.key)) {
         this.preventNextIteration = true;
         return;
       }
@@ -149,10 +139,15 @@ parasails.registerPage('signup', {
         this.preventNextIteration = false;
         return;
       }
-      this.phoneNoCountryNoFormat = this.phoneNoCountry.replace(/-/g, '').match(/(\d{1,10})/g)[0];
+      this.phoneNoCountryNoFormat = this.phoneNoCountry
+        .replace(/-/g, "")
+        .match(/(\d{1,10})/g)[0];
 
       // Format display value based on calculated currencyValue
-      this.phoneNoCountry = this.phoneNoCountryNoFormat.replace(/(\d{1,3})(\d{1,3})(\d{1,4})/g, '$1-$2-$3');
+      this.phoneNoCountry = this.phoneNoCountryNoFormat.replace(
+        /(\d{1,3})(\d{1,3})(\d{1,4})/g,
+        "$1-$2-$3"
+      );
     },
     // countryCodeChange: function (event) {
     //   // const newVal = event.srcElement.value;
@@ -160,11 +155,11 @@ parasails.registerPage('signup', {
     roleOnChange: function (selectEvent) {
       const newVal = selectEvent.srcElement.value;
 
-      if (newVal === 'courier' && !this.isCourier) {
-        window.alert('isCourier getter not working');
+      if (newVal === "courier" && !this.isCourier) {
+        window.alert("isCourier getter not working");
       }
-      if (newVal === 'vendor' && !this.isVendor) {
-        window.alert('isVendor getter not working');
+      if (newVal === "vendor" && !this.isVendor) {
+        window.alert("isVendor getter not working");
       }
     },
     parseRegistrationForm: function () {
@@ -181,19 +176,19 @@ parasails.registerPage('signup', {
       //   'courierRole': document.getElementById('courierRole').options[document.getElementById('courierRole').selectedIndex].value,
       // };
       var argins = {
-        'phoneNumber': this.phoneNumber,
-        'email': this.email.toString().trim(),
-        'name': this.name.toString().trim(),
-        'vendor': this.isVendor ? this.businessId : null,
-        'courier': this.isCourier ? this.businessId : null,
-        'role': this.role,
-        'vendorRole': this.vendorRole,
-        'courierRole': this.courierRole,
+        phoneNumber: this.phoneNumber,
+        email: this.email.toString().trim(),
+        name: this.name.toString().trim(),
+        vendor: this.isVendor ? this.businessId : null,
+        courier: this.isCourier ? this.businessId : null,
+        role: this.role,
+        vendorRole: this.vendorRole,
+        courierRole: this.courierRole,
       };
 
       const firebasePhoneRegex = /^\+\d{1,2} \d{3}-\d{3}-\d{4}$/;
 
-      if (argins['phoneNumber'].match(firebasePhoneRegex)) {
+      if (argins["phoneNumber"].match(firebasePhoneRegex)) {
         // this.phoneNumber = argins['phoneNumber'];
       } else {
         this.formErrors.phoneNumber = true;
@@ -201,7 +196,12 @@ parasails.registerPage('signup', {
       }
 
       // Validate email:
-      if (!(argins.emailAddress && parasails.util.isValidEmailAddress(argins['email']))) {
+      if (
+        !(
+          argins.emailAddress &&
+          parasails.util.isValidEmailAddress(argins["email"])
+        )
+      ) {
         this.formErrors.emailAddress = true;
       }
 
@@ -216,40 +216,38 @@ parasails.registerPage('signup', {
       } else {
         return argins;
       }
-
     },
     clickRegisterUserWithEmailPassword: async function () {
-
-      window.replace('/admin/login');
-
-      return;
-
       var argins = {
-        'phoneNoCountry': Number.parseInt(this.phoneNoCountry.trim().replace(/[^0-9]/g, '')),
-        'phoneCountryCode': Number.parseInt(this.countryCode.trim().replace(/[^0-9]/g, '')),
-        'email': this.email.toString().trim(),
-        'password': this.password.toString().trim(),
-        'name': this.name.toString().trim(),
-        'vendor': this.isVendor ? this.businessId : null,
-        'courier': this.isCourier ? this.businessId : null,
-        'role': this.role,
-        'vendorRole': this.vendorRole,
-        'courierRole': this.courierRole,
+        phoneNoCountry: Number.parseInt(
+          this.phoneNoCountry.trim().replace(/[^0-9]/g, "")
+        ),
+        phoneCountryCode: Number.parseInt(
+          this.countryCode.trim().replace(/[^0-9]/g, "")
+        ),
+        email: this.email.toString().trim(),
+        password: this.password.toString().trim(),
+        name: this.name.toString().trim(),
+        vendor: this.isVendor ? this.businessId : null,
+        courier: this.isCourier ? this.businessId : null,
+        role: this.role,
+        vendorRole: this.vendorRole ?? "none",
+        courierRole: this.courierRole ?? "none",
       };
 
       try {
         this.syncing = true;
         const response = await Cloud.signupWithPassword(
-          argins['email'],
-          argins['password'],
-          argins['phoneNoCountry'],
-          argins['phoneCountryCode'],
-          argins['name'],
-          argins['vendor'],
-          argins['courier'],
-          argins['role'],
-          argins['vendorRole'],
-          argins['courierRole'],
+          argins["email"],
+          argins["password"],
+          argins["phoneNoCountry"],
+          argins["phoneCountryCode"],
+          argins["name"],
+          argins["vendor"],
+          argins["courier"],
+          argins["role"],
+          argins["vendorRole"],
+          argins["courierRole"]
         );
 
         if (response.status) {
@@ -259,16 +257,14 @@ parasails.registerPage('signup', {
         }
 
         return this.submittedEmailPasswordRegistrationForm();
-
       } catch (err) {
         this.cloudError = err.message;
-        if (err.message === 'userExists') {
+        if (err.message === "userExists") {
           return;
         }
       }
     },
     clickRegisterUserWithPhone: async function () {
-      console.log("registering user using phone");
       // argins = {
       //   'phoneNumber': document.getElementById('phoneNumber').value.toString().trim(),
       //   'email': document.getElementById('email').value.toString().trim(),
@@ -281,65 +277,90 @@ parasails.registerPage('signup', {
       // };
 
       var argins = {
-        'phoneNoCountry': Number.parseInt(this.phoneNoCountry.trim().replace(/[^0-9]/g, '')),
-        'phoneCountryCode': Number.parseInt(this.countryCode.trim().replace(/[^0-9]/g, '')),
-        'email': this.email.toString().trim(),
-        'name': this.name.toString().trim(),
-        'vendor': this.isVendor ? this.businessId : null,
-        'courier': this.isCourier ? this.businessId : null,
-        'role': this.role,
-        'vendorRole': this.vendorRole,
-        'courierRole': this.courierRole,
+        phoneNoCountry: Number.parseInt(
+          this.phoneNoCountry.trim().replace(/[^0-9]/g, "")
+        ),
+        phoneCountryCode: Number.parseInt(
+          this.countryCode.trim().replace(/[^0-9]/g, "")
+        ),
+        email: this.email.toString().trim(),
+        name: this.name.toString().trim(),
+        vendor: this.isVendor ? this.businessId : null,
+        courier: this.isCourier ? this.businessId : null,
+        role: this.role,
+        vendorRole: this.vendorRole ? "none" : this.vendorRole,
+        courierRole: this.courierRole ? "none" : this.courierRole,
       };
 
       try {
         this.syncing = true;
         const response = await Cloud.signup(
-          argins['email'],
-          argins['phoneNoCountry'],
-          argins['phoneCountryCode'],
-          argins['name'],
-          argins['vendor'],
-          argins['courier'],
-          argins['role'],
-          argins['vendorRole'],
-          argins['courierRole'],
+          argins["email"],
+          argins["phoneNoCountry"],
+          argins["phoneCountryCode"],
+          argins["name"],
+          argins["vendor"],
+          argins["courier"],
+          argins["role"],
+          argins["vendorRole"],
+          argins["courierRole"]
         );
 
-        if (response.status) {
+        // eslint-disable-next-line no-console
+        // eslint-disable-next-line no-console
+        // console.log(response.headers["x-exit"]);
+        // // eslint-disable-next-line no-console
+        // console.log(response.message);
+        if (response.status || !response.data) {
           this.formErrors.phoneNumber = true;
           this.formErrors.countryCode = true;
           this.formErrors.business = true;
         }
 
         return this.submittedRegistrationForm();
-
       } catch (err) {
+        // err has ['name', 'responseInfo', 'exit', 'code']
+        // err.responseInfo contains the body, headers, code etc
         this.cloudError = err.message;
-        if (err.message === 'userExists') {
-          return;
+        
+        if (err.exit === "userExists") {
+          this.cloudError = 'Unable to register. A user already exists for these credentials.';
         }
       }
     },
     submittedRegistrationForm: function () {
       this.syncing = true;
-      location.replace('./admin/login');
+      location.replace("./login");
     },
     submittedEmailPasswordRegistrationForm: function () {
       this.syncing = true;
-      location.replace('./admin/login-with-password');
+      location.replace("./login-with-password");
     },
     hideSignupWithPassword: function () {
-      document.getElementById('signupWithPhoneButton').classList.add('hidden');
-      document.getElementById('signupWithPasswordButton').classList.remove('hidden');
-      document.getElementById('registrationPhoneContainer').classList.remove('hidden');
-      document.getElementById('registrationEmailPasswordContainer').classList.add('hidden');
+      document.getElementById("signupWithPhoneButton").classList.add("hidden");
+      document
+        .getElementById("signupWithPasswordButton")
+        .classList.remove("hidden");
+      document
+        .getElementById("registrationPhoneContainer")
+        .classList.remove("hidden");
+      document
+        .getElementById("registrationEmailPasswordContainer")
+        .classList.add("hidden");
     },
     hideSignupWithPhone: function () {
-      document.getElementById('signupWithPhoneButton').classList.remove('hidden');
-      document.getElementById('signupWithPasswordButton').classList.add('hidden');
-      document.getElementById('registrationPhoneContainer').classList.add('hidden');
-      document.getElementById('registrationEmailPasswordContainer').classList.remove('hidden');
+      document
+        .getElementById("signupWithPhoneButton")
+        .classList.remove("hidden");
+      document
+        .getElementById("signupWithPasswordButton")
+        .classList.add("hidden");
+      document
+        .getElementById("registrationPhoneContainer")
+        .classList.add("hidden");
+      document
+        .getElementById("registrationEmailPasswordContainer")
+        .classList.remove("hidden");
     },
-  }
+  },
 });

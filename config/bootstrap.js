@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /**
  * Seed Function
  * (sails.config.bootstrap)
@@ -22,8 +23,21 @@ async function asyncForEach(array, callback) {
 }
 
 
+
+
 module.exports.bootstrap = async function () {
   _.extend(sails.hooks.http.app.locals, sails.config.http.locals);
+
+  //Pull in Fixtures
+  var fixtures = {};
+  const fs = require("fs");
+
+  _.each(fs.readdirSync(process.cwd() + "/test/fixtures/"), function (file) {
+    fixtures[file.replace(/\.js$/, "").toLowerCase()] = require(process.cwd() +
+      "/test/fixtures/" +
+      file);
+  });
+
 
   // Import dependencies
   var path = require('path');
@@ -74,6 +88,15 @@ module.exports.bootstrap = async function () {
       phoneNumber: '0123456789',
       status: 'active',
     }).fetch();
+
+    if(fixtures && fixtures.vendors){
+      // for (var i = 0; i < fixtures.vendors.length; i++){
+      //   Vendor.create(fixtures.vendors[i]);
+      // }
+      await Vendor.createEach(fixtures.vendors);
+    }else{
+      sails.log('Unable to load fixtures to populate db');
+    }
 
     var delifonseca = await Vendor.create({
       name: 'Delifonseca',
@@ -324,17 +347,18 @@ module.exports.bootstrap = async function () {
 
     // * Create admin-user
     await User.create({
-      email: 'joey@vegiapp.co.uk',
+      email: "joey@vegiapp.co.uk",
       // password: 'Testing123!',
       phoneNoCountry: 7905532512,
       phoneCountryCode: 44,
-      name: 'Joey Dwonczyk',
+      name: "Joey Dwonczyk",
       vendor: delifonseca.id,
       vendorConfirmed: true,
       isSuperAdmin: true,
-      vendorRole: 'none',
-      role: 'admin',
-      firebaseSessionToken: 'DUMMY_FIREBASE_TOKEN',
+      vendorRole: "none",
+      courierRole: "none",
+      role: "admin",
+      firebaseSessionToken: "DUMMY_FIREBASE_TOKEN",
     });
 
     await User.create({
@@ -346,6 +370,8 @@ module.exports.bootstrap = async function () {
       role: "admin",
       firebaseSessionToken: "DUMMY_FIREBASE_TOKEN",
       secret: envConfig["test_secret"],
+      vendorRole: "none",
+      courierRole: "none",
     });
     console.log('test.service@example.com Test Account User created');
 

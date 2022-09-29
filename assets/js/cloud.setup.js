@@ -136,13 +136,30 @@ Cloud.setup({
       url: "/api/v1/admin/logged-in",
       args: [],
     },
-    logout: { 
+    logout: {
       verb: "GET",
-      url: "/admin/logout", 
-      args: []
+      url: "/admin/logout",
+      args: [],
     },
-    deregisterUser: { verb: "POST", url: "/admin/deregister-user", args: ['id'] },
-    updateUser: { verb: "POST", url: "/admin/user", args: ['email', 'vendorId', 'vendorRole', 'vendorConfirmed', 'courierId', 'courierRole', 'name', 'role'] },
+    deregisterUser: {
+      verb: "POST",
+      url: "/admin/deregister-user",
+      args: ["id"],
+    },
+    updateUser: {
+      verb: "POST",
+      url: "/admin/user",
+      args: [
+        "email",
+        "vendorId",
+        "vendorRole",
+        "vendorConfirmed",
+        "courierId",
+        "courierRole",
+        "name",
+        "role",
+      ],
+    },
     userExistsForPhone: {
       verb: "POST",
       url: "/api/v1/admin/user-exists-for-phone",
@@ -161,8 +178,8 @@ Cloud.setup({
     loginWithPassword: {
       verb: "POST",
       url: "/api/v1/admin/login-with-password",
-      args: ["emailAddress", "password", "rememberMe"],
-    }, 
+      args: ["emailAddress", "firebaseSessionToken", "rememberMe"],
+    },
     createVendor: {
       verb: "POST",
       url: "/api/v1/admin/create-vendor",
@@ -327,7 +344,15 @@ Cloud.setup({
     customerUpdatePaidOrder: {
       verb: "POST",
       url: "/api/v1/admin/customer-update-paid-order",
-      args: ["orderId", "customerWalletAddress", "orderFulfilled", "retainItems", "removeItems", "refundRequestGBPx", "refundRequestPPL"],
+      args: [
+        "orderId",
+        "customerWalletAddress",
+        "orderFulfilled",
+        "retainItems",
+        "removeItems",
+        "refundRequestGBPx",
+        "refundRequestPPL",
+      ],
     },
     customerCancelOrder: {
       verb: "POST",
@@ -337,7 +362,13 @@ Cloud.setup({
     customerReceivedOrder: {
       verb: "POST",
       url: "/api/v1/admin/customer-received-order",
-      args: ["orderId", "orderReceived", "orderCondition", "deliveryPunctuality", "feedback"],
+      args: [
+        "orderId",
+        "orderReceived",
+        "orderCondition",
+        "deliveryPunctuality",
+        "feedback",
+      ],
     },
     createPostalDistrict: {
       verb: "POST",

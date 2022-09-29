@@ -3582,7 +3582,7 @@
           },
           {
             "in": "query",
-            "name": "password",
+            "name": "firebaseSessionToken",
             "required": true,
             "schema": {
               "type": "string"
@@ -3595,11 +3595,15 @@
             "schema": {
               "type": "boolean",
               "default": false
-            }
+            },
+            "description": "Whether to extend the lifetime of the user's session."
           }
         ],
         "responses": {
           "200": {
+            "description": "Success"
+          },
+          "401": {
             "description": "Success",
             "content": {
               "application/json": {
@@ -3607,7 +3611,7 @@
                   "oneOf": [
                     {
                       "type": "string",
-                      "description": "Success"
+                      "description": "firebase errored on verifying the user token"
                     },
                     {
                       "type": "string",
@@ -3619,7 +3623,7 @@
             }
           },
           "404": {
-            "description": "Resource not found"
+            "description": "Success"
           },
           "500": {
             "description": "Internal server error"

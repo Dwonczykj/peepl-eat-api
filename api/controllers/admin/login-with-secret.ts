@@ -56,7 +56,7 @@ module.exports = {
     // If the password doesn't match, then also exit thru "badCombo".
     // await sails.helpers.passwords.checkPassword(inputs.secret, userRecord.secret)
     //   .intercept('incorrect', 'badCombo');
-    if(inputs.secret !== userRecord.secret){
+    if (!userRecord.secret || !inputs.secret || inputs.secret !== userRecord.secret) {
       return exits.badCombo();
     }
 

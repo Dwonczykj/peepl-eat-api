@@ -51,6 +51,10 @@ requests over WebSockets instead of HTTP).`,
     badCombo: {
       statusCode: 401,
       responseType: 'unauthorised',
+    },
+    serverError: {
+      statusCode: 500,
+      data: null,
     }
   },
 
@@ -82,15 +86,16 @@ requests over WebSockets instead of HTTP).`,
       const inputPhoneDetails = splitPhoneNumber(inputs.phoneNumber);
       var decodedToken;
       const auth = getAuth();
-      if (inputs.firebaseSessionToken === 'DUMMY'){
-        decodedToken = {
-          // eslint-disable-next-line camelcase
-          phone_number: inputs.phoneNumber,
-          uid: 'testing_DUMMY',
-        };
-      } else {
-        decodedToken = await auth.verifyIdToken(inputs.firebaseSessionToken);
-      }
+      // if (inputs.firebaseSessionToken === 'DUMMY'){
+      //   decodedToken = {
+      //     // eslint-disable-next-line camelcase
+      //     phone_number: inputs.phoneNumber,
+      //     uid: 'testing_DUMMY',
+      //   };
+      // } else {
+      //   decodedToken = await auth.verifyIdToken(inputs.firebaseSessionToken);
+      // }
+      decodedToken = await auth.verifyIdToken(inputs.firebaseSessionToken);
 
       const formattedFirebaseNumber = decodedToken.phone_number;
       if (!formattedFirebaseNumber){
@@ -104,10 +109,28 @@ requests over WebSockets instead of HTTP).`,
         return exits.badCombo(); // phone number doesnt match, throw badCombo
       }
 
-      const user = User.findOne({
+      let user = await User.findOne({
         phoneNoCountry: inputPhoneDetails['phoneNoCountry'],
         phoneCountryCode: inputPhoneDetails['countryCode'],
-      }).then((user) => {
+      });
+      if(!user){
+        //create one as using valid firebase token:
+        user = await User.create({
+          email: "",
+          // password: 'Testing123!',
+          phoneNoCountry: inputPhoneDetails["phoneNoCountry"],
+          phoneCountryCode: inputPhoneDetails["countryCode"],
+          name: "",
+          vendor: null,
+          vendorConfirmed: false,
+          isSuperAdmin: false,
+          vendorRole: "none",
+          courierRole: "none",
+          role: "none",
+          firebaseSessionToken: decodedToken,
+        });
+      }
+      try {
         // Update the session
         User.updateOne({
           phoneNoCountry: inputPhoneDetails['phoneNoCountry'],
@@ -143,11 +166,14 @@ requests over WebSockets instead of HTTP).`,
 
         exits.success({data: user});
         return user;
-      })
-      .catch((error) => {
+      } catch(error){
         sails.log.info(error);
-        return exits.firebaseErrored({code: error.code, message: error.message, error: error}); //https://firebase.google.com/docs/reference/js/auth#autherrorcodes
-      });
+        return exits.serverError({data:{
+          code: error.code,
+          message: error.message,
+          error: error,
+        }}); //https://firebase.google.com/docs/reference/js/auth#autherrorcodes
+      }
     } catch (error) {
       sails.log.info(error);
       return exits.firebaseErrored({ code: error.code, message: error.message, error: error });

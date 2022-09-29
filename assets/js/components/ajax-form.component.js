@@ -165,7 +165,7 @@ parasails.registerComponent('ajaxForm', {
 
       // Determine the argins that will be sent to the server in our request.
       var argins;
-      debugger;
+      
       if (this.handleParsing) {
         // Run the provided "handle-parsing" logic.
         // > This should clear out any pre-existing error messages, perform any additional
@@ -324,8 +324,6 @@ parasails.registerComponent('ajaxForm', {
           return;
         }//•
       }//ﬁ  (determining argins)
-
-      debugger;
 
       // Set syncing state to `true` on userland "syncing" prop.
       this.$emit('update:syncing', true);

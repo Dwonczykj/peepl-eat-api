@@ -22,10 +22,10 @@ module.exports = {
         couriers: [],
       });
     } else {
-      return exits.success({data:{
+      return exits.success({
         vendors,
         couriers: [],
-      }});
+      });
     }
   },
 };

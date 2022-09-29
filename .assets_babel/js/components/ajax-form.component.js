@@ -308,10 +308,8 @@ parasails.registerComponent('ajaxForm', {
                 // Clear the userland "cloudError" prop.
                 this.$emit('update:cloudError', ''); // Determine the argins that will be sent to the server in our request.
 
-                debugger;
-
                 if (!this.handleParsing) {
-                  _context4.next = 14;
+                  _context4.next = 13;
                   break;
                 }
 
@@ -322,27 +320,27 @@ parasails.registerComponent('ajaxForm', {
                 argins = this.handleParsing();
 
                 if (!(argins === undefined)) {
-                  _context4.next = 10;
+                  _context4.next = 9;
                   break;
                 }
 
                 return _context4.abrupt("return");
 
-              case 10:
+              case 9:
                 if (!(!_.isObject(argins) || _.isArray(argins) || _.isFunction(argins))) {
-                  _context4.next = 12;
+                  _context4.next = 11;
                   break;
                 }
 
                 throw new Error('Invalid data returned from custom form parsing logic.  (Should return a dictionary of argins, like `{}`.)');
 
-              case 12:
-                _context4.next = 85;
+              case 11:
+                _context4.next = 84;
                 break;
 
-              case 14:
+              case 13:
                 if (!this.formData) {
-                  _context4.next = 85;
+                  _context4.next = 84;
                   break;
                 }
 
@@ -354,9 +352,9 @@ parasails.registerComponent('ajaxForm', {
                 formErrors = {};
                 _context4.t0 = _regeneratorRuntime().keys(this.formRules);
 
-              case 19:
+              case 18:
                 if ((_context4.t1 = _context4.t0()).done) {
-                  _context4.next = 81;
+                  _context4.next = 80;
                   break;
                 }
 
@@ -364,9 +362,9 @@ parasails.registerComponent('ajaxForm', {
                 fieldValue = formData[fieldName];
                 _context4.t2 = _regeneratorRuntime().keys(this.formRules[fieldName]);
 
-              case 23:
+              case 22:
                 if ((_context4.t3 = _context4.t2()).done) {
-                  _context4.next = 79;
+                  _context4.next = 78;
                   break;
                 }
 
@@ -376,7 +374,7 @@ parasails.registerComponent('ajaxForm', {
                 isFieldValuePresent = fieldValue !== undefined && fieldValue !== '' && !_.isNull(fieldValue);
 
                 if (!(ruleName === 'required' && (ruleRhs === true || ruleRhs === false))) {
-                  _context4.next = 32;
+                  _context4.next = 31;
                   break;
                 }
 
@@ -387,21 +385,21 @@ parasails.registerComponent('ajaxForm', {
                   violation = !isFieldValuePresent;
                 }
 
-                _context4.next = 74;
+                _context4.next = 73;
                 break;
 
-              case 32:
+              case 31:
                 if (isFieldValuePresent) {
-                  _context4.next = 35;
+                  _context4.next = 34;
                   break;
                 }
 
-                _context4.next = 74;
+                _context4.next = 73;
                 break;
 
-              case 35:
+              case 34:
                 if (!(ruleName === 'isEmail' && (ruleRhs === true || ruleRhs === false))) {
-                  _context4.next = 39;
+                  _context4.next = 38;
                   break;
                 }
 
@@ -412,56 +410,56 @@ parasails.registerComponent('ajaxForm', {
                   violation = !parasails.util.isValidEmailAddress(fieldValue);
                 }
 
-                _context4.next = 74;
+                _context4.next = 73;
                 break;
 
-              case 39:
+              case 38:
                 if (!(ruleName === 'isIn' && _.isArray(ruleRhs))) {
-                  _context4.next = 43;
+                  _context4.next = 42;
                   break;
                 }
 
                 // ® Must be one of these things
                 violation = !_.contains(ruleRhs, fieldValue);
-                _context4.next = 74;
+                _context4.next = 73;
                 break;
 
-              case 43:
+              case 42:
                 if (!(ruleName === 'is')) {
-                  _context4.next = 47;
+                  _context4.next = 46;
                   break;
                 }
 
                 // ® Must be exactly this thing (useful for required checkboxes)
                 violation = ruleRhs !== fieldValue;
-                _context4.next = 74;
+                _context4.next = 73;
                 break;
 
-              case 47:
+              case 46:
                 if (!(ruleName === 'minLength' && _.isNumber(ruleRhs))) {
-                  _context4.next = 51;
+                  _context4.next = 50;
                   break;
                 }
 
                 // ® Must consist of at least this many characters
                 violation = !_.isString(fieldValue) || fieldValue.length < ruleRhs;
-                _context4.next = 74;
+                _context4.next = 73;
                 break;
 
-              case 51:
+              case 50:
                 if (!(ruleName === 'maxLength' && _.isNumber(ruleRhs))) {
-                  _context4.next = 55;
+                  _context4.next = 54;
                   break;
                 }
 
                 // ® Must consist of no more than this many characters
                 violation = !_.isString(fieldValue) || fieldValue.length > ruleRhs;
-                _context4.next = 74;
+                _context4.next = 73;
                 break;
 
-              case 55:
+              case 54:
                 if (!(ruleName === 'sameAs' && ruleRhs !== '' && _.isString(ruleRhs))) {
-                  _context4.next = 61;
+                  _context4.next = 60;
                   break;
                 }
 
@@ -469,12 +467,12 @@ parasails.registerComponent('ajaxForm', {
                 otherFieldName = ruleRhs;
                 otherFieldValue = formData[otherFieldName];
                 violation = otherFieldValue !== fieldValue;
-                _context4.next = 74;
+                _context4.next = 73;
                 break;
 
-              case 61:
+              case 60:
                 if (!(ruleName === 'isHalfwayDecentPassword' && (ruleRhs === true || ruleRhs === false))) {
-                  _context4.next = 65;
+                  _context4.next = 64;
                   break;
                 }
 
@@ -488,23 +486,23 @@ parasails.registerComponent('ajaxForm', {
                   violation = !_.isString(fieldValue) && !_.isNumber(fieldValue) || fieldValue.length < 6;
                 }
 
-                _context4.next = 74;
+                _context4.next = 73;
                 break;
 
-              case 65:
+              case 64:
                 if (!(ruleName === 'regex')) {
-                  _context4.next = 69;
+                  _context4.next = 68;
                   break;
                 }
 
                 // ® Must match the regex specified
                 violation = !ruleRhs.test(fieldValue);
-                _context4.next = 74;
+                _context4.next = 73;
                 break;
 
-              case 69:
+              case 68:
                 if (!(ruleName === 'custom' && _.isFunction(ruleRhs))) {
-                  _context4.next = 73;
+                  _context4.next = 72;
                   break;
                 }
 
@@ -517,30 +515,30 @@ parasails.registerComponent('ajaxForm', {
                   violation = true;
                 }
 
-                _context4.next = 74;
+                _context4.next = 73;
                 break;
 
-              case 73:
+              case 72:
                 throw new Error('Cannot interpret client-side validation rule (`' + ruleName + '`) because the configuration provided for it is not recognized by <ajax-form>.\n [?] If you\'re unsure, visit https://sailsjs.com/support');
 
-              case 74:
+              case 73:
                 if (!violation) {
-                  _context4.next = 77;
+                  _context4.next = 76;
                   break;
                 }
 
                 formErrors[fieldName] = ruleName;
-                return _context4.abrupt("break", 79);
+                return _context4.abrupt("break", 78);
 
-              case 77:
-                _context4.next = 23;
+              case 76:
+                _context4.next = 22;
                 break;
 
-              case 79:
-                _context4.next = 19;
+              case 78:
+                _context4.next = 18;
                 break;
 
-              case 81:
+              case 80:
                 //∞
                 // Whether there are any errors or not, update userland "formErrors" prop
                 // so that the markup reflects the new reality (i.e. inline validation errors
@@ -548,7 +546,7 @@ parasails.registerComponent('ajaxForm', {
                 this.$emit('update:formErrors', formErrors); // If there were any form errors, avast.  (Submission will not be attempted.)
 
                 if (!(Object.keys(formErrors).length > 0)) {
-                  _context4.next = 85;
+                  _context4.next = 84;
                   break;
                 }
 
@@ -563,90 +561,89 @@ parasails.registerComponent('ajaxForm', {
 
                 return _context4.abrupt("return");
 
-              case 85:
+              case 84:
                 //ﬁ  (determining argins)
-                debugger; // Set syncing state to `true` on userland "syncing" prop.
-
+                // Set syncing state to `true` on userland "syncing" prop.
                 this.$emit('update:syncing', true); // Submit the form
 
                 if (!this.handleSubmitting) {
-                  _context4.next = 113;
+                  _context4.next = 111;
                   break;
                 }
 
-                _context4.prev = 88;
+                _context4.prev = 86;
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                 // FUTURE: Consider cloning the argins ahead of time to prevent accidental mutation of form data.
                 // (but remember argins could contain File instances that might not be clone-able)
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                 // eslint-disable-next-line no-console
                 console.log('handleSubmitting handle called on form');
-                _context4.next = 92;
+                _context4.next = 90;
                 return this.handleSubmitting(argins);
 
-              case 92:
+              case 90:
                 result = _context4.sent;
-                _context4.next = 111;
+                _context4.next = 109;
                 break;
 
-              case 95:
-                _context4.prev = 95;
-                _context4.t4 = _context4["catch"](88);
+              case 93:
+                _context4.prev = 93;
+                _context4.t4 = _context4["catch"](86);
                 rawErrorFromCloudSDK = _context4.t4;
 
                 if (!(_.isString(_context4.t4) && _context4.t4 !== '')) {
-                  _context4.next = 102;
+                  _context4.next = 100;
                   break;
                 }
 
                 failedWithCloudExit = _context4.t4;
-                _context4.next = 111;
+                _context4.next = 109;
                 break;
 
-              case 102:
+              case 100:
                 if (!(_.isError(_context4.t4) && _context4.t4.exit)) {
-                  _context4.next = 106;
+                  _context4.next = 104;
                   break;
                 }
 
                 failedWithCloudExit = _context4.t4.exit;
-                _context4.next = 111;
+                _context4.next = 109;
                 break;
 
-              case 106:
+              case 104:
                 if (!(_.isObject(_context4.t4) && !_.isError(_context4.t4) && !_.isArray(_context4.t4) && !_.isFunction(_context4.t4) && Object.keys(_context4.t4)[0] && _.isString(Object.keys(_context4.t4)[0]))) {
-                  _context4.next = 110;
+                  _context4.next = 108;
                   break;
                 }
 
                 failedWithCloudExit = Object.keys(_context4.t4)[0];
-                _context4.next = 111;
+                _context4.next = 109;
                 break;
 
-              case 110:
+              case 108:
                 throw _context4.t4;
 
-              case 111:
-                _context4.next = 117;
+              case 109:
+                _context4.next = 115;
                 break;
 
-              case 113:
+              case 111:
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                 // FUTURE: Potentially filter unused data in argins here before proceeding
                 // (assuming cloudsdk has that information available)
                 // Or better yet, just have `Cloud.*.with()` take care of that automatically.
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                 protocol = this.protocol || 'jQuery';
-                _context4.next = 116;
+                _context4.next = 114;
                 return Cloud[this.action]["with"](argins).protocol(protocol).tolerate(function (err) {
                   rawErrorFromCloudSDK = err;
                   failedWithCloudExit = err.exit || 'error';
                 });
 
-              case 116:
+              case 114:
                 result = _context4.sent;
 
-              case 117:
+              case 115:
                 // When a cloud error occurs, tolerate it, but set the userland "cloudError"
                 // prop accordingly.
                 if (failedWithCloudExit) {
@@ -662,12 +659,12 @@ parasails.registerComponent('ajaxForm', {
                   this.$emit('rejected', rawErrorFromCloudSDK);
                 }
 
-              case 120:
+              case 118:
               case "end":
                 return _context4.stop();
             }
           }
-        }, _callee4, this, [[88, 95]]);
+        }, _callee4, this, [[86, 93]]);
       }));
 
       function _submit() {
