@@ -36,6 +36,7 @@ async function createUsers() {
     });
     console.log("test.service@example.com Test Account User created");
 
+<<<<<<< HEAD
     await User.create({
       email: "joey@vegiapp.co.uk",
       // password: 'Testing123!',
@@ -50,6 +51,10 @@ async function createUsers() {
       firebaseSessionToken: "DUMMY_FIREBASE_TOKEN",
     });
 }
+=======
+  // Increase the Mocha timeout so that Sails has enough time to lift, even if you have a bunch of assets.
+  this.timeout(16000);
+>>>>>>> upstream/main
 
 async function populateDbData() {
     var vendorCategory = await VendorCategory.create({

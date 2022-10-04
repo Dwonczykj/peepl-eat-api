@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 // ./test/integration/models/User.test.js
 
 var util = require('util');

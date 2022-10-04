@@ -77,18 +77,21 @@ module.exports = {
 
     // If generating slots for tomorrow, check if it is before the cutoff time
     let isAfterCutoff = false;
-    const cutoffTime = fulfilmentMethod.orderCutoff; // e.g. 15:00
+    const cutoffTime = fulfilmentMethod.orderCutoff; // e.g. 22:00
 
     if(cutoffTime){
-      const tomorrow = moment().add(1, 'days').endOf('day'); // End of day tomorrow
+      const tomorrow = moment().add(1, 'days').startOf('day'); // End of day tomorrow
 
-      if(dt.isSameOrBefore(tomorrow) && cutoffTime) {
+      // If dt is today
+      if(dt.isSame(moment(), 'day')){
+        isAfterCutoff = true;
+      } else if(dt.isSameOrBefore(tomorrow) && cutoffTime) {
         const cutoff = moment(cutoffTime, 'HH:mm'); // Moment version of cutoff time
         // If the current time is after the cutoff time, set isAfterCutoff to true
         if(moment().isAfter(cutoff)) {
           isAfterCutoff = true;
         }
-      }
+      } // else nothing (too far in the future)
     }
 
     // If there are opening hours available
@@ -127,6 +130,7 @@ module.exports = {
       ]; */
 
       // Find orders for that fulfilment method between the start and end times.
+<<<<<<< HEAD
       // let fulfilmentSlotFrom = moment(openTime, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DD HH:mm:ss');
       // let fulfilmentSlotTo = moment(closeTime, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DD HH:mm:ss');
       let orders = await Order.find({
@@ -137,6 +141,11 @@ module.exports = {
         fulfilmentSlotTo: {'<=': closeTime},
         completedFlag: ''
       });
+=======
+      // var fulfilmentSlotFrom = moment(openTime, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DD HH:mm:ss');
+      // var fulfilmentSlotTo = moment(closeTime, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DD HH:mm:ss');
+      var orders = await Order.find({fulfilmentMethod: inputs.fulfilmentMethodId, paymentStatus: 'paid', restaurantAcceptanceStatus: { '!=' : 'rejected' }, fulfilmentSlotFrom: {'>=': openTime}, fulfilmentSlotTo: {'<=': closeTime}});
+>>>>>>> upstream/main
 
       /* let orders = [{
         fulfilmentSlotFrom: '17/02/2022 10:00',

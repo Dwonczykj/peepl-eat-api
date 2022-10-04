@@ -1622,6 +1622,7 @@
           },
           "pickupAddressPostCode": {
             "type": "string",
+            "pattern": "^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\\s?[0-9][A-Za-z]{2})$/",
             "nullable": true
           },
           "costLevel": {
@@ -4209,6 +4210,42 @@
           },
           {
             "in": "query",
+            "name": "pickupAddressLineOne",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            }
+          },
+          {
+            "in": "query",
+            "name": "pickupAddressLineTwo",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            }
+          },
+          {
+            "in": "query",
+            "name": "pickupAddressCity",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            }
+          },
+          {
+            "in": "query",
+            "name": "pickupAddressPostCode",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            }
+          },
+          {
+            "in": "query",
             "name": "status",
             "required": false,
             "schema": {
@@ -4354,6 +4391,42 @@
           },
           {
             "in": "query",
+            "name": "pickupAddressLineOne",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            }
+          },
+          {
+            "in": "query",
+            "name": "pickupAddressLineTwo",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            }
+          },
+          {
+            "in": "query",
+            "name": "pickupAddressCity",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            }
+          },
+          {
+            "in": "query",
+            "name": "pickupAddressPostCode",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            }
+          },
+          {
+            "in": "query",
             "name": "status",
             "required": false,
             "schema": {
@@ -4434,6 +4507,10 @@
                     {
                       "type": "string",
                       "description": "No file was attached."
+                    },
+                    {
+                      "type": "string",
+                      "description": "Postal Code didnt match regex formatter in action"
                     },
                     {
                       "type": "string",

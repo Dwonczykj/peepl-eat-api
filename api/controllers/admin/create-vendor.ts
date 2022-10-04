@@ -36,6 +36,22 @@ module.exports = {
     phoneNumber: {
       type: 'string',
     },
+    pickupAddressLineOne: {
+      type: 'string',
+      allowNull: true
+    },
+    pickupAddressLineTwo: {
+      type: 'string',
+      allowNull: true
+    },
+    pickupAddressCity: {
+      type: 'string',
+      allowNull: true
+    },
+    pickupAddressPostCode: {
+      type: 'string',
+      allowNull: true
+    },
     // deliveryRestrictionDetails: {
     //   type: 'string'
     // },
@@ -96,12 +112,17 @@ module.exports = {
     if(!imageInfo) {
       return exits.noFileAttached();
     }
-
+    
+    //TODO: Validate the address input and use google maps service to validate the postcode using google services
     var newVendor = await Vendor.create({
       imageUrl: sails.config.custom.amazonS3BucketUrl + imageInfo.fd,
       name: inputs.name,
       description: inputs.description,
       phoneNumber: inputs.phoneNumber,
+      pickupAddressLineOne: inputs.pickupAddressLineOne,
+      pickupAddressLineTwo: inputs.pickupAddressLineTwo,
+      pickupAddressCity: inputs.pickupAddressCity,
+      pickupAddressPostCode: inputs.pickupAddressPostCode.toLocaleUpperCase(),
       type: inputs.type,
       walletAddress: inputs.walletAddress,
       isVegan: inputs.isVegan,

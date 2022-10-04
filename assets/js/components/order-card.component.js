@@ -41,8 +41,14 @@ parasails.registerComponent('order-card', {
     <div v-for="item in order.items">
       <h2 class="h5 border-top pt-3 mt-3 mb-0">{{item.product.name}}</h2>
       <ol v-if="item.optionValues && item.optionValues.length" class="order-confirmation__option-values">
+<<<<<<< HEAD
         <!-- TODO: Add checkbox to li below to allow Vendor to approve some of the orders -> then handle auto refunds if not all items checked or declined. GRey the approve button if no items ticked -->
         <li v-for="optionValue in item.optionValues"><b>{{optionValue.option.name}}</b>: {{optionValue.optionValue.name}}</li>
+=======
+        <li v-for="optionValue in item.optionValues">
+          <b>{{optionValue.option.name}}</b>: {{optionValue.optionValue.name}} ({{optionValue.optionValue.description}})
+        </li>
+>>>>>>> upstream/main
       </ol>
     </div>
 
@@ -56,13 +62,20 @@ parasails.registerComponent('order-card', {
       <br><b>Post Code:</b> {{order.deliveryAddressPostCode}}
       <br><b>Notes:</b> {{order.deliveryAddressInstructions}}</p>
     </div>
+    <div v-else>
+      <h2 class="h5 border-top pt-3 mt-3 mb-0">Collection details:</h2>
+      <p><b>Name:</b> {{order.deliveryName}}
+      <br><b>Email:</b> {{order.deliveryEmail}}
+      <br><b>Number:</b> <a :href="'tel:'+order.deliveryPhoneNumber">{{order.deliveryPhoneNumber}}</a>
+      <br><b>Notes:</b> {{order.deliveryAddressInstructions}}</p>
+    </div>
     <h2 class="h5 border-top pt-3 mt-3 mb-0 d-flex">
       <span class="mr-auto">Total</span>
       <span>£{{order.total / 100}}</span>
     </h2>
     <p class="mt-2 mb-0 d-flex text-success">
       <span class="mr-auto">Reward</span>
-      <span>+ {{order.total / 100}} PPL</span>
+      <span>+ {{order.total / 200}} PPL</span>
     </p>
     <div v-if="order.restaurantAcceptanceStatus == 'pending' && isInFuture(order.fulfilmentSlotFrom)">
       <h2 class="h5 border-top pt-3 mt-3 mb-0 d-flex">
