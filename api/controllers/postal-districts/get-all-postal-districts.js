@@ -17,11 +17,11 @@ module.exports = {
   },
 
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
     var postalDistricts = await PostalDistrict.find();
 
     // All done.
-    return postalDistricts;
+    return exits.success({ postalDistricts: postalDistricts });
 
   }
 

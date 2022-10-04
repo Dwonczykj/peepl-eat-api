@@ -40,6 +40,7 @@ var admin = require('firebase-admin');
 var serviceAccount = require('../../config/vegiliverpool-firebase-adminsdk-4dfpz-8f01f888b3.json');
 if(isDebugEnv){
   admin.initializeApp({ projectId: "vegiliverpool" });
+  // eslint-disable-next-line no-console
   console.log('RUNNING APP IN DEBUG MODE VS FIREBASE EMULATOR');
 } else {
   admin.initializeApp({
