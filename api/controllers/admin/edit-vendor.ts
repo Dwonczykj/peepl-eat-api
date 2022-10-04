@@ -127,7 +127,7 @@ module.exports = {
       throw 'unauthorised';
     }
 
-    if(inputs.image){
+    if(inputs.image /*&& sails.config.custom.amazonS3Secret && sails.config.custom.amazonS3AccessKey*/){
       var imageInfo = await sails.uploadOne(inputs.image, {
         adapter: require('skipper-s3'),
         key: sails.config.custom.amazonS3AccessKey,
@@ -143,6 +143,10 @@ module.exports = {
       }
       delete inputs.image;
     }
+    // else {
+    //   delete inputs.image;
+    //   inputs.imageUrl = vendor.imageUrl;
+    // }
 
     if(inputs.pickupAddressPostCode){
       inputs.pickupAddressPostCode = inputs.pickupAddressPostCode.toLocaleUpperCase();

@@ -52,6 +52,14 @@ module.exports = {
       type: 'string',
       allowNull: true
     },
+    pickupAddressLatitude: {
+      type: 'number',
+      allowNull: true,
+    },
+    pickupAddressLongitude: {
+      type: 'number',
+      allowNull: true,
+    },
     // deliveryRestrictionDetails: {
     //   type: 'string'
     // },
@@ -91,6 +99,13 @@ module.exports = {
       description: 'The file is too big.',
       responseType: 'badRequest'
     },
+    badGeoCoordinate: {
+      description: 'Vendor address geocoordinates are out of bounds',
+      statusCode: 403,
+      responseType: 'badRequest',
+      latitudeAboveBounds: null,
+      longitudeAboveBounds: null
+    },
   },
 
   fn: async function (inputs, exits) {
@@ -112,7 +127,14 @@ module.exports = {
     if(!imageInfo) {
       return exits.noFileAttached();
     }
-    
+
+    if(inputs.pickupAddressLatitude > 180 || inputs.pickupAddressLatitude < -180){
+      return exits.badGeoCoordinate({latitudeAboveBounds: (inputs.pickupAddressLatitude > 180)});
+    }
+    if(inputs.pickupAddressLongitude > 180 || inputs.pickupAddressLongitude < -180){
+      return exits.badGeoCoordinate({longitudeAboveBounds: (inputs.pickupAddressLongitude > 180)});
+    } // TODO: How to return bad formdata to page via exits action sails?
+
     //TODO: Validate the address input and use google maps service to validate the postcode using google services
     var newVendor = await Vendor.create({
       imageUrl: sails.config.custom.amazonS3BucketUrl + imageInfo.fd,
@@ -123,6 +145,8 @@ module.exports = {
       pickupAddressLineTwo: inputs.pickupAddressLineTwo,
       pickupAddressCity: inputs.pickupAddressCity,
       pickupAddressPostCode: inputs.pickupAddressPostCode.toLocaleUpperCase(),
+      pickupAddressLatitude: inputs.pickupAddressLatitude,
+      pickupAddressLongitude: inputs.pickupAddressLongitude,
       type: inputs.type,
       walletAddress: inputs.walletAddress,
       isVegan: inputs.isVegan,
