@@ -141,10 +141,6 @@ module.exports = {
       if(imageInfo) {
         inputs.imageUrl = sails.config.custom.amazonS3BucketUrl + imageInfo.fd;
       }
-<<<<<<< HEAD
-
-      delete inputs.image;
-=======
       delete inputs.image;
     }
 
@@ -156,7 +152,6 @@ module.exports = {
     if (!inputs.pickupAddressPostCode || !inputs.pickupAddressPostCode.match(regPostcode))
     {
       return exits.badPostalCode();
->>>>>>> upstream/main
     }
 
     var newVendor = await Vendor.updateOne(inputs.id).set(inputs);

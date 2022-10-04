@@ -6,10 +6,6 @@
     "configurations": [
         {
             "type": "node",
-<<<<<<< HEAD
-            // "runtimeExecutable": "/Users/joeyd/.nvm/versions/node/v17.1.0/bin/node",
-=======
->>>>>>> upstream/main
             "request": "launch",
             "name": "Launch Program",
             "skipFiles": [

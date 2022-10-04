@@ -39,12 +39,7 @@ $card-carousel-peek-overlap: 30px;
   flex: 0 0 (100vw - #{$card-carousel-peek-overlap});
   scroll-snap-align: start;
 
-<<<<<<< HEAD
-  & + & {
-    margin-left: calc($grid-gutter-width / -2);
-=======
     &+& {
       margin-left: $grid-gutter-width/-2;
->>>>>>> upstream/main
   }
 }

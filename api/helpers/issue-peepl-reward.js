@@ -30,19 +30,11 @@ module.exports = {
   },
 
 
-<<<<<<< HEAD
-  fn: async function (inputs) {
-    var client = axios.create({
-      baseURL: sails.config.custom.fuseStudioBaseUrl,
-      timeout: 20000,
-      headers: { 'API-SECRET': 'sk_q8TiAxOSniziV6G4CPHY1Ql1' } //TODO: Move to .env
-=======
   fn: async function (inputs, exits) {
     const instance = axios.create({
       baseURL: sails.config.custom.peeplPayUrl,
       timeout: 2000,
       headers: {'Authorization': 'Basic ' + sails.config.custom.peeplAPIKey}
->>>>>>> upstream/main
     });
 
     var data = {
@@ -50,15 +42,6 @@ module.exports = {
       recipientWallet: inputs.recipient,
     };
 
-<<<<<<< HEAD
-    await client.post('admin/tokens/transfer?apiKey=pk_FDM9_lyd9leeOG4utgmzfr6h', data)
-      .catch((err) => {
-        sails.log.error(err);
-        throw new Error('Error issuing PPL token reward.');
-      });
-
-    return;
-=======
     instance.post('/reward/issue-reward', data)
     .then(async () => {
       return exits.success({});
@@ -68,7 +51,6 @@ module.exports = {
       // TODO: Error handling in case this fails
       return exits.error();
     });
->>>>>>> upstream/main
   }
 
 
