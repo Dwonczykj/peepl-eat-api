@@ -3,6 +3,9 @@
  * @description :: Policy that attaches the firebase admin sdk onto `req.firebase`
  */
 
+const dotenv = require("dotenv");
+const envConfig = dotenv.config("./env").parsed;
+
 // const firebase = require('firebase-admin');
 // const config = require('./../../config/custom').custom.firebase;
 // Import the functions you need from the SDKs you need
@@ -32,12 +35,17 @@
 
 // // * Initialize Firebase for each individual request to the api.
 // const app = firebase.initializeApp(_firebaseConfig);
-
+const isDebugEnv = !!envConfig['FIREBASE_AUTH_EMULATOR_HOST']; // * process.env.FIREBASE_AUTH_EMULATOR_HOST
 var admin = require('firebase-admin');
 var serviceAccount = require('../../config/vegiliverpool-firebase-adminsdk-4dfpz-8f01f888b3.json');
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
+if(isDebugEnv){
+  admin.initializeApp({ projectId: "vegiliverpool" });
+  console.log('RUNNING APP IN DEBUG MODE VS FIREBASE EMULATOR');
+} else {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
+}
 
 module.exports = async function (req, res, proceed) {
   req.firebase = admin;

@@ -3517,7 +3517,7 @@
             "description": "Success"
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Success"
           }
         }
       }
