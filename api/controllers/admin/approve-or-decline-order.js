@@ -109,7 +109,6 @@ module.exports = {
         recipient: order.customerWalletAddress
       });
 
-<<<<<<< HEAD
       await Order.updateOne({ publicId: inputs.orderId })
         .set({ rewardsIssued: rewardAmount });
 
@@ -166,14 +165,6 @@ module.exports = {
       // * wait for user response via /admin/customer-update-order controller action.
     } else {
       sails.log.warn('Unknown orderFulfilled status passed to approve-or-decline-order action.');
-=======
-      await Order.updateOne({publicId: inputs.orderId})
-      .set({rewardsIssued: rewardAmount});
-    } else if (inputs.restaurantAccepted === false) {
-      // TODO: Isssue refund to customer
-      await Order.updateOne({publicId: inputs.orderId})
-      .set({restaurantAcceptanceStatus: 'rejected'});
->>>>>>> upstream/main
     }
 
     // All done.

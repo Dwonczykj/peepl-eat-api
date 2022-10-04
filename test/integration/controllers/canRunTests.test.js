@@ -3,20 +3,11 @@
 // test/integration/controllers/UserController.test.js
 var supertest = require('supertest');
 
-<<<<<<< HEAD
-
 describe('Is Logged In', () => {
   describe('TestControllerAction()', () => {
     it('GET logged-in should return 200', (done) => {
       supertest(sails.hooks.http.app)
         .get('/api/v1/admin/logged-in')
-=======
-describe('Can Run Tests', () => {
-  describe('TestControllerAction()', () => {
-    it('should return success', (done) => {
-      supertest(sails.hooks.http.app)
-        .get('/admin/logged-in')
->>>>>>> upstream/main
         // .send({ emailAddress: 'adam@itsaboutpeepl.com', password: 'Testing123!' })
         .expect(200, (response) => {
           console.log(response);
@@ -24,7 +15,6 @@ describe('Can Run Tests', () => {
         });
     });
   });
-<<<<<<< HEAD
   describe('Test login-with-password Action()', () => {
     it('POST login-with-password EXPECT FAILURE AS NOT FIREBASE AND HAVE NOT REGISTERED', (done) => {
       supertest(sails.hooks.http.app)
@@ -36,6 +26,4 @@ describe('Can Run Tests', () => {
         });
     });
   });
-=======
->>>>>>> upstream/main
 });
