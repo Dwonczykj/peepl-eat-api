@@ -8,8 +8,8 @@ const _ = require('lodash');
 const { expect } = require("chai");
 var supertest = require("supertest");
 var util = require("util");
-
 require("ts-node/register");
+
 
 const { callAuthActionWithCookie } = require("../../utils");
 
