@@ -5,20 +5,11 @@ const request = require('supertest');
 const dotenv = require('dotenv');
 const envConfig = dotenv.config('./env').parsed;
 
-const login = async function () {
+const login = async function (verbose=false) {
   try {
-
-    console.log('Login with Test Account');
-
-    // request(sails.hooks.http.app)
-    //     .get('/csrfToken')
-    //     .set('Accept', 'application/json')
-    //     .then(response => {
-    //         console.log(response.body);
-    //         this._csrf = response.body._csrf;
-    //         console.log('Sails lifted!');
-    //     })
-    //     .catch(err => err);
+    if(verbose){
+      console.log('Login with Test Account');
+    }
 
     return request(sails.hooks.http.app)
       .post("/api/v1/admin/login-with-secret")
@@ -59,10 +50,12 @@ const login = async function () {
   }
 };
 
-const logout = async function () {
+const logout = async function (verbose=false) {
   try {
 
-    console.log('Logout with Test Account');
+    if(verbose){
+      console.log('Logout with Test Account');
+    }
 
 
     return request(sails.hooks.http.app)
@@ -79,23 +72,27 @@ const logout = async function () {
       });
   } catch (logoutErr) {
     console.warn('test/utils.js: Lifecycle.test failed to logout with test service account: ' + logoutErr);
-    return done(login_err);
+    throw logoutErr;
   }
 };
 
-const logoutCbLogin = async (cb) => logout().then(() => cb()).then((unused) => login());
+const logoutCbLogin = async (cb, verbose = false) =>
+  logout(verbose)
+    .then(() => cb())
+    .then((unused) => login(verbose));
 
-const callAuthActionWithCookie = async (cb) =>
-  login()
+const callAuthActionWithCookie = async (cb, verbose=false) =>
+  login(verbose)
     .then((response) => {
       expect(response.statusCode).to.equal(200);
       expect(Object.keys(response.headers)).to.deep.include("set-cookie");
       expect(response.body).to.deep.equal({ data: true });
       const sessionCookie = response.headers["set-cookie"];
-      console.log('SESSION COOKIE: "' + sessionCookie + '"');
+      if(verbose){
+        console.log('SESSION COOKIE: "' + sessionCookie + '"');
+      }
       return cb(sessionCookie);
-    })
-    .catch((errs) => done(errs));
+    });
 
 module.exports = {
   login,

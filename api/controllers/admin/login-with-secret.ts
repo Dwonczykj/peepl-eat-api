@@ -50,7 +50,7 @@ module.exports = {
       return exits.badCombo();
     }
 
-    sails.log.info('Service User record located for ' + inputs.name);
+    // sails.log.info('Service User record located for ' + inputs.name);
 
     // Check secret matches the secret stored against the user
     // If the password doesn't match, then also exit thru "badCombo".

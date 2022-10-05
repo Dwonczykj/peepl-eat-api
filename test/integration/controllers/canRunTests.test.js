@@ -5,14 +5,14 @@ var supertest = require('supertest');
 
 describe('Is Logged In', () => {
   describe('TestControllerAction()', () => {
-    it('GET logged-in should return 200', (done) => {
-      supertest(sails.hooks.http.app)
-        .get('/api/v1/admin/logged-in')
-        // .send({ emailAddress: 'adam@itsaboutpeepl.com', password: 'Testing123!' })
-        .expect(200, (response) => {
-          console.log(response);
-          return done();
-        });
+    it('GET logged-in should return 200', async () => {
+      try {
+	      const response = await supertest(sails.hooks.http.app)
+	        .get('/api/v1/admin/logged-in')
+	        .expect(200);
+      } catch (errs) {
+        throw errs;
+      } 
     });
   });
   describe('Test login-with-password Action()', () => {

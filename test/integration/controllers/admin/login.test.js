@@ -60,7 +60,7 @@ describe("Authentication Tests", () => {
       //     return cb(sessionCookie);
       //   })
       //   .catch((errs) => done(errs));
-      callAuthActionWithCookie(cb);
+      callAuthActionWithCookie(cb, true);
     });
     it("GET logged-in returns false when not signed in", (done) => {
       supertest(sails.hooks.http.app)

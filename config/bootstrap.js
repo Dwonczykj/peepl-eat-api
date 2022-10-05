@@ -22,9 +22,6 @@ async function asyncForEach(array, callback) {
   }
 }
 
-
-
-
 module.exports.bootstrap = async function () {
   _.extend(sails.hooks.http.app.locals, sails.config.http.locals);
 
@@ -373,6 +370,7 @@ module.exports.bootstrap = async function () {
       vendorRole: "none",
       courierRole: "none",
     });
+    // eslint-disable-next-line no-console
     console.log('test.service@example.com Test Account User created');
 
     // // * Create consumer user
