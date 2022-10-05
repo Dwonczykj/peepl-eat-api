@@ -102,9 +102,9 @@ _.each(Object.keys(routes_read), function (route_key) {
 describe("Fetch GET Routes from routes.js", async () => {
   for (const testObj of actionsToTest["GET"]) {
     describe(`${testObj["actionRelPath"]}() returns a 200 with json when authenticated`, () => {
-      it(`${testObj["actionRelPath"]}() returns data`, async () => {
+      it(`${testObj["routeHttp"]} ${testObj["actionRelPath"]} returns data`, async () => {
         const cb = async (cookie) => {
-          if (testObj["actionName"].toLowerCase().includes('login')) {
+          if (testObj["actionName"].toLowerCase().includes("login")) {
             return;
           }
           try {
@@ -113,10 +113,10 @@ describe("Fetch GET Routes from routes.js", async () => {
               .get(testObj["routePath"]) //TODO: Set the path parameters for GETS with params.
               .set("Cookie", cookie)
               .set("Accept", "application/json");
-            
+
             expect(response.statusCode).to.equal(200);
             expect(response.body).not.to.have.property("data");
-            
+
             console.info(
               `${testObj["routePath"]} -> ` +
                 util.inspect(response.body, { depth: 0 }) + // * depth: null for full object print
