@@ -47,13 +47,13 @@ module.exports = {
       throw new Error('the order has not been paid for.');
     }
 
-    if(inputs.restaurantAccepted === true) {
+    if(inputs.restaurantAccepted === true && order.subtotal > 0) {
       await Order.updateOne({publicId: inputs.orderId})
       .set({restaurantAcceptanceStatus: 'accepted'});
 
       // Issue Peepl rewards
       // (5% order total in pence) / 10 pence (value of PPL token)
-      var rewardAmount = (order.total * 0.05) / 10;
+      var rewardAmount = (order.subtotal * 0.05) / 10;
 
       await sails.helpers.issuePeeplReward.with({
         rewardAmount: rewardAmount,
