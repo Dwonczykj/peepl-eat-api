@@ -70,7 +70,7 @@ parasails.registerComponent('order-card', {
     </h2>
     <p class="mt-2 mb-0 d-flex text-success">
       <span class="mr-auto">Reward</span>
-      <span>+ {{order.total / 200}} PPL</span>
+      <span>+ {{order.rewardsIssued || order.subtotal / 200}} PPL</span>
     </p>
     <div v-if="order.restaurantAcceptanceStatus == 'pending' && isInFuture(order.fulfilmentSlotFrom)">
       <h2 class="h5 border-top pt-3 mt-3 mb-0 d-flex">
