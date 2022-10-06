@@ -2,6 +2,34 @@ module.exports = [
   {
     "createdAt": 1650878843365,
     "updatedAt": 1651529215649,
+    "name": 'Delifonseca',
+    "type": 'restaurant',
+    "description": 'Life\'s too short to have a bad meal. Delifonseca is here to help you enjoy the finer tastes in life.',
+    "walletAddress": '0xf039CD9391cB28a7e632D07821deeBc249a32410',
+    "imageUrl": 'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
+    "status": 'active',
+    "phoneNumber": '+447495995614',
+    "pickupAddressLineOne": null,
+    "pickupAddressLineTwo": null,
+    "pickupAddressCity": null,
+    "pickupAddressPostCode": null,
+    "costLevel": null,
+    "rating": 0,
+    "isVegan": false,
+    "minimumOrderAmount": 0,
+    "platformFee": 0,
+    "collectionFulfilmentMethod": 8,
+    "deliveryFulfilmentMethod": 7,
+    "deliveryPartner": 1, // Agile
+    "products": [],
+    "vendorCategories": [1], // Cafes
+    "productCategories": [],
+    "fulfilmentPostalDistricts": [1,2], // L1, L2
+    "users": [],
+  },
+  {
+    "createdAt": 1650878843365,
+    "updatedAt": 1651529215649,
     
     "name": "Hi Vibe Nutrition",
     "type": "restaurant",
