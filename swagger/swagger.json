@@ -490,6 +490,11 @@
             "uniqueItems": true,
             "description": "Note Sails special attributes: autoIncrement"
           },
+          "subtotal": {
+            "type": "number",
+            "format": "double",
+            "description": "The subtotal of the order."
+          },
           "total": {
             "type": "number",
             "format": "double",

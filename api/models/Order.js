@@ -12,6 +12,10 @@ module.exports = {
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
     //  ╩  ╩╚═╩╩ ╩╩ ╩ ╩ ╚╝ ╚═╝╚═╝
+    subtotal: {
+      type: 'number',
+      description: 'The subtotal of the order.',
+    },
     total: {
       type: 'number',
       description: 'The order total in pence.',

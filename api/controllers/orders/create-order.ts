@@ -158,7 +158,10 @@ module.exports = {
 
         // Update with correct amount
         await Order.updateOne(order.id)
-        .set({total: calculatedOrderTotal.finalAmount})
+        .set({
+          subtotal: calculatedOrderTotal.withoutFees,
+          total: calculatedOrderTotal.finalAmount
+        })
         .usingConnection(db);
       }
 
