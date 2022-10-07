@@ -6,7 +6,7 @@
         "**/.sass-cache": true,
         "**/.assets_babel": true,
         "**/node_modules": true,
-        "**/.tscache": true,
+        "**/.tscache": false,
         "**/.svn": true,
         "**/.hg": true,
         "**/CVS": true,
