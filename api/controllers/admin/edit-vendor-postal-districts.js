@@ -31,7 +31,7 @@ module.exports = {
   },
 
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
     // Check whether user is authorised for vendor.
     let vendor = await Vendor.findOne({id: inputs.vendorId});
     if(!vendor){
@@ -45,7 +45,7 @@ module.exports = {
     });
 
     if(!isAuthorisedForVendor) {
-      throw 'unauthorised';
+      return exits.unauthorised();
     }
 
     var updatedVendor = await Vendor.replaceCollection(inputs.vendorId, 'fulfilmentPostalDistricts')

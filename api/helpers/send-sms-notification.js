@@ -32,7 +32,7 @@ module.exports = {
   },
 
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
     const twilioClient = new twilio(sails.config.custom.twilioSID, sails.config.custom.twilioAuthToken);
 
     twilioClient.messages.create({

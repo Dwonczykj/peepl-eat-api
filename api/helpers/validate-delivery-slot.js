@@ -32,7 +32,7 @@ module.exports = {
   },
 
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
     var moment = require('moment');
 
     // Strip time from inputted datetime

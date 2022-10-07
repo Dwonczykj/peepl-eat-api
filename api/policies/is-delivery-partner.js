@@ -1,5 +1,5 @@
 /**
- * is-courier
+ * is-delivery-partner
  *
  *
  * For more about how to use policies, see:
@@ -9,7 +9,9 @@
  */
 module.exports = async function (req, res, proceed) {
   if (!req.session.userId) {
-    sails.log('Policy:<is-courier> -> redirect to admin as not logged in');
+    sails.log(
+      "Policy:<is-delivery-partner> -> redirect to admin as not logged in"
+    );
     if (req.wantsJSON) {
       return res.forbidden();
     } else {
@@ -21,11 +23,13 @@ module.exports = async function (req, res, proceed) {
     id: req.session.userId,
   });
 
-  if (user.role === 'courier' || user.isSuperAdmin) {
+  if (user.role === 'deliveryPartner' || user.isSuperAdmin) {
     return proceed();
   }
 
-  sails.log('Policy:<is-courier> -> redirect to admin as not a courier');
+  sails.log(
+    "Policy:<is-delivery-partner> -> redirect to admin as not a deliveryPartner"
+  );
   if (req.wantsJSON) {
     return res.forbidden();
   } else {

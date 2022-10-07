@@ -6,55 +6,104 @@
  */
 
 module.exports = {
-
   attributes: {
-
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
     //  ╩  ╩╚═╩╩ ╩╩ ╩ ╩ ╚╝ ╚═╝╚═╝
     name: {
-      type: 'string',
-      description: 'The name of the Delivery Partner.',
+      type: "string",
+      description: "The name of the Delivery Partner.",
       required: true,
-      maxLength: 50
+      unique: true,
+      maxLength: 50,
     },
-    email:{
-      type: 'string',
-      description: 'The email of the Delivery Partner.',
+    email: {
+      type: "string",
+      description: "The email of the Delivery Partner.",
       required: true,
       isEmail: true,
-      maxLength: 50
+      maxLength: 50,
     },
     phoneNumber: {
-      type: 'string',
-      description: 'Phone number of the Delivery Partner.',
+      type: "string",
+      description: "Phone number of the Delivery Partner.",
       required: true,
-      maxLength: 20
+      maxLength: 20,
+    },
+    type: {
+      type: "string",
+      description: "The type of delivery partner.",
+      isIn: ["bike", "electric"],
+      defaultsTo: "bike",
+    },
+    description: {
+      type: "string",
+      description: "A brief description of the delivery partner.",
+      required: false,
+      maxLength: 200,
+    },
+    walletAddress: {
+      type: "string",
+      description:
+        "The blockchain wallet address for the delivery partner. Used to distribute payments from vendors.",
+      required: true,
+      regex: /^0x[a-fA-F0-9]{40}$/,
+    },
+    imageUrl: {
+      type: "string",
+      description:
+        "A description of where the featured image file can be found",
+      required: true,
     },
     status: {
-      type: 'string',
-      isIn: ['active', 'inactive'],
-      defaultsTo: 'inactive'
+      type: "string",
+      isIn: ["active", "inactive"],
+      defaultsTo: "inactive",
+    },
+    deliversToPostCodes: {
+      type: "json",
+      defaultsTo: [],
+    },
+    rating: {
+      type: "number",
+      min: 0,
+      max: 5,
+      columnType: "INT",
     },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
     //  ╚═╝╩ ╩╚═╝╚═╝═╩╝╚═╝
 
-
     //  ╔═╗╔═╗╔═╗╔═╗╔═╗╦╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
     //  ╠═╣╚═╗╚═╗║ ║║  ║╠═╣ ║ ║║ ║║║║╚═╗
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
     deliveryFulfilmentMethod: {
-      model: 'FulfilmentMethod',
-    }
+      model: "FulfilmentMethod",
+    },
+    users: {
+      // a collection of users that belong to a delivery partner
+      collection: "user",
+      via: "deliveryPartner", // NOTE: A collection of users that joins via the user.deliveryPartner property on the user model -> https://sailsjs.com/documentation/concepts/models-and-orm/associations/reflexive-associations
+    },
+  },
+
+  beforeCreate: async function (deliveryPartnerDraft, proceed) {
+    return proceed();
   },
 
   afterCreate: async function (newlyCreatedRecord, proceed) {
-    await sails.helpers.initialiseDeliveryMethods.with({deliveryPartner: newlyCreatedRecord.id});
-
+    if (!sails.helpers.isSuperAdmin.with({ userId: this.req.session.userId })) {
+      await DeliveryPartner.addToCollection(
+        newlyCreatedRecord.id,
+        "users",
+        this.req.session.userId
+      );
+    }
+    await sails.helpers.initialiseDeliveryMethods.with({
+      deliveryPartner: newlyCreatedRecord.id,
+    });
     return proceed();
-  }
-
+  },
 };
 

@@ -47,7 +47,7 @@ module.exports = {
     },
     role: {
       type: "string",
-      isIn: ["admin", "vendor", "courier", "consumer"],
+      isIn: ["admin", "vendor", "deliveryPartner", "consumer"],
       required: true,
     },
     vendorRole: {
@@ -55,7 +55,7 @@ module.exports = {
       isIn: ["admin", "owner", "inventoryManager", "salesManager", "none"],
       defaultsTo: "none",
     },
-    courierRole: {
+    deliveryPartnerRole: {
       type: "string",
       isIn: ["admin", "owner", "deliveryManager", "rider", "none"],
       defaultsTo: "none",
@@ -96,8 +96,8 @@ module.exports = {
     vendor: {
       model: "vendor",
     },
-    courier: {
-      model: "courier",
+    deliveryPartner: {
+      model: "deliverypartner",
     },
   },
   //} /*as { [K in keyof userModel]: any },
@@ -123,7 +123,7 @@ module.exports = {
     return `+${user.phoneCountryCode} ${x}`;
   },
 
-  beforeCreate: async function (user, proceed) {
+  beforeCreate: async function (userDraft, proceed) {
     // const saltRounds = sails.config.custom.passwordSaltRounds;
 
     // try {
@@ -133,8 +133,8 @@ module.exports = {
     // }
 
     const existingUser = await User.findOne({
-      phoneNoCountry: user.phoneNoCountry,
-      phoneCountryCode: user.phoneCountryCode,
+      phoneNoCountry: userDraft.phoneNoCountry,
+      phoneCountryCode: userDraft.phoneCountryCode,
     });
 
     if (existingUser) {
@@ -142,63 +142,63 @@ module.exports = {
       return undefined;
     }
 
-    const nonNull = (val) => val !== null && val !== undefined && val !== -1;
-    const isNull = (val) => val === null || val === undefined || val === -1;
+    const nonNull = (val) => val !== null && val !== undefined;
+    const isNull = (val) => val === null || val === undefined;
 
     const setRoles = () => {
-      if (nonNull(user.courier) && nonNull(user.vendor)) {
+      if (nonNull(userDraft.deliveryPartner) && nonNull(userDraft.vendor)) {
         return undefined; //TODO: Throw Exception on creation here
       } else if (
-        nonNull(user.vendor) &&
-        (isNull(user.vendorRole) ||
+        nonNull(userDraft.vendor) &&
+        (isNull(userDraft.vendorRole) ||
           !["owner", "salesManager", "inventoryManager"].includes(
-            user.vendorRole
+            userDraft.vendorRole
           ))
       ) {
-        user.vendor = null;
+        userDraft.vendor = null;
         return undefined; //todo throw
       } else if (
-        nonNull(user.courier) &&
-        (isNull(user.courierRole) ||
-          !["owner", "deliveryManager", "rider"].includes(user.courierRole))
+        nonNull(userDraft.deliveryPartner) &&
+        (isNull(userDraft.deliveryPartnerRole) ||
+          !["owner", "deliveryManager", "rider"].includes(userDraft.deliveryPartnerRole))
       ) {
-        user.courier = null;
+        userDraft.deliveryPartner = null;
         return undefined; //todo throw
       }
 
-      if (nonNull(user.vendor)) {
-        user.role = "vendor";
-        user.courierRole = "none";
-        user.courier = null;
-      } else if (nonNull(user.courier)) {
-        user.role = "courier";
-        user.vendorRole = "none";
-        user.vendor = null;
-      } else if (!user.isSuperAdmin) {
-        user.role = "consumer";
-        user.vendorRole = "none";
-        user.courierRole = "none";
-        user.vendor = null;
-        user.courier = null;
+      if (nonNull(userDraft.vendor)) {
+        userDraft.role = "vendor";
+        userDraft.deliveryPartnerRole = "none";
+        userDraft.deliveryPartner = null;
+      } else if (nonNull(userDraft.deliveryPartner)) {
+        userDraft.role = "deliveryPartner";
+        userDraft.vendorRole = "none";
+        userDraft.vendor = null;
+      } else if (!userDraft.isSuperAdmin) {
+        userDraft.role = "consumer";
+        userDraft.vendorRole = "none";
+        userDraft.deliveryPartnerRole = "none";
+        userDraft.vendor = null;
+        userDraft.deliveryPartner = null;
       }
-      return user;
+      return userDraft;
     };
 
-    if (user.isSuperAdmin) {
-      user.role = "admin";
-      user.vendorRole = "admin";
-      user.courierRole = "admin";
-    } else if (user.role === "admin" && !user.isSuperAdmin) {
-      user = setRoles();
+    if (userDraft.isSuperAdmin) {
+      userDraft.role = "admin";
+      userDraft.vendorRole = "admin";
+      userDraft.deliveryPartnerRole = "admin";
+    } else if (userDraft.role === "admin" && !userDraft.isSuperAdmin) {
+      userDraft = setRoles();
     }
 
-    if (user.role !== "vendor") {
-      user.vendorRole = "none";
-      user.vendor = null;
+    if (userDraft.role !== "vendor") {
+      userDraft.vendorRole = "none";
+      userDraft.vendor = null;
     }
-    if (user.role !== "courier") {
-      user.courierRole = "none";
-      user.courier = null;
+    if (userDraft.role !== "deliveryPartner") {
+      userDraft.deliveryPartnerRole = "none";
+      userDraft.deliveryPartner = null;
     }
 
     return proceed();

@@ -21,7 +21,7 @@ module.exports = {
   },
 
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
 
     var unixtime = Date.now();
 

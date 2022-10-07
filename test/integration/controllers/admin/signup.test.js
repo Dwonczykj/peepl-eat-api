@@ -45,10 +45,10 @@ describe("Signup Tests", () => {
     //       password: "DummyPass123",
     //       name: "Can Signup Password Vendor User",
     //       vendor: 1,
-    //       courier: null,
+    //       deliveryPartner: null,
     //       role: "vendor",
     //       vendorRole: "inventoryManager",
-    //       courierRole: "none",
+    //       deliveryPartnerRole: "none",
     //     })
     //     .expect(200)
     //     .then((response) => {
@@ -81,10 +81,10 @@ describe("Signup Tests", () => {
           email: userEmail,
           name: userName,
           vendor: 1,
-          courier: null,
+          deliveryPartner: null,
           role: "vendor",
           vendorRole: "inventoryManager",
-          courierRole: "none",
+          deliveryPartnerRole: "none",
         })
         .expect(200)
         .then((response) => {
@@ -126,10 +126,10 @@ describe("Signup Tests", () => {
               email: user.email,
               name: user.name,
               vendor: user.vendor,
-              courier: user.courier,
+              deliveryPartner: user.deliveryPartner.id,
               role: user.role,
               vendorRole: user.vendorRole,
-              courierRole: user.courierRole,
+              deliveryPartnerRole: user.deliveryPartnerRole,
             })
             .expect(401);
         })

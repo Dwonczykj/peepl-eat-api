@@ -26,27 +26,27 @@ module.exports = {
   },
 
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
     // TODO: Do all this inside a transaction
 
     // Create FulfilmentMethods
-    let del;
+    let delv;
     let col;
 
     // Add FulfilmentMethods to Vendor/DeliveryPartner
     if(inputs.vendor){
-      del = await FulfilmentMethod.create({vendor:inputs.vendor, methodType:'delivery'}).fetch();
+      delv = await FulfilmentMethod.create({vendor:inputs.vendor, methodType:'delivery'}).fetch();
       col = await FulfilmentMethod.create({vendor:inputs.vendor, methodType:'collection'}).fetch();
 
       await Vendor.updateOne(inputs.vendor).set({
-        deliveryFulfilmentMethod: del.id,
+        deliveryFulfilmentMethod: delv.id,
         collectionFulfilmentMethod: col.id
       });
     } else if (inputs.deliveryPartner){
-      del = await FulfilmentMethod.create({deliveryPartner:inputs.deliveryPartner, methodType:'delivery'}).fetch();
+      delv = await FulfilmentMethod.create({deliveryPartner:inputs.deliveryPartner, methodType:'delivery'}).fetch();
 
       await DeliveryPartner.updateOne(inputs.deliveryPartner).set({
-        deliveryFulfilmentMethod: del.id,
+        deliveryFulfilmentMethod: delv.id,
       });
     }
 
@@ -63,7 +63,7 @@ module.exports = {
         isOpen: false,
         openTime: '09:00',
         closeTime: '17:00',
-        fulfilmentMethod: del.id
+        fulfilmentMethod: delv.id
       });
 
       if(inputs.vendor){
@@ -81,7 +81,7 @@ module.exports = {
     // Add the opening hours to the database
     const newHoursDel = await OpeningHours.createEach(openingHoursDel).fetch();
     const newHoursIDsDel = newHoursDel.map(({ id }) => id);
-    await FulfilmentMethod.addToCollection(del.id, 'openingHours').members(newHoursIDsDel);
+    await FulfilmentMethod.addToCollection(delv.id, 'openingHours').members(newHoursIDsDel);
 
     if(inputs.vendor){
       const newHoursCol = await OpeningHours.createEach(openingHoursCol).fetch();

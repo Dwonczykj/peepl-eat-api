@@ -266,15 +266,15 @@
                   <select class="form-control" id="role" @change="roleOnChange($event)" v-model="role">
                     <!-- <option value="admin">Vegi Admin</option> -->
                     <option value="vendor">Merchant</option>
-                    <option value="courier">Courier</option>
+                    <option value="deliveryPartner">DeliveryPartner</option>
                   </select>
                 </div>
                 <div class="form-group">
                   <label for="business">Business</label>
                   <select class="form-control" id="business" v-model="businessId">
-                    <option v-if="role !== 'courier'" v-for="vendor in vendors" :value="vendor.id">{{vendor.name}} -
+                    <option v-if="role !== 'deliveryPartner'" v-for="vendor in vendors" :value="vendor.id">{{vendor.name}} -
                       {{vendor.type}}</option>
-                    <option v-if="role === 'courier'" v-for="vendor in couriers" :value="vendor.id">{{vendor.name}} -
+                    <option v-if="role === 'deliveryPartner'" v-for="vendor in deliveryPartners" :value="vendor.id">{{vendor.name}} -
                       {{vendor.type}}</option>
                   </select>
                   <!-- <input type="text" id="business" v-model="business" value="" hint="(Business name if known)" :class="{ 'is-invalid': formErrors.name }"
@@ -287,26 +287,26 @@
                 <div id="vendorRoleContainer" class="form-group" :class="!isVendor ? 'hidden' : ''">
                   <label for="vendorRole">Vendor Role</label>
                   <!-- <select class="form-control" id="vendorRole" v-model="vendorRole">
-                    <option v-if="!isCourier" value="owner">Merchant Owner</option>
-                    <option v-if="!isCourier" value="inventoryManager">Inventory manager</option>
-                    <option v-if="!isCourier" value="salesManager">Sales manager</option>
-                    <option v-if="isCourier" value="courier">Courier</option>
+                    <option v-if="!isDeliveryPartner" value="owner">Merchant Owner</option>
+                    <option v-if="!isDeliveryPartner" value="inventoryManager">Inventory manager</option>
+                    <option v-if="!isDeliveryPartner" value="salesManager">Sales manager</option>
+                    <option v-if="isDeliveryPartner" value="deliveryPartner">DeliveryPartner</option>
                   </select> -->
                   <b-form-select class="form-control" v-model="vendorRole" id="vendorRole"
                     :options="filteredVendorRoles">
                   </b-form-select>
                 </div>
 
-                <div id="courierRoleContainer" class="form-group" :class="!isCourier ? 'hidden' : ''">
-                  <label for="courierRole">Courier Role</label>
-                  <!-- <select class="form-control" id="courierRole" v-model="courierRole">
-                    <option v-if="!isCourier" value="owner">Merchant Owner</option>
-                    <option v-if="!isCourier" value="inventoryManager">Inventory manager</option>
-                    <option v-if="!isCourier" value="salesManager">Sales manager</option>
-                    <option v-if="isCourier" value="courier">Courier</option>
+                <div id="deliveryPartnerRoleContainer" class="form-group" :class="!isDeliveryPartner ? 'hidden' : ''">
+                  <label for="deliveryPartnerRole">DeliveryPartner Role</label>
+                  <!-- <select class="form-control" id="deliveryPartnerRole" v-model="deliveryPartnerRole">
+                    <option v-if="!isDeliveryPartner" value="owner">Merchant Owner</option>
+                    <option v-if="!isDeliveryPartner" value="inventoryManager">Inventory manager</option>
+                    <option v-if="!isDeliveryPartner" value="salesManager">Sales manager</option>
+                    <option v-if="isDeliveryPartner" value="deliveryPartner">DeliveryPartner</option>
                   </select> -->
-                  <b-form-select class="form-control" v-model="courierRole" id="courierRole"
-                    :options="filteredCourierRoles">
+                  <b-form-select class="form-control" v-model="deliveryPartnerRole" id="deliveryPartnerRole"
+                    :options="filteredDeliveryPartnerRoles">
                   </b-form-select>
                 </div>
                 <ajax-button 
@@ -590,15 +590,15 @@
                   <select class="form-control" id="roleEP" @change="roleOnChange($event)" v-model="role">
                     <!-- <option value="admin">Vegi Admin</option> -->
                     <option value="vendor">Merchant</option>
-                    <option value="courier">Courier</option>
+                    <option value="deliveryPartner">DeliveryPartner</option>
                   </select>
                 </div>
                 <div class="form-group">
                   <label for="businessEP">Business</label>
                   <select class="form-control" id="businessEP" v-model="businessId">
-                    <option v-if="role !== 'courier'" v-for="vendor in vendors" :value="vendor.id">{{vendor.name}} -
+                    <option v-if="role !== 'deliveryPartner'" v-for="vendor in vendors" :value="vendor.id">{{vendor.name}} -
                       {{vendor.type}}</option>
-                    <option v-if="role === 'courier'" v-for="vendor in couriers" :value="vendor.id">{{vendor.name}} -
+                    <option v-if="role === 'deliveryPartner'" v-for="vendor in deliveryPartners" :value="vendor.id">{{vendor.name}} -
                       {{vendor.type}}</option>
                   </select>
                   <!-- <input type="text" id="businessEP" v-model="business" value="" hint="(Business name if known)" :class="{ 'is-invalid': formErrors.name }"
@@ -611,26 +611,26 @@
                 <div id="vendorRoleContainerEP" class="form-group" :class="!isVendor ? 'hidden' : ''">
                   <label for="vendorRoleEP">Vendor Role</label>
                   <!-- <select class="form-control" id="vendorRole" v-model="vendorRole">
-                    <option v-if="!isCourier" value="owner">Merchant Owner</option>
-                    <option v-if="!isCourier" value="inventoryManager">Inventory manager</option>
-                    <option v-if="!isCourier" value="salesManager">Sales manager</option>
-                    <option v-if="isCourier" value="courier">Courier</option>
+                    <option v-if="!isDeliveryPartner" value="owner">Merchant Owner</option>
+                    <option v-if="!isDeliveryPartner" value="inventoryManager">Inventory manager</option>
+                    <option v-if="!isDeliveryPartner" value="salesManager">Sales manager</option>
+                    <option v-if="isDeliveryPartner" value="deliveryPartner">DeliveryPartner</option>
                   </select> -->
                   <b-form-select class="form-control" v-model="vendorRole" id="vendorRoleEP"
                     :options="filteredVendorRoles">
                   </b-form-select>
                 </div>
 
-                <div id="courierRoleContainerEP" class="form-group" :class="!isCourier ? 'hidden' : ''">
-                  <label for="courierRoleEP">Courier Role</label>
-                  <!-- <select class="form-control" id="courierRole" v-model="courierRole">
-                    <option v-if="!isCourier" value="owner">Merchant Owner</option>
-                    <option v-if="!isCourier" value="inventoryManager">Inventory manager</option>
-                    <option v-if="!isCourier" value="salesManager">Sales manager</option>
-                    <option v-if="isCourier" value="courier">Courier</option>
+                <div id="deliveryPartnerRoleContainerEP" class="form-group" :class="!isDeliveryPartner ? 'hidden' : ''">
+                  <label for="deliveryPartnerRoleEP">DeliveryPartner Role</label>
+                  <!-- <select class="form-control" id="deliveryPartnerRole" v-model="deliveryPartnerRole">
+                    <option v-if="!isDeliveryPartner" value="owner">Merchant Owner</option>
+                    <option v-if="!isDeliveryPartner" value="inventoryManager">Inventory manager</option>
+                    <option v-if="!isDeliveryPartner" value="salesManager">Sales manager</option>
+                    <option v-if="isDeliveryPartner" value="deliveryPartner">DeliveryPartner</option>
                   </select> -->
-                  <b-form-select class="form-control" v-model="courierRole" id="courierRoleEP"
-                    :options="filteredCourierRoles">
+                  <b-form-select class="form-control" v-model="deliveryPartnerRole" id="deliveryPartnerRoleEP"
+                    :options="filteredDeliveryPartnerRoles">
                   </b-form-select>
                 </div>
 

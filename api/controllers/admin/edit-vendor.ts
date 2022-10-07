@@ -114,7 +114,7 @@ module.exports = {
     let vendor = await Vendor.findOne({ id: inputs.id });
 
     if (!vendor) {
-      throw 'notFound';
+      return exits.notFound();
     }
 
     // Check if user is authorised to edit vendor.
@@ -124,7 +124,7 @@ module.exports = {
     });
 
     if (!isAuthorisedForVendor) {
-      throw 'unauthorised';
+      return exits.unauthorised();
     }
 
     if(inputs.image /*&& sails.config.custom.amazonS3Secret && sails.config.custom.amazonS3AccessKey*/){

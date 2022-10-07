@@ -78,18 +78,18 @@
                 </div>
             </div>
         </div>
-        <div v-if="user.isSuperAdmin || user.role === 'courier'">
-            <h1 class="h4 text-center my-4">Courier Panel</h1>
+        <div v-if="user.isSuperAdmin || user.role === 'deliveryPartner'">
+            <h1 class="h4 text-center my-4">Delivery Partner Panel</h1>
             <div class="container">
-                <label for="courier-container">Courier</h3>
-                    <div id="courier-container">
-                        <p v-if="user.courier" class="text-muted m-0">{{user.courier.name}}</p>
-                        <p v-else class="text-muted m-0">No Courier</p>
+                <label for="deliveryPartner-container">Delivery Partner</h3>
+                    <div id="deliveryPartner-container">
+                        <p v-if="user.deliveryPartner" class="text-muted m-0">{{user.deliveryPartner.name}}</p>
+                        <p v-else class="text-muted m-0">No Delivery Partner</p>
                     </div>
-                    <label for="courierrole">Role</h3>
-                        <p class="text-muted m-0" id="courierrole">{{user.courierRole}}</p>
+                    <label for="deliveryPartnerrole">Role</h3>
+                        <p class="text-muted m-0" id="deliveryPartnerrole">{{user.deliveryPartnerRole}}</p>
             </div>
-            <div v-if="user.isSuperAdmin || user.courierRole === 'admin'">
+            <div v-if="user.isSuperAdmin || user.deliveryPartnerRole === 'admin'">
                 <!-- <ajax-form id="accountDetailsForm" class="" :handle-parsing="parseAccountDetails" :syncing.sync="syncing"
                                                         :cloud-error.sync="cloudError" @submitted="submittedAccountDetailsForm()"
                                                         :handle-submitting="clickUpdateAccountDetails">
@@ -116,7 +116,7 @@
                                                         </div>
                                                     </ajax-form> -->
                 <div>
-                    <p>Placeholder for managing users registered to this courier.</p>
+                    <p>Placeholder for managing users registered to this delivery partner.</p>
                 </div>
             </div>
     </div>

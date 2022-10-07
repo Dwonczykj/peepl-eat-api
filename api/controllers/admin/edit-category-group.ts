@@ -47,14 +47,14 @@ module.exports = {
     },
 
 
-    fn: async function (inputs) {
+    fn: async function (inputs, exits) {
         // Find the category group to edit
         var categoryGroup = await CategoryGroup.findOne({
             id: inputs.id
         });
 
         if (!categoryGroup) {
-            throw 'notFound';
+            return exits.notFound();
         }
 
         if (inputs.image) {

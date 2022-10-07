@@ -23,7 +23,7 @@ module.exports = {
   },
 
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
     var order = await Order.findOne({
       publicId: inputs.orderId,
       completedFlag: ''

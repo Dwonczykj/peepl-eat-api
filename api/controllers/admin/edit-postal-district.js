@@ -23,7 +23,7 @@ module.exports = {
   },
 
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
     var updatedPostalDistrict = await PostalDistrict.updateOne(inputs.id).set(inputs);
 
     // All done.

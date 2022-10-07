@@ -1,4 +1,4 @@
-declare var Courier: any;
+declare var DeliveryPartner: any;
 module.exports = {
 
 
@@ -20,16 +20,16 @@ module.exports = {
     },
     vendorRole: {
       type: 'string',
-      isIn: ['owner', 'inventoryManager', 'salesManager', 'courier', 'none'],
+      isIn: ['owner', 'inventoryManager', 'salesManager', 'deliveryPartner', 'none'],
     },
     vendorConfirmed: {
       type: 'boolean',
     },
-    courierId: {
+    deliveryPartnerId: {
       type: 'number',
       required: true,
     },
-    courierRole: {
+    deliveryPartnerRole: {
       type: 'string',
       isIn: ['owner', 'deliveryManager', 'rider', 'none'],
     },
@@ -38,7 +38,7 @@ module.exports = {
     },
     role: {
       type: 'string',
-      isIn: ['admin', 'vendor', 'courier'],
+      isIn: ['admin', 'vendor', 'deliveryPartner'],
     },
   },
 
@@ -83,7 +83,7 @@ module.exports = {
       let vendor = await Vendor.findOne({ id: inputs.vendorId });
 
       if (!vendor) {
-        throw 'notFound';
+        return exits.notFound();
       }
       // Check if admin user is authorised to edit vendor.
       var isAuthorisedForVendor = await sails.helpers.isAuthorisedForVendor.with({
@@ -92,11 +92,11 @@ module.exports = {
       });
 
       if (!isAuthorisedForVendor) {
-        throw 'unauthorised';
+        return exits.unauthorised();
       }
 
       if (!['owner', 'inventoryManager', 'salesManager', 'none'].includes(inputs.vendorRole)) {
-        throw 'badRequest';
+        return exits.badRequest();
       }
 
       updateUserObj['vendorRole'] = inputs.vendorRole;
@@ -104,29 +104,29 @@ module.exports = {
 
     }
 
-    if (Object.keys(inputs).includes('courierId')) {
-      //TODO: Check that the user is registered to a courier and that it matches the courier in the inputs (request)
-      let courier = await Courier.findOne({ id: inputs.courierId });
+    if (Object.keys(inputs).includes('deliveryPartnerId')) {
+      //TODO: Check that the user is registered to a deliveryPartner and that it matches the deliveryPartner in the inputs (request)
+      let deliveryPartner = await DeliveryPartner.findOne({ id: inputs.deliveryPartnerId });
 
-      if (!courier) {
-        throw 'notFound';
+      if (!deliveryPartner) {
+        return exits.notFound();
       }
-      // Check if admin user is authorised to edit courier.
-      var isAuthorisedForCourier = await sails.helpers.isAuthorisedForCourier.with({
+      // Check if admin user is authorised to edit deliveryPartner.
+      var isAuthorisedForDeliveryPartner = await sails.helpers.isAuthorisedForDeliveryPartner.with({
         userId: this.req.session.userId,
-        courierId: courier.id
+        deliveryPartnerId: deliveryPartner.id
       });
 
-      if (!isAuthorisedForCourier) {
-        throw 'unauthorised';
+      if (!isAuthorisedForDeliveryPartner) {
+        return exits.unauthorised();
       }
 
-      if (!['owner', 'deliveryManager', 'rider', 'none'].includes(inputs.courierRole)) {
-        throw 'badRequest';
+      if (!['owner', 'deliveryManager', 'rider', 'none'].includes(inputs.deliveryPartnerRole)) {
+        return exits.badRequest();
       }
 
-      updateUserObj['courierRole'] = inputs.courierRole;
-      updateUserObj['courier'] = courier;
+      updateUserObj['deliveryPartnerRole'] = inputs.deliveryPartnerRole;
+      updateUserObj['deliveryPartner'] = deliveryPartner;
 
     }
 

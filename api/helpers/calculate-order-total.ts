@@ -25,7 +25,7 @@ module.exports = {
 
   },
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
     var order = await Order.findOne(inputs.orderId)
     .populate('items.product&optionValues&optionValues.option&optionValue&discount');
 

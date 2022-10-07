@@ -24,7 +24,7 @@ module.exports = {
   },
 
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
     mailchimp.setConfig({
       apiKey: sails.config.custom.mailchimpAPIKey,
       server: 'us7'

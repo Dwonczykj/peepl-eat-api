@@ -39,7 +39,7 @@ module.exports = {
     },
   },
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
     let productOption = await ProductOption.findOne({ id: inputs.productOption })
     .populate('product');
 
@@ -54,7 +54,7 @@ module.exports = {
     });
 
     if(!isAuthorisedForVendor) {
-      throw 'unauthorised';
+      return exits.unauthorised();
     }
 
     var newProductOptionValue = await ProductOptionValue.create({

@@ -57,6 +57,6 @@ module.exports.policies = {
     "is-logged-in",
     "is-vendor",
   ],
-  "couriers/*": ["is-logged-in", "is-courier"],
+  "couriers/*": ["is-logged-in", "is-delivery-partner"],
   "*": "is-logged-in",
 };

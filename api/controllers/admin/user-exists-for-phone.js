@@ -41,7 +41,7 @@ module.exports = {
     });
 
     if (!user) {
-      // throw 'badCombo';
+      // return exits.badCombo();
       return exits.success(false);
     }
 

@@ -1,5 +1,3 @@
-const OrderItem = require('../../models/OrderItem');
-
 const OrderTypeEnum = {
   vegiEats: 'vegiEats',
   vegiPays: 'vegiPays',
@@ -124,7 +122,6 @@ module.exports = {
         .set({ restaurantAcceptanceStatus: 'rejected' });
 
       // send a refund to the user:
-      //TODO: Implement the below helper method
       await sails.helpers.revertPaymentFull.with({
         paymentId: order.paymentIntentId,
         refundAmount: order.total,
@@ -132,12 +129,7 @@ module.exports = {
         recipientName: order.deliveryName,
         refundFromName: order.vendor.name,
       });
-      // revert the token issuance
-      //TODO: Implement the below helper method
-      await sails.helpers.revertPeeplRewardIssue.with({
-        peeplPayPaymentIntentId: order.paymentIntentId,
-        recipient: order.customerWalletAddress
-      });
+      // ! Do NOT revert the token issuance as not issued yet, only issued above in acceptance flow
 
       await sails.helpers.sendFirebaseNotification.with({
         topic: 'order-' + order.publicId,
@@ -153,11 +145,11 @@ module.exports = {
       });
 
       if (!response || !response['validRequest']) {
-        sails.log.warn('Bad partial fulfilment requested by vendor on approve-or-decline-order action')
+        sails.log.warn('Bad partial fulfilment requested by vendor on approve-or-decline-order action');
         return exits.badPartialFulfilmentRequest();
       }
 
-      await sails.helpers.requestUpdateFromConsumer.with({// todo: dont need to revert peepl tokens as only sent in accept clause above.
+      await sails.helpers.requestUpdateFromConsumer.with({
         customerWalletAddress: order.customerWalletAddress,
         orderPublicId: order.publicId,
       });

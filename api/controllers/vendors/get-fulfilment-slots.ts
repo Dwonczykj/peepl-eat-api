@@ -27,7 +27,7 @@ module.exports = {
   },
 
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
 
     var deliverySlots: iSlot[] = [];
     var collectionSlots: iSlot[] = [];

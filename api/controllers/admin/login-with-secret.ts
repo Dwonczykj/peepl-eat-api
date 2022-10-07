@@ -61,17 +61,17 @@ module.exports = {
     }
 
     this.req.session.userId = userRecord.id;
-
-    return exits.success({ data: true });
+    exits.success({ data: userRecord });
+    return userRecord;
 
     // const user = await signInWithEmailAndPassword(auth, inputs.email, inputs.password)
     // if(!user){
-    //   throw 'badCombo';
+    //   return exits.badCombo();
     // }
 
     // const isValidPassword = await bcrypt.compare(inputs.password, user.password);
     // if(!isValidPassword){
-    //   throw 'badCombo';
+    //   return exits.badCombo();
     // }
 
 

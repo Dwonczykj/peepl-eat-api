@@ -54,7 +54,7 @@ module.exports = {
         id: inputs.id
       });
       if (!user) {
-        throw 'notFound';
+        return exits.notFound();
       }
       // userFB = await auth.getUserByEmail(user.email);
       userFB = await auth.getUserByPhoneNumber(user.phoneNumber);

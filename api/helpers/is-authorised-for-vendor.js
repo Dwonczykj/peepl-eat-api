@@ -30,7 +30,7 @@ module.exports = {
   },
 
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
     // get the user
     const user = await User.findOne({
       id: inputs.userId,

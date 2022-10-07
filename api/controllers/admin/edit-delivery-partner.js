@@ -55,14 +55,14 @@ module.exports = {
   },
 
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
     // Find the delivery partner to edit
     var deliveryPartner = await DeliveryPartner.findOne({
       id: inputs.id
     });
 
     if (!deliveryPartner) {
-      throw 'notFound';
+      return exits.notFound();
     }
 
     // Update the delivery partner

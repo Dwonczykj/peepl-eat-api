@@ -14,7 +14,7 @@ module.exports = {
     },
     vendorRole: {
       type: 'string',
-      isIn: ['owner', 'inventoryManager', 'salesManager', 'courier', 'none'],
+      isIn: ['owner', 'inventoryManager', 'salesManager', 'none'],
       required: true,
     },
 
@@ -42,14 +42,10 @@ module.exports = {
 
 
   fn: async function (inputs, exits) {
-    // TODO: Test this
-    let user = await User.findOne({ id: this.req.session.userId });
-
-    //TODO: Check that the user is registered to a vendor and that it matches the vendor in the inputs (request)
     let vendor = await Vendor.findOne({ id: inputs.vendorId });
 
     if (!vendor) {
-      throw 'notFound';
+      return exits.notFound();
     }
 
     // Check if user is authorised to edit vendor.
@@ -59,11 +55,11 @@ module.exports = {
     });
 
     if (!isAuthorisedForVendor) {
-      throw 'unauthorised';
+      return exits.unauthorised();
     }
 
-    if (!['owner', 'inventoryManager', 'salesManager', 'courier', 'none'].includes(inputs.vendorRole)) {
-      throw 'badRequest';
+    if (!['owner', 'inventoryManager', 'salesManager', 'none'].includes(inputs.vendorRole)) {
+      return exits.badRequest();
     }
 
     var updatedUser = await User.updateOne(inputs.id).set({

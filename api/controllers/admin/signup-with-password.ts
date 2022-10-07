@@ -31,7 +31,7 @@ module.exports = {
       type: "number",
       allowNull: true,
     },
-    courierId: {
+    deliveryPartnerId: {
       type: "number",
       allowNull: true,
     },
@@ -42,7 +42,7 @@ module.exports = {
       type: "string",
       defaultsTo: "none",
     },
-    courierRole: {
+    deliveryPartnerRole: {
       type: "string",
       defaultsTo: "none",
     },
@@ -60,7 +60,7 @@ module.exports = {
       responseType: "badRequest",
       statusCode: 403,
       message: 'Bad Roles Supplied to request',
-      description: "Register request passed with string roles that do not exist on the roles/vendorRoles/courierRoles of a User"
+      description: "Register request passed with string roles that do not exist on the roles/vendorRoles/deliveryPartnerRoles of a User"
     },
     success: {
       outputDescription: "",
@@ -85,15 +85,15 @@ module.exports = {
       }
       if (
         !["admin", "owner", "deliveryManager", "rider", "none"].includes(
-          inputs.courierRole
+          inputs.deliveryPartnerRole
         )
       ) {
         return exits.badRolesRequest({
-          message: "Bad courierRole Supplied to request",
+          message: "Bad deliveryPartnerRole Supplied to request",
         });
       }
       if (
-        !["admin", "vendor", "courier", "consumer"].includes(inputs.role)
+        !["admin", "vendor", "deliveryPartner", "consumer"].includes(inputs.role)
       ) {
         return exits.badRolesRequest({
           message: "Bad role Supplied to request",
@@ -154,11 +154,11 @@ module.exports = {
           name: inputs.name,
           // password: 'Testing123!',
           vendor: inputs.vendorId,
-          courier: inputs.courierId,
+          deliveryPartner: inputs.deliveryPartnerId,
           vendorConfirmed: false,
           isSuperAdmin: false,
           vendorRole: inputs.vendorRole ?? "none",
-          courierRole: inputs.courierRole ?? "none",
+          deliveryPartnerRole: inputs.deliveryPartnerRole ?? "none",
           role: inputs.role,
           firebaseSessionToken: sessionToken,
           fbUid: fbUser.uid,

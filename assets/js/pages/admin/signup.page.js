@@ -34,45 +34,45 @@ parasails.registerPage("signup", {
     businessId: -1,
     role: "vendor",
     vendorRole: "salesManager",
-    courierRole: "none",
+    deliveryPartnerRole: "none",
     options: {
-      role: ["admin", "vendor", "courier"],
+      role: ["admin", "vendor", "deliveryPartner"],
       vendorRole: ["owner", "inventoryManager", "salesManager", "none"],
-      courierRole: ["owner", "deliveryManager", "rider", "none"],
+      deliveryPartnerRole: ["owner", "deliveryManager", "rider", "none"],
     },
     vendors: [],
-    couriers: [],
+    deliveryPartners: [],
   },
   computed: {
     // * Getter -> a computed getter so that computed each time we access it
     filteredBusinesses() {
-      if (this.isCourier) {
-        return this.couriers;
+      if (this.isDeliveryPartner) {
+        return this.deliveryPartners;
       } else if (this.isVendor) {
         return this.vendors;
       }
-      return [...this.vendors, ...this.couriers];
+      return [...this.vendors, ...this.deliveryPartners];
     },
     filteredVendorRoles() {
       // `this` points to the component instance
       if (this.isVendor) {
         return this.options.vendorRole.filter((t) => t !== "owner");
-      } else if (this.isCourier) {
+      } else if (this.isDeliveryPartner) {
         return [];
       }
       return [];
     },
-    filteredCourierRoles() {
+    filteredDeliveryPartnerRoles() {
       // `this` points to the component instance
       if (this.isVendor) {
         return [];
-      } else if (this.isCourier) {
-        return this.options.courierRole.filter((t) => t !== "owner");
+      } else if (this.isDeliveryPartner) {
+        return this.options.deliveryPartnerRole.filter((t) => t !== "owner");
       }
       return [];
     },
-    isCourier() {
-      return this.role === "courier";
+    isDeliveryPartner() {
+      return this.role === "deliveryPartner";
     },
     isVendor() {
       return this.role === "vendor";
@@ -95,15 +95,15 @@ parasails.registerPage("signup", {
       if (newVal !== oldVal) {
         if (!this.isVendor) {
           document
-            .getElementById("courierRoleContainer")
+            .getElementById("deliveryPartnerRoleContainer")
             .classList.remove("hidden");
           document
             .getElementById("vendorRoleContainer")
             .classList.add("hidden");
         }
-        if (!this.isCourier) {
+        if (!this.isDeliveryPartner) {
           document
-            .getElementById("courierRoleContainer")
+            .getElementById("deliveryPartnerRoleContainer")
             .classList.add("hidden");
           document
             .getElementById("vendorRoleContainer")
@@ -112,7 +112,7 @@ parasails.registerPage("signup", {
 
         document.getElementById("business").selectedIndex = -1;
         document.getElementById("vendorRole").selectedIndex = -1;
-        document.getElementById("courierRole").selectedIndex = -1;
+        document.getElementById("deliveryPartnerRole").selectedIndex = -1;
       }
     },
   },
@@ -155,8 +155,8 @@ parasails.registerPage("signup", {
     roleOnChange: function (selectEvent) {
       const newVal = selectEvent.srcElement.value;
 
-      if (newVal === "courier" && !this.isCourier) {
-        window.alert("isCourier getter not working");
+      if (newVal === "deliveryPartner" && !this.isDeliveryPartner) {
+        window.alert("isDeliveryPartner getter not working");
       }
       if (newVal === "vendor" && !this.isVendor) {
         window.alert("isVendor getter not working");
@@ -173,17 +173,17 @@ parasails.registerPage("signup", {
       //   'vendor': document.getElementById('business').options[document.getElementById('business').selectedIndex].value,
       //   'role': document.getElementById('role').options[document.getElementById('role').selectedIndex].value,
       //   'vendorRole': document.getElementById('vendorRole').options[document.getElementById('vendorRole').selectedIndex].value,
-      //   'courierRole': document.getElementById('courierRole').options[document.getElementById('courierRole').selectedIndex].value,
+      //   'deliveryPartnerRole': document.getElementById('deliveryPartnerRole').options[document.getElementById('deliveryPartnerRole').selectedIndex].value,
       // };
       var argins = {
         phoneNumber: this.phoneNumber,
         email: this.email.toString().trim(),
         name: this.name.toString().trim(),
         vendor: this.isVendor ? this.businessId : null,
-        courier: this.isCourier ? this.businessId : null,
+        deliveryPartner: this.isDeliveryPartner ? this.businessId : null,
         role: this.role,
         vendorRole: this.vendorRole,
-        courierRole: this.courierRole,
+        deliveryPartnerRole: this.deliveryPartnerRole,
       };
 
       const firebasePhoneRegex = /^\+\d{1,2} \d{3}-\d{3}-\d{4}$/;
@@ -229,10 +229,10 @@ parasails.registerPage("signup", {
         password: this.password.toString().trim(),
         name: this.name.toString().trim(),
         vendor: this.isVendor ? this.businessId : null,
-        courier: this.isCourier ? this.businessId : null,
+        deliveryPartner: this.isDeliveryPartner ? this.businessId : null,
         role: this.role,
         vendorRole: this.vendorRole ?? "none",
-        courierRole: this.courierRole ?? "none",
+        deliveryPartnerRole: this.deliveryPartnerRole ?? "none",
       };
 
       try {
@@ -244,10 +244,10 @@ parasails.registerPage("signup", {
           argins["phoneCountryCode"],
           argins["name"],
           argins["vendor"],
-          argins["courier"],
+          argins["deliveryPartner"],
           argins["role"],
           argins["vendorRole"],
-          argins["courierRole"]
+          argins["deliveryPartnerRole"]
         );
 
         if (response.status) {
@@ -271,9 +271,9 @@ parasails.registerPage("signup", {
       //   'name': document.getElementById('name').value.toString().trim(),
       //   'role': document.getElementById('role').options[document.getElementById('role').selectedIndex].value,
       //   'vendorId': this.isVendor ? document.getElementById('business').options[document.getElementById('business').selectedIndex].value : '',
-      //   'courierId': this.isCourier ? document.getElementById('business').options[document.getElementById('business').selectedIndex].value : '',
+      //   'deliveryPartnerId': this.isDeliveryPartner ? document.getElementById('business').options[document.getElementById('business').selectedIndex].value : '',
       //   'vendorRole': document.getElementById('vendorRole').options[document.getElementById('vendorRole').selectedIndex].value,
-      //   'courierRole': document.getElementById('courierRole').options[document.getElementById('courierRole').selectedIndex].value,
+      //   'deliveryPartnerRole': document.getElementById('deliveryPartnerRole').options[document.getElementById('deliveryPartnerRole').selectedIndex].value,
       // };
 
       var argins = {
@@ -286,10 +286,10 @@ parasails.registerPage("signup", {
         email: this.email.toString().trim(),
         name: this.name.toString().trim(),
         vendor: this.isVendor ? this.businessId : null,
-        courier: this.isCourier ? this.businessId : null,
+        deliveryPartner: this.isDeliveryPartner ? this.businessId : null,
         role: this.role,
         vendorRole: this.vendorRole ? "none" : this.vendorRole,
-        courierRole: this.courierRole ? "none" : this.courierRole,
+        deliveryPartnerRole: this.deliveryPartnerRole ? "none" : this.deliveryPartnerRole,
       };
 
       try {
@@ -300,10 +300,10 @@ parasails.registerPage("signup", {
           argins["phoneCountryCode"],
           argins["name"],
           argins["vendor"],
-          argins["courier"],
+          argins["deliveryPartner"],
           argins["role"],
           argins["vendorRole"],
-          argins["courierRole"]
+          argins["deliveryPartnerRole"]
         );
 
         // eslint-disable-next-line no-console

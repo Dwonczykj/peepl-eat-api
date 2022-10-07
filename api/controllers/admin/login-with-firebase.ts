@@ -125,7 +125,7 @@ requests over WebSockets instead of HTTP).`,
           vendorConfirmed: false,
           isSuperAdmin: false,
           vendorRole: "none",
-          courierRole: "none",
+          deliveryPartnerRole: "none",
           role: "none",
           firebaseSessionToken: decodedToken,
         });
@@ -182,12 +182,12 @@ requests over WebSockets instead of HTTP).`,
 
     // const user = await signInWithEmailAndPassword(auth, inputs.email, inputs.password)
     // if(!user){
-    //   throw 'badCombo';
+    //   return exits.badCombo();
     // }
 
     // const isValidPassword = await bcrypt.compare(inputs.password, user.password);
     // if(!isValidPassword){
-    //   throw 'badCombo';
+    //   return exits.badCombo();
     // }
 
 

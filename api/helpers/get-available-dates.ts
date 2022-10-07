@@ -28,7 +28,7 @@ module.exports = {
   },
 
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
     // TODO: Consider timezones
     // TODO: Account for overnight opening hours
     // TODO: Generate IDs for slots to simplify logic (but must account for changes to opening hours and slot duration)

@@ -23,19 +23,19 @@ module.exports.policies = {
   "admin/login": true,
   "admin/logout": true,
   "admin/logged-in": true,
-  "admin/view-account": true,/*[
+  "admin/view-account": [
     "localize",
     "firebase",
     "firebase-auth",
     "is-logged-in",
-  ],*/
+  ],
   "admin/user-exists-for-email": true,
   "admin/user-exists-for-phone": true,
   "admin/signup": true,
   "admin/signup-with-password": true,
   "admin/view-signup": true,
   "admin/view-create-vendor": "is-super-admin",
-  "admin/view-vendors": true, // "is-super-admin",
+  "admin/view-vendors": "is-super-admin",
   "admin/create-vendor": "is-super-admin",
   "admin/create-delivery-partner": "is-super-admin",
   "admin/edit-delivery-partner": "is-super-admin",
@@ -43,20 +43,20 @@ module.exports.policies = {
   "admin/view-create-delivery-partner": "is-super-admin",
   "admin/create-postal-district": "is-super-admin",
   "admin/edit-postal-district": "is-super-admin",
-  "admin/view-postal-districts": true, // "is-super-admin",
+  "admin/view-postal-districts": "is-super-admin",
   "admin/view-approve-order": true, //TODO: add 'is-logged-in' and 'is-vendor' poligices to this
   "admin/approve-or-decline-order": true, //TODO: add 'is-logged-in' and 'is-vendor' poligices to this
-  "admin/*": true, // 'is-logged-in',
+  "admin/*": "is-logged-in",
   "discounts/*": true, // ['localize', 'firebase', 'firebase-auth', 'is-logged-in'],
   "orders/*": true, // ["localize", "firebase", "firebase-auth", "is-logged-in"],
   "products/*": true, // ["localize", "firebase", "firebase-auth", "is-logged-in"],
-  "vendors/*": true /*[
+  "vendors/*": true, /*[
     "localize",
     "firebase",
     "firebase-auth",
     "is-logged-in",
     "is-vendor",
-  ],*/,
-  "couriers/*": true, // ["is-logged-in", "is-courier"],
+  ],*/
+  "couriers/*": true, // ["is-logged-in", "is-delivery-partner"],
   "*": true, // "is-logged-in",
 };

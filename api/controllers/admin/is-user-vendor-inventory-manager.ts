@@ -32,7 +32,7 @@ module.exports = {
     },
   },
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
 
     var userRoleForVendor = await sails.helpers.getUserroleForVendor.with({
       userId: this.req.session.userId,

@@ -38,13 +38,13 @@ module.exports = {
   },
 
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
     const user = await User.findOne({
       email: inputs.email,
     });
 
     if (!user) {
-      throw 'badCombo';
+      return exits.badCombo();
     }
 
     // Update the session

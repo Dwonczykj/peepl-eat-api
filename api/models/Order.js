@@ -95,16 +95,13 @@ module.exports = {
       type: 'string',
       description: 'The ID to identify the delivery in the logistics system'
     },
-    courierAccepted: {
+    deliveryPartnerAccepted: {
       type: 'boolean',
       defaultsTo: false
     },
-    courierConfirmed: {
+    deliveryPartnerConfirmed: {
       type: 'boolean',
       defaultsTo: false
-    },
-    courierId: {
-      type: 'string',
     },
     fulfilmentSlotFrom: {
       type: 'ref',
@@ -187,6 +184,9 @@ module.exports = {
     vendor: {
       model: 'vendor',
       required: true
+    },
+    deliveryPartner: {
+      model: 'deliverypartner',
     },
     parentOrder: {
       model: 'order',

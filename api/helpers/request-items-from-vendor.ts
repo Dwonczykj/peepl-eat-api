@@ -57,11 +57,11 @@ module.exports = {
   },
 
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
     //TODO: Implement this function
 
     const vendor = Vendor.findOne({id:inputs.vendor});
 
-    throw 'notFound';
+    return exits.notFound();
   }
 };

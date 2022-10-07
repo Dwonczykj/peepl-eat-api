@@ -19,12 +19,12 @@ module.exports = {
     if (this.req.wantsJSON) {
       return exits.successJSON({
         vendors,
-        couriers: [],
+        deliveryPartners: [],
       });
     } else {
       return exits.success({
         vendors,
-        couriers: [],
+        deliveryPartners: [],
       });
     }
   },

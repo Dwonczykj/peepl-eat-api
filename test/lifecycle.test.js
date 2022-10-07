@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /* eslint-disable no-console */
 var sails = require('sails');
 const dotenv = require('dotenv');//.load('./env'); // alias of .config()
@@ -18,8 +19,8 @@ async function createUsers() {
         phoneCountryCode: 1,
         name: "SERVICE 1",
         isSuperAdmin: false,
-        role: "courier",
-        courierRole: "deliveryManager",
+        role: "deliveryPartner",
+        deliveryPartnerRole: "deliveryManager",
         firebaseSessionToken: "DUMMY_FIREBASE_TOKEN",
       },
     ]);

@@ -43,7 +43,7 @@ module.exports = {
   },
 
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
 
     const message = {
       data: inputs.data,

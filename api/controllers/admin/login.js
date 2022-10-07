@@ -42,12 +42,12 @@ module.exports = {
     // });
 
     // if (!user) {
-    //   throw 'badCombo';
+    //   return exits.badCombo();
     // }
 
     // const isValidPassword = await bcrypt.compare(inputs.password, user.password);
     // if (!isValidPassword) {
-    //   throw 'badCombo';
+    //   return exits.badCombo();
     // }
 
     // // Update the session

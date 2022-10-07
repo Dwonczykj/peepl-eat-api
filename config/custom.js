@@ -20,7 +20,7 @@ module.exports.custom = {
   ***************************************************************************/
   baseUrl: 'https://vegi.itsaboutpeepl.com',
   internalEmailAddress: 'support@itsaboutpeepl.com',
-  internalPhoneNumber: envConfig['internalPhone'],
+  internalPhoneNumber: envConfig['internalPhone'], // For support requests
   buildNumber: 1,
   peeplWebhookAddress: 'https://vegi.itsaboutpeepl.com/api/v1/orders/peepl-pay-webhook',
   peeplPayRefundWebhookAddress: 'https://vegi.itsaboutpeepl.com/api/v1/orders/peepl-pay-refund-webhook',

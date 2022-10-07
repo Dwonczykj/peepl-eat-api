@@ -35,6 +35,10 @@ module.exports = {
     // }).finally(() => {
     //   return this.res.redirect('/admin/login');
     // });
+    
+    // All done.
+
+    return this.res.redirect('/admin/login');
   }
 
 

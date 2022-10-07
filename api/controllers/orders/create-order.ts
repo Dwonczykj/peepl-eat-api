@@ -1,5 +1,5 @@
 const moment = require('moment');
-import { ICourier } from '../../helpers/get-available-courier-from-pool';
+import { IDeliveryPartner } from '../../helpers/get-available-delivery-partner-from-pool';
 
 /* eslint-disable camelcase */
 declare var OrderItemOptionValue: any;
@@ -73,9 +73,9 @@ module.exports = {
       statusCode: 400,
       description: 'The fulfilment slot is invalid.'
     },
-    courierUnavailable: {
+    deliveryPartnerUnavailable: {
       statusCode: 400,
-      description: 'No courier available.'
+      description: 'No deliveryPartner available.'
     },
     allItemsUnavailable: {
       statusCode: 400,
@@ -123,9 +123,9 @@ module.exports = {
     const deliverBefore = moment(inputs.fulfilmentSlotTo, 'YYYYMMdd hh:mm:ss'); //moment("01:15:00 PM", "h:mm:ss A")
 
     if(isDelivery){
-      //TODO: Organise delivery with available courier
-      const availableCourier: ICourier = await sails.helpers.getAvailableCourierFromPool
-        .with({
+      //TODO: Organise delivery with available deliveryPartner
+      const availableDeliveryPartner: IDeliveryPartner =
+        await sails.helpers.getAvailableDeliveryPartnerFromPool.with({
           pickupFromVendor: vendor.id,
           deliverAfter: deliverAfter, //moment("01:15:00 PM", "h:mm:ss A")
           deliverBefore: deliverBefore, //moment("01:15:00 PM", "h:mm:ss A")
@@ -136,13 +136,12 @@ module.exports = {
 
           deliveryAddressLineOne: inputs.address.lineOne,
           deliveryAddressLineTwo: inputs.address.lineTwo,
-          deliveryAddressCity: '',
+          deliveryAddressCity: "",
           deliveryAddressPostCode: inputs.address.postCode,
-
         });
 
-      if (!availableCourier) {
-        return exits.invalidSlot('No courier available for requested fulfilment');
+      if (!availableDeliveryPartner) {
+        return exits.invalidSlot('No deliveryPartner available for requested fulfilment');
       }
     }
 

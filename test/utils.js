@@ -86,7 +86,18 @@ const callAuthActionWithCookie = async (cb, verbose=false) =>
     .then((response) => {
       expect(response.statusCode).to.equal(200);
       expect(Object.keys(response.headers)).to.deep.include("set-cookie");
-      expect(response.body).to.deep.equal({ data: true });
+      expect(response.body).to.deep.equal({
+        data: {
+          email: "test.service@example.com",
+          phoneNoCountry: 9993137777,
+          phoneCountryCode: 44,
+          name: "TEST_SERVICE",
+          isSuperAdmin: true,
+          role: "admin",
+          firebaseSessionToken: "DUMMY_FIREBASE_TOKEN",
+          secret: envConfig["test_secret"],
+        },
+      });
       const sessionCookie = response.headers["set-cookie"];
       if(verbose){
         console.log('SESSION COOKIE: "' + sessionCookie + '"');

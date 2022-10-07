@@ -35,7 +35,7 @@ module.exports = {
     });
 
     if (!user) {
-      // throw 'badCombo';
+      // return exits.badCombo();
       exits.success({ data: false });
     }
 

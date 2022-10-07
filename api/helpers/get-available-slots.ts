@@ -34,7 +34,7 @@ module.exports = {
   },
 
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
     // TODO: Consider timezones
     // TODO: Account for overnight opening hours
     // TODO: Limit to ordering 7 days in future

@@ -36,7 +36,7 @@
 
         <div class="">
           <label for="deliveryId">Courier Delivery ID</label>
-          <input type="text" class="form-control" id="deliveryId" @change="changeCourierDeliveryId($event.target.text)"
+          <input type="text" class="form-control" id="deliveryId" @change="changeDeliveryPartnerDeliveryId($event.target.text)"
             required>
         </div>
         <div v-if="!order.restaurantAccepted">

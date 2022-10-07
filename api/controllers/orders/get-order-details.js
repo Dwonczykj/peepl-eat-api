@@ -22,12 +22,12 @@ module.exports = {
   },
 
 
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
     var order = await Order.findOne(inputs.orderId)
     .populate('vendor');
 
     if(!order) {
-      throw 'notFound';
+      return exits.notFound();
     }
 
     // All done.

@@ -156,9 +156,10 @@ module.exports = {
       }
     }
 
-    const postcodeRegex = /^(((([A-Z][A-Z]{0,1})[0-9][A-Z0-9]{0,1}) {0,}[0-9])[A-Z]{2})$/;
-    if (fulfilmentMethod.methodType === 'delivery') {
+    if(fulfilmentMethod.methodType === 'delivery') {
       // Check if vendor delivers to postal district
+      const postcodeRegex = /^(((([A-Z][A-Z]{0,1})[0-9][A-Z0-9]{0,1}) {0,}[0-9])[A-Z]{2})$/;
+
       const m = postcodeRegex.exec(inputs.address.postCode);
       if (m !== null) {
         let postalDistrict = m[3]; // 3rd match group is the postal district

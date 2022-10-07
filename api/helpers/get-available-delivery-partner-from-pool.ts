@@ -6,11 +6,11 @@ declare var sails: any;
 
 const request_delivery_availability = !!sails.config.custom.requestDeliveryAvailability;
 
-const DELIVERY_AVAIL_PENDING = -1;
+const DELIVERY_AVAIL_PENDING:number = null;
 
 export class DeliveryAvailability {
   provisionalDeliveryId?: number;
-  courierId?: number;
+  deliveryPartnerId?: number;
   get status(): string {
     if(
       this.provisionalDeliveryId !== null &&
@@ -24,9 +24,9 @@ export class DeliveryAvailability {
     }
   }
 
-  constructor(courierId: number, provisionalDeliveryId?: number) {
+  constructor(deliveryPartnerId: number, provisionalDeliveryId?: number) {
     this.provisionalDeliveryId = provisionalDeliveryId;
-    this.courierId = courierId;
+    this.deliveryPartnerId = deliveryPartnerId;
   }
 }
 
@@ -110,9 +110,9 @@ export enum DeliveryConfirmation {
   failure = -1,
 }
 
-export interface ICourier {
-  courierName: string;
-  courierId: number;
+export interface IDeliveryPartner {
+  deliveryPartnerName: string;
+  deliveryPartnerId: number;
 
   requestProvisionalDeliveryAvailability: (
     inputs: DeliveryInformation,
@@ -158,9 +158,9 @@ class DummyAxiosClient {
   static create = (config:{}) => new DummyAxiosClient();
 }
 
-export class CoopCycleCourier implements ICourier {
-  courierName = 'CoopCycle';
-  courierId = 1;
+export class CoopCycleDeliveryPartner implements IDeliveryPartner {
+  deliveryPartnerName = 'CoopCycle';
+  deliveryPartnerId = 1;
   client?:any;
 
   // * These are the CoopCycle Endpoints, they could be moved to a config file?
@@ -207,7 +207,7 @@ export class CoopCycleCourier implements ICourier {
   ): Promise<DeliveryAvailability> {
     
     if (!request_delivery_availability){
-      return Promise.resolve(new DeliveryAvailability(this.courierId, 999))
+      return Promise.resolve(new DeliveryAvailability(this.deliveryPartnerId, 999));
     }
 
     var deliverBefore = moment.unix(inputs.deliverBefore).calendar();
@@ -234,11 +234,11 @@ export class CoopCycleCourier implements ICourier {
     // Send the delivery information to Coopcycle
     var response = await this.client.post(this._requestDeliveryAvailabilityUrl, requestBody)
     .catch((err) => {
-      sails.log.info('Error requesting delivery availability from ' + this.courierName + '.');
+      sails.log.info('Error requesting delivery availability from ' + this.deliveryPartnerName + '.');
       sails.log.warn(err);
     });
 
-    return new DeliveryAvailability(this.courierId, response.data.id);
+    return new DeliveryAvailability(this.deliveryPartnerId, response.data.id);
   }
 
   async requestDeliveryConfirmation(
@@ -252,7 +252,7 @@ export class CoopCycleCourier implements ICourier {
     // Send the delivery information to Coopcycle
     var response = await this.client.post(this._requestDeliveryAvailabilityUrl, requestBody)
       .catch((err) => {
-        sails.log.info('Error confirming the delivery from ' + this.courierName + '.');
+        sails.log.info('Error confirming the delivery from ' + this.deliveryPartnerName + '.');
         sails.log.warn(err);
         return DeliveryConfirmation.failure;
       });
@@ -277,7 +277,7 @@ export class CoopCycleCourier implements ICourier {
     // Send the delivery information to Coopcycle
     var response = await this.client.post(this._requestDeliveryCancellationUrl, requestBody)
       .catch((err) => {
-        sails.log.info('Error cancelling the delivery from ' + this.courierName + '.');
+        sails.log.info('Error cancelling the delivery from ' + this.deliveryPartnerName + '.');
         sails.log.warn(err);
         return RequestReceived.failed;
       });
@@ -311,11 +311,11 @@ export class CoopCycleCourier implements ICourier {
   }
 }
 
-export class AgileCourier implements ICourier {
-  courierName = 'Agile';
-  courierId = 2;
+export class AgileDeliveryPartner implements IDeliveryPartner {
+  deliveryPartnerName = 'Agile';
+  deliveryPartnerId = 2;
   client?:any; //Send Emails to Agile with delivery requests and information
-  //TODO: Expose a dashboard for Agile to login to and accept a delivery that is backed by an api that allows couriers to programatically accept delivery requests. each deliveryrequest needs to have the vegi order id for this to be doable
+  //TODO: Expose a dashboard for Agile to login to and accept a delivery that is backed by an api that allows deliveryPartners to programatically accept delivery requests. each deliveryrequest needs to have the vegi order id for this to be doable
 
   private _requestDeliveryAvailabilityEmailAddress = 'danny@agile.com'; //! Does not exist
   
@@ -328,14 +328,14 @@ export class AgileCourier implements ICourier {
   ): Promise<DeliveryAvailability> {
 
     if (!request_delivery_availability){
-      return Promise.resolve(new DeliveryAvailability(this.courierId, 999))
+      return Promise.resolve(new DeliveryAvailability(this.deliveryPartnerId, 999));
     }
 
     var deliverBefore = moment.unix(deliveryInformation.deliverBefore).calendar(); // TODO: Correct the formatting for this line to Today if today, 14:34 (16/08/2022 14:34 +00)
     var deliverAfter = moment.unix(deliveryInformation.deliverAfter).calendar();
 
     var requestBody = {
-      vegiOrderId: deliveryInformation.vegiOrderId, // * Needed for non-HTTP courier clients
+      vegiOrderId: deliveryInformation.vegiOrderId, // * Needed for non-HTTP deliveryPartner clients
       subject: 'vegi Delivery Request - #' + deliveryInformation.vegiOrderId,
       message: 'Please confirm delivery availability for the following delivery details',
       pickup: {
@@ -356,10 +356,10 @@ export class AgileCourier implements ICourier {
       }
     };
 
-    // Send the delivery information to Courier
+    // Send the delivery information to DeliveryPartner
     await sails.helpers.sendTemplateEmail
       .with({
-        template: 'email-request-courier-availability',
+        template: 'email-request-deliveryPartner-availability',
         templateData: {
           vegiOrderId: requestBody.vegiOrderId,
           pickup: requestBody.pickup,
@@ -369,12 +369,12 @@ export class AgileCourier implements ICourier {
         subject: requestBody.subject,
         layout: false,
       }).intercept('', (err) => {
-        sails.log.info('Error requesting delivery availability from ' + this.courierName + '.');
+        sails.log.info('Error requesting delivery availability from ' + this.deliveryPartnerName + '.');
         sails.log.warn(err);
       });
     
 
-    return new DeliveryAvailability(this.courierId, DELIVERY_AVAIL_PENDING);
+    return new DeliveryAvailability(this.deliveryPartnerId, DELIVERY_AVAIL_PENDING);
   }
 
   async requestDeliveryConfirmation(
@@ -387,7 +387,7 @@ export class AgileCourier implements ICourier {
     var deliverAfter = moment.unix(deliveryInformation.deliverAfter).calendar();
 
     var requestBody = {
-      vegiOrderId: deliveryInformation.vegiOrderId, // * Needed for non-HTTP courier clients
+      vegiOrderId: deliveryInformation.vegiOrderId, // * Needed for non-HTTP deliveryPartner clients
       subject: 'vegi Delivery Confirmation Request - #' + deliveryInformation.vegiOrderId,
       id: provisionalDeliveryId,
       message: 'Please confirm delivery for this delivery id',
@@ -409,10 +409,10 @@ export class AgileCourier implements ICourier {
       }
     };
 
-    // Send the delivery information to Courier
+    // Send the delivery information to DeliveryPartner
     await sails.helpers.sendTemplateEmail
       .with({
-        template: 'email-request-courier-confirmation',
+        template: 'email-request-deliveryPartner-confirmation',
         templateData: {
           vegiOrderId: requestBody.vegiOrderId,
           pickup: requestBody.pickup,
@@ -422,7 +422,7 @@ export class AgileCourier implements ICourier {
         subject: requestBody.subject,
         layout: false,
       }).intercept('', (err) => {
-        sails.log.info('Error requesting delivery availability from ' + this.courierName + '.');
+        sails.log.info('Error requesting delivery availability from ' + this.deliveryPartnerName + '.');
         sails.log.warn(err);
       });
 
@@ -440,7 +440,7 @@ export class AgileCourier implements ICourier {
     var deliverAfter = moment.unix(deliveryInformation.deliverAfter).calendar();
 
     var requestBody = {
-      vegiOrderId: deliveryInformation.vegiOrderId, // * Needed for non-HTTP courier clients
+      vegiOrderId: deliveryInformation.vegiOrderId, // * Needed for non-HTTP deliveryPartner clients
       subject: 'vegi Delivery Cancellation Request - #' + deliveryInformation.vegiOrderId,
       id: provisionalDeliveryId,
       message: 'Please cancel the delivery request for this delivery id',
@@ -462,10 +462,10 @@ export class AgileCourier implements ICourier {
       }
     };
 
-    // Send the delivery information to Courier
+    // Send the delivery information to DeliveryPartner
     await sails.helpers.sendTemplateEmail
       .with({
-        template: 'email-request-courier-cancellation',
+        template: 'email-request-deliveryPartner-cancellation',
         templateData: {
           vegiOrderId: requestBody.vegiOrderId,
           pickup: requestBody.pickup,
@@ -475,7 +475,7 @@ export class AgileCourier implements ICourier {
         subject: requestBody.subject,
         layout: false,
       }).intercept('', (err) => {
-        sails.log.info('Error requesting delivery availability from ' + this.courierName + '.');
+        sails.log.info('Error requesting delivery availability from ' + this.deliveryPartnerName + '.');
         sails.log.warn(err);
         return RequestReceived.failed;
       });
@@ -489,7 +489,7 @@ export class AgileCourier implements ICourier {
     var deliverAfter = moment.unix(deliveryInformation.deliverAfter).calendar();
 
     var requestBody = {
-      vegiOrderId: deliveryInformation.vegiOrderId, // * Needed for non-HTTP courier clients
+      vegiOrderId: deliveryInformation.vegiOrderId, // * Needed for non-HTTP deliveryPartner clients
       subject: 'vegi Delivery Cancellation Request - #' + deliveryInformation.vegiOrderId,
       id: provisionalDeliveryId,
       message: 'Please cancel the delivery request for this delivery id',
@@ -511,10 +511,10 @@ export class AgileCourier implements ICourier {
       }
     };
 
-    // Send the delivery information to Courier
+    // Send the delivery information to DeliveryPartner
     await sails.helpers.sendTemplateEmail
       .with({
-        template: 'email-request-courier-cancellation',
+        template: 'email-request-deliveryPartner-cancellation',
         templateData: {
           vegiOrderId: requestBody.vegiOrderId,
           pickup: requestBody.pickup,
@@ -524,7 +524,7 @@ export class AgileCourier implements ICourier {
         subject: requestBody.subject,
         layout: false,
       }).intercept('', (err) => {
-        sails.log.info('Error requesting delivery availability from ' + this.courierName + '.');
+        sails.log.info('Error requesting delivery availability from ' + this.deliveryPartnerName + '.');
         sails.log.warn(err);
         return RequestReceived.failed;
       });
@@ -533,16 +533,16 @@ export class AgileCourier implements ICourier {
   }
 }
 
-export const couriers = [
-    new CoopCycleCourier(),
-    new AgileCourier()
+export const deliveryPartners = [
+    new CoopCycleDeliveryPartner(),
+    new AgileDeliveryPartner()
   ];
 
 module.exports = {
 
-  couriers: [
-    new CoopCycleCourier(),
-    new AgileCourier()
+  deliveryPartners: [
+    new CoopCycleDeliveryPartner(),
+    new AgileDeliveryPartner()
   ],
 
 };
@@ -551,10 +551,10 @@ module.exports = {
 module.exports = {
 
 
-  friendlyName: 'Get available courier from pool',
+  friendlyName: 'Get available deliveryPartner from pool',
 
 
-  description: 'Get an available courier from the pool of couriers',
+  description: 'Get an available deliveryPartner from the pool of deliveryPartners',
 
 
   inputs: {
@@ -656,13 +656,13 @@ module.exports = {
       }
     };
 
-    const n = couriers.length;
-    var chosenCourier:ICourier = null;
+    const n = deliveryPartners.length;
+    var chosenDeliveryPartner:IDeliveryPartner = null;
     // for(var i = 0; i < n; i += 1) {
 
-      // const courier: ICourier = couriers[i];
-    const courier: ICourier = new AgileCourier();
-    const deliveryAvailability = await courier.requestProvisionalDeliveryAvailability(new DeliveryInformation(
+      // const deliveryPartner: IDeliveryPartner = deliveryPartners[i];
+    const deliveryPartner: IDeliveryPartner = new AgileDeliveryPartner();
+    const deliveryAvailability = await deliveryPartner.requestProvisionalDeliveryAvailability(new DeliveryInformation(
       deliverBefore,
       deliverAfter,
       vendor.pickupAddressLineOne,
@@ -680,12 +680,12 @@ module.exports = {
       inputs.vegiOrderId
     ));
     if(deliveryAvailability.status === 'accepted'){
-      chosenCourier = courier;
+      chosenDeliveryPartner = deliveryPartner;
         // break;
-    } else if(deliveryAvailability.status === 'pending' && chosenCourier === null) {
-      chosenCourier = courier;
+    } else if(deliveryAvailability.status === 'pending' && chosenDeliveryPartner === null) {
+      chosenDeliveryPartner = deliveryPartner;
     }
     // }
-    return chosenCourier;
+    return chosenDeliveryPartner;
   }
 };
