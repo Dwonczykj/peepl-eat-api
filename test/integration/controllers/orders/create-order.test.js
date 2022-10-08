@@ -20,6 +20,15 @@ function checkIfValidUUID(str) {
   return regexExp.test(str);
 }
 
+var fixtures = {};
+const fs = require("fs");
+
+_.each(fs.readdirSync(process.cwd() + "/test/fixtures/"), (file) => {
+  fixtures[file.replace(/\.js$/, "")] = require(process.cwd() +
+    "/test/fixtures/" +
+    file);
+});
+
 const CREATE_ORDER = {
   HTTP_TYPE: "post",
   ACTION_PATH: "orders",
@@ -107,72 +116,10 @@ const VIEW_ORDER = {
   HTTP_TYPE: "get",
   ACTION_PATH: "admin",
   ACTION_NAME: "view-order",
-  sendData:{
+  sendData: {
     orderId: 1, //fixture
   },
-  expectResponse: {
-    items: [
-      {
-        id: 1,
-        options: {
-          1: 1,
-          2: 5,
-          3: 10,
-        }
-      },
-      {
-        id: 2,
-        options: {
-          1: 1,
-          2: 5,
-          3: 10,
-        },
-      },
-      {
-        id: 3,
-        options: {
-          1: 1,
-          2: 5,
-          3: 10,
-        },
-      },
-    ],
-    total: 1500,
-    tipAmount: 0,
-    marketingOptIn: false,
-    vendor: "1",
-    customerWalletAddress: "0x41190Dd82D43129C26955063fa2854350e14554B",
-    paidDateTime: null,
-    refundDateTime: null,
-    address: {
-      name: "Test Runner 1",
-      email: "adam@itsaboutpeepl.com",
-      phoneNumber: "07905532512",
-      lineOne: "11 Feck Street",
-      lineTwo: "",
-      postCode: "L1 0AB",
-      deliveryInstructions: "Leave it behind the bin",
-    },
-    publicId: "",
-    fulfilmentMethod: 1,
-    fulfilmentSlotFrom: "2022-10-12 11:00:00",
-    fulfilmentSlotTo: "2022-10-12 12:00:00",
-    discount: 1,
-    paymentStatus: "unpaid",
-    paymentIntentId: "",
-    deliveryId: "",
-    deliveryPartnerAccepted: false, //TODO Check can update
-    deliveryPartnerConfirmed: false, //TODO Check can update,
-    rewardsIssued: 0, //TODO Check can update,
-    sentToDeliveryPartner: false, //TODO Check can update,
-    completedFlag: false, //TODO Check can update ["", "completed", "cancelled", "refunded", "void"]
-    completedOrderFeedback: null, //TODO: Check can add feedback after order
-    deliveryPunctuality: null, //TODO check can be set after and has to be an INT between 0 and 5 inclusive
-    orderCondition: null, // TODO check can be set after and has to be an INT between 0 and 5 inclusive
-    unfulfilledItems: [], //Check using partial orders
-    deliveryPartner: null, // TODO Check can set after order creation when the courier is subsequently confirmed
-    parentOrder: null,
-  },
+  expectResponse: fixtures.orders.where((order) => order.id === 1)[0],
 };
 const GET_ORDER = {
   HTTP_TYPE: "get",
@@ -181,69 +128,7 @@ const GET_ORDER = {
   sendData: {
     orderId: 1,
   },
-  expectResponse: {
-    items: [
-      {
-        id: 1,
-        options: {
-          1: 1,
-          2: 5,
-          3: 10,
-        },
-      },
-      {
-        id: 2,
-        options: {
-          1: 1,
-          2: 5,
-          3: 10,
-        },
-      },
-      {
-        id: 3,
-        options: {
-          1: 1,
-          2: 5,
-          3: 10,
-        },
-      },
-    ],
-    total: 1500,
-    tipAmount: 0,
-    marketingOptIn: false,
-    vendor: "1",
-    customerWalletAddress: "0x41190Dd82D43129C26955063fa2854350e14554B",
-    paidDateTime: null,
-    refundDateTime: null,
-    address: {
-      name: "Test Runner 1",
-      email: "adam@itsaboutpeepl.com",
-      phoneNumber: "07905532512",
-      lineOne: "11 Feck Street",
-      lineTwo: "",
-      postCode: "L1 0AB",
-      deliveryInstructions: "Leave it behind the bin",
-    },
-    publicId: "",
-    fulfilmentMethod: 1,
-    fulfilmentSlotFrom: "2022-10-12 11:00:00",
-    fulfilmentSlotTo: "2022-10-12 12:00:00",
-    discount: 1,
-    paymentStatus: "unpaid",
-    paymentIntentId: "",
-    deliveryId: "",
-    deliveryPartnerAccepted: false, //TODO Check can update
-    deliveryPartnerConfirmed: false, //TODO Check can update,
-    rewardsIssued: 0, //TODO Check can update,
-    sentToDeliveryPartner: false, //TODO Check can update,
-    completedFlag: false, //TODO Check can update ["", "completed", "cancelled", "refunded", "void"]
-    completedOrderFeedback: null, //TODO: Check can add feedback after order
-    deliveryPunctuality: null, //TODO check can be set after and has to be an INT between 0 and 5 inclusive
-    orderCondition: null, // TODO check can be set after and has to be an INT between 0 and 5 inclusive
-    unfulfilledItems: [], //Check using partial orders
-    deliveryPartner: null, // TODO Check can set after order creation when the courier is subsequently confirmed
-    parentOrder: null,
-  },
+  expectResponse: fixtures.orders.where((order) => order.id === 1)[0],
 };
 const GET_ORDER_STATUS = {
   HTTP_TYPE: "get",
@@ -256,6 +141,79 @@ const GET_ORDER_STATUS = {
     paymentStatus: "unpaid",
     restaurantAcceptanceStatus: "pending"
   }
+};
+const GET_ORDER_BY_WALLETADDRESS = {
+  HTTP_TYPE: "get",
+  ACTION_PATH: "orders",
+  ACTION_NAME: "ongoing-orders-by-wallet",
+  sendData: {
+    walletAddress: "0x41190Dd82D43129C26955063fa2854350e14554B",
+  },
+  expectResponse: [
+    {
+      items: [
+        {
+          id: 1,
+          options: {
+            1: 1,
+            2: 5,
+            3: 10,
+          },
+        },
+        {
+          id: 2,
+          options: {
+            1: 1,
+            2: 5,
+            3: 10,
+          },
+        },
+        {
+          id: 3,
+          options: {
+            1: 1,
+            2: 5,
+            3: 10,
+          },
+        },
+      ],
+      total: 1500,
+      tipAmount: 0,
+      marketingOptIn: false,
+      vendor: "1",
+      customerWalletAddress: "0x41190Dd82D43129C26955063fa2854350e14554B",
+      paidDateTime: null,
+      refundDateTime: null,
+      address: {
+        name: "Test Runner 1",
+        email: "adam@itsaboutpeepl.com",
+        phoneNumber: "07905532512",
+        lineOne: "11 Feck Street",
+        lineTwo: "",
+        postCode: "L1 0AB",
+        deliveryInstructions: "Leave it behind the bin",
+      },
+      publicId: "",
+      fulfilmentMethod: 1,
+      fulfilmentSlotFrom: "2022-10-12 11:00:00",
+      fulfilmentSlotTo: "2022-10-12 12:00:00",
+      discount: 1, 
+      paymentStatus: "unpaid", 
+      paymentIntentId: "",
+      deliveryId: "",
+      deliveryPartnerAccepted: false, 
+      deliveryPartnerConfirmed: false, 
+      rewardsIssued: 0, 
+      sentToDeliveryPartner: false, 
+      completedFlag: false, 
+      completedOrderFeedback: null, 
+      deliveryPunctuality: null, 
+      orderCondition: null, 
+      unfulfilledItems: [], //Check using partial orders
+      deliveryPartner: null, 
+      parentOrder: null,
+    },
+  ],
 };
 const MARK_ORDER_AS_PAID = {
   HTTP_TYPE: "post",
@@ -280,6 +238,125 @@ const MARK_ORDER_AS_PAYMENT_FAILED = {
   expectResponse: {
     
   }
+};
+const VIEW_ALL_ORDERS_ACCEPTED = {
+  HTTP_TYPE: "get",
+  ACTION_PATH: "admin",
+  ACTION_NAME: "view-all-orders",
+  sendData: {
+    acceptanceStatus: "accepted", //['accepted', 'rejected', 'pending']
+    timePeriod: "all", //['upcoming', 'past', 'all']
+  },
+  expectResponse: fixtures.orders.where(order => order.id===2)[0],
+};
+const VIEW_ALL_ORDERS_REJECTED = {
+  HTTP_TYPE: "get",
+  ACTION_PATH: "admin",
+  ACTION_NAME: "view-all-orders",
+  sendData: {
+    acceptanceStatus: "rejected", //['accepted', 'rejected', 'pending']
+    timePeriod: "all", //['upcoming', 'past', 'all']
+  },
+  expectResponse: fixtures.orders.where((order) => order.id === 3)[0],
+};
+const VIEW_ALL_ORDERS_PENDING = {
+  HTTP_TYPE: "get",
+  ACTION_PATH: "admin",
+  ACTION_NAME: "view-all-orders",
+  sendData: {
+    acceptanceStatus: "pending", //['accepted', 'rejected', 'pending']
+    timePeriod: "all", //['upcoming', 'past', 'all']
+  },
+  expectResponse: fixtures.orders.where((order) => order.id === 1)[0], //TODO: call to create or setup in fixtures
+};
+const VIEW_ALL_ORDERS_DEFAULT = {
+  HTTP_TYPE: "get",
+  ACTION_PATH: "admin",
+  ACTION_NAME: "view-all-orders",
+  sendData: {
+    timePeriod: "all", //['upcoming', 'past', 'all']
+  },
+  expectResponse: fixtures.orders,
+};
+const VIEW_ALL_ORDERS_UPCOMING = {
+  HTTP_TYPE: "get",
+  ACTION_PATH: "admin",
+  ACTION_NAME: "view-all-orders",
+  sendData: {
+    timePeriod: "upcoming", //['upcoming', 'past', 'all']
+  },
+  expectResponse: fixtures.orders.where((order) => {
+    return moment.utc(order.fulfilmentSlotFrom).isAfter(moment.utc());
+  }),
+};
+const VIEW_ALL_ORDERS_PAST = {
+  HTTP_TYPE: "get",
+  ACTION_PATH: "admin",
+  ACTION_NAME: "view-all-orders",
+  sendData: {
+    timePeriod: "past", //['upcoming', 'past', 'all']
+  },
+  expectResponse: fixtures.orders.where((order) => {
+    return moment.utc(order.fulfilmentSlotFrom).isBefore(moment.utc());
+  }),
+};
+const VIEW_ALL_ORDERS_NON_ADMIN = {
+  //TODO: Login / create another a secret account that does not have admin priveledges.
+  HTTP_TYPE: "get",
+  ACTION_PATH: "admin",
+  ACTION_NAME: "view-all-orders",
+  sendData: {
+    //TODO: Implement each of the below and add multiple orders for each in fixtures
+    acceptanceStatus: "accepted", //['accepted', 'rejected', 'pending']
+    timePeriod: "all", //['upcoming', 'past', 'all']
+  },
+  expectResponse: null, //TODO: call to create or setup in fixtures
+};
+const VIEW_APPROVE_ORDER = {
+  HTTP_TYPE: "get",
+  ACTION_PATH: "admin",
+  ACTION_NAME: "view-approve-order",
+  sendData: {
+    orderId: 1,
+  },
+  expectResponse: VIEW_ORDER.expectResponse,
+};
+
+const APPROVE_OR_DECLINE_ORDER_ACCEPT = {
+  HTTP_TYPE: "post",
+  ACTION_PATH: "admin",
+  ACTION_NAME: "approve-or-decline-order",
+  sendData: {
+    orderId: 1,
+    orderFulfilled: "accept", //['accept', 'reject', 'partial'],
+    retainItems: [],
+    removeItems: [],
+  },
+  expectResponse: {},
+};
+const APPROVE_OR_DECLINE_ORDER_REJECT = {
+  HTTP_TYPE: "post",
+  ACTION_PATH: "admin",
+  ACTION_NAME: "approve-or-decline-order",
+  sendData: {
+    orderId: 1,
+    orderFulfilled: "reject", //['accept', 'reject', 'partial'],
+    retainItems: [],
+    removeItems: [],
+  },
+  expectResponse: {},
+};
+const APPROVE_OR_DECLINE_ORDER_PARTIAL = {
+  HTTP_TYPE: "post",
+  ACTION_PATH: "admin",
+  ACTION_NAME: "approve-or-decline-order",
+  sendData: {
+    orderId: 1,
+    orderFulfilled: "partial", //['accept', 'reject', 'partial'],
+    retainItems: [13],
+    removeItems: [14],
+  },
+  expectResponse: {},
 };
 
 
@@ -340,198 +417,6 @@ const MARK_ORDER_AS_REFUNDED_FAILED = {
 //TODO: do couriers/cancel-delivery
 //TODO: do couriers/view-delivery
 
-const GET_ORDER_BY_WALLETADDRESS = {
-  HTTP_TYPE: "get",
-  ACTION_PATH: "orders",
-  ACTION_NAME: "ongoing-orders-by-wallet",
-  sendData: {
-    walletAddress: "0x41190Dd82D43129C26955063fa2854350e14554B"
-  },
-  expectResponse: [
-    {
-      items: [
-        {
-          id: 1,
-          options: {
-            1: 1,
-            2: 5,
-            3: 10,
-          },
-        },
-        {
-          id: 2,
-          options: {
-            1: 1,
-            2: 5,
-            3: 10,
-          },
-        },
-        {
-          id: 3,
-          options: {
-            1: 1,
-            2: 5,
-            3: 10,
-          },
-        },
-      ],
-      total: 1500,
-      tipAmount: 0,
-      marketingOptIn: false,
-      vendor: "1",
-      customerWalletAddress: "0x41190Dd82D43129C26955063fa2854350e14554B",
-      paidDateTime: null,
-      refundDateTime: null,
-      address: {
-        name: "Test Runner 1",
-        email: "adam@itsaboutpeepl.com",
-        phoneNumber: "07905532512",
-        lineOne: "11 Feck Street",
-        lineTwo: "",
-        postCode: "L1 0AB",
-        deliveryInstructions: "Leave it behind the bin",
-      },
-      publicId: "",
-      fulfilmentMethod: 1,
-      fulfilmentSlotFrom: "2022-10-12 11:00:00",
-      fulfilmentSlotTo: "2022-10-12 12:00:00",
-      discount: 1, //TODO: Check what the id of this should be for DELI10
-      paymentStatus: "unpaid", //TODO: CHeck can update to paid|failed after object creation
-      paymentIntentId: "",
-      deliveryId: "",
-      deliveryPartnerAccepted: false, //TODO Check can update
-      deliveryPartnerConfirmed: false, //TODO Check can update,
-      rewardsIssued: 0, //TODO Check can update,
-      sentToDeliveryPartner: false, //TODO Check can update,
-      completedFlag: false, //TODO Check can update ["", "completed", "cancelled", "refunded", "void"]
-      completedOrderFeedback: null, //TODO: Check can add feedback after order
-      deliveryPunctuality: null, //TODO check can be set after and has to be an INT between 0 and 5 inclusive
-      orderCondition: null, // TODO check can be set after and has to be an INT between 0 and 5 inclusive
-      unfulfilledItems: [], //Check using partial orders
-      deliveryPartner: null, // TODO Check can set after order creation when the courier is subsequently confirmed
-      parentOrder: null,
-    },
-  ]
-};
-
-const VIEW_ALL_ORDERS_ACCEPTED = {
-  HTTP_TYPE: "get",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "view-all-orders",
-  sendData: {
-    acceptanceStatus: 'accepted', //['accepted', 'rejected', 'pending']
-    timePeriod: 'all', //['upcoming', 'past', 'all']
-  },
-  expectResponse: null, //TODO: call to create or setup in fixtures
-};
-const VIEW_ALL_ORDERS_REJECTED = {
-  HTTP_TYPE: "get",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "view-all-orders",
-  sendData: {
-    acceptanceStatus: "rejected", //['accepted', 'rejected', 'pending']
-    timePeriod: "all", //['upcoming', 'past', 'all']
-  },
-  expectResponse: null, //TODO: call to create or setup in fixtures
-};
-const VIEW_ALL_ORDERS_PENDING = {
-  HTTP_TYPE: "get",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "view-all-orders",
-  sendData: {
-    acceptanceStatus: "pending", //['accepted', 'rejected', 'pending']
-    timePeriod: "all", //['upcoming', 'past', 'all']
-  },
-  expectResponse: null, //TODO: call to create or setup in fixtures
-};
-const VIEW_ALL_ORDERS_DEFAULT = {
-  HTTP_TYPE: "get",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "view-all-orders",
-  sendData: {
-    timePeriod: 'all', //['upcoming', 'past', 'all']
-  },
-  expectResponse: null, //TODO: call to create or setup in fixtures
-};
-const VIEW_ALL_ORDERS_UPCOMING = {
-  HTTP_TYPE: "get",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "view-all-orders",
-  sendData: {
-    timePeriod: 'upcoming', //['upcoming', 'past', 'all']
-  },
-  expectResponse: null, //TODO: call to create or setup in fixtures
-};
-const VIEW_ALL_ORDERS_PAST = {
-  HTTP_TYPE: "get",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "view-all-orders",
-  sendData: {
-    timePeriod: 'past', //['upcoming', 'past', 'all']
-  },
-  expectResponse: null, //TODO: call to create or setup in fixtures
-};
-const VIEW_ALL_ORDERS_NON_ADMIN = {
-  HTTP_TYPE: "get",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "view-all-orders",
-  sendData: {
-    //TODO: Implement each of the below and add multiple orders for each in fixtures
-    acceptanceStatus: 'accepted', //['accepted', 'rejected', 'pending']
-    timePeriod: 'all', //['upcoming', 'past', 'all']
-  },
-  expectResponse: null, //TODO: call to create or setup in fixtures
-};
-const VIEW_APPROVE_ORDER = {
-  HTTP_TYPE: "get",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "view-approve-order",
-  sendData: {
-    orderId: 1,
-  },
-  expectResponse: VIEW_ORDER.expectResponse
-};
-
-const APPROVE_OR_DECLINE_ORDER_ACCEPT = {
-  HTTP_TYPE: "post",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "approve-or-decline-order",
-  sendData: {
-    orderId: 1,
-    orderFulfilled: 'accept', //['accept', 'reject', 'partial'],
-    retainItems: [],
-    removeItems: [],
-  },
-  expectResponse: {}
-};
-const APPROVE_OR_DECLINE_ORDER_REJECT = {
-  HTTP_TYPE: "post",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "approve-or-decline-order",
-  sendData: {
-    orderId: 1,
-    orderFulfilled: 'reject', //['accept', 'reject', 'partial'],
-    retainItems: [],
-    removeItems: [],
-  },
-  expectResponse: {}
-};
-const APPROVE_OR_DECLINE_ORDER_PARTIAL = {
-  HTTP_TYPE: "post",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "approve-or-decline-order",
-  sendData: {
-    orderId: 1,
-    orderFulfilled: 'partial', //['accept', 'reject', 'partial'],
-    retainItems: [
-      13
-    ],
-    removeItems: [
-      14
-    ],
-  },
-  expectResponse: {}
-};
 
 const CUSTOMER_RECEIVED_ORDER_GOOD = {
   HTTP_TYPE: "post",
@@ -793,9 +678,15 @@ class HttpAuthTestSender extends HttpTestSender {
     });
   }
 
-  async makeAuthCallWith(updatedPostDataWith, updatedPostDataWithOutKeys = []) {
-    return callAuthActionWithCookie((cookie) =>
-      this.makeCallWith(cookie)(updatedPostDataWith, updatedPostDataWithOutKeys)
+  async makeAuthCallWith(updatedPostDataWith, updatedPostDataWithOutKeys = [], otherLoginDetails = {}) {
+    return callAuthActionWithCookie(
+      (cookie) =>
+        this.makeCallWith(cookie)(
+          updatedPostDataWith,
+          updatedPostDataWithOutKeys
+        ),
+      false,
+      otherLoginDetails || null
     );
   }
 }
@@ -890,8 +781,25 @@ describe(`Order Model Integration Tests`, () => {
       }
     });
   });
+
+  describe(`${GET_ORDER.ACTION_NAME}() successfully gets order with id 1`, () => {
+    it("Can GET Orders by wallet address", async () => {
+      try {
+        const hats = HttpAuthTestSender(GET_ORDER);
+        const response = await hats.makeAuthCallWith(
+          {},
+          []
+        );
+        expect(response.statusCode).to.equal(200);
+        hats.expectedResponse.checkResponse(response.body);
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+  });
   describe(`${GET_ORDER_BY_WALLETADDRESS.ACTION_NAME}() successfully gets orders for walletaddress`, () => {
-    it("Can Orders by wallet address", async () => {
+    it("Can GET Orders by wallet address", async () => {
       try {
         const parentOrder = await HttpAuthTestSender(
           CREATE_ORDER
@@ -948,7 +856,7 @@ describe(`Order Model Integration Tests`, () => {
         throw errs;
       }
     });
-    it("flags order as payment failed", async () => {
+    it("can flag order as payment failed", async () => {
       try {
         const parentOrder = await HttpAuthTestSender(
           CREATE_ORDER
@@ -995,8 +903,127 @@ describe(`Order Model Integration Tests`, () => {
       }
     });
   });
+  describe(`${VIEW_ALL_ORDERS_ACCEPTED.ACTION_NAME}()`, () => {
+    it("successfully gets all accepted orders", async () => {
+      try {
+        const hats = HttpAuthTestSender(VIEW_ALL_ORDERS_ACCEPTED);
+        const response = await hats.makeAuthCallWith({}, []);
 
-  describe(`${UPDATE_ORDER.ACTION_NAME}() successfully upserts a replacement order with udpated items`, () => {
+        expect(response.statusCode).to.equal(200);
+        hats.expectedResponse.checkResponse(response.body);
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+  });
+  describe(`${VIEW_ALL_ORDERS_REJECTED.ACTION_NAME}()`, () => {
+    it("successfully gets all rejected orders", async () => {
+      try {
+        const hats = HttpAuthTestSender(VIEW_ALL_ORDERS_REJECTED);
+        const response = await hats.makeAuthCallWith({}, []);
+
+        expect(response.statusCode).to.equal(200);
+        hats.expectedResponse.checkResponse(response.body);
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+  });
+  describe(`${VIEW_ALL_ORDERS_PENDING.ACTION_NAME}()`, () => {
+    it("successfully gets all pending orders", async () => {
+      try {
+        const hats = HttpAuthTestSender(VIEW_ALL_ORDERS_PENDING);
+        const response = await hats.makeAuthCallWith({}, []);
+
+        expect(response.statusCode).to.equal(200);
+        hats.expectedResponse.checkResponse(response.body);
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+  });
+  describe(`${VIEW_ALL_ORDERS_DEFAULT.ACTION_NAME}()`, () => {
+    it("successfully gets all orders with no status parameter set", async () => {
+      try {
+        const hats = HttpAuthTestSender(VIEW_ALL_ORDERS_DEFAULT);
+        const response = await hats.makeAuthCallWith({}, []);
+
+        expect(response.statusCode).to.equal(200);
+        hats.expectedResponse.checkResponse(response.body);
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+  });
+  describe(`${VIEW_ALL_ORDERS_UPCOMING.ACTION_NAME}()`, () => {
+    it("successfully gets all upcoming orders with no status parameter set", async () => {
+      try {
+        const hats = HttpAuthTestSender(VIEW_ALL_ORDERS_UPCOMING);
+        const response = await hats.makeAuthCallWith({}, []);
+
+        expect(response.statusCode).to.equal(200);
+        hats.expectedResponse.checkResponse(response.body);
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+  });
+  describe(`${VIEW_ALL_ORDERS_PAST.ACTION_NAME}()`, () => {
+    it("successfully gets all past orders with no status parameter set", async () => {
+      try {
+        const hats = HttpAuthTestSender(VIEW_ALL_ORDERS_PAST);
+        const response = await hats.makeAuthCallWith({}, []);
+
+        expect(response.statusCode).to.equal(200);
+        hats.expectedResponse.checkResponse(response.body);
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+  });
+  describe(`${VIEW_ALL_ORDERS_NON_ADMIN.ACTION_NAME}()`, () => {
+    it("successfully gets all orders when logged in as admin", async () => {
+      try {
+        const hats = HttpAuthTestSender(VIEW_ALL_ORDERS_NON_ADMIN);
+        const response = await hats.makeAuthCallWith({}, []);
+
+        expect(response.statusCode).to.equal(200);
+        hats.expectedResponse.checkResponse(response.body);
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+    it("fails to get any orders when logged in as non-admin", async () => {
+      try {
+        const hats = HttpAuthTestSender(VIEW_ALL_ORDERS_NON_ADMIN);
+        const response = await hats.makeAuthCallWith({}, [], {
+          email: "test_user.service@example.com",
+          phoneNoCountry: 9991137777,
+          phoneCountryCode: 1,
+          name: "TEST_USER",
+          isSuperAdmin: false,
+          role: "vendor",
+          vendorRole: "inventoryManager",
+          firebaseSessionToken: "DUMMY_FIREBASE_TOKEN",
+          secret: "TEST_USER_SECRET", //TODO: Create one
+        });
+
+        expect(response.statusCode).to.equal(401);
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+  });
+
+  describe(`${UPDATE_ORDER.ACTION_NAME}() successfully upserts a replacement order with updated items`, () => {
     it("Can Set ParentOrder for Create-order for child order in refunds chain / after updated items by consumer", async () => {
       try {
         const parentOrder = await HttpAuthTestSender(
