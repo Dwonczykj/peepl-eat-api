@@ -106,7 +106,7 @@ node_modules
 
 .tmp
 .assets_babel
-.ts_cache
+.tscache
 *.code-workspace
 
 ################################################

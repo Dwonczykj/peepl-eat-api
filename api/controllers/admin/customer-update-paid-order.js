@@ -7,6 +7,33 @@ const OrderTypeEnum = {
   vegiPays: 'vegiPays',
 };
 
+class MockPeeplPayPricingAPI {
+  async getAmountInCurrency({
+    amount=0,
+    fromCurrency= "",
+    toCurrency= "",
+  }){
+    if (fromCurrency === "GBP") {
+      if (toCurrency === "PPL") {
+        return amount * (sails.config.custom.PPLTokenValueInPence / 100.0);
+      } else if (toCurrency === 'GBPx'){
+        return amount * 100.0;
+      }
+    } else if (fromCurrency === "PPL") {
+      if (toCurrency === "GBP") {
+        return amount / (sails.config.custom.PPLTokenValueInPence / 100.0);
+      }
+    } else if (fromCurrency === "GBPX") {
+      if(toCurrency === "GBP"){
+        return amount * 100;
+      }
+    }
+    throw new Error(`MockPeeplPayPricingAPI cant convert from ${fromCurrency} to ${toCurrency}`);
+  }
+}
+
+const peeplPay = MockPeeplPayPricingAPI();
+
 Object.freeze(OrderTypeEnum);
 
 module.exports = {
