@@ -1,9 +1,6 @@
 // test/integration/controllers/UserController.test.js
 var request = require('supertest');
-const assert = require('assert');
-const dotenv = require('dotenv');//.load('./env'); // alias of .config()
-// const envConfig = dotenv.load().parsed;
-const envConfig = dotenv.config('./env').parsed;
+const { envConfig } = require('../../utils');
 
 describe('Login Controllers', () => {
 

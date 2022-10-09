@@ -3,7 +3,7 @@
 const { expect } = require("chai");
 const request = require('supertest');
 const dotenv = require('dotenv');
-const envConfig = dotenv.config('./env').parsed;
+const envConfig = dotenv.config('./test/env').parsed;
 
 const login = async function (verbose=false) {
   try {
@@ -113,4 +113,5 @@ module.exports = {
   logout,
   logoutCbLogin,
   callAuthActionWithCookie,
+  envConfig,
 };

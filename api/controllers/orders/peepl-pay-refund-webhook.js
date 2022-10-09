@@ -33,11 +33,13 @@ module.exports = {
     var unixtime = Date.now();
 
     // Update order with payment ID and time
-    await Order.updateOne({ paymentIntentId: inputs.publicId })
-      .set({
-        completedFlag: 'refunded',
-        refundDateTime: unixtime
-      });
+    if(refundSucceeded){
+      await Order.updateOne({ paymentIntentId: inputs.publicId })
+        .set({
+          completedFlag: 'refunded',
+          refundDateTime: unixtime
+        });
+    }
 
     var order = await Order.findOne({
       paymentIntentId: inputs.publicId,
@@ -48,16 +50,22 @@ module.exports = {
       '£' + (amount / 100.0).toFixed(2);
     };
 
+    var refundStr = refundSucceeded ? 'success' : 'failure';
+    var refundWorked = refundSucceeded ? 'has been successfully refunded' : 'failed to be refunded';
     await sails.helpers.sendSmsNotification.with({
       to: order.deliveryPhoneNumber,
-      body: 'Your vegi order: ' + order.publicId + ' has been rufunded for ' + formulateMoney(order.total)
+      body: 'Your vegi order: ' + order.publicId + ` ${refundWorked} for ` + formulateMoney(order.total)
     });
     await sails.helpers.sendSmsNotification.with({
       to: order.vendor.phoneNumber,
-      body: 'Refund complete for vegi order: ' + order.publicId + '. Order has been rufunded to customer for ' + formulateMoney(order.total)
+      body:
+        "Refund complete for vegi order: " +
+        order.publicId +
+        ". Order " +
+        refundWorked +
+        " to customer for " +
+        formulateMoney(order.total),
     });
-    var refundStr = refundSucceeded ? 'success' : 'failure';
-    var refundWorked = refundSucceeded ? 'has been successfully refunded' : 'failed to be refunded';
     await sails.helpers.raiseVegiSupportIssue.with({
       orderId: order.publicId,
       title: 'order_refund_' + refundStr,

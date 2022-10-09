@@ -1,6 +1,4 @@
-const dotenv = require("dotenv"); //.load('./env'); // alias of .config()
-// const envConfig = dotenv.load().parsed;
-const envConfig = dotenv.config("./env").parsed;
+const { envConfig } = require("../../utils");
 
 module.exports = [
   {
@@ -21,7 +19,69 @@ module.exports = [
     isSuperAdmin: true,
     role: "admin",
     firebaseSessionToken: "DUMMY_FIREBASE_TOKEN",
-    secret: envConfig["test_secret"],
+    secret: envConfig["test_TEST_SERVICE_secret"],
+  },
+  {
+    email: "test_user.service@example.com",
+    phoneNoCountry: 9991137777,
+    phoneCountryCode: 1,
+    name: "TEST_USER",
+    isSuperAdmin: false,
+    role: "consumer",
+    vendor: null,
+    vendorRole: "inventoryManager",
+    firebaseSessionToken: "DUMMY_FIREBASE_TOKEN",
+    secret: envConfig["test_TEST_USER_secret"],
+  },
+  {
+    email: "test_vendor.service@example.com",
+    phoneNoCountry: 9991135555,
+    phoneCountryCode: 1,
+    name: "TEST_VENDOR",
+    isSuperAdmin: false,
+    role: "vendor",
+    vendor: 1, //delifonseca
+    vendorRole: "inventoryManager",
+    firebaseSessionToken: "DUMMY_FIREBASE_TOKEN",
+    secret: envConfig["test_TEST_VENDOR_secret"],
+  },
+  {
+    email: "test_vendor_sales.service@example.com",
+    phoneNoCountry: 9991135555,
+    phoneCountryCode: 1,
+    name: "TEST_VENDOR",
+    isSuperAdmin: false,
+    role: "vendor",
+    vendor: 1, //delifonseca
+    vendorRole: "salesManager",
+    firebaseSessionToken: "DUMMY_FIREBASE_TOKEN",
+  },
+  {
+    email: "test_deliveryPartner.service@example.com",
+    phoneNoCountry: 9991134455,
+    phoneCountryCode: 1,
+    name: "TEST_DELIVERY_PARTNER",
+    isSuperAdmin: false,
+    role: "deliveryPartner",
+    deliveryPartner: 1, //AGILE
+    deliveryPartnerRole: "deliveryManager",
+    vendor: null,
+    vendorRole: "none",
+    firebaseSessionToken: "DUMMY_FIREBASE_TOKEN",
+    secret: envConfig["test_TEST_DELIVERY_PARTNER_secret"],
+  },
+  {
+    email: "test_delivery_rider.service@example.com",
+    phoneNoCountry: 9991132255,
+    phoneCountryCode: 44,
+    name: "TEST_DELIVERY_RIDER",
+    isSuperAdmin: false,
+    role: "deliveryPartner",
+    deliveryPartner: 1, //AGILE
+    deliveryPartnerRole: "rider",
+    vendor: null,
+    vendorRole: "none",
+    firebaseSessionToken: "DUMMY_FIREBASE_TOKEN",
   },
   {
     email: "joey@vegiapp.co.uk",
@@ -36,5 +96,4 @@ module.exports = [
     role: "admin",
     firebaseSessionToken: "DUMMY_FIREBASE_TOKEN",
   },
-  
 ];

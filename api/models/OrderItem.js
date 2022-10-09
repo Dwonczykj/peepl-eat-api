@@ -21,6 +21,7 @@ module.exports = {
       type: 'string',
       required: false,
       defaultsTo: '',
+      description: 'Used to track the original order id of the parent order when an item is flagged as unfulfilled on an order, it is not removed from the order, it is just flagged as unfulfilled for tracking purposes. '
     },
 
 

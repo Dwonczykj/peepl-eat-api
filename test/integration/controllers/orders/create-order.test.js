@@ -2,12 +2,12 @@
 /* eslint-disable no-undef */
 // test/integration/controllers/admin/create-product.test.js
 const { assert, expect } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
-var supertest = require("supertest");
+// var supertest = require("supertest");
 const _ = require('lodash');
-const { callAuthActionWithCookie } = require("../../../utils");
 // var util = require("util");
 const moment = require("moment/moment");
 require("ts-node/register");
+const { HttpAuthTestSender, ExpectResponse } = require('../../../httpTestSender');
 
 // const { v4: uuidv4 } = require('uuid');
 /* Check if string is valid UUID */
@@ -20,6 +20,58 @@ function checkIfValidUUID(str) {
   return regexExp.test(str);
 }
 
+class ExpectResponseOrder extends ExpectResponse {
+  constructor({
+    HTTP_TYPE = "get",
+    ACTION_PATH = "",
+    ACTION_NAME = "",
+    sendData = {},
+    expectResponse = {},
+  }) {
+    super({
+      HTTP_TYPE,
+      ACTION_PATH,
+      ACTION_NAME,
+      sendData,
+      expectResponse,
+    });
+  }
+
+  customChecks({ responseBody, expectedResponse }) {
+    expect(responseBody.orderedDateTime).closeTo(
+      expectedResponse.orderedDateTime,
+      100,
+      "OrderedDateTime should be within 100s of test."
+    );
+    // ~ https://devenum.com/delete-property-from-objects-array-in-javascript/#:~:text=Delete%20property%20from%20objects%20Array%20in%20Javascript%20%286,to%20Delete%20property%20from%20objects%20array%20in%20Javascript
+    delete expectedResponse.orderedDateTime;
+    expect(checkIfValidUUID(responseBody.publicId)).to.equal(true);
+    delete expectedResponse.publicId;
+    return expectedResponse;
+  }
+}
+
+class HttpAuthTestSenderOrder extends HttpAuthTestSender {
+  constructor({
+    HTTP_TYPE = "get",
+    ACTION_PATH = "",
+    ACTION_NAME = "",
+    useAccount = "TEST_SERVICE",
+    sendData = {},
+    expectResponse = {},
+  }) {
+    super({
+      HTTP_TYPE,
+      ACTION_PATH,
+      ACTION_NAME,
+      useAccount,
+      sendData,
+      expectResponse,
+      ExpectResponseOrder,
+    });
+  }
+}
+
 var fixtures = {};
 const fs = require("fs");
 
@@ -30,6 +82,7 @@ _.each(fs.readdirSync(process.cwd() + "/test/fixtures/"), (file) => {
 });
 
 const CREATE_ORDER = {
+  useAccount: "TEST_SERVICE",
   HTTP_TYPE: "post",
   ACTION_PATH: "orders",
   ACTION_NAME: "create-order",
@@ -95,7 +148,7 @@ const CREATE_ORDER = {
     fulfilmentMethod: 1,
     fulfilmentSlotFrom: "2022-10-07 11:00:00",
     fulfilmentSlotTo: "2022-10-07 12:00:00",
-    discount: 1, //TODO: Check what the id of this should be for DELI10
+    discount: 1,
     paymentStatus: "unpaid",
     paymentIntentId: "",
     deliveryId: "",
@@ -103,25 +156,17 @@ const CREATE_ORDER = {
     deliveryPartnerConfirmed: false, //TODO Check can update,
     rewardsIssued: 0, //TODO Check can update,
     sentToDeliveryPartner: false, //TODO Check can update,
-    completedFlag: false, //TODO Check can update ["", "completed", "cancelled", "refunded", "void"]
-    completedOrderFeedback: null, //TODO: Check can add feedback after order
-    deliveryPunctuality: null, //TODO check can be set after and has to be an INT between 0 and 5 inclusive
-    orderCondition: null, // TODO check can be set after and has to be an INT between 0 and 5 inclusive
+    completedFlag: false,
+    completedOrderFeedback: null,
+    deliveryPunctuality: null,
+    orderCondition: null,
     unfulfilledItems: [], //Check using partial orders
     deliveryPartner: null, // TODO Check can set after order creation when the courier is subsequently confirmed
     parentOrder: null,
   }
 };
-const VIEW_ORDER = {
-  HTTP_TYPE: "get",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "view-order",
-  sendData: {
-    orderId: 1, //fixture
-  },
-  expectResponse: fixtures.orders.where((order) => order.id === 1)[0],
-};
 const GET_ORDER = {
+  useAccount: "TEST_SERVICE",
   HTTP_TYPE: "get",
   ACTION_PATH: "orders",
   ACTION_NAME: "get-order-details",
@@ -131,6 +176,7 @@ const GET_ORDER = {
   expectResponse: fixtures.orders.where((order) => order.id === 1)[0],
 };
 const GET_ORDER_STATUS = {
+  useAccount: "TEST_SERVICE",
   HTTP_TYPE: "get",
   ACTION_PATH: "orders",
   ACTION_NAME: "get-order-status",
@@ -139,10 +185,11 @@ const GET_ORDER_STATUS = {
   },
   expectResponse: {
     paymentStatus: "unpaid",
-    restaurantAcceptanceStatus: "pending"
-  }
+    restaurantAcceptanceStatus: "pending",
+  },
 };
 const GET_ORDER_BY_WALLETADDRESS = {
+  useAccount: "TEST_SERVICE",
   HTTP_TYPE: "get",
   ACTION_PATH: "orders",
   ACTION_NAME: "ongoing-orders-by-wallet",
@@ -197,49 +244,70 @@ const GET_ORDER_BY_WALLETADDRESS = {
       fulfilmentMethod: 1,
       fulfilmentSlotFrom: "2022-10-12 11:00:00",
       fulfilmentSlotTo: "2022-10-12 12:00:00",
-      discount: 1, 
-      paymentStatus: "unpaid", 
+      discount: 1,
+      paymentStatus: "unpaid",
       paymentIntentId: "",
       deliveryId: "",
-      deliveryPartnerAccepted: false, 
-      deliveryPartnerConfirmed: false, 
-      rewardsIssued: 0, 
-      sentToDeliveryPartner: false, 
-      completedFlag: false, 
-      completedOrderFeedback: null, 
-      deliveryPunctuality: null, 
-      orderCondition: null, 
+      deliveryPartnerAccepted: false,
+      deliveryPartnerConfirmed: false,
+      rewardsIssued: 0,
+      sentToDeliveryPartner: false,
+      completedFlag: false,
+      completedOrderFeedback: null,
+      deliveryPunctuality: null,
+      orderCondition: null,
       unfulfilledItems: [], //Check using partial orders
-      deliveryPartner: null, 
+      deliveryPartner: null,
       parentOrder: null,
     },
   ],
 };
 const MARK_ORDER_AS_PAID = {
+  useAccount: "TEST_SERVICE",
   HTTP_TYPE: "post",
   ACTION_PATH: "orders",
   ACTION_NAME: "peepl-pay-webhook",
   sendData: {
     publicId: null,
-    status: "paid"
+    status: "paid",
   },
-  expectResponse: {
-    
-  }
+  expectResponse: {},
 };
 const MARK_ORDER_AS_PAYMENT_FAILED = {
+  useAccount: "TEST_SERVICE",
   HTTP_TYPE: "post",
   ACTION_PATH: "orders",
   ACTION_NAME: "peepl-pay-webhook",
   sendData: {
     publicId: null,
-    status: "failed"
+    status: "failed",
   },
-  expectResponse: {
-    
-  }
+  expectResponse: {},
+};
+const MARK_ORDER_AS_REFUNDED_SUCCESS = {
+  useAccount: "TEST_SERVICE",
+  HTTP_TYPE: "post",
+  ACTION_PATH: "orders",
+  ACTION_NAME: "peepl-pay-refund-webhook",
+  sendData: {
+    publicId: null,
+    status: "success",
+  },
+  expectResponse: {},
+};
+const MARK_ORDER_AS_REFUNDED_FAILED = {
+  useAccount: "TEST_SERVICE",
+  HTTP_TYPE: "post",
+  ACTION_PATH: "orders",
+  ACTION_NAME: "peepl-pay-refund-webhook",
+  sendData: {
+    publicId: null,
+    status: "failure",
+  },
+  expectResponse: {},
 };
 const VIEW_ALL_ORDERS_ACCEPTED = {
+  useAccount: "TEST_SERVICE",
   HTTP_TYPE: "get",
   ACTION_PATH: "admin",
   ACTION_NAME: "view-all-orders",
@@ -247,9 +315,10 @@ const VIEW_ALL_ORDERS_ACCEPTED = {
     acceptanceStatus: "accepted", //['accepted', 'rejected', 'pending']
     timePeriod: "all", //['upcoming', 'past', 'all']
   },
-  expectResponse: fixtures.orders.where(order => order.id===2)[0],
+  expectResponse: fixtures.orders.where((order) => order.id === 2)[0],
 };
 const VIEW_ALL_ORDERS_REJECTED = {
+  useAccount: "TEST_SERVICE",
   HTTP_TYPE: "get",
   ACTION_PATH: "admin",
   ACTION_NAME: "view-all-orders",
@@ -260,6 +329,7 @@ const VIEW_ALL_ORDERS_REJECTED = {
   expectResponse: fixtures.orders.where((order) => order.id === 3)[0],
 };
 const VIEW_ALL_ORDERS_PENDING = {
+  useAccount: "TEST_SERVICE",
   HTTP_TYPE: "get",
   ACTION_PATH: "admin",
   ACTION_NAME: "view-all-orders",
@@ -270,6 +340,7 @@ const VIEW_ALL_ORDERS_PENDING = {
   expectResponse: fixtures.orders.where((order) => order.id === 1)[0], //TODO: call to create or setup in fixtures
 };
 const VIEW_ALL_ORDERS_DEFAULT = {
+  useAccount: "TEST_SERVICE",
   HTTP_TYPE: "get",
   ACTION_PATH: "admin",
   ACTION_NAME: "view-all-orders",
@@ -279,6 +350,7 @@ const VIEW_ALL_ORDERS_DEFAULT = {
   expectResponse: fixtures.orders,
 };
 const VIEW_ALL_ORDERS_UPCOMING = {
+  useAccount: "TEST_SERVICE",
   HTTP_TYPE: "get",
   ACTION_PATH: "admin",
   ACTION_NAME: "view-all-orders",
@@ -290,6 +362,7 @@ const VIEW_ALL_ORDERS_UPCOMING = {
   }),
 };
 const VIEW_ALL_ORDERS_PAST = {
+  useAccount: "TEST_SERVICE",
   HTTP_TYPE: "get",
   ACTION_PATH: "admin",
   ACTION_NAME: "view-all-orders",
@@ -301,33 +374,33 @@ const VIEW_ALL_ORDERS_PAST = {
   }),
 };
 const VIEW_ALL_ORDERS_NON_ADMIN = {
-  //TODO: Login / create another a secret account that does not have admin priveledges.
+  useAccount: "TEST_VENDOR",
   HTTP_TYPE: "get",
   ACTION_PATH: "admin",
   ACTION_NAME: "view-all-orders",
   sendData: {
-    //TODO: Implement each of the below and add multiple orders for each in fixtures
     acceptanceStatus: "accepted", //['accepted', 'rejected', 'pending']
     timePeriod: "all", //['upcoming', 'past', 'all']
   },
-  expectResponse: null, //TODO: call to create or setup in fixtures
+  expectResponse: null,
 };
 const VIEW_APPROVE_ORDER = {
+  useAccount: "TEST_SERVICE",
   HTTP_TYPE: "get",
   ACTION_PATH: "admin",
   ACTION_NAME: "view-approve-order",
   sendData: {
-    orderId: 1,
+    orderId: null, // populate from parent order
   },
-  expectResponse: VIEW_ORDER.expectResponse,
+  expectResponse: null, // populate from parent order
 };
-
 const APPROVE_OR_DECLINE_ORDER_ACCEPT = {
+  useAccount: "TEST_SERVICE",
   HTTP_TYPE: "post",
   ACTION_PATH: "admin",
   ACTION_NAME: "approve-or-decline-order",
   sendData: {
-    orderId: 1,
+    orderId: null, // populate from parentOrder
     orderFulfilled: "accept", //['accept', 'reject', 'partial'],
     retainItems: [],
     removeItems: [],
@@ -335,11 +408,12 @@ const APPROVE_OR_DECLINE_ORDER_ACCEPT = {
   expectResponse: {},
 };
 const APPROVE_OR_DECLINE_ORDER_REJECT = {
+  useAccount: "TEST_SERVICE",
   HTTP_TYPE: "post",
   ACTION_PATH: "admin",
   ACTION_NAME: "approve-or-decline-order",
   sendData: {
-    orderId: 1,
+    orderId: null,
     orderFulfilled: "reject", //['accept', 'reject', 'partial'],
     retainItems: [],
     removeItems: [],
@@ -347,20 +421,20 @@ const APPROVE_OR_DECLINE_ORDER_REJECT = {
   expectResponse: {},
 };
 const APPROVE_OR_DECLINE_ORDER_PARTIAL = {
+  useAccount: "TEST_SERVICE",
   HTTP_TYPE: "post",
   ACTION_PATH: "admin",
   ACTION_NAME: "approve-or-decline-order",
   sendData: {
-    orderId: 1,
+    orderId: null,
     orderFulfilled: "partial", //['accept', 'reject', 'partial'],
-    retainItems: [13],
-    removeItems: [14],
+    retainItems: [1, 2, 3],
+    removeItems: [8],
   },
   expectResponse: {},
 };
-
-
 const UPDATE_PAID_ORDER_SUCCESS = {
+  useAccount: "TEST_SERVICE",
   HTTP_TYPE: "post",
   ACTION_PATH: "orders",
   ACTION_NAME: "peepl-pay-update-paid-order-webhook",
@@ -376,6 +450,7 @@ const UPDATE_PAID_ORDER_SUCCESS = {
   expectResponse: {},
 };
 const UPDATE_PAID_ORDER_FAILED = {
+  useAccount: "TEST_SERVICE",
   HTTP_TYPE: "post",
   ACTION_PATH: "orders",
   ACTION_NAME: "peepl-pay-update-paid-order-webhook",
@@ -390,312 +465,122 @@ const UPDATE_PAID_ORDER_FAILED = {
   },
   expectResponse: {},
 };
-
-const MARK_ORDER_AS_REFUNDED_SUCCESS = {
-  HTTP_TYPE: "post",
-  ACTION_PATH: "orders",
-  ACTION_NAME: "peepl-pay-refund-webhook",
-  sendData: {
-    publicId: null,
-    status: "success",
-  },
-  expectResponse: {},
-};
-const MARK_ORDER_AS_REFUNDED_FAILED = {
-  HTTP_TYPE: "post",
-  ACTION_PATH: "orders",
-  ACTION_NAME: "peepl-pay-refund-webhook",
-  sendData: {
-    publicId: null,
-    status: "failure",
-  },
-  expectResponse: {},
-};
-
-//TODO: do couriers/accept-reject-delivery-confirmation
-//TODO: do couriers/add-delivery-availability-for-order which should default to the fulfilment slots of that deliverypartner for now and not contact the delvery partner
-//TODO: do couriers/cancel-delivery
-//TODO: do couriers/view-delivery
-
-
-const CUSTOMER_RECEIVED_ORDER_GOOD = {
-  HTTP_TYPE: "post",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "customer-received-order",
-  sendData: {
-    orderId: 1,
-    orderReceived: true,
-    orderCondition: 4, 
-    deliveryPunctuality: 5,
-    feedback: "punctual and good condition"
-  },
-  expectResponse: {}
-};
-const CUSTOMER_RECEIVED_ORDER_POOR_CONDITION = {
-  HTTP_TYPE: "post",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "customer-received-order",
-  sendData: {
-    orderId: 1,
-    orderReceived: true,
-    orderCondition: 4,
-    deliveryPunctuality: 5,
-    feedback: "punctual and good condition"
-  },
-  expectResponse: {}
-};
-const CUSTOMER_RECEIVED_ORDER_LATE_DELIVERY = {
-  HTTP_TYPE: "post",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "customer-received-order",
-  sendData: {
-    orderId: 1,
-    orderReceived: true,
-    orderCondition: 4,
-    deliveryPunctuality: 0,
-    feedback: "delivery late and good condition"
-  },
-  expectResponse: {}
-};
-const CUSTOMER_RECEIVED_ORDER_BAD_INPUT_ORDER_COND = {
-  HTTP_TYPE: "post",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "customer-received-order",
-  sendData: {
-    orderId: 1,
-    orderReceived: true,
-    orderCondition: -1,
-    deliveryPunctuality: 5,
-    feedback: "some feedback"
-  },
-  expectResponse: {}
-};
-const CUSTOMER_RECEIVED_ORDER_BAD_INPUT_DELV_PUNCT = {
-  HTTP_TYPE: "post",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "customer-received-order",
-  sendData: {
-    orderId: 1,
-    orderReceived: true,
-    orderCondition: 4,
-    deliveryPunctuality: 6,
-    feedback: "some feedback"
-  },
-  expectResponse: {}
-};
-const CUSTOMER_RECEIVED_ORDER_NOT_RECEIVED = {
-  HTTP_TYPE: "post",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "customer-received-order",
-  sendData: {
-    orderId: 1,
-    orderReceived: false,
-    orderCondition: 0,
-    deliveryPunctuality: 0,
-    feedback: "Order not received. Why?"
-  },
-  expectResponse: {}
-};
-
 const CUSTOMER_UPDATE_PAID_ORDER = {
+  useAccount: "TEST_USER",
   HTTP_TYPE: "post",
   ACTION_PATH: "admin",
   ACTION_NAME: "customer-update-paid-order",
   sendData: {
-    orderId: 1, //TODO: Local DB updated by other tests, so replace this with a new create-order on each test
+    orderId: null,
     customerWalletAddress: "0x41190Dd82D43129C26955063fa2854350e14554B",
-    retainItems: [
-      13
-    ],
-    removeItems: [
-      14
-    ],
-    refundRequestGBPx: 45, //TODO what wasnt in the refundRequestPPL
-    refundRequestPPL: 100, //TODO order.total before flat fees and stuff added, pull adam changes, * 5% (coln/delv)
+    refundRequestGBPx: 5100, //TODO what wasnt in the refundRequestPPL
+    refundRequestPPL: 0, //TODO order.total before flat fees and stuff added, pull adam changes, * 5% (coln/delv)
   },
   expectResponse: {
     orderId: null, //newOrderId
-  }
+  },
 };
 const CUSTOMER_CANCEL_ORDER = {
+  useAccount: "TEST_USER",
   HTTP_TYPE: "post",
   ACTION_PATH: "admin",
   ACTION_NAME: "customer-cancel-order",
   sendData: {
-    orderId: 1, //TODO: Local DB updated by other tests, so replace this with a new create-order on each test
+    orderId: null, //TODO: Local DB updated by other tests, so replace this with a new create-order on each test
     customerWalletAddress: "0x41190Dd82D43129C26955063fa2854350e14554B",
   },
-  expectResponse: {}
+  expectResponse: {},
 };
-
-class ExpectResponse {
-  constructor({
-    HTTP_TYPE = "get",
-    ACTION_PATH = "",
-    ACTION_NAME = "",
-    sendData = {},
-    expectResponse = {},
-  }) {
-    this._EXPECTED_RESPONSE = expectResponse;
-    this._send = sendData;
-    this._expectedResposeWithUpdates = _.cloneDeep(this._EXPECTED_RESPONSE);
-  }
-
-  get EXPECTED_RESPONSE() {
-    // ~ https://code.tutsplus.com/articles/the-best-way-to-deep-copy-an-object-in-javascript--cms-39655
-    return _.cloneDeep(this._EXPECTED_RESPONSE);
-  }
-  get expectedResposeWithUpdates() {
-    return _.cloneDeep(this._expectedResposeWithUpdates);
-  }
-  get send() {
-    return _.cloneDeep(this._send);
-  }
-
-  // ~ https://masteringjs.io/tutorials/fundamentals/parameters#:~:text=JavaScript%2C%20by%20default%2C%20does%20not%20support%20named%20parameters.,even%20if%20you%20have%20default%20values%20set%20up.
-  // sendWith({ updatedPostDataWith = {}, updatedPostDataWithOutKeys = [] } = {}) {
-  sendWith(updatedPostDataWith, updatedPostDataWithOutKeys = []) {
-    assert.isObject(updatedPostDataWith, "updatedPostDataWith is an object");
-    assert.isArray(
-      updatedPostDataWithOutKeys,
-      "updatedPostDataWithOutKeys is an array"
-    );
-    assert.containsAllKeys(
-      this.EXPECTED_RESPONSE,
-      Object.keys(updatedPostDataWith),
-      ""
-    );
-    assert.containsAllKeys(
-      this.EXPECTED_RESPONSE,
-      Object.keys(updatedPostDataWithOutKeys),
-      ""
-    );
-    let send = this.send;
-    for (let k of updatedPostDataWithOutKeys) {
-      delete send[k];
-      delete this._expectedResposeWithUpdates[k];
-    }
-    this._expectedResposeWithUpdates = {
-      ...this._expectedResposeWithUpdates,
-      ...updatedPostDataWith,
-    };
-    return {
-      ...send,
-      ...updatedPostDataWith,
-    };
-  }
-
-  checkResponse(responseBody) {
-    let expectedResponse = this.expectedResposeWithUpdates;
-
-    for (prop of Object.keys(expectedResponse)) {
-      expect(response.body).to.have.property(prop);
-    }
-
-    expect(responseBody.orderedDateTime).closeTo(
-      expectedResponse.orderedDateTime,
-      100,
-      "OrderedDateTime should be within 100s of test."
-    );
-    // ~ https://devenum.com/delete-property-from-objects-array-in-javascript/#:~:text=Delete%20property%20from%20objects%20Array%20in%20Javascript%20%286,to%20Delete%20property%20from%20objects%20array%20in%20Javascript
-    delete expectedResponse.orderedDateTime;
-    expect(checkIfValidUUID(responseBody.publicId)).to.equal(true);
-    delete expectedResponse.publicId;
-
-    expect(response.body).to.deep.equal(expectedResponse);
-  }
-}
-
-class HttpTestSender {
-  constructor({
-    HTTP_TYPE="get",
-    ACTION_PATH="",
-    ACTION_NAME="",
-    sendData={},
-    expectResponse={},
-  }) {
-    const relUrl = `${ACTION_PATH_ORDERS}/${ACTION_NAME_CREATE_ORDER}`;
-    const baseUrl = !relUrl
-      ? `/api/v1/${ACTION_PATH_ORDERS}/${ACTION_NAME_CREATE_ORDER}`
-      : `/api/v1/${relUrl}`;
-    if (HTTP_TYPE.toLowerCase() === "get") {
-      this.httpCall = async () =>
-        await supertest(sails.hooks.http.app).get(baseUrl);
-    } else if (HTTP_TYPE.toLowerCase() === "post") {
-      this.httpCall = async () =>
-        await supertest(sails.hooks.http.app).post(baseUrl);
-    } else if (HTTP_TYPE.toLowerCase() === "all") {
-      this.httpCall = async () =>
-        await supertest(sails.hooks.http.app).get(baseUrl);
-    } else {
-      assert(false, `httpType of ${HTTP_TYPE} not implemented for tests.`);
-    }
-    this._expectedResponse = ExpectResponse({
-      HTTP_TYPE,
-      ACTION_PATH,
-      ACTION_NAME,
-      sendData,
-      expectResponse,
-    });
-  }
-
-  get expectedResponse() {
-    return this._expectedResponse;
-  }
-
-  get expectedResponseObjectWithUpdates() {
-    return this._expectedResponse.expectedResposeWithUpdates;
-  }
-
-  async makeCallWith(cookie) {
-    return (updatedPostDataWith, updatedPostDataWithOutKeys = []) =>
-      this.httpCall()
-        .send(
-          this.expectedResponse.sendWith(
-            updatedPostDataWith,
-            updatedPostDataWithOutKeys
-          )
-        )
-        .set("Cookie", cookie)
-        .set("Accept", "application/json");
-  }
-}
-
-class HttpAuthTestSender extends HttpTestSender {
-  constructor({
-    HTTP_TYPE = "get",
-    ACTION_PATH = "",
-    ACTION_NAME = "",
-    sendData = {},
-    expectResponse = {},
-  }) {
-    super({
-      HTTP_TYPE,
-      ACTION_PATH,
-      ACTION_NAME,
-      sendData,
-      expectResponse
-    });
-  }
-
-  async makeAuthCallWith(updatedPostDataWith, updatedPostDataWithOutKeys = [], otherLoginDetails = {}) {
-    return callAuthActionWithCookie(
-      (cookie) =>
-        this.makeCallWith(cookie)(
-          updatedPostDataWith,
-          updatedPostDataWithOutKeys
-        ),
-      false,
-      otherLoginDetails || null
-    );
-  }
-}
+const CUSTOMER_RECEIVED_ORDER_GOOD = {
+  useAccount: "TEST_SERVICE",
+  HTTP_TYPE: "post",
+  ACTION_PATH: "admin",
+  ACTION_NAME: "customer-received-order",
+  sendData: {
+    orderId: null,
+    orderReceived: true,
+    orderCondition: 4,
+    deliveryPunctuality: 5,
+    feedback: "punctual and good condition",
+  },
+  expectResponse: {},
+};
+const CUSTOMER_RECEIVED_ORDER_POOR_CONDITION = {
+  useAccount: "TEST_SERVICE",
+  HTTP_TYPE: "post",
+  ACTION_PATH: "admin",
+  ACTION_NAME: "customer-received-order",
+  sendData: {
+    orderId: null,
+    orderReceived: true,
+    orderCondition: 0,
+    deliveryPunctuality: 5,
+    feedback: "punctual and good condition",
+  },
+  expectResponse: {},
+};
+const CUSTOMER_RECEIVED_ORDER_NOT_RECEIVED = {
+  useAccount: "TEST_USER",
+  HTTP_TYPE: "post",
+  ACTION_PATH: "admin",
+  ACTION_NAME: "customer-received-order",
+  sendData: {
+    orderId: null,
+    orderReceived: false,
+    orderCondition: 0,
+    deliveryPunctuality: 0,
+    feedback: "Order not received. Why?",
+  },
+  expectResponse: {},
+};
+const CUSTOMER_RECEIVED_ORDER_LATE_DELIVERY = {
+  useAccount: "TEST_SERVICE",
+  HTTP_TYPE: "post",
+  ACTION_PATH: "admin",
+  ACTION_NAME: "customer-received-order",
+  sendData: {
+    orderId: null,
+    orderReceived: true,
+    orderCondition: 4,
+    deliveryPunctuality: 0,
+    feedback: "delivery late and good condition",
+  },
+  expectResponse: {},
+};
+const CUSTOMER_RECEIVED_ORDER_BAD_INPUT_ORDER_COND = {
+  useAccount: "TEST_SERVICE",
+  HTTP_TYPE: "post",
+  ACTION_PATH: "admin",
+  ACTION_NAME: "customer-received-order",
+  sendData: {
+    orderId: null,
+    orderReceived: true,
+    orderCondition: -1,
+    deliveryPunctuality: 5,
+    feedback: "some feedback",
+  },
+  expectResponse: {},
+};
+const CUSTOMER_RECEIVED_ORDER_BAD_INPUT_DELV_PUNCT = {
+  useAccount: "TEST_SERVICE",
+  HTTP_TYPE: "post",
+  ACTION_PATH: "admin",
+  ACTION_NAME: "customer-received-order",
+  sendData: {
+    orderId: null,
+    orderReceived: true,
+    orderCondition: 4,
+    deliveryPunctuality: 6,
+    feedback: "some feedback",
+  },
+  expectResponse: {},
+};
 
 describe(`Order Model Integration Tests`, () => {
   describe(`${CREATE_ORDER.ACTION_NAME}() returns a 200 with json when authenticated`, () => {
     it("Returns a new order", async () => {
       try {
-        const hats = HttpAuthTestSender(CREATE_ORDER);
+        const hats = HttpAuthTestSenderOrder(CREATE_ORDER);
         const response = await hats.makeAuthCallWith({}, []);
         expect(response.statusCode).to.equal(200);
         hats.expectedResponse.checkResponse(response.body);
@@ -706,7 +591,7 @@ describe(`Order Model Integration Tests`, () => {
     });
     it("Returns a new order with deliveryPostCode set", async () => {
       try {
-        const hats = HttpAuthTestSender(CREATE_ORDER);
+        const hats = HttpAuthTestSenderOrder(CREATE_ORDER);
         const response = await hats.makeAuthCallWith(
           {
             address: {
@@ -725,7 +610,7 @@ describe(`Order Model Integration Tests`, () => {
     });
     it("Create-order fails with badly formatted deliveryPostCode set to 'L1'", async () => {
       try {
-        const hats = HttpAuthTestSender(CREATE_ORDER);
+        const hats = HttpAuthTestSenderOrder(CREATE_ORDER);
         const response = await hats.makeAuthCallWith(
           {
             address: {
@@ -744,7 +629,7 @@ describe(`Order Model Integration Tests`, () => {
     });
     it("Create-order fails with badly formatted deliveryPostCode set to 'bs postcode'", async () => {
       try {
-        const hats = HttpAuthTestSender(CREATE_ORDER);
+        const hats = HttpAuthTestSenderOrder(CREATE_ORDER);
         const response = await hats.makeAuthCallWith(
           {
             address: {
@@ -763,7 +648,7 @@ describe(`Order Model Integration Tests`, () => {
     });
     it("Create-order with deliveryInstructions", async () => {
       try {
-        const hats = HttpAuthTestSender(CREATE_ORDER);
+        const hats = HttpAuthTestSenderOrder(CREATE_ORDER);
         const response = await hats.makeAuthCallWith(
           {
             address: {
@@ -785,7 +670,7 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${GET_ORDER.ACTION_NAME}() successfully gets order with id 1`, () => {
     it("Can GET Orders by wallet address", async () => {
       try {
-        const hats = HttpAuthTestSender(GET_ORDER);
+        const hats = HttpAuthTestSenderOrder(GET_ORDER);
         const response = await hats.makeAuthCallWith(
           {},
           []
@@ -801,7 +686,7 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${GET_ORDER_BY_WALLETADDRESS.ACTION_NAME}() successfully gets orders for walletaddress`, () => {
     it("Can GET Orders by wallet address", async () => {
       try {
-        const parentOrder = await HttpAuthTestSender(
+        const parentOrder = await HttpAuthTestSenderOrder(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
@@ -809,7 +694,7 @@ describe(`Order Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSender(
+        const hats = HttpAuthTestSenderOrder(
           GET_ORDER_BY_WALLETADDRESS
         );
         const response = await hats.makeAuthCallWith(
@@ -832,13 +717,13 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${MARK_ORDER_AS_PAID.ACTION_NAME} successfully flag order as paid`, () => {
     it("flags order as paid", async () => {
       try {
-        const parentOrder = await HttpAuthTestSender(
+        const parentOrder = await HttpAuthTestSenderOrder(
           CREATE_ORDER
         ).makeAuthCallWith(
           {},
           []
         );
-        const hats = HttpAuthTestSender(
+        const hats = HttpAuthTestSenderOrder(
           MARK_ORDER_AS_PAID
         );
         const response = await hats.makeAuthCallWith(
@@ -858,13 +743,13 @@ describe(`Order Model Integration Tests`, () => {
     });
     it("can flag order as payment failed", async () => {
       try {
-        const parentOrder = await HttpAuthTestSender(
+        const parentOrder = await HttpAuthTestSenderOrder(
           CREATE_ORDER
         ).makeAuthCallWith(
           {},
           []
         );
-        const hats = HttpAuthTestSender(
+        const hats = HttpAuthTestSenderOrder(
           MARK_ORDER_AS_PAYMENT_FAILED
         );
         const response = await hats.makeAuthCallWith(
@@ -883,11 +768,57 @@ describe(`Order Model Integration Tests`, () => {
         throw errs;
       }
     });
+    it("can flag order as refund succeeded and notifies users, vendors and vegisupport", async () => {
+      try {
+        const parentOrder = await HttpAuthTestSenderOrder(
+          CREATE_ORDER
+        ).makeAuthCallWith({}, []);
+        const hats = HttpAuthTestSenderOrder(MARK_ORDER_AS_REFUNDED_SUCCESS);
+        const response = await hats.makeAuthCallWith(
+          {
+            publicId: parentOrder.body.publicId,
+          },
+          []
+        );
+
+        expect(response.statusCode).to.equal(200);
+        const newOrder = await Orders.findOne({
+          publicId: parentOrder.body.publicId,
+        });
+        expect(newOrder.completedFlag).to.equal("refunded");
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+    it("can notify users, vendors and vegisupport when a refund fails", async () => {
+      try {
+        const parentOrder = await HttpAuthTestSenderOrder(
+          CREATE_ORDER
+        ).makeAuthCallWith({}, []);
+        const hats = HttpAuthTestSenderOrder(MARK_ORDER_AS_REFUNDED_FAILED);
+        const response = await hats.makeAuthCallWith(
+          {
+            publicId: parentOrder.body.publicId,
+          },
+          []
+        );
+
+        expect(response.statusCode).to.equal(200);
+        const newOrder = await Orders.findOne({
+          publicId: parentOrder.body.publicId,
+        });
+        expect(newOrder.completedFlag).to.not.equal("refunded");
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
   });
   describe(`${GET_ORDER_STATUS.ACTION_NAME}() successfully gets order status`, () => {
     it("Order status correct", async () => {
       try {
-        const hats = HttpAuthTestSender(
+        const hats = HttpAuthTestSenderOrder(
           GET_ORDER_STATUS
         );
         const response = await hats.makeAuthCallWith(
@@ -906,7 +837,7 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${VIEW_ALL_ORDERS_ACCEPTED.ACTION_NAME}()`, () => {
     it("successfully gets all accepted orders", async () => {
       try {
-        const hats = HttpAuthTestSender(VIEW_ALL_ORDERS_ACCEPTED);
+        const hats = HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_ACCEPTED);
         const response = await hats.makeAuthCallWith({}, []);
 
         expect(response.statusCode).to.equal(200);
@@ -920,7 +851,7 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${VIEW_ALL_ORDERS_REJECTED.ACTION_NAME}()`, () => {
     it("successfully gets all rejected orders", async () => {
       try {
-        const hats = HttpAuthTestSender(VIEW_ALL_ORDERS_REJECTED);
+        const hats = HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_REJECTED);
         const response = await hats.makeAuthCallWith({}, []);
 
         expect(response.statusCode).to.equal(200);
@@ -934,7 +865,7 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${VIEW_ALL_ORDERS_PENDING.ACTION_NAME}()`, () => {
     it("successfully gets all pending orders", async () => {
       try {
-        const hats = HttpAuthTestSender(VIEW_ALL_ORDERS_PENDING);
+        const hats = HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_PENDING);
         const response = await hats.makeAuthCallWith({}, []);
 
         expect(response.statusCode).to.equal(200);
@@ -948,7 +879,7 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${VIEW_ALL_ORDERS_DEFAULT.ACTION_NAME}()`, () => {
     it("successfully gets all orders with no status parameter set", async () => {
       try {
-        const hats = HttpAuthTestSender(VIEW_ALL_ORDERS_DEFAULT);
+        const hats = HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_DEFAULT);
         const response = await hats.makeAuthCallWith({}, []);
 
         expect(response.statusCode).to.equal(200);
@@ -962,7 +893,7 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${VIEW_ALL_ORDERS_UPCOMING.ACTION_NAME}()`, () => {
     it("successfully gets all upcoming orders with no status parameter set", async () => {
       try {
-        const hats = HttpAuthTestSender(VIEW_ALL_ORDERS_UPCOMING);
+        const hats = HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_UPCOMING);
         const response = await hats.makeAuthCallWith({}, []);
 
         expect(response.statusCode).to.equal(200);
@@ -976,7 +907,7 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${VIEW_ALL_ORDERS_PAST.ACTION_NAME}()`, () => {
     it("successfully gets all past orders with no status parameter set", async () => {
       try {
-        const hats = HttpAuthTestSender(VIEW_ALL_ORDERS_PAST);
+        const hats = HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_PAST);
         const response = await hats.makeAuthCallWith({}, []);
 
         expect(response.statusCode).to.equal(200);
@@ -990,7 +921,7 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${VIEW_ALL_ORDERS_NON_ADMIN.ACTION_NAME}()`, () => {
     it("successfully gets all orders when logged in as admin", async () => {
       try {
-        const hats = HttpAuthTestSender(VIEW_ALL_ORDERS_NON_ADMIN);
+        const hats = HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_NON_ADMIN);
         const response = await hats.makeAuthCallWith({}, []);
 
         expect(response.statusCode).to.equal(200);
@@ -1002,18 +933,8 @@ describe(`Order Model Integration Tests`, () => {
     });
     it("fails to get any orders when logged in as non-admin", async () => {
       try {
-        const hats = HttpAuthTestSender(VIEW_ALL_ORDERS_NON_ADMIN);
-        const response = await hats.makeAuthCallWith({}, [], {
-          email: "test_user.service@example.com",
-          phoneNoCountry: 9991137777,
-          phoneCountryCode: 1,
-          name: "TEST_USER",
-          isSuperAdmin: false,
-          role: "vendor",
-          vendorRole: "inventoryManager",
-          firebaseSessionToken: "DUMMY_FIREBASE_TOKEN",
-          secret: "TEST_USER_SECRET", //TODO: Create one
-        });
+        const hats = HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_NON_ADMIN);
+        const response = await hats.makeAuthCallWith({}, []);
 
         expect(response.statusCode).to.equal(401);
       } catch (errs) {
@@ -1023,10 +944,10 @@ describe(`Order Model Integration Tests`, () => {
     });
   });
 
-  describe(`${UPDATE_ORDER.ACTION_NAME}() successfully upserts a replacement order with updated items`, () => {
-    it("Can Set ParentOrder for Create-order for child order in refunds chain / after updated items by consumer", async () => {
+  describe(`${VIEW_APPROVE_ORDER.ACTION_NAME}()`, () => {
+    it("successfully view approve-order screen for order from publicId", async () => {
       try {
-        const parentOrder = await HttpAuthTestSender(
+        const parentOrder = await HttpAuthTestSenderOrder(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
@@ -1034,19 +955,977 @@ describe(`Order Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSender(
-          UPDATE_ORDER
-          `${ACTION_PATH_ORDERS}/${ACTION_NAME_UPDATE_ORDER_ITEMS}`
-        );
-        const response = await hats.makeAuthCallWith(
+        const hats = HttpAuthTestSenderOrder(VIEW_APPROVE_ORDER);
+        const response = await hats.makeAuthCallWith({
+          orderId: parentOrder.body.publicId
+        }, []);
+
+        expect(response.statusCode).to.equal(200);
+        hats.expectedResponse.checkResponse(response.body, parentOrder);
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+  });
+  describe(`${APPROVE_OR_DECLINE_ORDER_ACCEPT.ACTION_NAME}()`, () => {
+    it("vendors can successfully accept an order from approve-or-decline-order action", async () => {
+      try {
+        const parentOrder = await HttpAuthTestSenderOrder(
+          CREATE_ORDER
+        ).makeAuthCallWith(
           {
             parentOrder: null,
+            items: [
+              {
+                id: 1,
+                options: {
+                  1: 1, // productOption : productOptionValue
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 2,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 3,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 6,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 8,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+            ],
+            total: 5300,
+          },
+          []
+        );
+        const hats = HttpAuthTestSenderOrder(APPROVE_OR_DECLINE_ORDER_ACCEPT);
+        const response = await hats.makeAuthCallWith(
+          {
+            orderId: parentOrder.body.id,
           },
           []
         );
 
         expect(response.statusCode).to.equal(200);
         hats.expectedResponse.checkResponse(response.body);
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+    it("vendors can successfully reject an order from approve-or-decline-order action", async () => {
+      try {
+        const parentOrder = await HttpAuthTestSenderOrder(
+          CREATE_ORDER
+        ).makeAuthCallWith(
+          {
+            parentOrder: null,
+            items: [
+              {
+                id: 1,
+                options: {
+                  1: 1, // productOption : productOptionValue
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 2,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 3,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 6,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 8,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+            ],
+            total: 5300,
+          },
+          []
+        );
+        const hats = HttpAuthTestSenderOrder(APPROVE_OR_DECLINE_ORDER_REJECT);
+        const response = await hats.makeAuthCallWith(
+          {
+            orderId: parentOrder.body.id,
+          },
+          []
+        );
+
+        expect(response.statusCode).to.equal(200);
+        hats.expectedResponse.checkResponse(response.body);
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+    it("vendors can successfully partially accept an order from approve-or-decline-order action", async () => {
+      try {
+        const parentOrder = await HttpAuthTestSenderOrder(
+          CREATE_ORDER
+        ).makeAuthCallWith(
+          {
+            parentOrder: null,
+            items: [
+              {
+                id: 1,
+                options: {
+                  1: 1, // productOption : productOptionValue
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 2,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 3,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 6,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 8,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+            ],
+            total: 5300,
+          },
+          []
+        );
+        const hats = HttpAuthTestSenderOrder(APPROVE_OR_DECLINE_ORDER_PARTIAL);
+        const response = await hats.makeAuthCallWith(
+          {
+            orderId: parentOrder.body.id,
+          },
+          []
+        );
+
+        expect(response.statusCode).to.equal(200);
+        hats.expectedResponse.checkResponse(response.body);
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+  });
+  describe(`${CUSTOMER_UPDATE_PAID_ORDER.ACTION_NAME}()`, () => {
+    it("users can successfully UPDATE ITEMS on an order after getting a partial fulfillment back from a vendor", async () => {
+      try {
+        const parentOrder = await HttpAuthTestSenderOrder(
+          CREATE_ORDER
+        ).makeAuthCallWith(
+          {
+            parentOrder: null,
+            items: [
+              {
+                id: 1,
+                options: {
+                  1: 1, // productOption : productOptionValue
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 2,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 3,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 6,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 8,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+            ],
+            total: 5300,
+          },
+          []
+        );
+        const hats = HttpAuthTestSenderOrder(CUSTOMER_UPDATE_PAID_ORDER);
+        const response = await hats.makeAuthCallWith(
+          {
+            orderId: parentOrder.body.id,
+            retailItems: [1, 2, 3],
+            removeItems: [6, 8],
+            refundRequestGBPx: 5300, //TODO what wasnt in the refundRequestPPL
+            refundRequestPPL: 0, //TODO order.total before flat fees and stuff added, pull adam changes, * 5% (coln/delv)
+          },
+          []
+        );
+
+        expect(response.statusCode).to.equal(200);
+        // hats.expectedResponse.checkResponse(response.body);
+        expect(response.body).to.have.property('orderId');
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+    it("users can successfully CANCEL an order after getting a partial fulfillment back from a vendor", async () => {
+      try {
+        const parentOrder = await HttpAuthTestSenderOrder(
+          CREATE_ORDER
+        ).makeAuthCallWith(
+          {
+            parentOrder: null,
+            items: [
+              {
+                id: 1,
+                options: {
+                  1: 1, // productOption : productOptionValue
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 2,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 3,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 6,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 8,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+            ],
+            total: 5300,
+          },
+          []
+        );
+        const hats = HttpAuthTestSenderOrder(CUSTOMER_CANCEL_ORDER);
+        const response = await hats.makeAuthCallWith(
+          {
+            orderId: parentOrder.body.id,
+          },
+          []
+        );
+
+        expect(response.statusCode).to.equal(200);
+        // hats.expectedResponse.checkResponse(response.body);
+        const newOrder = await Orders.findOne({
+          publicId: parentOrder.body.publicId,
+        });
+        expect(newOrder.completedFlag).to.not.equal("cancelled");
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+  });
+  describe(`${CUSTOMER_RECEIVED_ORDER_GOOD.ACTION_NAME}()`, () => {
+    it("users can successfully confirm order was received in good condition", async () => {
+      try {
+        const parentOrder = await HttpAuthTestSenderOrder(
+          CREATE_ORDER
+        ).makeAuthCallWith(
+          {
+            parentOrder: null,
+            items: [
+              {
+                id: 1,
+                options: {
+                  1: 1, // productOption : productOptionValue
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 2,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 3,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 6,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 8,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+            ],
+            total: 5300,
+          },
+          []
+        );
+        const hats = HttpAuthTestSenderOrder(CUSTOMER_RECEIVED_ORDER_GOOD);
+        const response = await hats.makeAuthCallWith(
+          {
+            orderId: parentOrder.body.id,
+            orderReceived: true,
+            orderCondition: 4,
+            deliveryPunctuality: 5,
+            feedback: "punctual and good condition",
+          },
+          []
+        );
+
+        expect(response.statusCode).to.equal(200);
+        // hats.expectedResponse.checkResponse(response.body);
+        const newOrder = await Orders.findOne({
+          publicId: parentOrder.body.publicId,
+        });
+        expect(newOrder.completedFlag).to.equal("completed");
+        expect(newOrder.completedOrderFeedback).to.equal(
+          "punctual and good condition"
+        );
+        expect(newOrder.orderCondition).to.equal(4);
+        expect(newOrder.deliveryPunctuality).to.equal(5);
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+    it("users can successfully confirm order was received in POOR condition", async () => {
+      try {
+        const parentOrder = await HttpAuthTestSenderOrder(
+          CREATE_ORDER
+        ).makeAuthCallWith(
+          {
+            parentOrder: null,
+            items: [
+              {
+                id: 1,
+                options: {
+                  1: 1, // productOption : productOptionValue
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 2,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 3,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 6,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 8,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+            ],
+            total: 5300,
+          },
+          []
+        );
+        const hats = HttpAuthTestSenderOrder(CUSTOMER_RECEIVED_ORDER_POOR_CONDITION);
+        const response = await hats.makeAuthCallWith(
+          {
+            orderId: parentOrder.body.id,
+            orderCondition: 0,
+          },
+          []
+        );
+
+        expect(response.statusCode).to.equal(200);
+        // hats.expectedResponse.checkResponse(response.body);
+        const newOrder = await Orders.findOne({
+          publicId: parentOrder.body.publicId,
+        });
+        expect(newOrder.orderCondition).to.equal(0);
+        expect(newOrder.completedFlag).to.equal("completed");
+        expect(newOrder.completedOrderFeedback).to.equal(
+          "punctual and good condition"
+        );
+        expect(newOrder.deliveryPunctuality).to.equal(5);
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+    it("users can successfully confirm order was received LATE", async () => {
+      try {
+        const parentOrder = await HttpAuthTestSenderOrder(
+          CREATE_ORDER
+        ).makeAuthCallWith(
+          {
+            parentOrder: null,
+            items: [
+              {
+                id: 1,
+                options: {
+                  1: 1, // productOption : productOptionValue
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 2,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 3,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 6,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 8,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+            ],
+            total: 5300,
+          },
+          []
+        );
+        const hats = HttpAuthTestSenderOrder(CUSTOMER_RECEIVED_ORDER_LATE_DELIVERY);
+        const response = await hats.makeAuthCallWith(
+          {
+            orderId: parentOrder.body.id,
+            orderCondition: 4,
+            deliveryPunctuality: 0,
+            feedback: "delivery late and good condition",
+          },
+          []
+        );
+
+        expect(response.statusCode).to.equal(200);
+        // hats.expectedResponse.checkResponse(response.body);
+        const newOrder = await Orders.findOne({
+          publicId: parentOrder.body.publicId,
+        });
+        expect(newOrder.deliveryPunctuality).to.equal(0);
+        expect(newOrder.orderCondition).to.equal(4);
+        expect(newOrder.completedFlag).to.equal("completed");
+        expect(newOrder.completedOrderFeedback).to.equal(
+          "delivery late and good condition"
+        );
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+    it("users can successfully confirm order was NOT RECEIVED", async () => {
+      try {
+        const parentOrder = await HttpAuthTestSenderOrder(
+          CREATE_ORDER
+        ).makeAuthCallWith(
+          {
+            parentOrder: null,
+            items: [
+              {
+                id: 1,
+                options: {
+                  1: 1, // productOption : productOptionValue
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 2,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 3,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 6,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 8,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+            ],
+            total: 5300,
+          },
+          []
+        );
+        const hats = HttpAuthTestSenderOrder(CUSTOMER_RECEIVED_ORDER_NOT_RECEIVED);
+        const response = await hats.makeAuthCallWith(
+          {
+            orderId: parentOrder.body.id,
+            orderReceived: false,
+            orderCondition: 0,
+            deliveryPunctuality: 0,
+            feedback: "Order not received. Why?",
+          },
+          []
+        );
+
+        expect(response.statusCode).to.equal(200);
+        // hats.expectedResponse.checkResponse(response.body);
+        const newOrder = await Orders.findOne({
+          publicId: parentOrder.body.publicId,
+        });
+        expect(newOrder.completedFlag).to.equal("");
+        expect(newOrder.deliveryPunctuality).to.be.null();
+        expect(newOrder.orderCondition).to.be.null();
+        expect(newOrder.completedOrderFeedback).to.be.null();
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+    it("API will not accept bad delivery punctuality input", async () => {
+      try {
+        const parentOrder = await HttpAuthTestSenderOrder(
+          CREATE_ORDER
+        ).makeAuthCallWith(
+          {
+            parentOrder: null,
+            items: [
+              {
+                id: 1,
+                options: {
+                  1: 1, // productOption : productOptionValue
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 2,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 3,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 6,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 8,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+            ],
+            total: 5300,
+          },
+          []
+        );
+        const hats = HttpAuthTestSenderOrder(CUSTOMER_RECEIVED_ORDER_BAD_INPUT_DELV_PUNCT);
+        const response = await hats.makeAuthCallWith(
+          {
+            orderId: parentOrder.body.id,
+            deliveryPunctuality: 6,
+          },
+          []
+        );
+
+        expect(response.statusCode).to.equal(400);
+        // hats.expectedResponse.checkResponse(response.body);
+        const newOrder = await Orders.findOne({
+          publicId: parentOrder.body.publicId,
+        });
+        expect(newOrder.completedFlag).to.equal("");
+        expect(newOrder.deliveryPunctuality).to.be.null();
+        expect(newOrder.orderCondition).to.be.null();
+        expect(newOrder.completedOrderFeedback).to.be.null();
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+    it("API will not accept bad order condition input", async () => {
+      try {
+        const parentOrder = await HttpAuthTestSenderOrder(
+          CREATE_ORDER
+        ).makeAuthCallWith(
+          {
+            parentOrder: null,
+            items: [
+              {
+                id: 1,
+                options: {
+                  1: 1, // productOption : productOptionValue
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 2,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 3,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 6,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 8,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+            ],
+            total: 5300,
+          },
+          []
+        );
+        const hats = HttpAuthTestSenderOrder(CUSTOMER_RECEIVED_ORDER_BAD_INPUT_ORDER_COND);
+        const response = await hats.makeAuthCallWith(
+          {
+            orderId: parentOrder.body.id,
+            orderCondition: -1,
+          },
+          []
+        );
+
+        expect(response.statusCode).to.equal(400);
+        // hats.expectedResponse.checkResponse(response.body);
+        const newOrder = await Orders.findOne({
+          publicId: parentOrder.body.publicId,
+        });
+        expect(newOrder.completedFlag).to.equal("");
+        expect(newOrder.deliveryPunctuality).to.be.null();
+        expect(newOrder.orderCondition).to.be.null();
+        expect(newOrder.completedOrderFeedback).to.be.null();
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+  });
+
+  describe(`${UPDATE_PAID_ORDER_SUCCESS.ACTION_NAME}()`, () => {
+    it("PeeplPay Service can successfully send notifications when a payment succeeds for an order", async () => {
+      try {
+        const parentOrder = await HttpAuthTestSenderOrder(
+          CREATE_ORDER
+        ).makeAuthCallWith(
+          {
+            parentOrder: null,
+            items: [
+              {
+                id: 1,
+                options: {
+                  1: 1, // productOption : productOptionValue
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 2,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 3,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 6,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 8,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+            ],
+            total: 5300,
+          },
+          []
+        );
+        const hats = HttpAuthTestSenderOrder(UPDATE_PAID_ORDER_SUCCESS);
+        const response = await hats.makeAuthCallWith(
+          {
+            orderId: parentOrder.body.id,
+          },
+          []
+        );
+
+        expect(response.statusCode).to.equal(200);
+        // hats.expectedResponse.checkResponse(response.body);
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+    it("PeeplPay Service can successfully send notifications when a payment fails for an order", async () => {
+      try {
+        const parentOrder = await HttpAuthTestSenderOrder(
+          CREATE_ORDER
+        ).makeAuthCallWith(
+          {
+            parentOrder: null,
+            items: [
+              {
+                id: 1,
+                options: {
+                  1: 1, // productOption : productOptionValue
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 2,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 3,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 6,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+              {
+                id: 8,
+                options: {
+                  1: 1,
+                  2: 5,
+                  3: 10,
+                },
+              },
+            ],
+            total: 5300,
+          },
+          []
+        );
+        const hats = HttpAuthTestSenderOrder(UPDATE_PAID_ORDER_FAILED);
+        const response = await hats.makeAuthCallWith(
+          {
+            orderId: parentOrder.body.id,
+          },
+          []
+        );
+
+        expect(response.statusCode).to.equal(200);
+        // hats.expectedResponse.checkResponse(response.body);
       } catch (errs) {
         console.warn(errs);
         throw errs;
