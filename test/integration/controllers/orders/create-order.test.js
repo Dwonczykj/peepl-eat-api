@@ -370,7 +370,7 @@ const VIEW_ALL_ORDERS_PAST = {
     timePeriod: "past", //['upcoming', 'past', 'all']
   },
   expectResponse: fixtures.orders.where((order) => {
-    return moment.utc(order.fulfilmentSlotFrom).isBefore(moment.utc());
+    return moment.utc(order.fulfilmentSlotFrom).isSameOrBefore(moment.utc());
   }),
 };
 const VIEW_ALL_ORDERS_NON_ADMIN = {
@@ -734,7 +734,7 @@ describe(`Order Model Integration Tests`, () => {
         );
 
         expect(response.statusCode).to.equal(200);
-        const newOrder = await Orders.findOne({publicId: parentOrder.body.publicId});
+        const newOrder = await Order.findOne({publicId: parentOrder.body.publicId});
         expect(newOrder.paymentStatus).to.equal("paid");
       } catch (errs) {
         console.warn(errs);
@@ -760,7 +760,7 @@ describe(`Order Model Integration Tests`, () => {
         );
 
         expect(response.statusCode).to.equal(200);
-        const newOrder = await Orders.findOne({publicId: parentOrder.body.publicId});
+        const newOrder = await Order.findOne({publicId: parentOrder.body.publicId});
         expect(newOrder.paymentStatus).to.equal("failed");
         
       } catch (errs) {
@@ -782,7 +782,7 @@ describe(`Order Model Integration Tests`, () => {
         );
 
         expect(response.statusCode).to.equal(200);
-        const newOrder = await Orders.findOne({
+        const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
         });
         expect(newOrder.completedFlag).to.equal("refunded");
@@ -805,7 +805,7 @@ describe(`Order Model Integration Tests`, () => {
         );
 
         expect(response.statusCode).to.equal(200);
-        const newOrder = await Orders.findOne({
+        const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
         });
         expect(newOrder.completedFlag).to.not.equal("refunded");
@@ -1311,7 +1311,7 @@ describe(`Order Model Integration Tests`, () => {
 
         expect(response.statusCode).to.equal(200);
         // hats.expectedResponse.checkResponse(response.body);
-        const newOrder = await Orders.findOne({
+        const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
         });
         expect(newOrder.completedFlag).to.not.equal("cancelled");
@@ -1389,7 +1389,7 @@ describe(`Order Model Integration Tests`, () => {
 
         expect(response.statusCode).to.equal(200);
         // hats.expectedResponse.checkResponse(response.body);
-        const newOrder = await Orders.findOne({
+        const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
         });
         expect(newOrder.completedFlag).to.equal("completed");
@@ -1467,7 +1467,7 @@ describe(`Order Model Integration Tests`, () => {
 
         expect(response.statusCode).to.equal(200);
         // hats.expectedResponse.checkResponse(response.body);
-        const newOrder = await Orders.findOne({
+        const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
         });
         expect(newOrder.orderCondition).to.equal(0);
@@ -1547,7 +1547,7 @@ describe(`Order Model Integration Tests`, () => {
 
         expect(response.statusCode).to.equal(200);
         // hats.expectedResponse.checkResponse(response.body);
-        const newOrder = await Orders.findOne({
+        const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
         });
         expect(newOrder.deliveryPunctuality).to.equal(0);
@@ -1628,7 +1628,7 @@ describe(`Order Model Integration Tests`, () => {
 
         expect(response.statusCode).to.equal(200);
         // hats.expectedResponse.checkResponse(response.body);
-        const newOrder = await Orders.findOne({
+        const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
         });
         expect(newOrder.completedFlag).to.equal("");
@@ -1704,7 +1704,7 @@ describe(`Order Model Integration Tests`, () => {
 
         expect(response.statusCode).to.equal(400);
         // hats.expectedResponse.checkResponse(response.body);
-        const newOrder = await Orders.findOne({
+        const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
         });
         expect(newOrder.completedFlag).to.equal("");
@@ -1780,7 +1780,7 @@ describe(`Order Model Integration Tests`, () => {
 
         expect(response.statusCode).to.equal(400);
         // hats.expectedResponse.checkResponse(response.body);
-        const newOrder = await Orders.findOne({
+        const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
         });
         expect(newOrder.completedFlag).to.equal("");

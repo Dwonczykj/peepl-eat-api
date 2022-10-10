@@ -72,12 +72,40 @@ _.each(fs.readdirSync(process.cwd() + "/test/fixtures/"), (file) => {
     file);
 });
 
-
-//TODO: do couriers/add-delivery-availability-for-order which should default to the fulfilment slots of that deliverypartner for now and not contact the delvery partner
-//TODO: do couriers/cancel-delivery
-//TODO: do couriers/view-delivery
-
-
+const VIEW_DELIVERIES = {
+  useAccount: "TEST_DELIVERY_PARTNER",
+  HTTP_TYPE: "post",
+  ACTION_PATH: "couriers",
+  ACTION_NAME: "view-delivery",
+  sendData: {
+    deliveryPartnerId: 1, //AGILE
+  },
+  expectResponse: fixtures.orders.where(
+    (order) => order.deliveryPartner.id === 1 && order.completedFlag === ''
+  ),
+};
+const CANCEL_DELIVERY = {
+  useAccount: "TEST_DELIVERY_PARTNER",
+  HTTP_TYPE: "post",
+  ACTION_PATH: "couriers",
+  ACTION_NAME: "cancel-delivery",
+  sendData: {
+    vegiOrderId: null, // populate in test
+    deliveryId: "", // populate in test
+  },
+  expectResponse: {},
+};
+const CANCEL_DELIVERY_NOT_ALLOWED_BY_USER = {
+  useAccount: "TEST_USER",
+  HTTP_TYPE: "post",
+  ACTION_PATH: "couriers",
+  ACTION_NAME: "cancel-delivery",
+  sendData: {
+    vegiOrderId: null, // populate in test
+    deliveryId: "", // populate in test
+  },
+  expectResponse: {},
+};
 const ACCEPT_DELIVERY_CONFIRMATION_AS_ADMIN = {
   useAccount: "TEST_SERVICE",
   HTTP_TYPE: "post",
@@ -108,6 +136,31 @@ const ACCEPT_DELIVERY_CONFIRMATION_AS_DELIVERYPARTNER = {
   sendData: {
     deliveryId: "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_3",
     deliveryPartnerConfirmed: true,
+  },
+  expectResponse: {},
+};
+//TODO: do couriers/add-delivery-availability-for-order which should default to the fulfilment slots of that deliverypartner for now and not contact the delvery partner
+const ADD_DELIVERY_DELIVERY_AVAILABILITY = {
+  useAccount: "TEST_DELIVERY_PARTNER",
+  HTTP_TYPE: "post",
+  ACTION_PATH: "couriers",
+  ACTION_NAME: "add-delivery-availability-for-order",
+  sendData: {
+    deliveryPartnerAccepted: true,
+    vegiOrderId: null, // populate in test
+    deliveryId: "", // populate in test
+  },
+  expectResponse: {},
+};
+const ADD_DELIVERY_DELIVERY_AVAILABILITY_AS_USER_NOT_ALLOWED = {
+  useAccount: "TEST_USER",
+  HTTP_TYPE: "post",
+  ACTION_PATH: "couriers",
+  ACTION_NAME: "add-delivery-availability-for-order",
+  sendData: {
+    deliveryPartnerAccepted: true,
+    vegiOrderId: null, // populate in test
+    deliveryId: "", // populate in test
   },
   expectResponse: {},
 };
@@ -198,6 +251,75 @@ const CREATE_ORDER = {
 };
 
 describe(`DeliveryPartner Model Integration Tests`, () => {
+  describe(`${VIEW_DELIVERIES.ACTION_NAME}()`, () => {
+    it(`${VIEW_DELIVERIES.ACTION_NAME} gets all orders but not completed orders`, async () => {
+      try {
+        
+        const hats = HttpAuthTestSenderDeliveryPartner(VIEW_DELIVERIES);
+        const response = await hats.makeAuthCallWith({}, []);
+
+        expect(response.statusCode).to.equal(200);
+        hats.expectedResponse.checkResponse(response.body);
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+  });
+  describe(`${CANCEL_DELIVERY.ACTION_NAME}()`, () => {
+    it(`DeliveryPartners can cancel delivery for an order`, async () => {
+      try {
+        const parentOrder = await HttpAuthTestSenderDeliveryPartner(
+          CREATE_ORDER
+        ).makeAuthCallWith(
+          {
+            deliveryId: "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_6",
+            deliveryPartnerAccepted: true,
+            deliveryPartnerConfirmed: true,
+          },
+          []
+        );
+        const hats = HttpAuthTestSenderDeliveryPartner(CANCEL_DELIVERY);
+        const response = await hats.makeAuthCallWith({
+          vegiOrderId: parentOrder.body.id,
+          deliveryId: "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_6"
+        }, []);
+
+        expect(response.statusCode).to.equal(200);
+        // hats.expectedResponse.checkResponse(response.body);
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+    it(`Non-DeliveryPartners cannot cancel delivery for an order`, async () => {
+      try {
+        const parentOrder = await HttpAuthTestSenderDeliveryPartner(
+          CREATE_ORDER
+        ).makeAuthCallWith(
+          {
+            deliveryId: "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_6",
+            deliveryPartnerAccepted: true,
+            deliveryPartnerConfirmed: true,
+          },
+          []
+        );
+        const hats = HttpAuthTestSenderDeliveryPartner(
+          CANCEL_DELIVERY_NOT_ALLOWED_BY_USER
+        );
+        const response = await hats.makeAuthCallWith({
+          vegiOrderId: parentOrder.body.id,
+          deliveryId: "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_6"
+        }, []);
+
+        expect(response.statusCode).to.equal(401);
+        // hats.expectedResponse.checkResponse(response.body);
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+  });
   describe(`${ACCEPT_DELIVERY_CONFIRMATION_AS_ADMIN.ACTION_NAME}()`, () => {
     it(`${ACCEPT_DELIVERY_CONFIRMATION_AS_ADMIN.ACTION_NAME} returns 401 when already confirmed`, async () => {
       try {
@@ -343,6 +465,282 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
         throw errs;
       }
     });
-    
+  });
+  describe(`${ADD_DELIVERY_DELIVERY_AVAILABILITY.ACTION_NAME}()`, () => {
+    it(`${ADD_DELIVERY_DELIVERY_AVAILABILITY.ACTION_NAME} returns 200 as Delivery Partner for the order`, async () => {
+      try {
+        const deliveryId = "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_10";
+        const parentOrder = await HttpAuthTestSenderDeliveryPartner(
+          CREATE_ORDER
+        ).makeAuthCallWith(
+          {
+            deliveryId: deliveryId,
+            deliveryPartnerAccepted: true,
+            deliveryPartnerConfirmed: false,
+          },
+          []
+        );
+        const hats = HttpAuthTestSenderDeliveryPartner(
+          ADD_DELIVERY_DELIVERY_AVAILABILITY
+        );
+        const response = await hats.makeAuthCallWith({}, []);
+
+        expect(response.statusCode).to.equal(200);
+        // hats.expectedResponse.checkResponse(response.body);
+        const newOrder = await Order.findOne({
+          publicId: parentOrder.body.publicId,
+        }).populate("deliveryPartner");
+        expect(newOrder.deliveryPartnerAccepted).to.equal(true);
+        expect(newOrder.deliveryPartnerConfirmed).to.equal(false);
+        expect(newOrder.deliveryId).to.equal(deliveryId);
+        expect(newOrder.deliveryPartner).to.equal(
+          1,
+          "Should be logged in as AGILE Delivery Partner Test Account, this should set the delivery partner on the order to the id of the AGILE delivery partner"
+        ); //AGILE
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+    it(`${ADD_DELIVERY_DELIVERY_AVAILABILITY.ACTION_NAME} returns 200 as Delivery Partner for the order`, async () => {
+      try {
+        const deliveryId = "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_11";
+        const parentOrder = await HttpAuthTestSenderDeliveryPartner(
+          CREATE_ORDER
+        ).makeAuthCallWith(
+          {
+            deliveryId: deliveryId,
+            deliveryPartnerAccepted: false,
+            deliveryPartnerConfirmed: false,
+          },
+          []
+        );
+        const hats = HttpAuthTestSenderDeliveryPartner(
+          ADD_DELIVERY_DELIVERY_AVAILABILITY
+        );
+        const response = await hats.makeAuthCallWith({}, []);
+
+        expect(response.statusCode).to.equal(200);
+        // hats.expectedResponse.checkResponse(response.body);
+        const newOrder = await Order.findOne({
+          publicId: parentOrder.body.publicId,
+        }).populate("deliveryPartner");
+        expect(newOrder.deliveryPartnerAccepted).to.equal(false);
+        expect(newOrder.deliveryPartnerConfirmed).to.equal(false);
+        expect(newOrder.deliveryId).to.equal("");
+        expect(newOrder.deliveryPartner).to.equal(null);
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+    it(`${ADD_DELIVERY_DELIVERY_AVAILABILITY.ACTION_NAME} returns 401 if Order has already been ACCEPTED || CONFIRMED by ANY delivery partner`, async () => {
+      try {
+        const parentOrder = await HttpAuthTestSenderDeliveryPartner(
+          CREATE_ORDER
+        ).makeAuthCallWith(
+          {
+            deliveryId: "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_3",
+            deliveryPartnerAccepted: true,
+            deliveryPartnerConfirmed: true,
+          },
+          []
+        );
+        const hats = HttpAuthTestSenderDeliveryPartner(
+          ADD_DELIVERY_DELIVERY_AVAILABILITY
+        );
+        const response = await hats.makeAuthCallWith({}, []);
+
+        expect(response.statusCode).to.equal(401);
+        // hats.expectedResponse.checkResponse(response.body);
+        const newOrder = await Order.findOne({
+          publicId: parentOrder.body.publicId,
+        }).populate("deliveryPartner");
+        expect(newOrder.deliveryPartnerAccepted).to.equal(false);
+        expect(newOrder.deliveryPartnerConfirmed).to.equal(false);
+        expect(newOrder.deliveryId).to.equal("");
+        expect(newOrder.deliveryPartner).to.equal(null);
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+    it(`${ADD_DELIVERY_DELIVERY_AVAILABILITY_AS_USER_NOT_ALLOWED.ACTION_NAME} returns 401 when not a delivery partner`, async () => {
+      try {
+        const parentOrder = await HttpAuthTestSenderDeliveryPartner(
+          CREATE_ORDER
+        ).makeAuthCallWith(
+          {
+            deliveryId: "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_12",
+            deliveryPartnerAccepted: false,
+            deliveryPartnerConfirmed: false,
+          },
+          []
+        );
+        const hats = HttpAuthTestSenderDeliveryPartner(
+          ADD_DELIVERY_DELIVERY_AVAILABILITY_AS_USER_NOT_ALLOWED
+        );
+        const response = await hats.makeAuthCallWith({}, []);
+
+        expect(response.statusCode).to.equal(401);
+        // hats.expectedResponse.checkResponse(response.body);
+        const newOrder = await Order.findOne({
+          publicId: parentOrder.body.publicId,
+        }).populate("deliveryPartner");
+        expect(newOrder.deliveryPartnerAccepted).to.equal(false);
+        expect(newOrder.deliveryPartnerConfirmed).to.equal(false);
+        expect(newOrder.deliveryId).to.equal("");
+        expect(newOrder.deliveryPartner).to.equal(null);
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+    it(`${ADD_DELIVERY_DELIVERY_AVAILABILITY.ACTION_NAME} returns 404 when no overlapping fulfliment slots between Vendor and Delivery Partner`, async () => {
+      // This should not be possible in the UI anyway, but needs protection on the backend anyway as elgible delivery slots should be the intersection of vendor and dp slots anyway.
+      try {
+        const deliveryStart = "11:00";
+        const deliveryEnd = "13:00";
+        // create an order with the fulfilment slot set to one that works for DeliveryPartner
+
+        const deliveryPartner = await DeliveryPartner.create({
+          name: "Test helpers getAvailableDeliveryPartnerFromPool Delivery Partner",
+          email: "getAvailableDeliveryPartnerFromPool@sailshelpers.com",
+          phoneNumber: "0123456123",
+          status: "active",
+          deliversToPostCodes: ["L1"],
+          rating: 5,
+        });
+        // Generate collection/delivery blank opening hours
+        var openingHoursDel = [];
+        var openingHoursDelVen = [];
+        var weekdays = [
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+          "saturday",
+          "sunday",
+        ];
+        const delvDp = await FulfilmentMethod.create({
+          deliveryPartner: deliveryPartner,
+          methodType: "delivery",
+        }).fetch();
+        const vendor = await Vendor.create({
+          createdAt: 1650878843365,
+          updatedAt: 1651529215649,
+          name: "Test action view-delivery",
+          type: "restaurant",
+          description: "Some test vendor",
+          walletAddress: "0xf039CD9391cB28a7e632D07821deeBc249a32410",
+          imageUrl:
+            "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
+          status: "active",
+          phoneNumber: "+447495865614",
+          pickupAddressLineOne: null,
+          pickupAddressLineTwo: null,
+          pickupAddressCity: null,
+          pickupAddressPostCode: null,
+          costLevel: null,
+          rating: 5,
+          isVegan: false,
+          minimumOrderAmount: 0,
+          platformFee: 0,
+          collectionFulfilmentMethod: 8,
+          deliveryFulfilmentMethod: null,
+          deliveryPartner: deliveryPartner.id, // Agile
+          products: [],
+          vendorCategories: [1], // Cafes
+          productCategories: [],
+          fulfilmentPostalDistricts: [1, 2], // L1, L2
+          users: [],
+        }).fetch();
+        const delvVendor = await FulfilmentMethod.create({
+          vendor: vendor.id,
+          methodType: "delivery",
+        }).fetch();
+        // Create blank opening hours for each day
+        weekdays.forEach((weekday) => {
+          // Delivery hours
+          openingHoursDel.push({
+            dayOfWeek: weekday,
+            isOpen: true,
+            openTime: deliveryStart,
+            closeTime: deliveryEnd,
+            fulfilmentMethod: delvDp.id,
+          });
+          // openingHoursDel.push({
+          //   dayOfWeek: weekday,
+          //   isOpen: true,
+          //   openTime: "15:00",
+          //   closeTime: "17:00",
+          //   fulfilmentMethod: delvDp.id,
+          // });
+
+          //vendor
+          // openingHoursDelVen.push({
+          //   dayOfWeek: weekday,
+          //   isOpen: true,
+          //   openTime: deliveryStart,
+          //   closeTime: deliveryEnd,
+          //   fulfilmentMethod: delvVendor.id,
+          // });
+          openingHoursDelVen.push({
+            dayOfWeek: weekday,
+            isOpen: true,
+            openTime: "15:00",
+            closeTime: "17:00",
+            fulfilmentMethod: delvVendor.id,
+          });
+        });
+
+        // Add the opening hours to the database
+        const newHoursDel = await OpeningHours.createEach(
+          openingHoursDel
+        ).fetch();
+        const newHoursIDsDel = newHoursDel.map(({ id }) => id);
+        const fmDp =await FulfilmentMethod.addToCollection(delvDp.id, "openingHours").members(
+          newHoursIDsDel
+        );
+        const newHoursDelVen = await OpeningHours.createEach(
+          openingHoursDelVen
+        ).fetch();
+        const newHoursIDsDelVen = newHoursDelVen.map(({ id }) => id);
+        const fmVen = await FulfilmentMethod.addToCollection(
+          delvVendor.id,
+          "openingHours"
+        ).members(newHoursIDsDelVen);
+        
+        const parentOrder = await HttpAuthTestSenderDeliveryPartner(
+          CREATE_ORDER
+        ).makeAuthCallWith(
+          {
+            deliveryId: "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_14",
+            fulfilmentMethod: fmVen, // mobile app only requests fulfilment methods for vendor at the moment
+            fulfilmentSlotFrom: moment("15:00", "hh:mm:ss").toDate(), //fmVen.openingHours.openTime -> closeTime
+            fulfilmentSlotTo: moment("17:00", "hh:mm:ss").toDate(),
+          },
+          []
+        );
+        const hats = HttpAuthTestSenderDeliveryPartner(
+          ADD_DELIVERY_DELIVERY_AVAILABILITY
+        );
+        const response = await hats.makeAuthCallWith({}, []);
+
+        expect(response.statusCode).to.equal(404); // because DeliveryPartner available slots are 11 -> 1
+        // hats.expectedResponse.checkResponse(response.body);
+        const newOrder = await Order.findOne({
+          publicId: parentOrder.body.publicId,
+        }).populate("deliveryPartner");
+        expect(newOrder.deliveryPartnerAccepted).to.equal(false);
+        expect(newOrder.deliveryPartnerConfirmed).to.equal(false);
+        expect(newOrder.deliveryId).to.equal("");
+        expect(newOrder.deliveryPartner).to.equal(null);
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
   });
 });

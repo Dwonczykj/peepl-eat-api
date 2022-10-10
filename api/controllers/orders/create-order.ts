@@ -123,7 +123,6 @@ module.exports = {
     const deliverBefore = moment(inputs.fulfilmentSlotTo, 'YYYYMMdd hh:mm:ss'); //moment("01:15:00 PM", "h:mm:ss A")
 
     if(isDelivery){
-      //TODO: Organise delivery with available deliveryPartner
       const availableDeliveryPartner: IDeliveryPartner =
         await sails.helpers.getAvailableDeliveryPartnerFromPool.with({
           pickupFromVendor: vendor.id,

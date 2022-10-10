@@ -69,8 +69,6 @@ module.exports.bootstrap = async function () {
     // var postalDistricts = createPostalDistricts.map((pd) => PostalDistrict.create(pd).fetch());
     var postalDistricts = await PostalDistrict.createEach(createPostalDistricts).fetch();
 
-    var deliveryPartner = await DeliveryPartner.create(fixtures.deliveryPartners[0]).fetch();
-
     if(fixtures && fixtures.vendors) {
       // for (var i = 0; i < fixtures.vendors.length; i++){
       //   Vendor.create(fixtures.vendors[i]);
@@ -96,13 +94,6 @@ module.exports.bootstrap = async function () {
     var delifonseca = await Vendor.findOne({ name: "Delifonseca" });
 
     await CategoryGroup.createEach(fixtures.categoryGroups);
-
-    var readyMealCatGroup = await CategoryGroup.findOne({
-      'name': 'Ready Meals'
-    });
-    var coffeeCatGroup = await CategoryGroup.findOne({
-      'name': 'Coffee'
-    });
 
     var productCategories = await ProductCategory.createEach(fixtures.productCategories).fetch();
     var lunchProductCategoryForDelifonsecaVendor = productCategories[0];
@@ -136,16 +127,11 @@ module.exports.bootstrap = async function () {
 
     sails.log.info('Product Categories added to delifonseca');
 
-    var burnsNight = await Product.create({
+    await Product.createEach(fixtures.products);
+
+    var burnsNight = await Product.findOne({
       name: 'Burns Night - Dine @ Home (For 1)',
-      description: 'Unfortunately, this year the 25th falls on a Monday. You won’t be able to join us, so we\'ve made our Dine@home Burns inspired instead.',
-      basePrice: 2200,
-      isAvailable: true,
-      vendor: delifonseca.id,
-      categoryGroup: readyMealCatGroup.id,
-      imageUrl: 'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
-      category: lunchProductCategoryForDelifonsecaVendor.id
-    }).fetch();
+    });
 
     var starterOption = await ProductOption.create({
       name: 'Starter',
@@ -165,6 +151,8 @@ module.exports.bootstrap = async function () {
     await ProductOptionValue.createEach(fixtures.productOptionValues);
 
     await Discount.createEach(fixtures.discountCodes);
+
+    await DeliveryPartner.createEach(fixtures.deliveryPartners);
 
     await User.createEach(fixtures.users);
     // eslint-disable-next-line no-console
