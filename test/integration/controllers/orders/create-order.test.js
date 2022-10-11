@@ -580,7 +580,7 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${CREATE_ORDER.ACTION_NAME}() returns a 200 with json when authenticated`, () => {
     it("Returns a new order", async () => {
       try {
-        const hats = HttpAuthTestSenderOrder(CREATE_ORDER);
+        const hats = new HttpAuthTestSenderOrder(CREATE_ORDER);
         const response = await hats.makeAuthCallWith({}, []);
         expect(response.statusCode).to.equal(200);
         hats.expectedResponse.checkResponse(response.body);
@@ -591,7 +591,7 @@ describe(`Order Model Integration Tests`, () => {
     });
     it("Returns a new order with deliveryPostCode set", async () => {
       try {
-        const hats = HttpAuthTestSenderOrder(CREATE_ORDER);
+        const hats = new HttpAuthTestSenderOrder(CREATE_ORDER);
         const response = await hats.makeAuthCallWith(
           {
             address: {
@@ -610,7 +610,7 @@ describe(`Order Model Integration Tests`, () => {
     });
     it("Create-order fails with badly formatted deliveryPostCode set to 'L1'", async () => {
       try {
-        const hats = HttpAuthTestSenderOrder(CREATE_ORDER);
+        const hats = new HttpAuthTestSenderOrder(CREATE_ORDER);
         const response = await hats.makeAuthCallWith(
           {
             address: {
@@ -629,7 +629,7 @@ describe(`Order Model Integration Tests`, () => {
     });
     it("Create-order fails with badly formatted deliveryPostCode set to 'bs postcode'", async () => {
       try {
-        const hats = HttpAuthTestSenderOrder(CREATE_ORDER);
+        const hats = new HttpAuthTestSenderOrder(CREATE_ORDER);
         const response = await hats.makeAuthCallWith(
           {
             address: {
@@ -648,7 +648,7 @@ describe(`Order Model Integration Tests`, () => {
     });
     it("Create-order with deliveryInstructions", async () => {
       try {
-        const hats = HttpAuthTestSenderOrder(CREATE_ORDER);
+        const hats = new HttpAuthTestSenderOrder(CREATE_ORDER);
         const response = await hats.makeAuthCallWith(
           {
             address: {
@@ -670,7 +670,7 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${GET_ORDER.ACTION_NAME}() successfully gets order with id 1`, () => {
     it("Can GET Orders by wallet address", async () => {
       try {
-        const hats = HttpAuthTestSenderOrder(GET_ORDER);
+        const hats = new HttpAuthTestSenderOrder(GET_ORDER);
         const response = await hats.makeAuthCallWith(
           {},
           []
@@ -694,7 +694,7 @@ describe(`Order Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSenderOrder(
+        const hats = new HttpAuthTestSenderOrder(
           GET_ORDER_BY_WALLETADDRESS
         );
         const response = await hats.makeAuthCallWith(
@@ -723,7 +723,7 @@ describe(`Order Model Integration Tests`, () => {
           {},
           []
         );
-        const hats = HttpAuthTestSenderOrder(
+        const hats = new HttpAuthTestSenderOrder(
           MARK_ORDER_AS_PAID
         );
         const response = await hats.makeAuthCallWith(
@@ -749,7 +749,7 @@ describe(`Order Model Integration Tests`, () => {
           {},
           []
         );
-        const hats = HttpAuthTestSenderOrder(
+        const hats = new HttpAuthTestSenderOrder(
           MARK_ORDER_AS_PAYMENT_FAILED
         );
         const response = await hats.makeAuthCallWith(
@@ -773,7 +773,7 @@ describe(`Order Model Integration Tests`, () => {
         const parentOrder = await HttpAuthTestSenderOrder(
           CREATE_ORDER
         ).makeAuthCallWith({}, []);
-        const hats = HttpAuthTestSenderOrder(MARK_ORDER_AS_REFUNDED_SUCCESS);
+        const hats = new HttpAuthTestSenderOrder(MARK_ORDER_AS_REFUNDED_SUCCESS);
         const response = await hats.makeAuthCallWith(
           {
             publicId: parentOrder.body.publicId,
@@ -796,7 +796,7 @@ describe(`Order Model Integration Tests`, () => {
         const parentOrder = await HttpAuthTestSenderOrder(
           CREATE_ORDER
         ).makeAuthCallWith({}, []);
-        const hats = HttpAuthTestSenderOrder(MARK_ORDER_AS_REFUNDED_FAILED);
+        const hats = new HttpAuthTestSenderOrder(MARK_ORDER_AS_REFUNDED_FAILED);
         const response = await hats.makeAuthCallWith(
           {
             publicId: parentOrder.body.publicId,
@@ -818,7 +818,7 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${GET_ORDER_STATUS.ACTION_NAME}() successfully gets order status`, () => {
     it("Order status correct", async () => {
       try {
-        const hats = HttpAuthTestSenderOrder(
+        const hats = new HttpAuthTestSenderOrder(
           GET_ORDER_STATUS
         );
         const response = await hats.makeAuthCallWith(
@@ -837,7 +837,7 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${VIEW_ALL_ORDERS_ACCEPTED.ACTION_NAME}()`, () => {
     it("successfully gets all accepted orders", async () => {
       try {
-        const hats = HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_ACCEPTED);
+        const hats = new HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_ACCEPTED);
         const response = await hats.makeAuthCallWith({}, []);
 
         expect(response.statusCode).to.equal(200);
@@ -851,7 +851,7 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${VIEW_ALL_ORDERS_REJECTED.ACTION_NAME}()`, () => {
     it("successfully gets all rejected orders", async () => {
       try {
-        const hats = HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_REJECTED);
+        const hats = new HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_REJECTED);
         const response = await hats.makeAuthCallWith({}, []);
 
         expect(response.statusCode).to.equal(200);
@@ -865,7 +865,7 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${VIEW_ALL_ORDERS_PENDING.ACTION_NAME}()`, () => {
     it("successfully gets all pending orders", async () => {
       try {
-        const hats = HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_PENDING);
+        const hats = new HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_PENDING);
         const response = await hats.makeAuthCallWith({}, []);
 
         expect(response.statusCode).to.equal(200);
@@ -879,7 +879,7 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${VIEW_ALL_ORDERS_DEFAULT.ACTION_NAME}()`, () => {
     it("successfully gets all orders with no status parameter set", async () => {
       try {
-        const hats = HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_DEFAULT);
+        const hats = new HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_DEFAULT);
         const response = await hats.makeAuthCallWith({}, []);
 
         expect(response.statusCode).to.equal(200);
@@ -893,7 +893,7 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${VIEW_ALL_ORDERS_UPCOMING.ACTION_NAME}()`, () => {
     it("successfully gets all upcoming orders with no status parameter set", async () => {
       try {
-        const hats = HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_UPCOMING);
+        const hats = new HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_UPCOMING);
         const response = await hats.makeAuthCallWith({}, []);
 
         expect(response.statusCode).to.equal(200);
@@ -907,7 +907,7 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${VIEW_ALL_ORDERS_PAST.ACTION_NAME}()`, () => {
     it("successfully gets all past orders with no status parameter set", async () => {
       try {
-        const hats = HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_PAST);
+        const hats = new HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_PAST);
         const response = await hats.makeAuthCallWith({}, []);
 
         expect(response.statusCode).to.equal(200);
@@ -921,7 +921,7 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${VIEW_ALL_ORDERS_NON_ADMIN.ACTION_NAME}()`, () => {
     it("successfully gets all orders when logged in as admin", async () => {
       try {
-        const hats = HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_NON_ADMIN);
+        const hats = new HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_NON_ADMIN);
         const response = await hats.makeAuthCallWith({}, []);
 
         expect(response.statusCode).to.equal(200);
@@ -933,7 +933,7 @@ describe(`Order Model Integration Tests`, () => {
     });
     it("fails to get any orders when logged in as non-admin", async () => {
       try {
-        const hats = HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_NON_ADMIN);
+        const hats = new HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_NON_ADMIN);
         const response = await hats.makeAuthCallWith({}, []);
 
         expect(response.statusCode).to.equal(401);
@@ -955,7 +955,7 @@ describe(`Order Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSenderOrder(VIEW_APPROVE_ORDER);
+        const hats = new HttpAuthTestSenderOrder(VIEW_APPROVE_ORDER);
         const response = await hats.makeAuthCallWith({
           orderId: parentOrder.body.publicId
         }, []);
@@ -1022,7 +1022,7 @@ describe(`Order Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSenderOrder(APPROVE_OR_DECLINE_ORDER_ACCEPT);
+        const hats = new HttpAuthTestSenderOrder(APPROVE_OR_DECLINE_ORDER_ACCEPT);
         const response = await hats.makeAuthCallWith(
           {
             orderId: parentOrder.body.id,
@@ -1090,7 +1090,7 @@ describe(`Order Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSenderOrder(APPROVE_OR_DECLINE_ORDER_REJECT);
+        const hats = new HttpAuthTestSenderOrder(APPROVE_OR_DECLINE_ORDER_REJECT);
         const response = await hats.makeAuthCallWith(
           {
             orderId: parentOrder.body.id,
@@ -1158,7 +1158,7 @@ describe(`Order Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSenderOrder(APPROVE_OR_DECLINE_ORDER_PARTIAL);
+        const hats = new HttpAuthTestSenderOrder(APPROVE_OR_DECLINE_ORDER_PARTIAL);
         const response = await hats.makeAuthCallWith(
           {
             orderId: parentOrder.body.id,
@@ -1228,7 +1228,7 @@ describe(`Order Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSenderOrder(CUSTOMER_UPDATE_PAID_ORDER);
+        const hats = new HttpAuthTestSenderOrder(CUSTOMER_UPDATE_PAID_ORDER);
         const response = await hats.makeAuthCallWith(
           {
             orderId: parentOrder.body.id,
@@ -1301,7 +1301,7 @@ describe(`Order Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSenderOrder(CUSTOMER_CANCEL_ORDER);
+        const hats = new HttpAuthTestSenderOrder(CUSTOMER_CANCEL_ORDER);
         const response = await hats.makeAuthCallWith(
           {
             orderId: parentOrder.body.id,
@@ -1375,7 +1375,7 @@ describe(`Order Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSenderOrder(CUSTOMER_RECEIVED_ORDER_GOOD);
+        const hats = new HttpAuthTestSenderOrder(CUSTOMER_RECEIVED_ORDER_GOOD);
         const response = await hats.makeAuthCallWith(
           {
             orderId: parentOrder.body.id,
@@ -1456,7 +1456,7 @@ describe(`Order Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSenderOrder(CUSTOMER_RECEIVED_ORDER_POOR_CONDITION);
+        const hats = new HttpAuthTestSenderOrder(CUSTOMER_RECEIVED_ORDER_POOR_CONDITION);
         const response = await hats.makeAuthCallWith(
           {
             orderId: parentOrder.body.id,
@@ -1534,7 +1534,7 @@ describe(`Order Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSenderOrder(CUSTOMER_RECEIVED_ORDER_LATE_DELIVERY);
+        const hats = new HttpAuthTestSenderOrder(CUSTOMER_RECEIVED_ORDER_LATE_DELIVERY);
         const response = await hats.makeAuthCallWith(
           {
             orderId: parentOrder.body.id,
@@ -1614,7 +1614,7 @@ describe(`Order Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSenderOrder(CUSTOMER_RECEIVED_ORDER_NOT_RECEIVED);
+        const hats = new HttpAuthTestSenderOrder(CUSTOMER_RECEIVED_ORDER_NOT_RECEIVED);
         const response = await hats.makeAuthCallWith(
           {
             orderId: parentOrder.body.id,
@@ -1693,7 +1693,7 @@ describe(`Order Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSenderOrder(CUSTOMER_RECEIVED_ORDER_BAD_INPUT_DELV_PUNCT);
+        const hats = new HttpAuthTestSenderOrder(CUSTOMER_RECEIVED_ORDER_BAD_INPUT_DELV_PUNCT);
         const response = await hats.makeAuthCallWith(
           {
             orderId: parentOrder.body.id,
@@ -1769,7 +1769,7 @@ describe(`Order Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSenderOrder(CUSTOMER_RECEIVED_ORDER_BAD_INPUT_ORDER_COND);
+        const hats = new HttpAuthTestSenderOrder(CUSTOMER_RECEIVED_ORDER_BAD_INPUT_ORDER_COND);
         const response = await hats.makeAuthCallWith(
           {
             orderId: parentOrder.body.id,
@@ -1848,7 +1848,7 @@ describe(`Order Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSenderOrder(UPDATE_PAID_ORDER_SUCCESS);
+        const hats = new HttpAuthTestSenderOrder(UPDATE_PAID_ORDER_SUCCESS);
         const response = await hats.makeAuthCallWith(
           {
             orderId: parentOrder.body.id,
@@ -1916,7 +1916,7 @@ describe(`Order Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSenderOrder(UPDATE_PAID_ORDER_FAILED);
+        const hats = new HttpAuthTestSenderOrder(UPDATE_PAID_ORDER_FAILED);
         const response = await hats.makeAuthCallWith(
           {
             orderId: parentOrder.body.id,

@@ -12,7 +12,7 @@ const ACTION_PATH = "admin";
 
 describe(`Fetch ${ACTION_NAME} Tests`, () => {
   describe(`${ACTION_NAME}() returns a 200 with json when authenticated`, () => {
-    it("Returns a new product", () => {
+    it("Returns a new product", async () => {
       const EXPECTED_RESPONSE = {
         name: "Test product",
         description: "This is a test.",
@@ -52,7 +52,7 @@ describe(`Fetch ${ACTION_NAME} Tests`, () => {
           throw errs;
         }
       };
-      callAuthActionWithCookie(cb);
+      await callAuthActionWithCookie(cb);
     });
   });
 });

@@ -12,7 +12,7 @@ const ACTION_PATH = "admin";
 
 describe(`Fetch ${ACTION_NAME} Tests`, () => {
   describe(`${ACTION_NAME}() returns a 200 with json when authenticated`, () => {
-    it("Returns a updated postal districts for vendor", () => {
+    it("Returns a updated postal districts for vendor", async () => {
       const EXPECTED_RESPONSE = {
         vendorId: 1,
         districts: [1, 2],
@@ -37,7 +37,7 @@ describe(`Fetch ${ACTION_NAME} Tests`, () => {
           throw errs;
         }
       };
-      callAuthActionWithCookie(cb);
+      await callAuthActionWithCookie(cb);
     });
   });
 });

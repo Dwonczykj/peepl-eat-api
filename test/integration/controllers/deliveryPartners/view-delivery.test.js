@@ -10,6 +10,7 @@ const {
   HttpAuthTestSender,
   ExpectResponse,
 } = require("../../../httpTestSender");
+const {fixtures} = require('../../../../scripts/build_db');
 
 class ExpectResponseDeliveryPartner extends ExpectResponse {
   constructor({
@@ -62,15 +63,6 @@ class HttpAuthTestSenderDeliveryPartner extends HttpAuthTestSender {
     });
   }
 }
-
-var fixtures = {};
-const fs = require("fs");
-
-_.each(fs.readdirSync(process.cwd() + "/test/fixtures/"), (file) => {
-  fixtures[file.replace(/\.js$/, "")] = require(process.cwd() +
-    "/test/fixtures/" +
-    file);
-});
 
 const VIEW_DELIVERIES = {
   useAccount: "TEST_DELIVERY_PARTNER",
@@ -139,7 +131,6 @@ const ACCEPT_DELIVERY_CONFIRMATION_AS_DELIVERYPARTNER = {
   },
   expectResponse: {},
 };
-//TODO: do couriers/add-delivery-availability-for-order which should default to the fulfilment slots of that deliverypartner for now and not contact the delvery partner
 const ADD_DELIVERY_DELIVERY_AVAILABILITY = {
   useAccount: "TEST_DELIVERY_PARTNER",
   HTTP_TYPE: "post",
@@ -255,7 +246,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
     it(`${VIEW_DELIVERIES.ACTION_NAME} gets all orders but not completed orders`, async () => {
       try {
         
-        const hats = HttpAuthTestSenderDeliveryPartner(VIEW_DELIVERIES);
+        const hats = new HttpAuthTestSenderDeliveryPartner(VIEW_DELIVERIES);
         const response = await hats.makeAuthCallWith({}, []);
 
         expect(response.statusCode).to.equal(200);
@@ -279,7 +270,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSenderDeliveryPartner(CANCEL_DELIVERY);
+        const hats = new HttpAuthTestSenderDeliveryPartner(CANCEL_DELIVERY);
         const response = await hats.makeAuthCallWith({
           vegiOrderId: parentOrder.body.id,
           deliveryId: "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_6"
@@ -304,7 +295,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSenderDeliveryPartner(
+        const hats = new HttpAuthTestSenderDeliveryPartner(
           CANCEL_DELIVERY_NOT_ALLOWED_BY_USER
         );
         const response = await hats.makeAuthCallWith({
@@ -333,7 +324,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSenderDeliveryPartner(
+        const hats = new HttpAuthTestSenderDeliveryPartner(
           ACCEPT_DELIVERY_CONFIRMATION_AS_DELIVERYPARTNER
         );
         const response = await hats.makeAuthCallWith({}, []);
@@ -355,7 +346,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSenderDeliveryPartner(
+        const hats = new HttpAuthTestSenderDeliveryPartner(
           ACCEPT_DELIVERY_CONFIRMATION_AS_USER_NOT_ALLOWED
         );
         const response = await hats.makeAuthCallWith({}, []);
@@ -378,7 +369,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSenderDeliveryPartner(
+        const hats = new HttpAuthTestSenderDeliveryPartner(
           ACCEPT_DELIVERY_CONFIRMATION_AS_USER_NOT_ALLOWED
         );
         const response = await hats.makeAuthCallWith({}, []);
@@ -400,7 +391,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSenderDeliveryPartner(
+        const hats = new HttpAuthTestSenderDeliveryPartner(
           ACCEPT_DELIVERY_CONFIRMATION_AS_ADMIN
         );
         const response = await hats.makeAuthCallWith(
@@ -425,7 +416,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSenderDeliveryPartner(
+        const hats = new HttpAuthTestSenderDeliveryPartner(
           ACCEPT_DELIVERY_CONFIRMATION_AS_DELIVERYPARTNER
         );
         const response = await hats.makeAuthCallWith(
@@ -450,7 +441,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSenderDeliveryPartner(
+        const hats = new HttpAuthTestSenderDeliveryPartner(
           ACCEPT_DELIVERY_CONFIRMATION_AS_USER_NOT_ALLOWED
         );
         const response = await hats.makeAuthCallWith(
@@ -480,7 +471,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSenderDeliveryPartner(
+        const hats = new HttpAuthTestSenderDeliveryPartner(
           ADD_DELIVERY_DELIVERY_AVAILABILITY
         );
         const response = await hats.makeAuthCallWith({}, []);
@@ -515,7 +506,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSenderDeliveryPartner(
+        const hats = new HttpAuthTestSenderDeliveryPartner(
           ADD_DELIVERY_DELIVERY_AVAILABILITY
         );
         const response = await hats.makeAuthCallWith({}, []);
@@ -546,7 +537,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSenderDeliveryPartner(
+        const hats = new HttpAuthTestSenderDeliveryPartner(
           ADD_DELIVERY_DELIVERY_AVAILABILITY
         );
         const response = await hats.makeAuthCallWith({}, []);
@@ -577,7 +568,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSenderDeliveryPartner(
+        const hats = new HttpAuthTestSenderDeliveryPartner(
           ADD_DELIVERY_DELIVERY_AVAILABILITY_AS_USER_NOT_ALLOWED
         );
         const response = await hats.makeAuthCallWith({}, []);
@@ -609,6 +600,9 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
           phoneNumber: "0123456123",
           status: "active",
           deliversToPostCodes: ["L1"],
+          walletAddress: "0xf039CD9391cB28a7e632D07821deeBc249a32410",
+          imageUrl:
+            "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
           rating: 5,
         });
         // Generate collection/delivery blank opening hours
@@ -723,7 +717,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
           },
           []
         );
-        const hats = HttpAuthTestSenderDeliveryPartner(
+        const hats = new HttpAuthTestSenderDeliveryPartner(
           ADD_DELIVERY_DELIVERY_AVAILABILITY
         );
         const response = await hats.makeAuthCallWith({}, []);

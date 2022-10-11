@@ -12,7 +12,7 @@ const ACTION_PATH = "admin";
 
 describe(`Fetch ${ACTION_NAME} Tests`, () => {
   describe(`${ACTION_NAME}() returns a 200 with json when authenticated`, () => {
-    it("Returns a new product option that has isRequired default to false", () => {
+    it("Returns a new product option that has isRequired default to false", async () => {
       const EXPECTED_RESPONSE = {
         name: "Test product",
         isRequired: false,
@@ -36,9 +36,9 @@ describe(`Fetch ${ACTION_NAME} Tests`, () => {
           throw errs;
         }
       };
-      callAuthActionWithCookie(cb);
+      await callAuthActionWithCookie(cb);
     });
-    it("Returns a new product option that has isRequired set to true", () => {
+    it("Returns a new product option that has isRequired set to true", async () => {
       const EXPECTED_RESPONSE = {
         name: "Test required product",
         isRequired: true,
@@ -62,7 +62,7 @@ describe(`Fetch ${ACTION_NAME} Tests`, () => {
           throw errs;
         }
       };
-      callAuthActionWithCookie(cb);
+      await callAuthActionWithCookie(cb);
     });
   });
 });

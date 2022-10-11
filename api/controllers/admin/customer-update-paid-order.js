@@ -32,7 +32,7 @@ class MockPeeplPayPricingAPI {
   }
 }
 
-const peeplPay = MockPeeplPayPricingAPI();
+const peeplPay = new MockPeeplPayPricingAPI();
 
 Object.freeze(OrderTypeEnum);
 

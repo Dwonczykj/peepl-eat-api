@@ -10,8 +10,10 @@
  */
 
 declare var User: any;
+declare var DeliveryPartner: any;
 declare var Order: any;
 declare var Vendor: any;
+declare var CategoryGroup: any;
 
 declare var firebase:any; // TODO: Remove once we make firebase an imported module, currently it is a CDN script
 declare var parasails:any;

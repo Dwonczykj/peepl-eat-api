@@ -30,7 +30,7 @@ const createVendor = {
 
 describe(`Fetch ${ACTION_NAME} Tests`, () => {
   describe(`${ACTION_NAME}() returns a 200 with json when authenticated`, () => {
-    it("Returns a new vendor", () => {
+    it("Returns a new vendor", async () => {
       const cb = async (cookie) => {
         try {
           const response = await supertest(sails.hooks.http.app)
@@ -55,7 +55,7 @@ describe(`Fetch ${ACTION_NAME} Tests`, () => {
           throw errs;
         }
       };
-      callAuthActionWithCookie(cb);
+      await callAuthActionWithCookie(cb);
     });
   });
 });

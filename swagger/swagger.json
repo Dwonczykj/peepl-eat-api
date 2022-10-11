@@ -285,110 +285,6 @@
           }
         }
       },
-      "courier": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/courier-without-required-constraint"
-          },
-          {
-            "required": [
-              "name",
-              "walletAddress",
-              "imageUrl",
-              "email"
-            ]
-          }
-        ]
-      },
-      "courier-without-required-constraint": {
-        "type": "object",
-        "description": "Sails ORM Model **Courier**",
-        "properties": {
-          "createdAt": {
-            "type": "number",
-            "format": "double"
-          },
-          "updatedAt": {
-            "type": "number",
-            "format": "double"
-          },
-          "id": {
-            "type": "integer",
-            "format": "int64",
-            "uniqueItems": true,
-            "description": "Note Sails special attributes: autoIncrement"
-          },
-          "name": {
-            "type": "string",
-            "description": "The name of the courier.",
-            "maxLength": 50,
-            "uniqueItems": true
-          },
-          "type": {
-            "type": "string",
-            "default": "bike",
-            "description": "The type of courier.",
-            "enum": [
-              "bike",
-              "electric"
-            ],
-            "example": "bike"
-          },
-          "description": {
-            "type": "string",
-            "description": "A brief description of the courier.",
-            "maxLength": 200
-          },
-          "walletAddress": {
-            "type": "string",
-            "pattern": "^0x[a-fA-F0-9]{40}$",
-            "description": "The blockchain wallet address for the courier. Used to distribute payments from vendors."
-          },
-          "imageUrl": {
-            "type": "string",
-            "description": "A description of where the featured image file can be found"
-          },
-          "status": {
-            "type": "string",
-            "default": "inactive",
-            "enum": [
-              "active",
-              "draft",
-              "inactive"
-            ],
-            "example": "inactive"
-          },
-          "phoneNumber": {
-            "type": "string",
-            "description": "Phone number of the courier hq."
-          },
-          "email": {
-            "type": "string",
-            "description": "Email of the courier hq.",
-            "uniqueItems": true
-          },
-          "deliversToPostCodes": {
-            "type": "array",
-            "items": {},
-            "default": [],
-            "example": []
-          },
-          "rating": {
-            "type": "integer",
-            "format": "int64",
-            "maximum": 5,
-            "minimum": 0
-          },
-          "users": {
-            "description": "Array of **user**'s or array of FK's when creating / updating / not populated",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/user"
-            }
-          }
-        }
-      },
       "deliverypartner": {
         "type": "object",
         "allOf": [
@@ -399,7 +295,9 @@
             "required": [
               "name",
               "email",
-              "phoneNumber"
+              "phoneNumber",
+              "walletAddress",
+              "imageUrl"
             ]
           }
         ]
@@ -425,7 +323,8 @@
           "name": {
             "type": "string",
             "description": "The name of the Delivery Partner.",
-            "maxLength": 50
+            "maxLength": 50,
+            "uniqueItems": true
           },
           "email": {
             "type": "string",
@@ -438,6 +337,30 @@
             "description": "Phone number of the Delivery Partner.",
             "maxLength": 20
           },
+          "type": {
+            "type": "string",
+            "default": "bike",
+            "description": "The type of delivery partner.",
+            "enum": [
+              "bike",
+              "electric"
+            ],
+            "example": "bike"
+          },
+          "description": {
+            "type": "string",
+            "description": "A brief description of the delivery partner.",
+            "maxLength": 200
+          },
+          "walletAddress": {
+            "type": "string",
+            "pattern": "^0x[a-fA-F0-9]{40}$",
+            "description": "The blockchain wallet address for the delivery partner. Used to distribute payments from vendors."
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "A description of where the featured image file can be found"
+          },
           "status": {
             "type": "string",
             "default": "inactive",
@@ -447,6 +370,18 @@
             ],
             "example": "inactive"
           },
+          "deliversToPostCodes": {
+            "type": "array",
+            "items": {},
+            "default": [],
+            "example": []
+          },
+          "rating": {
+            "type": "integer",
+            "format": "int64",
+            "maximum": 5,
+            "minimum": 0
+          },
           "deliveryFulfilmentMethod": {
             "description": "JSON dictionary representing the **fulfilmentmethod** instance or FK when creating / updating / not populated",
             "oneOf": [
@@ -454,6 +389,13 @@
                 "$ref": "#/components/schemas/fulfilmentmethod"
               }
             ]
+          },
+          "users": {
+            "description": "Array of **user**'s or array of FK's when creating / updating / not populated",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/user"
+            }
           }
         }
       },
@@ -801,16 +743,13 @@
             "type": "string",
             "description": "The ID to identify the delivery in the logistics system"
           },
-          "courierAccepted": {
+          "deliveryPartnerAccepted": {
             "type": "boolean",
             "default": false
           },
-          "courierConfirmed": {
+          "deliveryPartnerConfirmed": {
             "type": "boolean",
             "default": false
-          },
-          "courierId": {
-            "type": "string"
           },
           "fulfilmentSlotFrom": {
             "type": "string",
@@ -917,6 +856,14 @@
               }
             ]
           },
+          "deliveryPartner": {
+            "description": "JSON dictionary representing the **deliverypartner** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/deliverypartner"
+              }
+            ]
+          },
           "parentOrder": {
             "description": "JSON dictionary representing the **order** instance or FK when creating / updating / not populated",
             "oneOf": [
@@ -966,7 +913,8 @@
           },
           "unfulfilledOnOrderId": {
             "type": "string",
-            "default": ""
+            "default": "",
+            "description": "Used to track the original order id of the parent order when an item is flagged as unfulfilled on an order, it is not removed from the order, it is just flagged as unfulfilled for tracking purposes."
           },
           "order": {
             "description": "The order to which the item belongs JSON dictionary representing the **order** instance or FK when creating / updating / not populated",
@@ -1437,7 +1385,7 @@
             "enum": [
               "admin",
               "vendor",
-              "courier",
+              "deliveryPartner",
               "consumer"
             ]
           },
@@ -1453,7 +1401,7 @@
             ],
             "example": "none"
           },
-          "courierRole": {
+          "deliveryPartnerRole": {
             "type": "string",
             "default": "none",
             "enum": [
@@ -1492,41 +1440,13 @@
               }
             ]
           },
-          "courier": {
-            "description": "JSON dictionary representing the **courier** instance or FK when creating / updating / not populated",
+          "deliveryPartner": {
+            "description": "JSON dictionary representing the **deliverypartner** instance or FK when creating / updating / not populated",
             "oneOf": [
               {
-                "$ref": "#/components/schemas/courier"
+                "$ref": "#/components/schemas/deliverypartner"
               }
             ]
-          }
-        }
-      },
-      "usermodel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/usermodel-without-required-constraint"
-          }
-        ]
-      },
-      "usermodel-without-required-constraint": {
-        "type": "object",
-        "description": "Sails ORM Model **UserModel**",
-        "properties": {
-          "createdAt": {
-            "type": "number",
-            "format": "double"
-          },
-          "updatedAt": {
-            "type": "number",
-            "format": "double"
-          },
-          "id": {
-            "type": "integer",
-            "format": "int64",
-            "uniqueItems": true,
-            "description": "Note Sails special attributes: autoIncrement"
           }
         }
       },
@@ -1622,7 +1542,7 @@
           },
           "pickupAddressPostCode": {
             "type": "string",
-            "pattern": "^([a-zA-Z]){1}([0-9][0-9]|[0-9]|[a-zA-Z][0-9][a-zA-Z]|[a-zA-Z][0-9][0-9]|[a-zA-Z][0-9]){1}([ ])([0-9][a-zA-z][a-zA-z]){1}$/",
+            "pattern": "^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\\s?[0-9][A-Za-z]{2})$/",
             "nullable": true
           },
           "pickupAddressLatitude": {
@@ -1993,7 +1913,7 @@
           },
           {
             "in": "query",
-            "name": "courierId",
+            "name": "deliveryPartnerId",
             "required": false,
             "schema": {
               "type": "number",
@@ -2021,7 +1941,7 @@
           },
           {
             "in": "query",
-            "name": "courierRole",
+            "name": "deliveryPartnerRole",
             "required": false,
             "schema": {
               "type": "string",
@@ -2064,7 +1984,7 @@
             }
           },
           "403": {
-            "description": "Register request passed with string roles that do not exist on the roles/vendorRoles/courierRoles of a User"
+            "description": "Register request passed with string roles that do not exist on the roles/vendorRoles/deliveryPartnerRoles of a User"
           },
           "404": {
             "description": "Resource not found"
@@ -2397,14 +2317,14 @@
     "/couriers/deliveries": {
       "all": {
         "summary": "View deliveries",
-        "description": "Display \"Courier Deliveries\" page.",
+        "description": "Display \"DeliveryPartner Deliveries\" page.",
         "tags": [
           "View deliveries"
         ],
         "parameters": [
           {
             "in": "query",
-            "name": "courierId",
+            "name": "deliveryPartnerId",
             "required": true,
             "schema": {
               "type": "string"
@@ -2714,11 +2634,11 @@
             "schema": {
               "type": "string"
             },
-            "description": "The delivery id generated by the courier"
+            "description": "The delivery id generated by the deliveryPartner"
           },
           {
             "in": "query",
-            "name": "courierConfirmed",
+            "name": "deliveryPartnerConfirmed",
             "required": true,
             "schema": {
               "type": "boolean"
@@ -2737,11 +2657,15 @@
                   "oneOf": [
                     {
                       "type": "string",
-                      "description": "Courier has already confirmed this order."
+                      "description": "DeliveryPartner has already confirmed this order."
                     },
                     {
                       "type": "string",
-                      "description": "Order is registered to another courier!"
+                      "description": "Order is registered to another deliveryPartner!"
+                    },
+                    {
+                      "type": "string",
+                      "description": "No delivery partner is registered for this user!"
                     }
                   ]
                 }
@@ -2749,7 +2673,7 @@
             }
           },
           "404": {
-            "description": "No order found for courier delivery id"
+            "description": "No order found for deliveryPartner delivery id"
           },
           "500": {
             "description": "Internal server error"
@@ -2760,7 +2684,7 @@
     "/api/v1/couriers/add-delivery-availability-for-order": {
       "post": {
         "summary": "Add delivery availability to order",
-        "description": "For couriers to verify that they have riders available to service an order before the order has been sent to the vendor to be confirmed.",
+        "description": "For deliveryPartners to verify that they have riders available to service an order before the order has been sent to the vendor to be confirmed.",
         "tags": [
           "Add delivery availability to order"
         ],
@@ -2781,11 +2705,11 @@
             "schema": {
               "type": "string"
             },
-            "description": "The delivery id generated by the courier to be added here so that it can be added to the order for tracking."
+            "description": "The delivery id generated by the deliveryPartner to be added here so that it can be added to the order for tracking."
           },
           {
             "in": "query",
-            "name": "courierAccepted",
+            "name": "deliveryPartnerAccepted",
             "required": true,
             "schema": {
               "type": "boolean"
@@ -2804,11 +2728,11 @@
                   "oneOf": [
                     {
                       "type": "string",
-                      "description": "A courier has already accepted this order"
+                      "description": "A deliveryPartner has already accepted this order"
                     },
                     {
                       "type": "string",
-                      "description": "A courier has already accepted this order"
+                      "description": "A deliveryPartner has already accepted this order"
                     }
                   ]
                 }
@@ -2816,7 +2740,23 @@
             }
           },
           "404": {
-            "description": "No order found for order id"
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "DeliveryPartner does not have a slot to service this order"
+                    },
+                    {
+                      "type": "string",
+                      "description": "No order found for order id"
+                    }
+                  ]
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal server error"
@@ -2847,12 +2787,31 @@
             "schema": {
               "type": "string"
             },
-            "description": "The delivery id generated by the courier"
+            "description": "The delivery id generated by the deliveryPartner"
           }
         ],
         "responses": {
           "200": {
             "description": "The requested resource"
+          },
+          "401": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
           },
           "404": {
             "description": "Resource not found"
@@ -2982,7 +2941,7 @@
                     },
                     {
                       "type": "string",
-                      "description": "No courier available."
+                      "description": "No deliveryPartner available."
                     },
                     {
                       "type": "string",
@@ -3247,7 +3206,7 @@
           },
           {
             "in": "query",
-            "name": "courierId",
+            "name": "deliveryPartnerId",
             "required": false,
             "schema": {
               "type": "number",
@@ -3275,7 +3234,7 @@
           },
           {
             "in": "query",
-            "name": "courierRole",
+            "name": "deliveryPartnerRole",
             "required": false,
             "schema": {
               "type": "string",
@@ -3318,7 +3277,7 @@
             }
           },
           "403": {
-            "description": "Register request passed with string roles that do not exist on the roles/vendorRoles/courierRoles of a User"
+            "description": "Register request passed with string roles that do not exist on the roles/vendorRoles/deliveryPartnerRoles of a User"
           },
           "404": {
             "description": "Resource not found"
@@ -3392,7 +3351,7 @@
           },
           {
             "in": "query",
-            "name": "courierId",
+            "name": "deliveryPartnerId",
             "required": false,
             "schema": {
               "type": "number",
@@ -3420,7 +3379,7 @@
           },
           {
             "in": "query",
-            "name": "courierRole",
+            "name": "deliveryPartnerRole",
             "required": false,
             "schema": {
               "type": "string",
@@ -3456,7 +3415,7 @@
             }
           },
           "403": {
-            "description": "Register request passed with string roles that do not exist on the roles/vendorRoles/courierRoles of a User"
+            "description": "Register request passed with string roles that do not exist on the roles/vendorRoles/deliveryPartnerRoles of a User"
           },
           "404": {
             "description": "Resource not found"
@@ -3782,7 +3741,7 @@
                 "owner",
                 "inventoryManager",
                 "salesManager",
-                "courier",
+                "deliveryPartner",
                 "none"
               ]
             }
@@ -3797,7 +3756,7 @@
           },
           {
             "in": "query",
-            "name": "courierId",
+            "name": "deliveryPartnerId",
             "required": true,
             "schema": {
               "type": "number",
@@ -3806,7 +3765,7 @@
           },
           {
             "in": "query",
-            "name": "courierRole",
+            "name": "deliveryPartnerRole",
             "required": false,
             "schema": {
               "type": "string",
@@ -3835,7 +3794,7 @@
               "enum": [
                 "admin",
                 "vendor",
-                "courier"
+                "deliveryPartner"
               ]
             }
           }
@@ -4929,6 +4888,14 @@
               "type": "number",
               "format": "double"
             }
+          },
+          {
+            "in": "query",
+            "name": "category",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -5050,7 +5017,6 @@
                 "owner",
                 "inventoryManager",
                 "salesManager",
-                "courier",
                 "none"
               ]
             }

@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable no-undef */
 // test/integration/controllers/Vendors/get-fulfilment-slots.test.js
-const { expect } = require("chai");
+const { expect } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
 var supertest = require("supertest");
 const { callAuthActionWithCookie } = require("../../../utils");
 var util = require("util");
@@ -19,11 +19,10 @@ const EXAMPLE_RESPONSE = {
   eligibleDeliveryDates: {},
 };
 
-// ~ https://www.chaijs.com/api/bdd/
 
 describe(`Fetch ${ACTION_NAME} Tests`, () => {
   describe(`${ACTION_NAME}() returns a 200 with json when authenticated`, () => {
-    it("Returns All Fulfilment Slots for a given vendor (3)", () => {
+    it("Returns All Fulfilment Slots for a given vendor (3)", async () => {
       const cb = async (cookie) => {
         try {
 	        const response = await supertest(sails.hooks.http.app)
@@ -40,7 +39,7 @@ describe(`Fetch ${ACTION_NAME} Tests`, () => {
           throw errs;
         }
       };
-      callAuthActionWithCookie(cb);
+      await callAuthActionWithCookie(cb);
     });
   });
 });

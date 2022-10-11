@@ -1,4 +1,4 @@
-const { envConfig } = require("../../utils");
+const { envConfig } = require("../utils");
 
 module.exports = [
   {

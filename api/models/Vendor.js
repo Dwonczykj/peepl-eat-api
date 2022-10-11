@@ -145,9 +145,17 @@ module.exports = {
   },
 
   afterCreate: async function (newlyCreatedRecord, proceed) {
-    await sails.helpers.initialiseDeliveryMethods.with({vendor: newlyCreatedRecord.id});
+    sails.helpers.initialiseDeliveryMethods.with({vendor: newlyCreatedRecord.id})
+      .then(() => {
+        proceed();
+      })
+      .catch((err) => {
+        sails.log.warn(err);
+        proceed(err);
+      });
 
-    return proceed();
+
+    proceed();
   }
 
 };

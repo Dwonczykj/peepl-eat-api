@@ -1,11 +1,9 @@
 /* eslint-disable no-console */
 /* eslint-disable no-undef */
 // test/integration/controllers/Vendors/view-all-vendors.test.js
-const { expect } = require("chai");
+const { expect } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
 var supertest = require("supertest");
-const { login, callAuthActionWithCookie } = require("../../../utils");
 
-// ~ https://www.chaijs.com/api/bdd/
 
 const genUserName = (id, busType) => `Can Signup Password ${busType} User${id}`;
 const genUserEmail = (id, busType) => `User${id}@example.com`;

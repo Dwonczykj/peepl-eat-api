@@ -7,7 +7,7 @@ const { logoutCbLogin, callAuthActionWithCookie } = require("../../../utils");
 
 describe("Fetch Vendors Controller Tests", () => {
   describe("view-all-vendors() returns a 200 with json when authenticated", () => {
-    it("Returns All Vendors (1)", () => {
+    it("Returns All Vendors (1)", async () => {
       const cb = (cookie) =>
         supertest(sails.hooks.http.app)
           .get("/api/v1/vendors?outcode=L1")
@@ -23,7 +23,7 @@ describe("Fetch Vendors Controller Tests", () => {
           .catch((errs) => {
             throw errs;
           });
-      callAuthActionWithCookie(cb);
+      await callAuthActionWithCookie(cb);
     });
   });
   describe("view-all-vendors() returns a 403 with a view when unAuthenticated", () => {

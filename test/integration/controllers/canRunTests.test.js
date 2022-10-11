@@ -15,15 +15,15 @@ describe('Is Logged In', () => {
       } 
     });
   });
-  describe('Test login-with-password Action()', () => {
-    it('POST login-with-password EXPECT FAILURE AS NOT FIREBASE AND HAVE NOT REGISTERED', (done) => {
-      supertest(sails.hooks.http.app)
-        .post('/api/v1/admin/login-with-password') //This not will fail as expects to use firebase for this method, but this user details is not yet registered
-        .send({ emailAddress: 'joey@vegiapp.co.uk', password: 'DUMMY_FIREBASE_TOKEN', rememberMe: false })
-        .expect(200, (response) => {
-          console.log(response);
-          return done();
-        });
-    });
-  });
+  // describe('Test login-with-password Action()', () => {
+  //   it('POST login-with-password EXPECT FAILURE AS NOT FIREBASE AND HAVE NOT REGISTERED', (done) => {
+  //     supertest(sails.hooks.http.app)
+  //       .post('/api/v1/admin/login-with-password') //This not will fail as expects to use firebase for this method, but this user details is not yet registered
+  //       .send({ emailAddress: 'joey@vegiapp.co.uk', password: 'DUMMY_FIREBASE_TOKEN', rememberMe: false })
+  //       .expect(200, (response) => {
+  //         console.log(response);
+  //         return done();
+  //       });
+  //   });
+  // });
 });

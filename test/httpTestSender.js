@@ -37,16 +37,7 @@ class ExpectResponse {
       updatedPostDataWithOutKeys,
       "updatedPostDataWithOutKeys is an array"
     );
-    assert.containsAllKeys(
-      this.EXPECTED_RESPONSE,
-      Object.keys(updatedPostDataWith),
-      ""
-    );
-    assert.containsAllKeys(
-      this.EXPECTED_RESPONSE,
-      Object.keys(updatedPostDataWithOutKeys),
-      ""
-    );
+    
     let send = this.send;
     for (let k of updatedPostDataWithOutKeys) {
       delete send[k];
@@ -87,23 +78,27 @@ class HttpTestSender {
     expectResponse = {},
     expectResponseChecker = ExpectResponse,
   }) {
-    const relUrl = `${this.ACTION_PATH_ORDERS}/${this.ACTION_NAME_CREATE_ORDER}`;
+    this.ACTION_PATH = ACTION_PATH;
+    this.ACTION_NAME = ACTION_NAME;
+    this.HTTP_TYPE = HTTP_TYPE;
+    const relUrl = `${this.ACTION_PATH}/${this.ACTION_NAME}`;
     const baseUrl = !relUrl
-      ? `/api/v1/${this.ACTION_PATH_ORDERS}/${this.ACTION_NAME_CREATE_ORDER}`
-      : `/api/v1/${this.relUrl}`;
+      ? `/api/v1/${this.ACTION_PATH}/${this.ACTION_NAME}`
+      : `/api/v1/${relUrl}`;
+    console.log(`Supertest: -> ${HTTP_TYPE} ${baseUrl}`);
     if (HTTP_TYPE.toLowerCase() === "get") {
-      this.httpCall = async () =>
-        await supertest(sails.hooks.http.app).get(baseUrl);
+      this.httpCall = () =>
+        supertest(sails.hooks.http.app).get(baseUrl);
     } else if (HTTP_TYPE.toLowerCase() === "post") {
-      this.httpCall = async () =>
-        await supertest(sails.hooks.http.app).post(baseUrl);
+      this.httpCall = () =>
+        supertest(sails.hooks.http.app).post(baseUrl);
     } else if (HTTP_TYPE.toLowerCase() === "all") {
-      this.httpCall = async () =>
-        await supertest(sails.hooks.http.app).get(baseUrl);
+      this.httpCall = () =>
+        supertest(sails.hooks.http.app).get(baseUrl);
     } else {
-      assert(false, `httpType of ${HTTP_TYPE} not implemented for tests.`);
+      throw new Error(`httpType of ${HTTP_TYPE} not implemented for tests.`);
     }
-    this._expectedResponse = expectResponseChecker({
+    this._expectedResponse = new expectResponseChecker({
       HTTP_TYPE,
       ACTION_PATH,
       ACTION_NAME,
@@ -120,8 +115,8 @@ class HttpTestSender {
     return this._expectedResponse.expectedResposeWithUpdates;
   }
 
-  async makeCallWith(cookie) {
-    return (updatedPostDataWith, updatedPostDataWithOutKeys = []) =>
+  makeCallWith(cookie) {
+    return async (updatedPostDataWith, updatedPostDataWithOutKeys = []) =>
       this.httpCall()
         .send(
           this.expectedResponse.sendWith(
@@ -176,19 +171,25 @@ class HttpAuthTestSender extends HttpTestSender {
       };
       otherLoginDetails = bespokeUserDetails;
     }
-    return callAuthActionWithCookie(
-      (cookie) =>
-        this.makeCallWith(cookie)(
+    const self = this;
+    return this.useAccount !== "TEST_UNAUTHENTICATED"
+      ? callAuthActionWithCookie(
+          async (cookie) =>
+            self.makeCallWith(cookie)(
+              updatedPostDataWith,
+              updatedPostDataWithOutKeys
+            ),
+          false,
+          otherLoginDetails || null
+        )
+      : await self.makeCallWith("")(
           updatedPostDataWith,
           updatedPostDataWithOutKeys
-        ),
-      false,
-      otherLoginDetails || null
-    );
+        );
   }
 }
 
-module.export = {
+module.exports = {
   HttpAuthTestSender,
   ExpectResponse,
 };

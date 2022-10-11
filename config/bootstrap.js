@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable no-undef */
 /**
  * Seed Function
@@ -15,6 +16,8 @@
 const dotenv = require('dotenv');//.load('./env'); // alias of .config()
 // const envConfig = dotenv.load().parsed;
 const envConfig = dotenv.config('./env').parsed;
+const util = require('util');
+const { buildDb } = require('../scripts/build_db');
 
 async function asyncForEach(array, callback) {
   for (let index = 0; index < array.length; index++) {
@@ -57,29 +60,68 @@ module.exports.bootstrap = async function () {
 
   try {
 
-    var vendorCategory = await VendorCategory.create(fixtures.vendorCategories[0]).fetch();
+    // var vendorCategory = await VendorCategory.createEach(fixtures.vendorCategories).fetch();
+    // console.info(
+    //   "Finished populating vendorCategories: " +
+    //     util.inspect(vendorCategory, { depth: 1 }) + // * depth: null for full object print
+    //     ""
+    // );
 
-    const createPostalDistricts = fixtures.postalDistricts;
-    asyncForEach(createPostalDistricts, async (pd, ind, arr) => {
-      var existingPd = await PostalDistrict.findOne(pd);
-      if (existingPd) {
-        PostalDistrict.removeFromCollection(pd);
-      }
-    });
+    // var postalDistricts = await PostalDistrict.createEach(
+    //   fixtures.postalDistricts
+    // ).fetch();
+    // console.info("Finished populating Postal Districts");
+
+    // await Vendor.createEach(fixtures.vendors);
+
+    // await DeliveryPartner.createEach(fixtures.deliveryPartners);
+    // console.info("Finished populating Delivery Partners");
+
+    // await CategoryGroup.createEach(fixtures.categoryGroups);
+    // console.info("Finished populating Category Groups");
+
+    // await ProductCategory.createEach(
+    //   fixtures.productCategories
+    // ).fetch();
+    // console.info("Finished populating ProductCategories");
+    // await Product.createEach(fixtures.products);
+    // console.info("Finished populating Products");
+    // await ProductOption.createEach(fixtures.productOptions);
+    // await ProductOptionValue.createEach(fixtures.productOptionValues);
+    // console.info("Finished populating Product Options");
+    // await Discount.createEach(fixtures.discountCodes);
+    // console.info("Finished populating Discounts");
+
+    // await User.createEach([
+    //   {
+    //     email: "adam@itsaboutpeepl.co.uk",
+    //     // password: 'Testing123!',
+    //     phoneNoCountry: 7905532512,
+    //     phoneCountryCode: 44,
+    //     name: "Adam",
+    //     vendor: 1,
+    //     vendorConfirmed: true,
+    //     isSuperAdmin: true,
+    //     vendorRole: "none",
+    //     role: "admin",
+    //     firebaseSessionToken: "DUMMY_FIREBASE_TOKEN",
+    //   },
+    // ]);
+
+    await buildDb(sails, false);
+
+    // const createPostalDistricts = fixtures.postalDistricts;
+    // asyncForEach(createPostalDistricts, async (pd, ind, arr) => {
+    //   var existingPd = await PostalDistrict.findOne(pd);
+    //   if (existingPd) {
+    //     PostalDistrict.removeFromCollection(pd);
+    //   }
+    // });
     // var postalDistricts = createPostalDistricts.map((pd) => PostalDistrict.create(pd).fetch());
-    var postalDistricts = await PostalDistrict.createEach(createPostalDistricts).fetch();
-
-    if(fixtures && fixtures.vendors) {
-      // for (var i = 0; i < fixtures.vendors.length; i++){
-      //   Vendor.create(fixtures.vendors[i]);
-      // }
-      await Vendor.createEach(fixtures.vendors);
-    } else {
-      sails.log('Unable to load fixtures to populate db');
-    }
+    
 
     // var delifonseca = await Vendor.create({
-    //   name: 'Delifonseca',
+    //   name: 'Delifonseca Alt.',
     //   type: 'restaurant',
     //   description: 'Life\'s too short to have a bad meal. Delifonseca is here to help you enjoy the finer tastes in life.',
     //   walletAddress: '0xf039CD9391cB28a7e632D07821deeBc249a32410',
@@ -89,16 +131,24 @@ module.exports.bootstrap = async function () {
     //   vendorCategories: [vendorCategory.id],
     //   productCategories: [],
     //   fulfilmentPostalDistricts: [postalDistricts[0].id, postalDistricts[1].id, postalDistricts[2].id],
-    //   deliveryPartner: deliveryPartner.id,
+    //   deliveryPartner: null,
     // }).fetch();
-    var delifonseca = await Vendor.findOne({ name: "Delifonseca" });
+    // console.log('Delifonseca alt. created');
+    
 
-    await CategoryGroup.createEach(fixtures.categoryGroups);
+    // var delifonseca = await Vendor.findOne({ name: "Delifonseca Alt." });
 
-    var productCategories = await ProductCategory.createEach(fixtures.productCategories).fetch();
-    var lunchProductCategoryForDelifonsecaVendor = productCategories[0];
-    var coffeeProductCategoryForDelifonsecaVendor = productCategories[1];
-    var dinnerProductCategoryForDelifonsecaVendor = productCategories[2];
+    
+    // var lunchProductCategoryForDelifonsecaVendor = productCategories[0];
+    // var coffeeProductCategoryForDelifonsecaVendor = productCategories[1];
+    // var dinnerProductCategoryForDelifonsecaVendor = productCategories[2];
+    // await Vendor.addToCollection(delifonseca.id, "productCategories", [
+    //   lunchProductCategoryForDelifonsecaVendor.id,
+    //   coffeeProductCategoryForDelifonsecaVendor.id,
+    //   dinnerProductCategoryForDelifonsecaVendor.id,
+    // ]);
+
+    
 
     // var lunchProductCategoryForDelifonsecaVendor = await ProductCategory.create({
     //   name: 'Lunch',
@@ -116,47 +166,30 @@ module.exports.bootstrap = async function () {
     //   categoryGroup: readyMealCatGroup.id
     // }).fetch();
 
-    await Vendor.addToCollection(
-      delifonseca.id,
-      'productCategories',
-      [
-        lunchProductCategoryForDelifonsecaVendor.id,
-        coffeeProductCategoryForDelifonsecaVendor.id,
-        dinnerProductCategoryForDelifonsecaVendor.id
-      ]);
-
-    sails.log.info('Product Categories added to delifonseca');
-
-    await Product.createEach(fixtures.products);
-
-    var burnsNight = await Product.findOne({
-      name: 'Burns Night - Dine @ Home (For 1)',
-    });
-
-    var starterOption = await ProductOption.create({
-      name: 'Starter',
-      product: burnsNight.id
-    }).fetch();
-
-    var mainOption = await ProductOption.create({
-      name: 'Main',
-      product: burnsNight.id
-    }).fetch();
-
-    var dessertOption = await ProductOption.create({
-      name: 'Dessert',
-      product: burnsNight.id
-    }).fetch();
     
-    await ProductOptionValue.createEach(fixtures.productOptionValues);
 
-    await Discount.createEach(fixtures.discountCodes);
+    // var burnsNight = await Product.findOne({
+    //   name: 'Burns Night - Dine @ Home (For 1)',
+    // });
 
-    await DeliveryPartner.createEach(fixtures.deliveryPartners);
+    // var starterOption = await ProductOption.create({
+    //   name: 'Starter',
+    //   product: burnsNight.id
+    // }).fetch();
 
-    await User.createEach(fixtures.users);
+    // var mainOption = await ProductOption.create({
+    //   name: 'Main',
+    //   product: burnsNight.id
+    // }).fetch();
+
+    // var dessertOption = await ProductOption.create({
+    //   name: 'Dessert',
+    //   product: burnsNight.id
+    // }).fetch();
+    
+    
     // eslint-disable-next-line no-console
-    console.log('test.service@example.com Test Account User created');
+    // console.log('test.service@example.com Test Account User created');
 
     // // * Create consumer user
     // await User.create({

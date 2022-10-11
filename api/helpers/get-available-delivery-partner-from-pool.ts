@@ -1,10 +1,11 @@
-import { Slot } from "api/interfaces/vendors/slot";
+import { Slot } from "../interfaces/vendors/slot";
 
 /* eslint-disable no-console */
 declare var OpeningHours: any;
 declare var FulfilmentMethod: any;
 const moment = require('moment');
 declare var sails: any;
+declare var DeliveryPartner: any;
 
 const requestDeliveryAvailability = !!sails.config.custom.requestDeliveryAvailability;
 
@@ -144,13 +145,17 @@ abstract class DeliveryPartnerObject implements IDeliveryPartner {
   deliveryPartnerName: string;
   deliveryPartnerId: number;
   deliveryPartner: any;
+  DeliveryPartnerSailsModel: any;
 
-  constructor(name:string){
+  constructor(name: string, DeliveryPartnerSailsModel: any) {
     this._setDeliveryPartner(name);
+    this.DeliveryPartnerSailsModel = DeliveryPartnerSailsModel;
   }
 
-  private async _setDeliveryPartner(name:string):Promise<void>{
-    this.deliveryPartner = await DeliveryPartner.findOne({name: name});
+  private async _setDeliveryPartner(name: string): Promise<void> {
+    this.deliveryPartner = await this.DeliveryPartnerSailsModel.findOne({
+      name: name,
+    });
     this.deliveryPartnerName = this.deliveryPartner.name;
     this.deliveryPartnerId = this.deliveryPartner.id;
     return Promise.resolve();
@@ -249,8 +254,8 @@ export class CoopCycleDeliveryPartner extends DeliveryPartnerObject {
   private _requestDeliveryUrl = '/api/deliveries';
   private _requestJwtUrl = '/oauth2/token';
 
-  constructor() {
-    super("CoopCycle");
+  constructor(DeliveryPartnerSailsModel: any) {
+    super("CoopCycle", DeliveryPartnerSailsModel);
     this._startSession();
   }
 
@@ -393,8 +398,8 @@ export class AgileDeliveryPartner extends DeliveryPartnerObject {
 
   private _requestDeliveryAvailabilityEmailAddress = "danny@agile.com"; //! Does not exist
 
-  constructor() {
-    super("Agile");
+  constructor(DeliveryPartnerSailsModel: any) {
+    super("Agile",DeliveryPartnerSailsModel);
   }
 
   async requestProvisionalDeliveryAvailabilityInternal(
@@ -642,18 +647,16 @@ export class AgileDeliveryPartner extends DeliveryPartnerObject {
   }
 }
 
-export const deliveryPartners = [
-    new CoopCycleDeliveryPartner(),
-    new AgileDeliveryPartner()
-  ];
+export const deliveryPartnersFactory = (DeliveryPartnerSailsModel: any) => [
+  new CoopCycleDeliveryPartner(DeliveryPartnerSailsModel),
+  new AgileDeliveryPartner(DeliveryPartnerSailsModel),
+];
 
 module.exports = {
-
-  deliveryPartners: [
-    new CoopCycleDeliveryPartner(),
-    new AgileDeliveryPartner()
+  deliveryPartnersFactory: (DeliveryPartnerSailsModel: any) => [
+    new CoopCycleDeliveryPartner(DeliveryPartnerSailsModel),
+    new AgileDeliveryPartner(DeliveryPartnerSailsModel),
   ],
-
 };
 
 
@@ -736,7 +739,7 @@ module.exports = {
   },
 
 
-  fn: async function (inputs, exits) {
+  fn: async function (inputs) {
     // TODO: Consider timezones
     // TODO: Account for overnight opening hours
     // TODO: Generate IDs for slots to simplify logic (but must account for changes to opening hours and slot duration)
@@ -765,12 +768,13 @@ module.exports = {
       }
     };
 
+    const deliveryPartners = deliveryPartnersFactory(DeliveryPartner);
     const n = deliveryPartners.length;
     var chosenDeliveryPartner:IDeliveryPartner = null;
     // for(var i = 0; i < n; i += 1) {
 
     // const deliveryPartner: IDeliveryPartner = deliveryPartners[i];
-    const deliveryPartner: IDeliveryPartner = new AgileDeliveryPartner();
+    const deliveryPartner: IDeliveryPartner = new AgileDeliveryPartner(DeliveryPartner);
     const deliveryAvailability = await deliveryPartner.requestProvisionalDeliveryAvailability(new DeliveryInformation(
       deliverBefore,
       deliverAfter,

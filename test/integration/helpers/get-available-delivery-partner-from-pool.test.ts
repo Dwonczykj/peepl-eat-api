@@ -3,15 +3,24 @@
 
 const { expect } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
 const { login } = require("../../utils");
+import moment from 'moment';
+
+declare var User: any;
+declare var DeliveryPartner: any;
+declare var Vendor: any;
+declare var FulfilmentMethod: any;
+declare var OpeningHours: any;
+declare var sails: any;
 
 describe("helpers.getAvailableDeliveryPartnerFromPool", () => {
   it("returns a delivery partner when intersecting slots", async () => {
-    const user = await User.findOne({ name: response.body.data.name });
     const response = await login();
+    const user = await User.findOne({ name: response.body.data.name });
     
     const deliveryStart = "11:00";
     const deliveryEnd = "13:00";
     // create an order with the fulfilment slot set to one that works for DeliveryPartner
+    sails.log('hey');
     
     const deliveryPartner = await DeliveryPartner.create({
       name: "Test helpers getAvailableDeliveryPartnerFromPool Delivery Partner",
@@ -19,6 +28,9 @@ describe("helpers.getAvailableDeliveryPartnerFromPool", () => {
       phoneNumber: "0123456123",
       status: "active",
       deliversToPostCodes: ["L1"],
+      walletAddress: "0xf039CD9391cB28a7e632D07821deeBc249a32410",
+      imageUrl:
+        "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
       rating: 5,
     });
     // Generate collection/delivery blank opening hours
@@ -122,6 +134,7 @@ describe("helpers.getAvailableDeliveryPartnerFromPool", () => {
       email: "getAvailableDeliveryPartnerFromPool2@sailshelpers.com",
       phoneNumber: "0123456122",
       status: "active",
+      walletAddress: "0xf039CD9391cB28a7e632D07821deeBc249a32410",
       deliversToPostCodes: ["L1"],
       rating: 5,
     });

@@ -1,5 +1,5 @@
-import { Slot } from "api/interfaces/vendors/slot";
 import moment from "moment";
+import { Slot } from "../../interfaces/vendors/slot";
 
 module.exports = {
   friendlyName: "Add delivery availability to order",

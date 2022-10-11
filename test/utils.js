@@ -1,9 +1,23 @@
 /* eslint-disable no-console */
 /* eslint-disable no-undef */
-const { expect } = require("chai");
+const { expect, assert } = require("chai");
 const request = require('supertest');
 const dotenv = require('dotenv');
-const envConfig = dotenv.config('./test/env').parsed;
+const util = require("util");
+const envConfig = dotenv.config({path: process.cwd() + "/test/.env"}).parsed;
+
+assert.containsAllKeys(
+  envConfig,
+  [
+    "test_TEST_SERVICE_secret",
+    "test_TEST_USER_secret",
+    "test_TEST_VENDOR_secret",
+    "test_TEST_DELIVERY_PARTNER_secret",
+    "FIREBASE_AUTH_EMULATOR_HOST",
+  ],
+  ".env config does not contain secrets for testing: " +
+    util.inspect(envConfig, { depth: 1 })
+);
 
 const login = async function (verbose=false) {
   try {
@@ -15,10 +29,11 @@ const login = async function (verbose=false) {
       .post("/api/v1/admin/login-with-secret")
       .send({
         name: "TEST_SERVICE",
-        secret: envConfig["test_secret"],
+        secret: envConfig["test_TEST_SERVICE_secret"],
       })
       .expect(200)
-      .then((response) => {                          // must be then, not a callback
+      .then((response) => {
+        // must be then, not a callback
         // console.log(response.res.session);
         // console.log(response.res);
         // console.log(response._body);
@@ -86,21 +101,6 @@ const callAuthActionWithCookie = async (cb, verbose=false, data={}) =>
     .then((response) => {
       expect(response.statusCode).to.equal(200);
       expect(Object.keys(response.headers)).to.deep.include("set-cookie");
-      expect(response.body).to.deep.equal({
-        data: {
-          ...{
-            email: "test.service@example.com",
-            phoneNoCountry: 9993137777,
-            phoneCountryCode: 44,
-            name: "TEST_SERVICE",
-            isSuperAdmin: true,
-            role: "admin",
-            firebaseSessionToken: "DUMMY_FIREBASE_TOKEN",
-            secret: envConfig["test_secret"],
-          },
-          data
-        },
-      });
       const sessionCookie = response.headers["set-cookie"];
       if(verbose){
         console.log('SESSION COOKIE: "' + sessionCookie + '"');
