@@ -93,53 +93,57 @@ const IS_LOGGED_IN_UNAUTHENTICATED = {
     data: false,
   },
 };
+// const VIEW_LOGIN = {
+//   useAccount: "TEST_UNAUTHENTICATED",
+//   HTTP_TYPE: "get",
+//   ACTION_PATH: "admin",
+//   ACTION_NAME: "login",
+//   sendData: {},
+//   expectResponse: {
+    
+//   },
+// };
 const LOGIN = {
   useAccount: "TEST_SERVICE",
-  HTTP_TYPE: "post",
+  HTTP_TYPE: "get",
   ACTION_PATH: "admin",
-  ACTION_NAME: "login-with-secret",
+  ACTION_NAME: "logged-in", //handler will log us in with useAccount
   sendData: {
-    deliveryPartnerAccepted: true,
-    vegiOrderId: null, // populate in test
-    deliveryId: "", // populate in test
+    
   },
-  expectResponse: {},
+  expectResponse: {
+    data: true,
+  },
 };
 const LOGIN_AS_USER = {
   useAccount: "TEST_USER",
-  HTTP_TYPE: "post",
+  HTTP_TYPE: "get",
   ACTION_PATH: "admin",
-  ACTION_NAME: "login-with-secret",
-  sendData: {
-    deliveryPartnerAccepted: true,
-    vegiOrderId: null, // populate in test
-    deliveryId: "", // populate in test
+  ACTION_NAME: "logged-in", //handler will log us in with useAccount
+  sendData: {},
+  expectResponse: {
+    data: true,
   },
-  expectResponse: {},
 };
 const LOGIN_AS_VENDOR = {
   useAccount: "TEST_VENDOR",
-  HTTP_TYPE: "post",
+  HTTP_TYPE: "get",
   ACTION_PATH: "admin",
-  ACTION_NAME: "login-with-secret",
-  sendData: {
-    deliveryPartnerAccepted: true,
-    vegiOrderId: null, // populate in test
-    deliveryId: "", // populate in test
+  ACTION_NAME: "logged-in", //handler will log us in with useAccount
+  sendData: {},
+  expectResponse: {
+    data: true,
   },
-  expectResponse: {},
 };
 const LOGIN_AS_DELIVERY_PARTNER = {
   useAccount: "TEST_DELIVERY_PARTNER",
-  HTTP_TYPE: "post",
+  HTTP_TYPE: "get",
   ACTION_PATH: "admin",
-  ACTION_NAME: "login-with-secret",
-  sendData: {
-    deliveryPartnerAccepted: true,
-    vegiOrderId: null, // populate in test
-    deliveryId: "", // populate in test
+  ACTION_NAME: "logged-in", //handler will log us in with useAccount
+  sendData: {},
+  expectResponse: {
+    data: true,
   },
-  expectResponse: {},
 };
 
 
@@ -180,33 +184,34 @@ describe("Authentication Tests", () => {
       } catch (error) {
         throw error;
       }
+      const hats = new HttpAuthTestSenderLogin(LOGIN);
+      const response = await hats.makeAuthCallWith({}, []);
+      expect(response.statusCode).to.equal(200);
+      hats.expectedResponse.checkResponse(response.body, {data: true});
+      return;
+    });
+    it("POST login-with-secret as Customer User works", async () => {
+      const hats = new HttpAuthTestSenderLogin(LOGIN_AS_USER);
+      const response = await hats.makeAuthCallWith({}, []);
+      expect(response.statusCode).to.equal(200);
+      hats.expectedResponse.checkResponse(response.body, {data: true});
+      return;
+    });
+    it("POST login-with-secret as Vendor works", async () => {
+      const hats = new HttpAuthTestSenderLogin(LOGIN_AS_VENDOR);
+      const response = await hats.makeAuthCallWith({}, []);
+      expect(response.statusCode).to.equal(200);
+      hats.expectedResponse.checkResponse(response.body, {data: true});
+      return;
+    });
+    it("POST login-with-secret as Delivery Partner works", async () => {
+      const hats = new HttpAuthTestSenderLogin(LOGIN_AS_DELIVERY_PARTNER);
+      const response = await hats.makeAuthCallWith({}, []);
+      expect(response.statusCode).to.equal(200);
+      hats.expectedResponse.checkResponse(response.body, {data: true});
       return;
     });
     it("GET logged-in returns true when authenticated", async () => {
-      // const cb = (cookie) => supertest(sails.hooks.http.app)
-      //   .get("/api/v1/admin/logged-in")
-      //   .set("Cookie", cookie)
-      //   .expect(200)
-      //   .then((response) => {
-      //     expect(response.statusCode).to.equal(200);
-      //     expect(response.body).to.deep.equal({ data: true });
-      //     return;
-      //   })
-      //   .catch(errs => {
-      //     console.warn(errs);
-      //     throw errs;
-      //   });
-      // login()
-      //   .then((response) => {
-      //     expect(response.statusCode).to.equal(200);
-      //     expect(Object.keys(response.headers)).to.deep.include("set-cookie");
-      //     expect(response.body).to.deep.equal({ data: true });
-      //     const sessionCookie = response.headers["set-cookie"];
-      //     return cb(sessionCookie);
-      //   })
-      //   .catch((errs) => done(errs));
-      // await callAuthActionWithCookie(cb, true);
-
       const hats = new HttpAuthTestSenderLogin(IS_LOGGED_IN);
       const response = await hats.makeAuthCallWith({}, []);
       expect(response.statusCode).to.equal(200);
