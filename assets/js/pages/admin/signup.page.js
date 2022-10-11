@@ -249,6 +249,7 @@ parasails.registerPage("signup", {
           argins["vendorRole"],
           argins["deliveryPartnerRole"]
         );
+        this.syncing = false;
 
         if (response.status) {
           this.formErrors.email = true;
@@ -259,6 +260,7 @@ parasails.registerPage("signup", {
         return this.submittedEmailPasswordRegistrationForm();
       } catch (err) {
         this.cloudError = err.message;
+        this.syncing = false;
         if (err.message === "userExists") {
           return;
         }

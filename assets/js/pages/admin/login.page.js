@@ -1,6 +1,11 @@
 /* eslint-disable no-console */
 import { initializeApp } from 'firebase/app';
-import { browserSessionPersistence, getAuth, RecaptchaVerifier, setPersistence, signInWithPhoneNumber } from 'firebase/auth';
+import {
+  browserSessionPersistence, connectAuthEmulator, getAuth,
+  RecaptchaVerifier,
+  setPersistence,
+  signInWithPhoneNumber
+} from "firebase/auth";
 
 parasails.registerPage('login', {
   //  ╦╔╗╔╦╔╦╗╦╔═╗╦    ╔═╗╔╦╗╔═╗╔╦╗╔═╗
@@ -52,7 +57,8 @@ parasails.registerPage('login', {
       measurementId: 'G-YZCWVWRNKN'
     };
     initializeApp(config);
-
+    const auth = getAuth();
+    connectAuthEmulator(auth, "http://localhost:9099");
     // this.createRecaptcha();
 
 
@@ -73,7 +79,6 @@ parasails.registerPage('login', {
   //  ╩╝╚╝ ╩ ╚═╝╩╚═╩ ╩╚═╝ ╩ ╩╚═╝╝╚╝╚═╝
   methods: {
     createRecaptcha: function () {
-      const auth = getAuth();
       //TODO: Switch to invisible?
       // window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
       //   'size': 'invisible',
@@ -87,6 +92,7 @@ parasails.registerPage('login', {
       //     window.alert('repatcha expired callback called');
       //   }
       // }, auth);
+      const auth = getAuth();
       window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
         'size': 'invisible',
         'callback': (response) => {

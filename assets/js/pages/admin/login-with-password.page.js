@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import {
-  createUserWithEmailAndPassword, getAuth,
+  connectAuthEmulator, createUserWithEmailAndPassword,
+  getAuth,
   signInWithEmailAndPassword
 } from "firebase/auth";
 
@@ -39,6 +40,8 @@ parasails.registerPage("login-with-password", {
       measurementId: "G-YZCWVWRNKN",
     };
     initializeApp(config);
+    const auth = getAuth();
+    connectAuthEmulator(auth, "http://localhost:9099");
     this.$focus("[autofocus]");
   },
 
@@ -50,7 +53,15 @@ parasails.registerPage("login-with-password", {
       // Clear out any pre-existing error messages.
       this.formErrors = {};
 
-      var argins = this.formData;
+      const email = this.emailAddress;
+      const password = this.password;
+      const rememberMe = this.rememberMe;
+
+      var argins = {
+        email,
+        password,
+        rememberMe
+      };
 
       // Validate email:
       if (!argins.emailAddress) {
@@ -85,12 +96,13 @@ parasails.registerPage("login-with-password", {
           const fbUser = userCredential.user;
 
           // eslint-disable-next-line no-console
-          console.log(fbUser.email + " authorised signed in to firebase.");
           const sessionToken = await fbUser.getIdToken(true);
+          console.log(fbUser.email + " authorised signed in to firebase with session token " + sessionToken);
+
           return Cloud.loginWithPassword(email, sessionToken, rememberMe);
         })
         .then((response) => {
-          window.replace("/admin");
+          location.replace("/admin");
         })
         .catch((err) => {
           if (err.code === "auth/user-not-found") {
@@ -103,8 +115,13 @@ parasails.registerPage("login-with-password", {
           else if (err.exit === "userExists") {
             this.cloudError = "Unable to login. Check credentials.";
           }
+          else if (err.code === "firebaseErrored") {
+            this.cloudError = `${err.message}`;
+            // eslint-disable-next-line no-console
+            console.warn(err.responseInfo);
+          }
           else {
-            this.cloudError = err.message;
+            this.cloudError = `[${err.code}]: ${err.message}`;
             // eslint-disable-next-line no-console
             console.warn(err.responseInfo);
           }

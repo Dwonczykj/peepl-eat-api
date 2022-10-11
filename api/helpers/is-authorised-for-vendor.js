@@ -45,6 +45,7 @@ module.exports = {
     });
 
     if(!vendor){
+      sails.log.info(`Not authorised to view vendor route`);
       return false;
     }
 
@@ -52,7 +53,7 @@ module.exports = {
     if(user.vendor === inputs.vendorId){
       return true;
     }
-
+    sails.log.info(`Not authorised to view vendor route`);
     return false;
   }
 

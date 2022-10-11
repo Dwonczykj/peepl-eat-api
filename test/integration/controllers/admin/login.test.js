@@ -237,4 +237,44 @@ describe("Authentication Tests", () => {
       hats.expectedResponse.checkResponse(response.body);
     });
   });
+  describe("Login-with-password email & password firebase Tests", () => {
+    it("Successfully created the dummy user in firebase emulator", async () => {
+      const postUrlRegisterDummyUser = `http://localhost:9099/identitytoolkit.googleapis.com/v1/accounts:signUp?key=${API_KEY}`;
+      // supertest(sails.hooks.http.app)
+      //   .get("/api/v1/admin/logged-in")
+      //   .set("Cookie", "")
+      //   .expect(200, (errs, response, body) => {
+      //     if (errs) {
+      //       console.warn(errs);
+      //       throw errs;
+      //     }
+      //     expect(response.statusCode).to.equal(200);
+      //     expect(response._body).to.deep.equal({ data: false });
+      //     return;
+      //   });
+      //TODO: Ensure the emulator has started in headless mode and get the token from it when trying to auth with phone.
+      
+    });
+    it("Successfully logged in to vegi with dummy user", async () => {
+      // supertest(sails.hooks.http.app)
+      //   .get("/api/v1/admin/logged-in")
+      //   .set("Cookie", "")
+      //   .expect(200, (errs, response, body) => {
+      //     if (errs) {
+      //       console.warn(errs);
+      //       throw errs;
+      //     }
+      //     expect(response.statusCode).to.equal(200);
+      //     expect(response._body).to.deep.equal({ data: false });
+      //     return;
+      //   });
+      
+      //TODO: Ensure the emulator has started in headless mode and get the token from it when trying to auth with phone.
+      const hats = new HttpAuthTestSenderLogin(IS_LOGGED_IN_UNAUTHENTICATED);
+      const response = await hats.makeAuthCallWith({}, []);
+      expect(response.statusCode).to.equal(200);
+      hats.expectedResponse.checkResponse(response.body);
+    });
+  });
+
 });

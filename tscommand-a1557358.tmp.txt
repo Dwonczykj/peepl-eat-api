@@ -1,1 +1,0 @@
-assets/js/pages/admin/ignore-login.page.ts --sourcemap --removeComments --moduleResolution node --target ES5

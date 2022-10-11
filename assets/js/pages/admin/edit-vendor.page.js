@@ -126,6 +126,7 @@ parasails.registerPage('admin-edit-vendor', {
     clickAddProductCategory: function () {
       var newCategory = {
         name: '',
+        vendor: this.vendor.id,
         imageUrl: '',
         categoryGroup: '',
       };

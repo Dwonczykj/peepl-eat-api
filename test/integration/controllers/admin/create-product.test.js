@@ -29,6 +29,7 @@ describe(`Fetch ${ACTION_NAME} Tests`, () => {
       };
       const cb = async (cookie) => {
         try {
+          console.info(`POST /api/v1/${ACTION_PATH}/${ACTION_NAME}`);
           const response = await supertest(sails.hooks.http.app)
             .post(`/api/v1/${ACTION_PATH}/${ACTION_NAME}`)
             .send({
@@ -53,6 +54,7 @@ describe(`Fetch ${ACTION_NAME} Tests`, () => {
         }
       };
       await callAuthActionWithCookie(cb);
+      return;
     });
   });
 });

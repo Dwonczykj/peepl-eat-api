@@ -3,6 +3,12 @@
     // Hover to view descriptions of existing attributes.
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
+    "compounds": [
+        {
+            "name": "Compound",
+            "configurations": []
+        }
+    ],
     "configurations": [
         {
             "type": "node",
@@ -67,9 +73,15 @@
             "type": "node",
             "request": "launch",
             "name": "Mocha Custom Tests (js only)",
+            // "preLaunchTask": {
+            //     "task": "",
+            //     "type": ""
+            // },
             "program": "${workspaceFolder}/node_modules/mocha/bin/mocha",
             "args": [
                 "--exit",
+                "-t",
+                "8000",
                 // "--require",
                 // "esm",
                 // "--require",
@@ -80,7 +92,7 @@
                 // "5000",
                 "--colors",
                 // "${workspaceFolder}/test/integration/**/*.test.js",
-                "${workspaceFolder}/test/integration/controllers/admin/login.test.js",
+                "${workspaceFolder}/test/integration/controllers/admin/firebase.test.js",
             ],
             "internalConsoleOptions": "openOnSessionStart",
             "skipFiles": [
@@ -94,6 +106,8 @@
             "program": "${workspaceFolder}/node_modules/mocha/bin/mocha",
             "args": [
                 "--exit",
+                "-t",
+                "8000",
                 // "--require",
                 // "esm",
                 "--require",

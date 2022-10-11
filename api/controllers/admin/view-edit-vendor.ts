@@ -38,8 +38,9 @@ module.exports = {
       vendorid = user.vendor;
     }
 
-    var vendor = await Vendor.findOne(vendorid)
-      .populate('productCategories&products&products.options&options.values');
+    var vendor = await Vendor.findOne(vendorid).populate(
+      "productCategories&products&products.category&products.options&options.values"
+    );
 
     if(!vendor) {
       return exits.notFound();
