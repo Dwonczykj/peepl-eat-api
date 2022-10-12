@@ -95,6 +95,7 @@ module.exports = {
 
   fn: async function (inputs, exits) {
     if (!inputs.items) {
+      sails.log.warn("helpers.validateOrder: noItemsFound");
       return exits.noItemsFound();
     }
 
@@ -103,6 +104,7 @@ module.exports = {
       .populate('fulfilmentPostalDistricts');
 
     if (!vendor) {
+      sails.log.warn('helpers.validateOrder: invalidVendor');
       return exits.invalidVendor();
     }
 
@@ -112,30 +114,37 @@ module.exports = {
     });
 
     if (!fulfilmentMethod) {
+      sails.log.warn("helpers.validateOrder: invalidFulfilmentMethod");
       return exits.invalidFulfilmentMethod();
     }
     if (fulfilmentMethod.vendor !== vendor.id && fulfilmentMethod.deliveryPartner !== vendor.deliveryPartner) {
+      sails.log.warn("helpers.validateOrder: invalidFulfilmentMethod");
       return exits.invalidFulfilmentMethod();
     }
 
     // Get all the products from the database - only those associated with the vendor
     let products = await Product.find({
-      id: inputs.items.map(item => item.id),
+      id: inputs.items.map(item => item.product),
       vendor: vendor.id
     })
       .populate('options&options.values');
 
+    // const util = require("util");
+    // sails.log.info(`orderValidation helper: located (${products.length}) products with ids: ${util.inspect(products.map(p => p.id), {depth: null})}`);
+
     // Iterate through the items in the order
     for (let item of inputs.items) {
       // Check that the product exists
-      let product = products.find(product => product.id === item.id);
+      let product = products.find(product => product.id === item.product);
       if (!product) {
+        sails.log.warn("helpers.validateOrder: invalidProduct. Check products given are registered to the correct vendor.");
         return exits.invalidProduct();
       }
 
       // Check that the item has all required options
       for (let productOption of product.options) {
         if (productOption.isRequired && !Object.keys(item.options).find(option => parseInt(option) === productOption.id)) {
+          sails.log.warn("helpers.validateOrder: invalidProductOption");
           return exits.invalidProductOption();
         }
       }
@@ -146,16 +155,17 @@ module.exports = {
 
         // If option is not found
         if (!option) {
+          sails.log.warn("helpers.validateOrder: invalidProductOption");
           return exits.invalidProductOption();
         }
 
         // If option value for item is not found in product option values
         if (!option.values.some(value => value.id === item.options[Object.keys(item.options)[i]])) {
+          sails.log.warn("helpers.validateOrder: invalidProductOption");
           return exits.invalidProductOption();
         }
       }
     }
-
     if(fulfilmentMethod.methodType === 'delivery') {
       // Check if vendor delivers to postal district
       const postcodeRegex = /^(((([A-Z][A-Z]{0,1})[0-9][A-Z0-9]{0,1}) {0,}[0-9])[A-Z]{2})$/;
@@ -167,39 +177,64 @@ module.exports = {
 
         if (!postalDistrictStringArray.includes(postalDistrict)) {
           // throw new Error('Vendor does not deliver to this postal district.');
+          sails.log.warn("helpers.validateOrder: invalidPostalDistrict");
           return exits.invalidPostalDistrict();
         }
       } else {
         // Postcode is invalid
+        sails.log.warn("helpers.validateOrder: invalidPostalDistrict");
         return exits.invalidPostalDistrict();
       }
     }
     if (fulfilmentMethod.methodType === 'collection') {
       // require user to submit their name and address for identification purposes on collection
       if(!inputs.address){
+        sails.log.warn("helpers.validateOrder: invalidUserAddress address obj");
         return exits.invalidUserAddress({data: 'address object required'});
       }
       if(!inputs.address.name){
+        sails.log.warn("helpers.validateOrder: invalidUserAddress name");
         return exits.invalidUserAddress({data: 'address.name required'});
       }
       if(!inputs.address.email){
+        sails.log.warn("helpers.validateOrder: invalidUserAddress email");
         return exits.invalidUserAddress({data: 'address.email required'});
       }
       if(!inputs.address.phoneNumber){
+        sails.log.warn("helpers.validateOrder: invalidUserAddress phoneNumber");
         return exits.invalidUserAddress({data: 'address.phoneNumber required'});
+      }
+      if (!inputs.address.city) {
+        sails.log.warn("helpers.validateOrder: invalidUserAddress city");
+        return exits.invalidUserAddress({ data: "address.city" });
+      }
+      if (!inputs.address.lineOne) {
+        sails.log.warn("helpers.validateOrder: invalidUserAddress lineOne");
+        return exits.invalidUserAddress({ data: "address.lineOne" });
+      }
+      if (!inputs.address.postCode) {
+        sails.log.warn("helpers.validateOrder: invalidUserAddress postCode");
+        return exits.invalidUserAddress({ data: "address.postCode" });
       }
     }
 
 
-    // Check if the delivery slots are valid
-    var slotsValid = await sails.helpers.validateDeliverySlot
-      .with({
-        fulfilmentMethodId: inputs.fulfilmentMethod,
-        fulfilmentSlotFrom: inputs.fulfilmentSlotFrom,
-        fulfilmentSlotTo: inputs.fulfilmentSlotTo
-      });
+    // Check if the delivery slots are valid for vendor
+    var slotsValid;
+    try {
+	    slotsValid = await sails.helpers.validateDeliverySlot
+	      .with({
+	        fulfilmentMethodId: inputs.fulfilmentMethod,
+	        fulfilmentSlotFrom: inputs.fulfilmentSlotFrom,
+	        fulfilmentSlotTo: inputs.fulfilmentSlotTo
+	      });
+    } catch (error) {
+      sails.log.error(`validateDeliverySlot helper in validateOrder: failed to return: ${error}`);
+      return exits.invalidSlot("Invalid delivery slot");
+    }
 
     if (!slotsValid) {
+      sails.log.warn("helpers.validateOrder: invalidSlot");
       return exits.invalidSlot('Invalid delivery slot');
     }
 
@@ -208,6 +243,7 @@ module.exports = {
       var discount = await sails.helpers.checkDiscountCode(inputs.discountCode, inputs.vendor);
 
       if (!discount) {
+        sails.log.warn("helpers.validateOrder: invalidDiscountCode");
         return exits.invalidDiscountCode('Invalid discount code');
       }
     }

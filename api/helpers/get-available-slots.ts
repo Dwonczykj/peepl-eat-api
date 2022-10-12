@@ -3,6 +3,7 @@ declare let OpeningHours: any;
 declare let FulfilmentMethod: any;
 // const moment = require('moment');
 import moment from 'moment';
+import util from 'util';
 
 module.exports = {
 
@@ -49,8 +50,7 @@ module.exports = {
       vendorId: 1,
       ordersPerSlot: 1
     }; */
-
-    let dt = moment(inputs.date, 'YYYY-MM-DD'); // Moment version of date
+    let dt = moment.utc(inputs.date, 'YYYY-MM-DD'); // Moment version of date
     let dayOfWeek = dt.format('dddd').toLowerCase(); // e.g. monday
 
     // Get special opening hours from DB (for specific date)
@@ -80,23 +80,22 @@ module.exports = {
     const cutoffTime = fulfilmentMethod.orderCutoff; // e.g. 22:00
 
     if(cutoffTime){
-      const tomorrow = moment().add(1, 'days').startOf('day'); // End of day tomorrow
+      const tomorrow = moment.utc().add(1, 'days').startOf('day'); // End of day tomorrow
 
       // If dt is today
-      if(dt.isSame(moment(), 'day')){
+      if(dt.isSame(moment.utc(), 'day')){
         isAfterCutoff = true;
       } else if(dt.isSameOrBefore(tomorrow) && cutoffTime) {
-        const cutoff = moment(cutoffTime, 'HH:mm'); // Moment version of cutoff time
+        const cutoff = moment.utc(cutoffTime, 'HH:mm'); // Moment version of cutoff time
         // If the current time is after the cutoff time, set isAfterCutoff to true
-        if(moment().isAfter(cutoff)) {
+        if(moment.utc().isAfter(cutoff)) {
           isAfterCutoff = true;
         }
       } // else nothing (too far in the future)
     }
-
+    
     // If there are opening hours available
     if(openingHours && openingHours.isOpen && !isAfterCutoff) {
-
       let openTime = inputs.date + ' ' + openingHours.openTime; // e.g. 25/12/2022 09:00
       let closeTime = inputs.date + ' ' + openingHours.closeTime; // e.g. 25/12/2022 17:00
 
@@ -130,19 +129,15 @@ module.exports = {
       ]; */
 
       // Find orders for that fulfilment method between the start and end times.
-      // var fulfilmentSlotFrom = moment(openTime, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DD HH:mm:ss');
-      // var fulfilmentSlotTo = moment(closeTime, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DD HH:mm:ss');
-      var orders = await Order.find({fulfilmentMethod: inputs.fulfilmentMethodId, paymentStatus: 'paid', restaurantAcceptanceStatus: { '!=' : 'rejected' }, fulfilmentSlotFrom: {'>=': openTime}, fulfilmentSlotTo: {'<=': closeTime}});
-
-      /* let orders = [{
-        fulfilmentSlotFrom: '17/02/2022 10:00',
-        fulfilmentSlotTo: '17/02/2022 11:00',
-        // ...
-      }, {
-        fulfilmentSlotFrom: '17/02/2022 13:00',
-        fulfilmentSlotTo: '17/02/2022 14:00',
-        // ...
-      }]; */
+      // var fulfilmentSlotFrom = moment.utc(openTime, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DD HH:mm:ss');
+      // var fulfilmentSlotTo = moment.utc(closeTime, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DD HH:mm:ss');
+      var orders = await Order.find({
+        fulfilmentMethod: inputs.fulfilmentMethodId,
+        paymentStatus: "paid",
+        restaurantAcceptanceStatus: { "!=": "rejected" },
+        fulfilmentSlotFrom: { ">=": openTime },
+        fulfilmentSlotTo: { "<=": closeTime },
+      });
 
       // Loop through possible slots and determine if number of orders is greater than ordersPerSlot
       for(let slotI of slots) {
@@ -159,18 +154,54 @@ module.exports = {
         });
 
         // Is the time slot after current time plus fulfilment method buffer
-        let isInFuture = moment.utc(slotI.startTime).isAfter(moment().add(fulfilmentMethod.bufferLength, 'minutes'));
+        let isInFuture = moment.utc(slotI.startTime).isAfter(moment.utc().add(fulfilmentMethod.bufferLength, 'minutes'));
 
         if ((!fulfilmentMethod.maxOrders || (relevantOrders.length <= fulfilmentMethod.maxOrders)) && isInFuture) { // If there aren't too many orders in the slot
           availableSlots.push(slotI); // Add slot to availableSlots array
         }
       }
     } else {
+      sails.log.info(
+        "Enter helpers.getAvailableSlots no available slots as " +
+          (!openingHours
+            ? `no opening hours exist with date: ${dt || dayOfWeek}`
+            : !openingHours.isOpen
+            ? "opening hours are closed"
+            : isAfterCutoff
+            ? "slot is after opening hours cutoff"
+            : "no idea why")
+      );
+      
+      let openingHoursAll = [];
+      try {
+        openingHoursAll = await OpeningHours.find({
+          fulfilmentMethod: inputs.fulfilmentMethodId,
+        });
+      } catch (error) {
+        //ignore
+      }
+      sails.log.info(
+        `Vendors opening hours for ${
+          fulfilmentMethod.methodType
+        } fulfilmentMethod [${inputs.fulfilmentMethodId}] are: ${util.inspect(
+          openingHoursAll,
+          {
+            depth: null,
+          }
+        )}`
+      );
+      
       availableSlots = [];
     }
-
+    // sails.log.debug(
+    //   `helpers.getAvailableSlots got (${
+    //     availableSlots.length
+    //   }) available Slots: ${util.inspect(availableSlots, {
+    //     depth: null,
+    //   })}`
+    // );
     // Send back the result through the success exit.
-    return availableSlots;
+    return exits.success(availableSlots);
   }
 };
 

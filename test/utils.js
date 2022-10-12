@@ -99,7 +99,7 @@ const logoutCbLogin = async (cb, verbose = false) =>
 const callAuthActionWithCookie = async (cb, verbose=false, data={}) =>
   login(verbose)
     .then((response) => {
-      expect(response.statusCode).to.equal(200);
+      expect(response.statusCode).to.equal(200, 'Login-with-secret wrapper failed to login: ' + util.inspect(response, {depth: null}));
       expect(Object.keys(response.headers)).to.deep.include("set-cookie");
       const sessionCookie = response.headers["set-cookie"];
       if(verbose){
@@ -108,10 +108,64 @@ const callAuthActionWithCookie = async (cb, verbose=false, data={}) =>
       return cb(sessionCookie);
     });
 
+function getNextWeekday(weekday) {
+  // ~ https://stackoverflow.com/a/25493271
+  assert.include([
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+    "sunday",
+  ],weekday);
+  const weekdays = [
+    "sunday",
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+  ];
+  const dayInd = weekdays.indexOf(weekday.toLowerCase());
+  var today = new Date();
+  var theDay;
+  var day = today.getDay();
+  console.log("Today is " + weekdays[day]);
+  if (day === dayInd) {
+    return (
+      today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate()
+    );
+  } else {
+    day = today.getDay();
+    var dateOfFirstDayOfThisWeek = today.getDate() - day;
+    var dateOfFirstDayOfNextWeek = dateOfFirstDayOfThisWeek + 7;
+    if (today.getDay() < dayInd){
+      theDay = dateOfFirstDayOfThisWeek + dayInd;
+    } else {
+      theDay = dateOfFirstDayOfNextWeek + dayInd;
+    }
+  }
+  closest = new Date(today.setDate(theDay));
+  
+  return (
+    closest.getFullYear() +
+    "-" +
+    (closest.getMonth() + 1) +
+    "-" +
+    closest.getDate()
+  );
+}
+
+// console.log(getNextWeekday('thursday') + 'is next thursday');
+// console.log(getNextWeekday("monday") + "is next monday");
+
 module.exports = {
   login,
   logout,
   logoutCbLogin,
   callAuthActionWithCookie,
   envConfig,
+  getNextWeekday,
 };

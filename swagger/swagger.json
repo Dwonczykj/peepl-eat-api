@@ -2937,19 +2937,11 @@
                   "oneOf": [
                     {
                       "type": "string",
-                      "description": "The fulfilment slot is invalid."
-                    },
-                    {
-                      "type": "string",
-                      "description": "No deliveryPartner available."
-                    },
-                    {
-                      "type": "string",
-                      "description": "All items are unavailable from merchant."
-                    },
-                    {
-                      "type": "string",
                       "description": "The minimum order amount was not met."
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
                     },
                     {
                       "type": "string",
@@ -2970,6 +2962,29 @@
           },
           "404": {
             "description": "Resource not found"
+          },
+          "422": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "The fulfilment slot is invalid."
+                    },
+                    {
+                      "type": "string",
+                      "description": "No deliveryPartner available."
+                    },
+                    {
+                      "type": "string",
+                      "description": "All items are unavailable from merchant."
+                    }
+                  ]
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal server error"

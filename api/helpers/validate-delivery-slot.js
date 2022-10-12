@@ -28,6 +28,9 @@ module.exports = {
     success: {
       description: 'All done.',
     },
+    noValidSlots: {
+      description: 'No available slots found'
+    }
 
   },
 
@@ -36,19 +39,36 @@ module.exports = {
     var moment = require('moment');
 
     // Strip time from inputted datetime
-    var date = moment(inputs.fulfilmentSlotFrom, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD');
+    var date = moment.utc(inputs.fulfilmentSlotFrom, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD');
 
-    var validSlots = await sails.helpers.getAvailableSlots.with({date, fulfilmentMethodId: inputs.fulfilmentMethodId});
+    var validSlots = [];
+    try {
+	    validSlots = await sails.helpers.getAvailableSlots.with({date, fulfilmentMethodId: inputs.fulfilmentMethodId});
+    } catch (error) {
+      sails.log.error(`helpers.getAvailableSlots blew up: ${error}`);
+    }
+
+    if(!validSlots){
+      sails.log(
+        `helpers.validateDeliverySlots found no valid slots from helpers.getAvailableSlots`
+      );
+      return exits.noValidSlots();
+    }
 
     // Find slot within list of valid slots
     const found = validSlots.find(slots => {
-      return (moment(inputs.fulfilmentSlotFrom).isSame(slots.startTime)) && (moment(inputs.fulfilmentSlotTo).isSame(slots.endTime));
+      return (
+        moment.utc(inputs.fulfilmentSlotFrom).isSame(slots.startTime) &&
+        moment.utc(inputs.fulfilmentSlotTo).isSame(slots.endTime)
+      );
     });
 
+
+
     if (found) {
-      return true;
+      return exits.success(true);
     } else {
-      return false;
+      return exits.success(false);
     }
   }
 

@@ -1,4 +1,5 @@
 var supertest = require("supertest");
+const util = require('util');
 const { envConfig, callAuthActionWithCookie } = require("./utils");
 const { assert, expect } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
 
@@ -85,6 +86,7 @@ class HttpTestSender {
     const baseUrl = !relUrl
       ? `/api/v1/${this.ACTION_PATH}/${this.ACTION_NAME}`
       : `/api/v1/${relUrl}`;
+    this.baseUrl = baseUrl;
     console.log(`Supertest: -> ${HTTP_TYPE} ${baseUrl}`);
     if (HTTP_TYPE.toLowerCase() === "get") {
       this.httpCall = () =>
@@ -116,16 +118,27 @@ class HttpTestSender {
   }
 
   makeCallWith(cookie) {
-    return async (updatedPostDataWith, updatedPostDataWithOutKeys = []) =>
-      this.httpCall()
-        .send(
-          this.expectedResponse.sendWith(
-            updatedPostDataWith,
-            updatedPostDataWithOutKeys
-          )
-        )
+    return async (updatedPostDataWith, updatedPostDataWithOutKeys = []) => {
+      const _sw = this.expectedResponse.sendWith(
+        updatedPostDataWith,
+        updatedPostDataWithOutKeys
+      );
+      console.log(util.inspect(_sw, {depth:null}));
+      const response = this.httpCall()
+        .send(_sw)
         .set("Cookie", cookie)
         .set("Accept", "application/json");
+      if (response.statusCode === 400 || response.statusCode >= 402){
+        //we might want to get a 401 or 403
+        // eslint-disable-next-line no-console
+        console.warn(
+          `(${this.HTTP_TYPE} ${this.baseUrl})->[${response.statusCode}]: ` +
+            `body: ${util.inspect(response.body, { depth: null })}\n` + 
+            `request payload: ${util.inspect(_sw, { depth: null })}\n`
+        );
+      }
+      return response;
+    };
   }
 }
 

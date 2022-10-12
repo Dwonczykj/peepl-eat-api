@@ -154,8 +154,8 @@ parasails.registerComponent('order-card', {
     },
     isInFuture: function(dateTimeString){
       if (!dateTimeString) {return false;}
-      var dateTime = moment(dateTimeString);
-      return dateTime.isAfter(moment());
+      var dateTime = moment.utc(dateTimeString);
+      return dateTime.isAfter(moment.utc());
     }
   }
 });

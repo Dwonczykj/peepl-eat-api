@@ -67,10 +67,10 @@ module.exports = {
     var platformFee = vendor.platformFee;
     workingTotal = workingTotal + platformFee;
 
-    return {
+    return exits.success({
       withoutFees: withoutFees,
       finalAmount: workingTotal
-    };
+    });
   }
 
 };

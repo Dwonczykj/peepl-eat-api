@@ -14,8 +14,8 @@ export class Slot implements iSlot {
       startTime: (string | moment.Moment),
       endTime: (string | moment.Moment),
     }) {
-    this.startTime = moment(args.startTime);
-    this.endTime = moment(args.endTime);
+    this.startTime = moment.utc(args.startTime);
+    this.endTime = moment.utc(args.endTime);
   }
   static from(iSlot: iSlot){
     return new Slot({

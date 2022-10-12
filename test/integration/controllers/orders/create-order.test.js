@@ -4,10 +4,13 @@
 const { assert, expect } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
 // var supertest = require("supertest");
 const _ = require('lodash');
-// var util = require("util");
+var util = require("util");
 const moment = require("moment/moment");
 require("ts-node/register");
+const {fixtures} = require("../../../../scripts/build_db");
+const {getNextWeekday} = require("../../../utils");
 const { HttpAuthTestSender, ExpectResponse } = require('../../../httpTestSender');
+const e = require("express");
 
 // const { v4: uuidv4 } = require('uuid');
 /* Check if string is valid UUID */
@@ -72,98 +75,132 @@ class HttpAuthTestSenderOrder extends HttpAuthTestSender {
   }
 }
 
-var fixtures = {};
-const fs = require("fs");
+const CREATE_ORDER = (fixtures) => {
+  const vendor = fixtures.vendors[0];
+  const fulfilmentMethodVendor = fixtures.fulfilmentMethods.filter(
+    (fm) =>
+      fm.vendor === fixtures.vendors[0].id &&
+      fm.methodType === "collection" &&
+      fixtures.openingHours.filter((oh) => oh.fulfilmentMethod === fm.id && oh.isOpen === true)
+  )[0];
+  const openAtHours = fixtures.openingHours.filter(
+    (openHrs) =>
+      openHrs.isOpen === true &&
+      openHrs.fulfilmentMethod === fulfilmentMethodVendor.id
+  )[0];
 
-_.each(fs.readdirSync(process.cwd() + "/test/fixtures/"), (file) => {
-  fixtures[file.replace(/\.js$/, "")] = require(process.cwd() +
-    "/test/fixtures/" +
-    file);
-});
-
-const CREATE_ORDER = {
-  useAccount: "TEST_SERVICE",
-  HTTP_TYPE: "post",
-  ACTION_PATH: "orders",
-  ACTION_NAME: "create-order",
-  sendData: {
-    items: [
-      {
-        id: 1,
-        options: {
-          1: 1,
-          2: 5,
-          3: 10,
-        },
+  return {
+    useAccount: "TEST_SERVICE",
+    HTTP_TYPE: "post",
+    ACTION_PATH: "orders",
+    ACTION_NAME: "create-order",
+    sendData: {
+      vendor: vendor.id,
+      items: fixtures.products
+        .filter((product) => product.vendor === fixtures.vendors[0].id)
+        .map((product) => ({
+          // id: 6,
+          // order: 4,
+          product: product.id,
+          unfulfilled: false,
+          unfulfilledOnOrderId: null,
+          options: fixtures.productOptions
+            .filter((po) => po.product === product.id)
+            .map((po) => {
+              const x = fixtures.productOptionValues.filter(
+                (pov) => pov.option === po.id
+              );
+              const y = {};
+              if (x) {
+                y[po.id] = x[0].id;
+              }
+              return y;
+            })
+            .reduce((prev, cur) => ({ ...prev, ...cur }), {}),
+        })),
+      total: 2375,
+      tipAmount: 0,
+      marketingOptIn: false,
+      walletAddress: "0x41190Dd82D43129C26955063fa2854350e14554B",
+      address: {
+        name: "Adam Galloway",
+        email: "adam@itsaboutpeepl.com",
+        phoneNumber: "07495995614",
+        lineOne: "17 Teck Street",
+        lineTwo: "",
+        city: "Liverpool",
+        postCode: "L1 0AR",
+        deliveryInstructions: "Leave it behind the bin",
       },
-    ],
-    total: 2105,
-    tipAmount: 0,
-    marketingOptIn: false,
-    vendor: "1",
-    walletAddress: "0x41190Dd82D43129C26955063fa2854350e14554B",
-    address: {
-      name: "Adam Galloway",
-      email: "adam@itsaboutpeepl.com",
-      phoneNumber: "07495995614",
-      lineOne: "17 Teck Street",
-      lineTwo: "",
-      postCode: "L1 0AR",
-      deliveryInstructions: "Leave it behind the bin",
+      fulfilmentMethod: fulfilmentMethodVendor.id,
+      fulfilmentSlotFrom:
+        getNextWeekday(openAtHours.dayOfWeek) +
+        " " +
+        openAtHours.openTime +
+        ":00", // "2022-10-07 11:00:00"
+      fulfilmentSlotTo:
+        getNextWeekday(openAtHours.dayOfWeek) +
+        " " +
+        moment(openAtHours.openTime, "hh:mm")
+          .add(fulfilmentMethodVendor.slotLength, "minutes")
+          .format("hh:mm") +
+        ":00", // "2022-10-07 11:00:00"
+      discountCode: fixtures.discountCodes[0].code,
     },
-    fulfilmentMethod: 1,
-    fulfilmentSlotFrom: "2022-10-07 11:00:00",
-    fulfilmentSlotTo: "2022-10-07 12:00:00",
-    discountCode: "DELI10",
-  },
-  expectResponse: {
-    items: [
-      {
-        id: 1,
-        options: {
-          1: 1,
-          2: 5,
-          3: 10,
-        },
+    expectResponse: {
+      vendor: vendor.id,
+      items: fixtures.products
+        .filter((product) => product.vendor === fixtures.vendors[0].id)
+        .map((product) => ({
+          // id: 6,
+          // order: 4,
+          product: product.id,
+          unfulfilled: false,
+          unfulfilledOnOrderId: null,
+          options: fixtures.productOptions
+            .filter((po) => po.product === product.id)
+            .map((po) => {
+              const x = fixtures.productOptionValues.filter(
+                (pov) => pov.option === po.id
+              );
+              const y = {};
+              if (x) {
+                y[po.id] = x[0].id;
+              }
+              return y;
+            })
+            .reduce((prev, cur) => ({ ...prev, ...cur }), {}),
+        })),
+      total: 2375,
+      tipAmount: 0,
+      marketingOptIn: false,
+      walletAddress: "0x41190Dd82D43129C26955063fa2854350e14554B",
+      address: {
+        name: "Adam Galloway",
+        email: "adam@itsaboutpeepl.com",
+        phoneNumber: "07495995614",
+        lineOne: "17 Teck Street",
+        lineTwo: "",
+        city: "Liverpool",
+        postCode: "L1 0AR",
+        deliveryInstructions: "Leave it behind the bin",
       },
-    ],
-    total: 2105,
-    tipAmount: 0,
-    marketingOptIn: false,
-    vendor: "1",
-    customerWalletAddress: "0x41190Dd82D43129C26955063fa2854350e14554B",
-    orderedDateTime: moment.utc(),
-    paidDateTime: null, // TODO: Check set when order paid for
-    refundDateTime: null, // TODO: Check set when order cancelled
-    address: {
-      name: "Adam Galloway",
-      email: "adam@itsaboutpeepl.com",
-      phoneNumber: "07495995614",
-      lineOne: "17 Teck Street",
-      lineTwo: "",
-      postCode: "L1 0AR",
-      deliveryInstructions: "Leave it behind the bin",
+      fulfilmentMethod: fulfilmentMethodVendor.id,
+      fulfilmentSlotFrom:
+        getNextWeekday(openAtHours.dayOfWeek) +
+        " " +
+        openAtHours.openTime +
+        ":00", // "2022-10-07 11:00:00"
+      fulfilmentSlotTo:
+        getNextWeekday(openAtHours.dayOfWeek) +
+        " " +
+        moment(openAtHours.openTime, "hh:mm")
+          .add(fulfilmentMethodVendor.slotLength, "minutes")
+          .format("hh:mm") +
+        ":00", // "2022-10-07 11:00:00"
+      discountCode: fixtures.discountCodes[0].code,
     },
-    publicId: "",
-    fulfilmentMethod: 1,
-    fulfilmentSlotFrom: "2022-10-07 11:00:00",
-    fulfilmentSlotTo: "2022-10-07 12:00:00",
-    discount: 1,
-    paymentStatus: "unpaid",
-    paymentIntentId: "",
-    deliveryId: "",
-    deliveryPartnerAccepted: false, //TODO Check can update
-    deliveryPartnerConfirmed: false, //TODO Check can update,
-    rewardsIssued: 0, //TODO Check can update,
-    sentToDeliveryPartner: false, //TODO Check can update,
-    completedFlag: false,
-    completedOrderFeedback: null,
-    deliveryPunctuality: null,
-    orderCondition: null,
-    unfulfilledItems: [], //Check using partial orders
-    deliveryPartner: null, // TODO Check can set after order creation when the courier is subsequently confirmed
-    parentOrder: null,
-  }
+  };
 };
 const GET_ORDER = {
   useAccount: "TEST_SERVICE",
@@ -173,7 +210,7 @@ const GET_ORDER = {
   sendData: {
     orderId: 1,
   },
-  expectResponse: fixtures.orders.where((order) => order.id === 1)[0],
+  expectResponse: fixtures.orders.filter((order) => order.id === 1)[0],
 };
 const GET_ORDER_STATUS = {
   useAccount: "TEST_SERVICE",
@@ -315,7 +352,7 @@ const VIEW_ALL_ORDERS_ACCEPTED = {
     acceptanceStatus: "accepted", //['accepted', 'rejected', 'pending']
     timePeriod: "all", //['upcoming', 'past', 'all']
   },
-  expectResponse: fixtures.orders.where((order) => order.id === 2)[0],
+  expectResponse: fixtures.orders.filter((order) => order.id === 2)[0],
 };
 const VIEW_ALL_ORDERS_REJECTED = {
   useAccount: "TEST_SERVICE",
@@ -326,7 +363,7 @@ const VIEW_ALL_ORDERS_REJECTED = {
     acceptanceStatus: "rejected", //['accepted', 'rejected', 'pending']
     timePeriod: "all", //['upcoming', 'past', 'all']
   },
-  expectResponse: fixtures.orders.where((order) => order.id === 3)[0],
+  expectResponse: fixtures.orders.filter((order) => order.id === 3)[0],
 };
 const VIEW_ALL_ORDERS_PENDING = {
   useAccount: "TEST_SERVICE",
@@ -337,7 +374,7 @@ const VIEW_ALL_ORDERS_PENDING = {
     acceptanceStatus: "pending", //['accepted', 'rejected', 'pending']
     timePeriod: "all", //['upcoming', 'past', 'all']
   },
-  expectResponse: fixtures.orders.where((order) => order.id === 1)[0], //TODO: call to create or setup in fixtures
+  expectResponse: fixtures.orders.filter((order) => order.id === 1)[0], //TODO: call to create or setup in fixtures
 };
 const VIEW_ALL_ORDERS_DEFAULT = {
   useAccount: "TEST_SERVICE",
@@ -357,7 +394,7 @@ const VIEW_ALL_ORDERS_UPCOMING = {
   sendData: {
     timePeriod: "upcoming", //['upcoming', 'past', 'all']
   },
-  expectResponse: fixtures.orders.where((order) => {
+  expectResponse: fixtures.orders.filter((order) => {
     return moment.utc(order.fulfilmentSlotFrom).isAfter(moment.utc());
   }),
 };
@@ -369,7 +406,7 @@ const VIEW_ALL_ORDERS_PAST = {
   sendData: {
     timePeriod: "past", //['upcoming', 'past', 'all']
   },
-  expectResponse: fixtures.orders.where((order) => {
+  expectResponse: fixtures.orders.filter((order) => {
     return moment.utc(order.fulfilmentSlotFrom).isSameOrBefore(moment.utc());
   }),
 };
@@ -580,10 +617,31 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${CREATE_ORDER.ACTION_NAME}() returns a 200 with json when authenticated`, () => {
     it("Returns a new order", async () => {
       try {
-        const hats = new HttpAuthTestSenderOrder(CREATE_ORDER);
-        const response = await hats.makeAuthCallWith({}, []);
-        expect(response.statusCode).to.equal(200);
-        hats.expectedResponse.checkResponse(response.body);
+        const fulfilmentMethodsForVendor = await FulfilmentMethod.find({
+          vendor: fixtures.vendors[0].id,
+          methodType: "delivery",
+        });
+        assert.isArray(fulfilmentMethodsForVendor);
+        const fulfilmentMethod = fulfilmentMethodsForVendor[0];
+        const hats = new HttpAuthTestSenderOrder(CREATE_ORDER(fixtures));
+        const response = await hats.makeAuthCallWith(
+          {
+            fulfilmentMethod: fulfilmentMethod.id,
+          },
+          []
+        );
+        // console.log('Vendor one looks like: ' + util.inspect(fixtures.vendors[0], {depth: null}));
+        expect(response.statusCode).to.equal(
+          200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
+        expect(response.body).to.have.property("orderID");
+        expect(response.body).to.have.property("paymentIntentID");
+        // hats.expectedResponse.checkResponse(response.body);
       } catch (errs) {
         console.warn(errs);
         throw errs;
@@ -686,7 +744,7 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${GET_ORDER_BY_WALLETADDRESS.ACTION_NAME}() successfully gets orders for walletaddress`, () => {
     it("Can GET Orders by wallet address", async () => {
       try {
-        const parentOrder = await HttpAuthTestSenderOrder(
+        const parentOrder = await new HttpAuthTestSenderOrder(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
@@ -717,7 +775,7 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${MARK_ORDER_AS_PAID.ACTION_NAME} successfully flag order as paid`, () => {
     it("flags order as paid", async () => {
       try {
-        const parentOrder = await HttpAuthTestSenderOrder(
+        const parentOrder = await new HttpAuthTestSenderOrder(
           CREATE_ORDER
         ).makeAuthCallWith(
           {},
@@ -743,7 +801,7 @@ describe(`Order Model Integration Tests`, () => {
     });
     it("can flag order as payment failed", async () => {
       try {
-        const parentOrder = await HttpAuthTestSenderOrder(
+        const parentOrder = await new HttpAuthTestSenderOrder(
           CREATE_ORDER
         ).makeAuthCallWith(
           {},
@@ -770,7 +828,7 @@ describe(`Order Model Integration Tests`, () => {
     });
     it("can flag order as refund succeeded and notifies users, vendors and vegisupport", async () => {
       try {
-        const parentOrder = await HttpAuthTestSenderOrder(
+        const parentOrder = await new HttpAuthTestSenderOrder(
           CREATE_ORDER
         ).makeAuthCallWith({}, []);
         const hats = new HttpAuthTestSenderOrder(MARK_ORDER_AS_REFUNDED_SUCCESS);
@@ -793,7 +851,7 @@ describe(`Order Model Integration Tests`, () => {
     });
     it("can notify users, vendors and vegisupport when a refund fails", async () => {
       try {
-        const parentOrder = await HttpAuthTestSenderOrder(
+        const parentOrder = await new HttpAuthTestSenderOrder(
           CREATE_ORDER
         ).makeAuthCallWith({}, []);
         const hats = new HttpAuthTestSenderOrder(MARK_ORDER_AS_REFUNDED_FAILED);
@@ -947,7 +1005,7 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${VIEW_APPROVE_ORDER.ACTION_NAME}()`, () => {
     it("successfully view approve-order screen for order from publicId", async () => {
       try {
-        const parentOrder = await HttpAuthTestSenderOrder(
+        const parentOrder = await new HttpAuthTestSenderOrder(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
@@ -971,7 +1029,7 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${APPROVE_OR_DECLINE_ORDER_ACCEPT.ACTION_NAME}()`, () => {
     it("vendors can successfully accept an order from approve-or-decline-order action", async () => {
       try {
-        const parentOrder = await HttpAuthTestSenderOrder(
+        const parentOrder = await new HttpAuthTestSenderOrder(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
@@ -1039,7 +1097,7 @@ describe(`Order Model Integration Tests`, () => {
     });
     it("vendors can successfully reject an order from approve-or-decline-order action", async () => {
       try {
-        const parentOrder = await HttpAuthTestSenderOrder(
+        const parentOrder = await new HttpAuthTestSenderOrder(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
@@ -1107,7 +1165,7 @@ describe(`Order Model Integration Tests`, () => {
     });
     it("vendors can successfully partially accept an order from approve-or-decline-order action", async () => {
       try {
-        const parentOrder = await HttpAuthTestSenderOrder(
+        const parentOrder = await new HttpAuthTestSenderOrder(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
@@ -1177,7 +1235,7 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${CUSTOMER_UPDATE_PAID_ORDER.ACTION_NAME}()`, () => {
     it("users can successfully UPDATE ITEMS on an order after getting a partial fulfillment back from a vendor", async () => {
       try {
-        const parentOrder = await HttpAuthTestSenderOrder(
+        const parentOrder = await new HttpAuthTestSenderOrder(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
@@ -1250,7 +1308,7 @@ describe(`Order Model Integration Tests`, () => {
     });
     it("users can successfully CANCEL an order after getting a partial fulfillment back from a vendor", async () => {
       try {
-        const parentOrder = await HttpAuthTestSenderOrder(
+        const parentOrder = await new HttpAuthTestSenderOrder(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
@@ -1324,7 +1382,7 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${CUSTOMER_RECEIVED_ORDER_GOOD.ACTION_NAME}()`, () => {
     it("users can successfully confirm order was received in good condition", async () => {
       try {
-        const parentOrder = await HttpAuthTestSenderOrder(
+        const parentOrder = await new HttpAuthTestSenderOrder(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
@@ -1405,7 +1463,7 @@ describe(`Order Model Integration Tests`, () => {
     });
     it("users can successfully confirm order was received in POOR condition", async () => {
       try {
-        const parentOrder = await HttpAuthTestSenderOrder(
+        const parentOrder = await new HttpAuthTestSenderOrder(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
@@ -1483,7 +1541,7 @@ describe(`Order Model Integration Tests`, () => {
     });
     it("users can successfully confirm order was received LATE", async () => {
       try {
-        const parentOrder = await HttpAuthTestSenderOrder(
+        const parentOrder = await new HttpAuthTestSenderOrder(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
@@ -1563,7 +1621,7 @@ describe(`Order Model Integration Tests`, () => {
     });
     it("users can successfully confirm order was NOT RECEIVED", async () => {
       try {
-        const parentOrder = await HttpAuthTestSenderOrder(
+        const parentOrder = await new HttpAuthTestSenderOrder(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
@@ -1642,7 +1700,7 @@ describe(`Order Model Integration Tests`, () => {
     });
     it("API will not accept bad delivery punctuality input", async () => {
       try {
-        const parentOrder = await HttpAuthTestSenderOrder(
+        const parentOrder = await new HttpAuthTestSenderOrder(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
@@ -1718,7 +1776,7 @@ describe(`Order Model Integration Tests`, () => {
     });
     it("API will not accept bad order condition input", async () => {
       try {
-        const parentOrder = await HttpAuthTestSenderOrder(
+        const parentOrder = await new HttpAuthTestSenderOrder(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
@@ -1797,7 +1855,7 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${UPDATE_PAID_ORDER_SUCCESS.ACTION_NAME}()`, () => {
     it("PeeplPay Service can successfully send notifications when a payment succeeds for an order", async () => {
       try {
-        const parentOrder = await HttpAuthTestSenderOrder(
+        const parentOrder = await new HttpAuthTestSenderOrder(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
@@ -1865,7 +1923,7 @@ describe(`Order Model Integration Tests`, () => {
     });
     it("PeeplPay Service can successfully send notifications when a payment fails for an order", async () => {
       try {
-        const parentOrder = await HttpAuthTestSenderOrder(
+        const parentOrder = await new HttpAuthTestSenderOrder(
           CREATE_ORDER
         ).makeAuthCallWith(
           {

@@ -1,5 +1,6 @@
 module.exports = [
   {
+    id: 1,
     name: 'Delifonseca',
     type: 'restaurant',
     description: 'Life\'s too short to have a bad meal. Delifonseca is here to help you enjoy the finer tastes in life.',

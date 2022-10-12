@@ -26,11 +26,11 @@ async function buildDb(sails, test) {
   var vendorCategory = await VendorCategory.createEach(
     fixtures.vendorCategories
   ).fetch();
-  console.info(
-    "Finished populating vendorCategories: " +
-      util.inspect(vendorCategory, { depth: 1 }) + // * depth: null for full object print
-      ""
-  );
+  // console.info(
+  //   "Finished populating vendorCategories: " +
+  //     util.inspect(vendorCategory, { depth: 1 }) + // * depth: null for full object print
+  //     ""
+  // );
 
   var postalDistricts = await PostalDistrict.createEach(
     fixtures.postalDistricts
@@ -40,9 +40,12 @@ async function buildDb(sails, test) {
   await Vendor.createEach(fixtures.vendors);
   console.info("Finished populating Vendors");
 
-
   await DeliveryPartner.createEach(fixtures.deliveryPartners);
   console.info("Finished populating Delivery Partners");
+  await FulfilmentMethod.createEach(fixtures.fulfilmentMethods);
+  console.info("Finished populating fulfilment methods");
+  await OpeningHours.createEach(fixtures.openingHours);
+  console.info("Finished populating opening hours");
 
   await CategoryGroup.createEach(fixtures.categoryGroups);
   console.info("Finished populating Category Groups");
@@ -52,8 +55,9 @@ async function buildDb(sails, test) {
   await Product.createEach(fixtures.products);
   console.info("Finished populating Products");
   await ProductOption.createEach(fixtures.productOptions);
-  await ProductOptionValue.createEach(fixtures.productOptionValues);
   console.info("Finished populating Product Options");
+  await ProductOptionValue.createEach(fixtures.productOptionValues);
+  console.info("Finished populating Product Option Values");
   await Discount.createEach(fixtures.discountCodes);
   console.info("Finished populating Discounts");
 

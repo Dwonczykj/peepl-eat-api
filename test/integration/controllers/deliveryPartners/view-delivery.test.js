@@ -72,7 +72,7 @@ const VIEW_DELIVERIES = {
   sendData: {
     deliveryPartnerId: 1, //AGILE
   },
-  expectResponse: fixtures.orders.where(
+  expectResponse: fixtures.orders.filter(
     (order) => order.deliveryPartner.id === 1 && order.completedFlag === ''
   ),
 };
@@ -260,7 +260,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
   describe(`${CANCEL_DELIVERY.ACTION_NAME}()`, () => {
     it(`DeliveryPartners can cancel delivery for an order`, async () => {
       try {
-        const parentOrder = await HttpAuthTestSenderDeliveryPartner(
+        const parentOrder = await new HttpAuthTestSenderDeliveryPartner(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
@@ -285,7 +285,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
     });
     it(`Non-DeliveryPartners cannot cancel delivery for an order`, async () => {
       try {
-        const parentOrder = await HttpAuthTestSenderDeliveryPartner(
+        const parentOrder = await new HttpAuthTestSenderDeliveryPartner(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
@@ -314,7 +314,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
   describe(`${ACCEPT_DELIVERY_CONFIRMATION_AS_ADMIN.ACTION_NAME}()`, () => {
     it(`${ACCEPT_DELIVERY_CONFIRMATION_AS_ADMIN.ACTION_NAME} returns 401 when already confirmed`, async () => {
       try {
-        const parentOrder = await HttpAuthTestSenderDeliveryPartner(
+        const parentOrder = await new HttpAuthTestSenderDeliveryPartner(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
@@ -338,7 +338,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
     });
     it(`${ACCEPT_DELIVERY_CONFIRMATION_AS_ADMIN.ACTION_NAME} returns 401 when user is not a delivery partner`, async () => {
       try {
-        const parentOrder = await HttpAuthTestSenderDeliveryPartner(
+        const parentOrder = await new HttpAuthTestSenderDeliveryPartner(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
@@ -360,7 +360,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
     });
     it(`${ACCEPT_DELIVERY_CONFIRMATION_AS_ADMIN.ACTION_NAME} returns 401 when order has a delivery partner registered to another delivery partner`, async () => {
       try {
-        const parentOrder = await HttpAuthTestSenderDeliveryPartner(
+        const parentOrder = await new HttpAuthTestSenderDeliveryPartner(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
@@ -383,7 +383,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
     });
     it("Admin can successfully accept a delivery job for an order", async () => {
       try {
-        const parentOrder = await HttpAuthTestSenderDeliveryPartner(
+        const parentOrder = await new HttpAuthTestSenderDeliveryPartner(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
@@ -408,7 +408,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
     });
     it("Admin can successfully accept a delivery job for an order", async () => {
       try {
-        const parentOrder = await HttpAuthTestSenderDeliveryPartner(
+        const parentOrder = await new HttpAuthTestSenderDeliveryPartner(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
@@ -433,7 +433,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
     });
     it("Admin can successfully accept a delivery job for an order", async () => {
       try {
-        const parentOrder = await HttpAuthTestSenderDeliveryPartner(
+        const parentOrder = await new HttpAuthTestSenderDeliveryPartner(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
@@ -461,7 +461,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
     it(`${ADD_DELIVERY_DELIVERY_AVAILABILITY.ACTION_NAME} returns 200 as Delivery Partner for the order`, async () => {
       try {
         const deliveryId = "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_10";
-        const parentOrder = await HttpAuthTestSenderDeliveryPartner(
+        const parentOrder = await new HttpAuthTestSenderDeliveryPartner(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
@@ -496,7 +496,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
     it(`${ADD_DELIVERY_DELIVERY_AVAILABILITY.ACTION_NAME} returns 200 as Delivery Partner for the order`, async () => {
       try {
         const deliveryId = "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_11";
-        const parentOrder = await HttpAuthTestSenderDeliveryPartner(
+        const parentOrder = await new HttpAuthTestSenderDeliveryPartner(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
@@ -527,7 +527,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
     });
     it(`${ADD_DELIVERY_DELIVERY_AVAILABILITY.ACTION_NAME} returns 401 if Order has already been ACCEPTED || CONFIRMED by ANY delivery partner`, async () => {
       try {
-        const parentOrder = await HttpAuthTestSenderDeliveryPartner(
+        const parentOrder = await new HttpAuthTestSenderDeliveryPartner(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
@@ -558,7 +558,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
     });
     it(`${ADD_DELIVERY_DELIVERY_AVAILABILITY_AS_USER_NOT_ALLOWED.ACTION_NAME} returns 401 when not a delivery partner`, async () => {
       try {
-        const parentOrder = await HttpAuthTestSenderDeliveryPartner(
+        const parentOrder = await new HttpAuthTestSenderDeliveryPartner(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
@@ -706,14 +706,14 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
           "openingHours"
         ).members(newHoursIDsDelVen);
         
-        const parentOrder = await HttpAuthTestSenderDeliveryPartner(
+        const parentOrder = await new HttpAuthTestSenderDeliveryPartner(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
             deliveryId: "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_14",
             fulfilmentMethod: fmVen, // mobile app only requests fulfilment methods for vendor at the moment
-            fulfilmentSlotFrom: moment("15:00", "hh:mm:ss").toDate(), //fmVen.openingHours.openTime -> closeTime
-            fulfilmentSlotTo: moment("17:00", "hh:mm:ss").toDate(),
+            fulfilmentSlotFrom: moment.utc("15:00", "hh:mm:ss").toDate(), //fmVen.openingHours.openTime -> closeTime
+            fulfilmentSlotTo: moment.utc("17:00", "hh:mm:ss").toDate(),
           },
           []
         );

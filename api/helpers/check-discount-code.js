@@ -33,27 +33,27 @@ module.exports = {
     var currentTime = new Date().getTime();
 
     if(!discount){
-      return false;
+      return exits.success(false);
     }
 
     if(discount.vendor && (discount.vendor !== inputs.vendorId)){
-      return false;
+      return exits.success(false);
     }
 
     if(discount.expiryDateTime && discount.expiryDateTime < currentTime){
-      return false;
+      return exits.success(false);
     }
 
     if(discount.maxUses && discount.timesUsed >= discount.maxUses){
-      return false;
+      return exits.success(false);
     }
 
     if(!discount.isEnabled) {
-      return false;
+      return exits.success(false);
     }
 
     // All done.
-    return discount;
+    return exits.success(discount);
   }
 
 

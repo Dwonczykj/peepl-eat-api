@@ -6,48 +6,60 @@
  */
 
 module.exports = {
-
   attributes: {
-
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
     //  ╩  ╩╚═╩╩ ╩╩ ╩ ╩ ╚╝ ╚═╝╚═╝
     dayOfWeek: {
-      type: 'string',
-      isIn: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
+      type: "string",
+      isIn: [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday",
+      ],
       // required: true
     },
     specialDate: {
-      type: 'ref',
-      columnType: 'date',
-      description: 'Specific date override - for example Christmas day',
+      type: "ref",
+      columnType: "date",
+      description: "Specific date override - for example Christmas day",
       // unique: true
     },
     openTime: {
-      type: 'ref',
-      columnType: 'time'
+      type: "ref",
+      columnType: "time",
     },
     closeTime: {
-      type: 'ref',
-      columnType: 'time'
+      type: "ref",
+      columnType: "time",
     },
     isOpen: {
-      type: 'boolean',
-      defaultsTo: false
+      type: "boolean",
+      defaultsTo: false,
     },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
     //  ╚═╝╩ ╩╚═╝╚═╝═╩╝╚═╝
 
-
     //  ╔═╗╔═╗╔═╗╔═╗╔═╗╦╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
     //  ╠═╣╚═╗╚═╗║ ║║  ║╠═╣ ║ ║║ ║║║║╚═╗
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
     fulfilmentMethod: {
-      model: 'fulfilmentMethod'
-    }
+      model: "fulfilmentMethod",
+    },
   },
 
+  afterCreate: async function (newlyCreatedRecord, proceed) {
+    await FulfilmentMethod.addToCollection(
+      newlyCreatedRecord.fulfilmentMethod,
+      "openingHours"
+    ).members([newlyCreatedRecord.id]);
+    return proceed();
+  },
 };
 
