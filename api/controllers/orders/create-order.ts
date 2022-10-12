@@ -206,29 +206,35 @@ module.exports = {
 	        );
 	      }
 	      sails.log(`Create the order in the db`);
-	      var order = await wrapWithDb(db, () =>
-          Order.create({
-            total: inputs.total,
-            orderedDateTime: Date.now(),
-            deliveryAccepted: !!availableDeliveryPartner,
-            deliveryPartner: availableDeliveryPartner.id,
-            deliveryName: inputs.address.name,
-            deliveryEmail: inputs.address.email,
-            deliveryPhoneNumber: inputs.address.phoneNumber,
-            deliveryAddressLineOne: inputs.address.lineOne,
-            deliveryAddressLineTwo: inputs.address.lineTwo,
-            deliveryAddressCity: inputs.address.city,
-            deliveryAddressPostCode: inputs.address.postCode,
-            deliveryAddressInstructions: inputs.address.deliveryInstructions,
-            customerWalletAddress: inputs.walletAddress,
-            discount: discount ? discount.id : undefined,
-            vendor: vendor.id,
-            fulfilmentMethod: inputs.fulfilmentMethod,
-            fulfilmentSlotFrom: inputs.fulfilmentSlotFrom,
-            fulfilmentSlotTo: inputs.fulfilmentSlotTo,
-            tipAmount: inputs.tipAmount,
-          })
-        ).fetch();
+        var order;
+	      try {
+          order = await wrapWithDb(db, () =>
+            Order.create({
+              total: inputs.total,
+              orderedDateTime: Date.now(),
+              deliveryAccepted: !!availableDeliveryPartner,
+              deliveryPartner: availableDeliveryPartner ? availableDeliveryPartner.id : null,
+              deliveryName: inputs.address.name,
+              deliveryEmail: inputs.address.email,
+              deliveryPhoneNumber: inputs.address.phoneNumber,
+              deliveryAddressLineOne: inputs.address.lineOne,
+              deliveryAddressLineTwo: inputs.address.lineTwo,
+              deliveryAddressCity: inputs.address.city,
+              deliveryAddressPostCode: inputs.address.postCode,
+              deliveryAddressInstructions: inputs.address.deliveryInstructions,
+              customerWalletAddress: inputs.walletAddress,
+              discount: discount ? discount.id : undefined,
+              vendor: vendor.id,
+              fulfilmentMethod: inputs.fulfilmentMethod,
+              fulfilmentSlotFrom: inputs.fulfilmentSlotFrom,
+              fulfilmentSlotTo: inputs.fulfilmentSlotTo,
+              tipAmount: inputs.tipAmount,
+            })
+          ).fetch();
+        } catch (error) {
+          sails.log.error(`Error on Order.create(...) -> ${error}`);
+          return exits.error(error);
+        }
         
 	      // Strip unneccesary data from order items
 	      var updatedItems = _.map(inputs.items, (object) => {

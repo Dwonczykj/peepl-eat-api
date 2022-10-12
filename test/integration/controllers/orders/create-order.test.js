@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-/* eslint-disable no-undef */
 // test/integration/controllers/admin/create-product.test.js
 const { assert, expect } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
 // var supertest = require("supertest");
@@ -10,7 +9,6 @@ require("ts-node/register");
 const {fixtures} = require("../../../../scripts/build_db");
 const {getNextWeekday} = require("../../../utils");
 const { HttpAuthTestSender, ExpectResponse } = require('../../../httpTestSender');
-const e = require("express");
 
 // const { v4: uuidv4 } = require('uuid');
 /* Check if string is valid UUID */
@@ -79,8 +77,8 @@ const CREATE_ORDER = (fixtures) => {
   const vendor = fixtures.vendors[0];
   const fulfilmentMethodVendor = fixtures.fulfilmentMethods.filter(
     (fm) =>
-      fm.vendor === fixtures.vendors[0].id &&
-      fm.methodType === "collection" &&
+      fm.vendor === vendor.id &&
+      fm.methodType === "delivery" &&
       fixtures.openingHours.filter((oh) => oh.fulfilmentMethod === fm.id && oh.isOpen === true)
   )[0];
   const openAtHours = fixtures.openingHours.filter(
@@ -97,7 +95,7 @@ const CREATE_ORDER = (fixtures) => {
     sendData: {
       vendor: vendor.id,
       items: fixtures.products
-        .filter((product) => product.vendor === fixtures.vendors[0].id)
+        .filter((product) => product.vendor === vendor.id)
         .map((product) => ({
           // id: 6,
           // order: 4,
@@ -150,7 +148,7 @@ const CREATE_ORDER = (fixtures) => {
     expectResponse: {
       vendor: vendor.id,
       items: fixtures.products
-        .filter((product) => product.vendor === fixtures.vendors[0].id)
+        .filter((product) => product.vendor === vendor.id)
         .map((product) => ({
           // id: 6,
           // order: 4,
@@ -617,20 +615,12 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${CREATE_ORDER.ACTION_NAME}() returns a 200 with json when authenticated`, () => {
     it("Returns a new order", async () => {
       try {
-        const fulfilmentMethodsForVendor = await FulfilmentMethod.find({
-          vendor: fixtures.vendors[0].id,
-          methodType: "delivery",
-        });
-        assert.isArray(fulfilmentMethodsForVendor);
-        const fulfilmentMethod = fulfilmentMethodsForVendor[0];
-        const hats = new HttpAuthTestSenderOrder(CREATE_ORDER(fixtures));
+        const sendOrder = CREATE_ORDER(fixtures);
+        const hats = new HttpAuthTestSenderOrder(sendOrder);
         const response = await hats.makeAuthCallWith(
-          {
-            fulfilmentMethod: fulfilmentMethod.id,
-          },
+          {},
           []
         );
-        // console.log('Vendor one looks like: ' + util.inspect(fixtures.vendors[0], {depth: null}));
         expect(response.statusCode).to.equal(
           200,
           `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
@@ -642,6 +632,10 @@ describe(`Order Model Integration Tests`, () => {
         expect(response.body).to.have.property("orderID");
         expect(response.body).to.have.property("paymentIntentID");
         // hats.expectedResponse.checkResponse(response.body);
+        const newOrder = await Order.findOne({id: response.body.orderID}).populate('items');
+        expect(newOrder).to.have.property('items');
+        assert.isArray(newOrder.items);
+        expect(newOrder.items).to.have.lengthOf(sendOrder.sendData.items.length);
       } catch (errs) {
         console.warn(errs);
         throw errs;
@@ -649,18 +643,32 @@ describe(`Order Model Integration Tests`, () => {
     });
     it("Returns a new order with deliveryPostCode set", async () => {
       try {
-        const hats = new HttpAuthTestSenderOrder(CREATE_ORDER);
+        const sendOrder = CREATE_ORDER(fixtures);
+        const hats = new HttpAuthTestSenderOrder(sendOrder);
         const response = await hats.makeAuthCallWith(
           {
             address: {
-              ...hats.expectedResponseObjectWithUpdates.address,
-              ...{postCode: "L1 0AR"}
+              ...sendOrder.sendData.address,
+              ...{ postCode: "L1 0AR" },
             },
           },
           []
         );
-        expect(response.statusCode).to.equal(200);
-        hats.expectedResponse.checkResponse(response.body);
+        expect(response.statusCode).to.equal(
+          200,
+          `[${response.body.code}] -> response.body: ${util.inspect(
+            response.body,
+            {
+              depth: null,
+            }
+          )} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
+        expect(response.body).to.have.property("orderID");
+        const newOrder = await Order.findOne(response.body.orderID);
+        expect(newOrder).to.have.property("deliveryAddressPostCode");
+        expect(newOrder.deliveryAddressPostCode).to.equal("L1 0AR");
       } catch (errs) {
         console.warn(errs);
         throw errs;
@@ -668,18 +676,19 @@ describe(`Order Model Integration Tests`, () => {
     });
     it("Create-order fails with badly formatted deliveryPostCode set to 'L1'", async () => {
       try {
-        const hats = new HttpAuthTestSenderOrder(CREATE_ORDER);
+        const sendOrder = CREATE_ORDER(fixtures);
+        const hats = new HttpAuthTestSenderOrder(sendOrder);
         const response = await hats.makeAuthCallWith(
           {
             address: {
-              ...hats.expectedResponseObjectWithUpdates.address,
-              ...{postCode: "L1"}
+              ...sendOrder.sendData.address,
+              ...{ postCode: "L1" },
             },
           },
           []
         );
-        expect(response.statusCode).to.equal(200);
-        hats.expectedResponse.checkResponse(response.body);
+        expect(response.statusCode).to.equal(400);
+        expect(response.body).not.to.have.property("orderID");
       } catch (errs) {
         console.warn(errs);
         throw errs;
@@ -687,18 +696,19 @@ describe(`Order Model Integration Tests`, () => {
     });
     it("Create-order fails with badly formatted deliveryPostCode set to 'bs postcode'", async () => {
       try {
-        const hats = new HttpAuthTestSenderOrder(CREATE_ORDER);
+        const sendOrder = CREATE_ORDER(fixtures);
+        const hats = new HttpAuthTestSenderOrder(sendOrder);
         const response = await hats.makeAuthCallWith(
           {
             address: {
-              ...hats.expectedResponseObjectWithUpdates.address,
-              ...{postCode: "bs postcode"}
+              ...sendOrder.sendData.address,
+              ...{ postCode: "bs postcode" },
             },
           },
           []
         );
-        expect(response.statusCode).to.equal(200);
-        hats.expectedResponse.checkResponse(response.body);
+        expect(response.statusCode).not.to.equal(200);
+        expect(response.body).not.to.have.property("orderID");
       } catch (errs) {
         console.warn(errs);
         throw errs;
@@ -706,18 +716,98 @@ describe(`Order Model Integration Tests`, () => {
     });
     it("Create-order with deliveryInstructions", async () => {
       try {
-        const hats = new HttpAuthTestSenderOrder(CREATE_ORDER);
+        const sendOrder = CREATE_ORDER(fixtures);
+        const hats = new HttpAuthTestSenderOrder(sendOrder);
         const response = await hats.makeAuthCallWith(
           {
             address: {
-              ...hats.expectedResponseObjectWithUpdates.address,
+              ...sendOrder.sendData.address,
               ...{ deliveryInstructions: "Leave it by the door" },
             },
           },
           []
         );
         expect(response.statusCode).to.equal(200);
-        hats.expectedResponse.checkResponse(response.body);
+        expect(response.body).to.have.property("orderID");
+        const newOrder = await Order.findOne(response.body.orderID);
+        expect(newOrder).to.have.property("deliveryAddressInstructions");
+        expect(newOrder.deliveryAddressInstructions).to.equal(
+          "Leave it by the door"
+        );
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+    it("Create-order with a fulfilmentMethod of type collection set works", async () => {
+      try {
+        const sendOrder = CREATE_ORDER(fixtures);
+        const fulfilmentMethodVendor = fixtures.fulfilmentMethods.filter(
+          (fm) =>
+            fm.vendor === fixtures.vendors[0].id &&
+            fm.methodType === "delivery" &&
+            fixtures.openingHours.filter((oh) => oh.fulfilmentMethod === fm.id && oh.isOpen === true)
+        )[0];
+        const openAtHours = fixtures.openingHours.filter(
+          (openHrs) =>
+            openHrs.isOpen === true &&
+            openHrs.fulfilmentMethod === fulfilmentMethodVendor.id
+        )[0];
+        const hats = new HttpAuthTestSenderOrder(sendOrder);
+        const response = await hats.makeAuthCallWith(
+          {
+            fulfilmentMethod: fulfilmentMethodVendor.id,
+            fulfilmentSlotFrom:
+              getNextWeekday(openAtHours.dayOfWeek) +
+              " " +
+              openAtHours.openTime +
+              ":00", // "2022-10-07 11:00:00"
+            fulfilmentSlotTo:
+              getNextWeekday(openAtHours.dayOfWeek) +
+              " " +
+              moment(openAtHours.openTime, "hh:mm")
+                .add(fulfilmentMethodVendor.slotLength, "minutes")
+                .format("hh:mm") +
+              ":00",
+          },
+          []
+        );
+        expect(response.statusCode).to.equal(200);
+        expect(response.body).to.have.property("orderID");
+        const newOrder = await Order.findOne(response.body.orderID).populate('items');
+        expect(newOrder).to.have.property("items");
+        assert.isArray(newOrder.items);
+        expect(newOrder.items).to.have.lengthOf(
+          sendOrder.sendData.items.length
+        );
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+    it("Create-order fails when opening hours apply to a delivery fulfilment and order fulfilment id is for collection", async () => {
+      try {
+        const sendOrder = CREATE_ORDER(fixtures);
+        const fulfilmentMethodVendor = fixtures.fulfilmentMethods.filter(
+          (fm) =>
+            fm.vendor === fixtures.vendors[0].id &&
+            fm.methodType === "collection" &&
+            fixtures.openingHours.filter((oh) => oh.fulfilmentMethod === fm.id && oh.isOpen === true)
+        )[0];
+        // const openAtHours = fixtures.openingHours.filter(
+        //   (openHrs) =>
+        //     openHrs.isOpen === true &&
+        //     openHrs.fulfilmentMethod === fulfilmentMethodVendor.id
+        // )[0];
+        const hats = new HttpAuthTestSenderOrder(sendOrder);
+        const response = await hats.makeAuthCallWith(
+          {
+            fulfilmentMethod: fulfilmentMethodVendor.id,
+          },
+          []
+        );
+        expect(response.statusCode).to.equal(400);
+        expect(response.body).not.to.have.property("orderID");
       } catch (errs) {
         console.warn(errs);
         throw errs;
