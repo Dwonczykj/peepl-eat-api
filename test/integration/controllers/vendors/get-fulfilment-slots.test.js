@@ -35,7 +35,7 @@ describe(`Fetch ${ACTION_NAME} Tests`, () => {
           })} with trace: ${util.inspect(response.body.traceRef, {
             depth: null,
           })}`
-        );
+          );
           for (prop of Object.keys(EXAMPLE_RESPONSE)){
 	          expect(response.body).to.have.property(prop);
           }

@@ -2,7 +2,7 @@
 // test/integration/controllers/Vendors/view-all-vendors.test.js
 const { expect, assert } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
 var supertest = require("supertest");
-const { login, callAuthActionWithCookie } = require("../../../utils");
+const { login } = require("../../../utils");
 const {fixtures} = require("../../../../scripts/build_db");
 const {
   HttpAuthTestSender,
@@ -72,7 +72,7 @@ class HttpAuthTestSenderLogin extends HttpAuthTestSender {
   }
 }
 
-const IS_LOGGED_IN = {
+const IS_LOGGED_IN = (fixtures) => { return {
   useAccount: "TEST_SERVICE",
   HTTP_TYPE: "get",
   ACTION_PATH: "admin",
@@ -83,8 +83,13 @@ const IS_LOGGED_IN = {
   expectResponse: {
     data: true,
   },
-};
-const IS_LOGGED_IN_UNAUTHENTICATED = {
+  expectStatusCode: 200,
+  expectResponseCb: (responseBody) => {
+    
+    return;
+  },
+};};
+const IS_LOGGED_IN_UNAUTHENTICATED = (fixtures) => { return {
   useAccount: "TEST_UNAUTHENTICATED",
   HTTP_TYPE: "get",
   ACTION_PATH: "admin",
@@ -93,8 +98,13 @@ const IS_LOGGED_IN_UNAUTHENTICATED = {
   expectResponse: {
     data: false,
   },
-};
-// const VIEW_LOGIN = {
+  expectStatusCode: 200,
+  expectResponseCb: (responseBody) => {
+    
+    return;
+  },
+};};
+// const VIEW_LOGIN = (fixtures) => { return {
 //   useAccount: "TEST_UNAUTHENTICATED",
 //   HTTP_TYPE: "get",
 //   ACTION_PATH: "admin",
@@ -104,7 +114,7 @@ const IS_LOGGED_IN_UNAUTHENTICATED = {
     
 //   },
 // };
-const LOGIN = {
+const LOGIN = (fixtures) => { return {
   useAccount: "TEST_SERVICE",
   HTTP_TYPE: "get",
   ACTION_PATH: "admin",
@@ -115,8 +125,13 @@ const LOGIN = {
   expectResponse: {
     data: true,
   },
-};
-const LOGIN_AS_USER = {
+  expectStatusCode: 200,
+  expectResponseCb: (responseBody) => {
+    
+    return;
+  },
+};};
+const LOGIN_AS_USER = (fixtures) => { return {
   useAccount: "TEST_USER",
   HTTP_TYPE: "get",
   ACTION_PATH: "admin",
@@ -125,8 +140,13 @@ const LOGIN_AS_USER = {
   expectResponse: {
     data: true,
   },
-};
-const LOGIN_AS_VENDOR = {
+  expectStatusCode: 200,
+  expectResponseCb: (responseBody) => {
+    
+    return;
+  },
+};};
+const LOGIN_AS_VENDOR = (fixtures) => { return {
   useAccount: "TEST_VENDOR",
   HTTP_TYPE: "get",
   ACTION_PATH: "admin",
@@ -135,8 +155,13 @@ const LOGIN_AS_VENDOR = {
   expectResponse: {
     data: true,
   },
-};
-const LOGIN_AS_DELIVERY_PARTNER = {
+  expectStatusCode: 200,
+  expectResponseCb: (responseBody) => {
+    
+    return;
+  },
+};};
+const LOGIN_AS_DELIVERY_PARTNER = (fixtures) => { return {
   useAccount: "TEST_DELIVERY_PARTNER",
   HTTP_TYPE: "get",
   ACTION_PATH: "admin",
@@ -145,7 +170,12 @@ const LOGIN_AS_DELIVERY_PARTNER = {
   expectResponse: {
     data: true,
   },
-};
+  expectStatusCode: 200,
+  expectResponseCb: (responseBody) => {
+    
+    return;
+  },
+};};
 
 
 describe("Authentication Tests", () => {
@@ -162,7 +192,7 @@ describe("Authentication Tests", () => {
           })} with trace: ${util.inspect(response.body.traceRef, {
             depth: null,
           })}`
-        );
+          );
           expect(response.text).to.have.string(
             '<div id="login" class="admin" v-cloak>'
           );
@@ -197,7 +227,7 @@ describe("Authentication Tests", () => {
       } catch (error) {
         throw error;
       }
-      const hats = new HttpAuthTestSenderLogin(LOGIN);
+      const hats = new HttpAuthTestSenderLogin(LOGIN(fixtures));
       const response = await hats.makeAuthCallWith({}, []);
       expect(response.statusCode).to.equal(200,
           `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
@@ -205,12 +235,12 @@ describe("Authentication Tests", () => {
           })} with trace: ${util.inspect(response.body.traceRef, {
             depth: null,
           })}`
-        );
+      );
       hats.expectedResponse.checkResponse(response.body, {data: true});
       return;
     });
     it("POST login-with-secret as Customer User works", async () => {
-      const hats = new HttpAuthTestSenderLogin(LOGIN_AS_USER);
+      const hats = new HttpAuthTestSenderLogin(LOGIN_AS_USER(fixtures));
       const response = await hats.makeAuthCallWith({}, []);
       expect(response.statusCode).to.equal(200,
           `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
@@ -218,12 +248,12 @@ describe("Authentication Tests", () => {
           })} with trace: ${util.inspect(response.body.traceRef, {
             depth: null,
           })}`
-        );
+      );
       hats.expectedResponse.checkResponse(response.body, {data: true});
       return;
     });
     it("POST login-with-secret as Vendor works", async () => {
-      const hats = new HttpAuthTestSenderLogin(LOGIN_AS_VENDOR);
+      const hats = new HttpAuthTestSenderLogin(LOGIN_AS_VENDOR(fixtures));
       const response = await hats.makeAuthCallWith({}, []);
       expect(response.statusCode).to.equal(200,
           `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
@@ -231,12 +261,12 @@ describe("Authentication Tests", () => {
           })} with trace: ${util.inspect(response.body.traceRef, {
             depth: null,
           })}`
-        );
+      );
       hats.expectedResponse.checkResponse(response.body, {data: true});
       return;
     });
     it("POST login-with-secret as Delivery Partner works", async () => {
-      const hats = new HttpAuthTestSenderLogin(LOGIN_AS_DELIVERY_PARTNER);
+      const hats = new HttpAuthTestSenderLogin(LOGIN_AS_DELIVERY_PARTNER(fixtures));
       const response = await hats.makeAuthCallWith({}, []);
       expect(response.statusCode).to.equal(200,
           `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
@@ -244,12 +274,12 @@ describe("Authentication Tests", () => {
           })} with trace: ${util.inspect(response.body.traceRef, {
             depth: null,
           })}`
-        );
+      );
       hats.expectedResponse.checkResponse(response.body, {data: true});
       return;
     });
     it("GET logged-in returns true when authenticated", async () => {
-      const hats = new HttpAuthTestSenderLogin(IS_LOGGED_IN);
+      const hats = new HttpAuthTestSenderLogin(IS_LOGGED_IN(fixtures));
       const response = await hats.makeAuthCallWith({}, []);
       expect(response.statusCode).to.equal(200,
           `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
@@ -257,8 +287,8 @@ describe("Authentication Tests", () => {
           })} with trace: ${util.inspect(response.body.traceRef, {
             depth: null,
           })}`
-        );
-      hats.expectedResponse.checkResponse(response.body);
+      );
+      hats.expectedResponse.checkResponse(response);
     });
     it("GET logged-in returns false when not signed in", async () => {
       // supertest(sails.hooks.http.app)
@@ -270,17 +300,17 @@ describe("Authentication Tests", () => {
       //       throw errs;
       //     }
       //     expect(response.statusCode).to.equal(200,
-          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
-            depth: null,
-          })} with trace: ${util.inspect(response.body.traceRef, {
-            depth: null,
-          })}`
-        );
+      //   `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+      //     depth: null,
+      //   })} with trace: ${util.inspect(response.body.traceRef, {
+      //     depth: null,
+      //   })}`
+      // );
       //     expect(response._body).to.deep.equal({ data: false });
       //     return;
       //   });
 
-      const hats = new HttpAuthTestSenderLogin(IS_LOGGED_IN_UNAUTHENTICATED);
+      const hats = new HttpAuthTestSenderLogin(IS_LOGGED_IN_UNAUTHENTICATED(fixtures));
       const response = await hats.makeAuthCallWith({}, []);
       expect(response.statusCode).to.equal(200,
           `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
@@ -288,13 +318,15 @@ describe("Authentication Tests", () => {
           })} with trace: ${util.inspect(response.body.traceRef, {
             depth: null,
           })}`
-        );
-      hats.expectedResponse.checkResponse(response.body);
+      );
+      hats.expectedResponse.checkResponse(response);
     });
   });
   describe("Login-with-password email & password firebase Tests", () => {
     it("Successfully created the dummy user in firebase emulator", async () => {
-      const postUrlRegisterDummyUser = `http://localhost:9099/identitytoolkit.googleapis.com/v1/accounts:signUp?key=${API_KEY}`;
+      const DUMMY_API_KEY = "dummy_firebase_key";
+      const postUrlRegisterDummyUser = 
+        `http://localhost:9099/identitytoolkit.googleapis.com/v1/accounts:signUp?key=${DUMMY_API_KEY}`;
       // supertest(sails.hooks.http.app)
       //   .get("/api/v1/admin/logged-in")
       //   .set("Cookie", "")
@@ -304,12 +336,12 @@ describe("Authentication Tests", () => {
       //       throw errs;
       //     }
       //     expect(response.statusCode).to.equal(200,
-          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
-            depth: null,
-          })} with trace: ${util.inspect(response.body.traceRef, {
-            depth: null,
-          })}`
-        );
+      //   `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+      //     depth: null,
+      //   })} with trace: ${util.inspect(response.body.traceRef, {
+      //     depth: null,
+      //   })}`
+      // );
       //     expect(response._body).to.deep.equal({ data: false });
       //     return;
       //   });
@@ -326,18 +358,18 @@ describe("Authentication Tests", () => {
       //       throw errs;
       //     }
       //     expect(response.statusCode).to.equal(200,
-          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
-            depth: null,
-          })} with trace: ${util.inspect(response.body.traceRef, {
-            depth: null,
-          })}`
-        );
+      //   `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+      //     depth: null,
+      //   })} with trace: ${util.inspect(response.body.traceRef, {
+      //     depth: null,
+      //   })}`
+      // );
       //     expect(response._body).to.deep.equal({ data: false });
       //     return;
       //   });
       
       //TODO: Ensure the emulator has started in headless mode and get the token from it when trying to auth with phone.
-      const hats = new HttpAuthTestSenderLogin(IS_LOGGED_IN_UNAUTHENTICATED);
+      const hats = new HttpAuthTestSenderLogin(IS_LOGGED_IN_UNAUTHENTICATED(fixtures));
       const response = await hats.makeAuthCallWith({}, []);
       expect(response.statusCode).to.equal(200,
           `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
@@ -345,8 +377,8 @@ describe("Authentication Tests", () => {
           })} with trace: ${util.inspect(response.body.traceRef, {
             depth: null,
           })}`
-        );
-      hats.expectedResponse.checkResponse(response.body);
+      );
+      hats.expectedResponse.checkResponse(response);
     });
   });
 

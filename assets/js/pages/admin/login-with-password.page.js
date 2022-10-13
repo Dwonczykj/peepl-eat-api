@@ -142,7 +142,7 @@ parasails.registerPage("login-with-password", {
           return Cloud.loginWithPassword(email, sessionToken, this.rememberMe);
         })
         .then(response => {
-          window.replace("/admin");
+          location.replace("/admin");
         })
         .catch((err) => {
           this.cloudError = err.message;

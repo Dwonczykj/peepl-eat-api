@@ -24,7 +24,7 @@ describe("Signup Tests", () => {
           })} with trace: ${util.inspect(response.body.traceRef, {
             depth: null,
           })}`
-        );
+          );
           expect(response.text).to.have.string(
             '<div id="signup" class="admin" v-cloak>'
           );
@@ -62,12 +62,12 @@ describe("Signup Tests", () => {
     //       // console.log(response._body);
     //       // console.log(Object.keys(response));
     //       expect(response.statusCode).to.equal(200,
-          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
-            depth: null,
-          })} with trace: ${util.inspect(response.body.traceRef, {
-            depth: null,
-          })}`
-        );
+    //   `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+    //     depth: null,
+    //   })} with trace: ${util.inspect(response.body.traceRef, {
+    //     depth: null,
+    //   })}`
+    // );
     //       expect(response.body).to.have.property("data");
     //       expect(response.body["data"]).to.have.property("fbUid");
     //       done();
@@ -107,7 +107,7 @@ describe("Signup Tests", () => {
           })} with trace: ${util.inspect(response.body.traceRef, {
             depth: null,
           })}`
-        );
+          );
           expect(response._body).to.have.property("data");
           expect(response._body["data"]).to.deep.include({
             // firebaseSessionToken: "REGISTERING_USER", * These are hid from JSON remember
@@ -159,7 +159,7 @@ describe("Signup Tests", () => {
           })} with trace: ${util.inspect(response.body.traceRef, {
             depth: null,
           })}`
-        );
+          );
           expect(response.headers).to.have.property("x-exit");
           expect(response.headers).to.deep.include({ "x-exit": "userExists" });
           expect(response.headers).to.have.property("x-exit-description");

@@ -31,7 +31,7 @@ module.exports = {
     }
 
     // All done.
-    return {order};
+    return exits.success({order});
 
   }
 

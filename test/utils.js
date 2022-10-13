@@ -39,12 +39,12 @@ const login = async function (verbose=false) {
         // console.log(response._body);
         // console.log(Object.keys(response));
         // expect(response.statusCode).to.equal(200,
-          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
-            depth: null,
-          })} with trace: ${util.inspect(response.body.traceRef, {
-            depth: null,
-          })}`
-        );
+        //   `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+        //     depth: null,
+        //   })} with trace: ${util.inspect(response.body.traceRef, {
+        //     depth: null,
+        //   })}`
+        // );
         // expect(response.body).to.equal({ data: true });
         return response;
       })
@@ -52,25 +52,25 @@ const login = async function (verbose=false) {
         console.warn(errs);
         throw errs;
       });
-      // .end((errs, response) => { //dont use end here as we want to use the response in the call back function maybe later.
-      //   if (errs) {
-      //     console.warn(errs);
-      //     throw errs;
-      //   }
-      //   console.log(response.res.session);
-      //   console.log(response.res);
-      //   console.log(response._body);
-      //   console.log(Object.keys(response));
-      //   expect(response.statusCode).to.equal(200,
-          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
-            depth: null,
-          })} with trace: ${util.inspect(response.body.traceRef, {
-            depth: null,
-          })}`
-        );
-      //   expect(response._body).to.equal({ data: true });
-      //   return response;
-      // });
+    // .end((errs, response) => { //dont use end here as we want to use the response in the call back function maybe later.
+    //   if (errs) {
+    //     console.warn(errs);
+    //     throw errs;
+    //   }
+    //   console.log(response.res.session);
+    //   console.log(response.res);
+    //   console.log(response._body);
+    //   console.log(Object.keys(response));
+    //   expect(response.statusCode).to.equal(200,
+    //   `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+    //     depth: null,
+    //   })} with trace: ${util.inspect(response.body.traceRef, {
+    //     depth: null,
+    //   })}`
+    // );
+    //   expect(response._body).to.equal({ data: true });
+    //   return response;
+    // });
   } catch (loginErr) {
     console.warn('test/utils.js: Lifecycle.test failed to login with test service account: ' + loginErr);
     return loginErr;

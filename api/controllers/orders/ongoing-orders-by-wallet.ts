@@ -14,7 +14,6 @@ module.exports = {
       message: 'Error!'
     },
     success: {
-      data: null,
       message: 'success!'
     }
   },
@@ -23,6 +22,6 @@ module.exports = {
       customerWalletAddress: inputs.walletAddress,
       completedFlag: ''
     });
-    exits.success({ data: orders });
+    exits.success({ orders });
   }
 };

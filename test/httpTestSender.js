@@ -5,18 +5,20 @@ const { assert, expect } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
 
 class ExpectResponse {
   constructor({
-    // eslint-disable-next-line no-unused-vars
     HTTP_TYPE = "get",
-    // eslint-disable-next-line no-unused-vars
     ACTION_PATH = "",
-    // eslint-disable-next-line no-unused-vars
     ACTION_NAME = "",
     sendData = {},
     expectResponse = {},
+    expectResponseCb = async (response, requestPayload) => {},
+    expectStatusCode = 200,
   }) {
     this._EXPECTED_RESPONSE = expectResponse;
     this._send = sendData;
     this._expectedResposeWithUpdates = _.cloneDeep(this._EXPECTED_RESPONSE);
+    this.expectedResponseCb = expectResponseCb;
+    this.expectStatusCode = expectStatusCode;
+    this.payloadRequestedWith = this._send;
   }
 
   get EXPECTED_RESPONSE() {
@@ -48,13 +50,28 @@ class ExpectResponse {
       ...this._expectedResposeWithUpdates,
       ...updatedPostDataWith,
     };
-    return {
+    this.payloadRequestedWith = {
       ...send,
       ...updatedPostDataWith,
     };
+    return this.payloadRequestedWith;
   }
 
-  checkResponse(responseBody, overrideExpectedResponse = null) {
+  async checkResponse(response) {
+    expect(response.statusCode).to.equal(
+      this.expectStatusCode,
+      `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+        depth: null,
+      })} with trace: ${util.inspect(response.body.traceRef, {
+        depth: null,
+      })}`
+    );
+    if(this.expectedResponseCb){
+      await this.expectedResponseCb(response, this.payloadRequestedWith);
+    }
+  }
+
+  checkResponseExpectedObject(responseBody, overrideExpectedResponse = null) {
     let expectedResponse =
       overrideExpectedResponse || this.expectedResposeWithUpdates;
 
@@ -78,6 +95,8 @@ class HttpTestSender {
     sendData = {},
     expectResponse = {},
     expectResponseChecker = ExpectResponse,
+    expectResponseCb = async (response, requestPayload) => {},
+    expectStatusCode = 200,
   }) {
     this.ACTION_PATH = ACTION_PATH;
     this.ACTION_NAME = ACTION_NAME;
@@ -87,16 +106,12 @@ class HttpTestSender {
       ? `/api/v1/${this.ACTION_PATH}/${this.ACTION_NAME}`
       : `/api/v1/${relUrl}`;
     this.baseUrl = baseUrl;
-    console.log(`Supertest: -> ${HTTP_TYPE} ${baseUrl}`);
     if (HTTP_TYPE.toLowerCase() === "get") {
-      this.httpCall = () =>
-        supertest(sails.hooks.http.app).get(baseUrl);
+      this.httpCall = () => supertest(sails.hooks.http.app).get(baseUrl);
     } else if (HTTP_TYPE.toLowerCase() === "post") {
-      this.httpCall = () =>
-        supertest(sails.hooks.http.app).post(baseUrl);
+      this.httpCall = () => supertest(sails.hooks.http.app).post(baseUrl);
     } else if (HTTP_TYPE.toLowerCase() === "all") {
-      this.httpCall = () =>
-        supertest(sails.hooks.http.app).get(baseUrl);
+      this.httpCall = () => supertest(sails.hooks.http.app).get(baseUrl);
     } else {
       throw new Error(`httpType of ${HTTP_TYPE} not implemented for tests.`);
     }
@@ -106,6 +121,8 @@ class HttpTestSender {
       ACTION_NAME,
       sendData,
       expectResponse,
+      expectResponseCb,
+      expectStatusCode,
     });
   }
 
@@ -123,17 +140,36 @@ class HttpTestSender {
         updatedPostDataWith,
         updatedPostDataWithOutKeys
       );
-      // console.log(util.inspect(_sw, {depth:null}));
-      const response = this.httpCall()
-        .send(_sw)
+      
+      if (this.HTTP_TYPE.toUpperCase() === "GET" && _sw){
+        console.log(
+          "We are going to add query params to get: " + util.inspect(_sw, {depth: 1})
+        );
+
+      }
+
+      const _makeCall = () =>
+        this.HTTP_TYPE.toUpperCase() === "GET"
+          ? this.httpCall().query(_sw)
+          : this.httpCall().send(_sw);
+      
+      const response = _makeCall()
         .set("Cookie", cookie)
         .set("Accept", "application/json");
-      if (response.statusCode === 400 || response.statusCode >= 402){
-        //we might want to get a 401 or 403
+
+
+      console.log(
+        `Supertest: -> ${response.method} ${
+          response.url
+        }`
+      );
+
+      if (response.statusCode === 400 || response.statusCode >= 402) {
+        // we might want to expect a 401
         // eslint-disable-next-line no-console
         console.warn(
           `(${this.HTTP_TYPE} ${this.baseUrl})->[${response.statusCode}]: ` +
-            `body: ${util.inspect(response.body, { depth: null })}\n` + 
+            `body: ${util.inspect(response.body, { depth: null })}\n` +
             `request payload: ${util.inspect(_sw, { depth: null })}\n`
         );
       }
@@ -151,6 +187,8 @@ class HttpAuthTestSender extends HttpTestSender {
     sendData = {},
     expectResponse = {},
     expectResponseChecker = ExpectResponse,
+    expectResponseCb = async (response, requestPayload) => {},
+    expectStatusCode = 200,
   }) {
     super({
       HTTP_TYPE,
@@ -159,6 +197,8 @@ class HttpAuthTestSender extends HttpTestSender {
       sendData,
       expectResponse,
       expectResponseChecker,
+      expectResponseCb,
+      expectStatusCode,
     });
     this.useAccount = useAccount;
   }

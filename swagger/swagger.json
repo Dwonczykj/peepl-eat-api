@@ -112,6 +112,9 @@
       "name": "Get order details"
     },
     {
+      "name": "Ongoing Orders by Wallet"
+    },
+    {
       "name": "Logged in"
     },
     {
@@ -678,6 +681,7 @@
           "paidDateTime": {
             "type": "number",
             "format": "double",
+            "nullable": true,
             "description": "The unixtime when the order payment was confirmed (if at all)."
           },
           "refundDateTime": {
@@ -3085,6 +3089,36 @@
           },
           "500": {
             "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/orders/ongoing-orders-by-wallet": {
+      "get": {
+        "summary": "Ongoing Orders by Wallet",
+        "description": "Fetch all ongoing orders from a wallet address",
+        "tags": [
+          "Ongoing Orders by Wallet"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "walletAddress",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Server error"
           }
         }
       }
