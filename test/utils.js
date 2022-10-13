@@ -144,7 +144,6 @@ function getNextWeekday(weekday) {
   var today = new Date();
   var theDay;
   var day = today.getDay();
-  console.log("Today is " + weekdays[day]);
   if (day === dayInd) {
     return (
       today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate()

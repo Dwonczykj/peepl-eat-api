@@ -33,6 +33,15 @@ module.exports = {
 
 
   fn: async function (inputs, exits) {
+    var dontActuallySend =
+      sails.config.environment === "test" ||
+      process.env.FIREBASE_AUTH_EMULATOR_HOST;
+    if (dontActuallySend) {
+      sails.log
+        .info(`Running sails in test mode, helpers.sendSmsNotification will not send notifications.
+      Message would have been send to ${inputs.to} with body: ${inputs.body}`);
+      return exits.success();
+    }
     const twilioClient = new twilio(sails.config.custom.twilioSID, sails.config.custom.twilioAuthToken);
 
     twilioClient.messages.create({
@@ -46,6 +55,8 @@ module.exports = {
     .catch((err) => {
       throw new Error(err.message);
     });
+
+    return exits.success();
 
   }
 

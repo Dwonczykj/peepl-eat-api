@@ -45,7 +45,10 @@ module.exports = {
     },
     complete: {
       data: null
-    }
+    },
+    error: {
+      description: 'partial fulfilment creation in db failed'
+    },
   },
 
 
@@ -96,80 +99,120 @@ module.exports = {
     }
 
     // Create the copy of the order object now before removing items on th new order
+    try {
+      const datastore = sails.getDatastore();
+      
+      const wrapWithDb = (db, cb) => {
+        if(db){
+          return cb().usingConnection(db);
+        } else {
+          return cb();
+        }
+      };
+      
+      const createOrderTransactionDB = async (db: any) => {
+        // TODO: Error handling here.
+        const newOrder = await wrapWithDb(db, () => Order.create({
+          total: 0.0, // * Set later!
+          orderedDateTime: originalOrder.orderedDateTime,
+          paidDateTime: originalOrder.paidDateTime,
+          paymentStatus: originalOrder.paymentStatus,
+          paymentIntentId: originalOrder.paymentIntentId,
+          deliveryName: originalOrder.deliveryName,
+          deliveryEmail: originalOrder.deliveryEmail,
+          deliveryPhoneNumber: originalOrder.deliveryPhoneNumber,
+          deliveryAddressLineOne: originalOrder.deliveryAddressLineOne,
+          deliveryAddressLineTwo: originalOrder.deliveryAddressLineTwo,
+          deliveryAddressCity: originalOrder.deliveryAddressCity,
+          deliveryAddressPostCode: originalOrder.deliveryAddressPostCode,
+          deliveryAddressInstructions:
+            originalOrder.address.deliveryInstructions,
+          customerWalletAddress: originalOrder.walletAddress,
+          discount: originalOrder.discount.id,
+          vendor: originalOrder.vendor.id,
+          fulfilmentMethod: originalOrder.fulfilmentMethod,
+          fulfilmentSlotFrom: originalOrder.fulfilmentSlotFrom,
+          fulfilmentSlotTo: originalOrder.fulfilmentSlotTo,
+          tipAmount: originalOrder.tipAmount,
+        })).fetch();
+
+        // Strip unneccesary data from order items
+        //TODO Is this necessary?
+        const retainedItems = originalOrder.items.filter((item) =>
+          inputs.retainItems.included(item.id)
+        );
+        var updatedItems = _.map(retainedItems, (object) => {
+          object.order = newOrder.id;
+          object.product = object.id;
+
+          return _.pick(object, ["order", "product", "optionValues"]);
+        });
+
+        // Create each order item
+        await wrapWithDb(db, () => OrderItem.createEach(updatedItems));
+
+        // Calculate the order total on the backend
+        var calculatedOrderTotal = await sails.helpers.calculateOrderTotal.with(
+          { orderId: newOrder.id }
+        );
+
+        // Update with correct amount
+        await wrapWithDb(db, () => Order.updateOne(newOrder.id)
+          .set({ total: calculatedOrderTotal.finalAmount }));
+
+        // Return error if vendor minimum order value not met
+        if (
+          calculatedOrderTotal.withoutFees <
+          originalOrder.vendor.minimumOrderAmount
+        ) {
+          return exits.minimumOrderAmount(
+            "Vendor minimum order value not met on partially fulfilled updated order"
+          );
+        }
+
+        await wrapWithDb(db, () =>
+          Order.updateOne(findOrderCriteria).set({
+            restaurantAcceptanceStatus: "partially fulfilled",
+            completedFlag: "void",
+          })
+        );
+
+        // Remove items from order that were not fulfilled by vendor
+        await wrapWithDb(db, () =>
+          OrderItem.update({
+            order: newOrder.id,
+            id: [...inputs.removeItems],
+          }).set({ unfulfilled: true, unfulfilledOnOrderId: originalOrder.id })
+        ).fetch();
+
+        return exits.complete({
+          data: {
+            validRequest: true,
+            calculatedOrderTotal: calculatedOrderTotal.finalAmount,
+            orderID: newOrder.id,
+            paymentIntentID: newOrder.paymentIntentId,
+          },
+        });
+      };
+
+      if(datastore.config.adapter === 'sails-disk'){
+        createOrderTransactionDB(null);
+      } else {
+        await sails.getDatastore().transaction(async (db) => {
+          createOrderTransactionDB(db);
+        }).intercept((issues) => {
+          sails.log(issues);
+          return exits.error(new Error("Error creating Order in DB"));
+        });
+      }
+    } catch (error) {
+      sails.log.error(error);
+      return exits.error(new Error("Error creating a child order in DB to set up a partial fulfilment"));
+    }
+    //todo: add the same wrap as in the create-order function.
     await sails.getDatastore()
     .transaction(async (db: any)=> {
-      // TODO: Error handling here.
-      const newOrder = await Order.create({
-        total: 0.0, // * Set later!
-        orderedDateTime: originalOrder.orderedDateTime,
-        paidDateTime: originalOrder.paidDateTime,
-        paymentStatus: originalOrder.paymentStatus,
-        paymentIntentId: originalOrder.paymentIntentId,
-        deliveryName: originalOrder.deliveryName,
-        deliveryEmail: originalOrder.deliveryEmail,
-        deliveryPhoneNumber: originalOrder.deliveryPhoneNumber,
-        deliveryAddressLineOne: originalOrder.deliveryAddressLineOne,
-        deliveryAddressLineTwo: originalOrder.deliveryAddressLineTwo,
-        deliveryAddressCity: originalOrder.deliveryAddressCity,
-        deliveryAddressPostCode: originalOrder.deliveryAddressPostCode,
-        deliveryAddressInstructions: originalOrder.address.deliveryInstructions,
-        customerWalletAddress: originalOrder.walletAddress,
-        discount: originalOrder.discount.id,
-        vendor: originalOrder.vendor.id,
-        fulfilmentMethod: originalOrder.fulfilmentMethod,
-        fulfilmentSlotFrom: originalOrder.fulfilmentSlotFrom,
-        fulfilmentSlotTo: originalOrder.fulfilmentSlotTo,
-        tipAmount: originalOrder.tipAmount
-      })
-      .fetch();
-
-      // Strip unneccesary data from order items
-      //TODO Is this necessary?
-      const retainedItems = originalOrder.items.filter(item => inputs.retainItems.included(item.id));
-      var updatedItems = _.map(retainedItems, (object) => {
-        object.order = newOrder.id;
-        object.product = object.id;
-
-        return _.pick(object, ['order', 'product', 'optionValues']);
-      });
-
-      // Create each order item
-      await OrderItem.createEach(updatedItems)
-        .usingConnection(db);
-
-      // Calculate the order total on the backend
-      var calculatedOrderTotal = await sails.helpers.calculateOrderTotal.with({orderId: newOrder.id});
-
-      // Update with correct amount
-      await Order.updateOne(newOrder.id)
-        .set({ total: calculatedOrderTotal.finalAmount })
-        .usingConnection(db);
-
-      // Return error if vendor minimum order value not met
-      if(calculatedOrderTotal.withoutFees < originalOrder.vendor.minimumOrderAmount) {
-        return exits.minimumOrderAmount('Vendor minimum order value not met on partially fulfilled updated order');
-      }
-
-      await Order.updateOne(findOrderCriteria)
-      .set({
-        restaurantAcceptanceStatus: 'partially fulfilled',
-        completedFlag: 'void',
-      })
-      .usingConnection(db);
-
-      // Remove items from order that were not fulfilled by vendor
-      await OrderItem
-        .update({ order: newOrder.id, id: [...inputs.removeItems] })
-        .set({ unfulfilled: true, unfulfilledOnOrderId: originalOrder.id })
-        .usingConnection(db)
-        .fetch();
-
-      return exits.complete({data: {
-        validRequest: true, 
-        calculatedOrderTotal: calculatedOrderTotal.finalAmount,
-        orderID: newOrder.id,
-        paymentIntentID: newOrder.paymentIntentId
-      }});
+      
     });
   }
 

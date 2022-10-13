@@ -109,6 +109,12 @@
       "name": "Peepl pay webhook"
     },
     {
+      "name": "Peepl pay Update Paid Order webhook"
+    },
+    {
+      "name": "Peepl pay refunds webhook"
+    },
+    {
       "name": "Get order details"
     },
     {
@@ -3016,10 +3022,13 @@
         ],
         "responses": {
           "200": {
-            "description": "The requested resource"
+            "description": "Success"
+          },
+          "400": {
+            "description": "Not found"
           },
           "404": {
-            "description": "Not found"
+            "description": "Resource not found"
           },
           "500": {
             "description": "Internal server error"
@@ -3040,7 +3049,8 @@
             "required": false,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "the paymentIntentId as this is the publicId that the peeplPay api keeps"
           },
           {
             "in": "query",
@@ -3053,10 +3063,92 @@
         ],
         "responses": {
           "200": {
-            "description": "The requested resource"
+            "description": "Success"
           },
           "404": {
-            "description": "Resource not found"
+            "description": "Success"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/orders/peepl-pay-update-paid-order-webhook": {
+      "post": {
+        "summary": "Peepl pay Update Paid Order webhook",
+        "tags": [
+          "Peepl pay Update Paid Order webhook"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "publicId",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the paymentIntentId as this is the publicId that the peeplPay api keeps"
+          },
+          {
+            "in": "query",
+            "name": "metadata",
+            "required": false,
+            "schema": {}
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Success"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/orders/peepl-pay-refund-webhook": {
+      "post": {
+        "summary": "Peepl pay refunds webhook",
+        "tags": [
+          "Peepl pay refunds webhook"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "publicId",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the paymentIntentId as this is the publicId that the peeplPay api keeps"
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Success"
           },
           "500": {
             "description": "Internal server error"
@@ -6287,7 +6379,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "The order to be approved or rejected."
+            "description": "The public id of the order to be approved or rejected."
           }
         ],
         "responses": {
@@ -6295,7 +6387,7 @@
             "description": "Success"
           },
           "404": {
-            "description": "Resource not found"
+            "description": "Not found"
           },
           "500": {
             "description": "Internal server error"
@@ -6318,7 +6410,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "The order to view."
+            "description": "The public id of the order to view."
           }
         ],
         "responses": {
@@ -6345,7 +6437,7 @@
             "description": "user not allowed to see vendor or vendor orders"
           },
           "404": {
-            "description": "Resource not found"
+            "description": "Not found"
           },
           "500": {
             "description": "Internal server error"

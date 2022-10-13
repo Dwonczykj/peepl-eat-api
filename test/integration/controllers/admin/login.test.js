@@ -15,17 +15,26 @@ var util = require("util");
 class ExpectResponseLogin extends ExpectResponse {
   constructor({
     HTTP_TYPE = "get",
+    ACTION_PREFIX = "/api/v1",
     ACTION_PATH = "",
     ACTION_NAME = "",
+    useAccount = "TEST_SERVICE",
     sendData = {},
     expectResponse = {},
+    expectResponseCb = async (response, requestPayload) => {},
+    expectStatusCode = 200,
   }) {
     super({
       HTTP_TYPE,
+      ACTION_PREFIX,
       ACTION_PATH,
       ACTION_NAME,
+      useAccount,
       sendData,
       expectResponse,
+      ExpectResponseLogin,
+      expectResponseCb,
+      expectStatusCode,
     });
   }
 
@@ -288,7 +297,7 @@ describe("Authentication Tests", () => {
             depth: null,
           })}`
       );
-      hats.expectedResponse.checkResponse(response);
+      await hats.expectedResponse.checkResponse(response);
     });
     it("GET logged-in returns false when not signed in", async () => {
       // supertest(sails.hooks.http.app)
@@ -319,7 +328,7 @@ describe("Authentication Tests", () => {
             depth: null,
           })}`
       );
-      hats.expectedResponse.checkResponse(response);
+      await hats.expectedResponse.checkResponse(response);
     });
   });
   describe("Login-with-password email & password firebase Tests", () => {
@@ -378,7 +387,7 @@ describe("Authentication Tests", () => {
             depth: null,
           })}`
       );
-      hats.expectedResponse.checkResponse(response);
+      await hats.expectedResponse.checkResponse(response);
     });
   });
 

@@ -92,133 +92,181 @@ module.exports = {
       outputType: {
         loggedInsteadOfSending: 'boolean'
       }
+    },
+    failed: {
+
     }
+
   },
 
-  fn: async function({template, templateData, to, toName, subject, from, fromName, layout, ensureAck, bcc, attachments}) {
+  fn: async function({template, templateData, to, toName, subject, from, fromName, layout, ensureAck, bcc, attachments}, exits) {
     var path = require('path');
     var url = require('url');
     var util = require('util');
     var AWS = require('aws-sdk');
-
-    AWS.config.loadFromPath('config/aws.json');
-
-    if (!_.startsWith(path.basename(template), 'email-')) {
-      sails.log.warn(
-        'The "template" that was passed in to `sendTemplateEmail()` does not begin with '+
-        '"email-" -- but by convention, all email template files in `views/emails/` should '+
-        'be namespaced in this way.  (This makes it easier to look up email templates by '+
-        'filename; e.g. when using CMD/CTRL+P in Sublime Text.)\n'+
-        'Continuing regardless...'
-      );
-    }
-
-    if (_.startsWith(template, 'views/') || _.startsWith(template, 'emails/')) {
-      throw new Error(
-        'The "template" that was passed in to `sendTemplateEmail()` was prefixed with\n'+
-        '`emails/` or `views/` -- but that part is supposed to be omitted.  Instead, please\n'+
-        'just specify the path to the desired email template relative from `views/emails/`.\n'+
-        'For example:\n'+
-        '  template: \'email-reset-password\'\n'+
-        'Or:\n'+
-        '  template: \'admin/email-contact-form\'\n'+
-        ' [?] If you\'re unsure or need advice, see https://sailsjs.com/support'
-      );
-    }//•
-
-    // Determine appropriate email layout and template to use.
-    var emailTemplatePath = path.join('emails/', template);
-    var emailTemplateLayout;
-    if (layout) {
-      emailTemplateLayout = path.relative(path.dirname(emailTemplatePath), path.resolve('layouts/', layout));
-    } else {
-      emailTemplateLayout = false;
-    }
-
-    // Compile HTML template.
-    // > Note that we set the layout, provide access to core `url` package (for
-    // > building links and image srcs, etc.), and also provide access to core
-    // > `util` package (for dumping debug data in internal emails).
-    var htmlEmailContents = await sails.renderView(
-      emailTemplatePath,
-      _.extend({layout: emailTemplateLayout, url, util }, templateData)
-    )
-    .intercept((err)=>{
-      err.message =
-      'Could not compile view template.\n'+
-      '(Usually, this means the provided data is invalid, or missing a piece.)\n'+
-      'Details:\n'+
-      err.message;
-      return err;
-    });
-
-    // Sometimes only log info to the console about the email that WOULD have been sent.
-    // Specifically, if the "To" email address is anything "@example.com".
-    //
-    // > This is used below when determining whether to actually send the email,
-    // > for convenience during development, but also for safety.  (For example,
-    // > a special-cased version of "user@example.com" is used by Trend Micro Mars
-    // > scanner to "check apks for malware".)
-    var isToAddressConsideredFake = Boolean(to.match(/@example\.com$/i));
-
-    // If that's the case, or if we're in the "test" environment, then log
-    // the email instead of sending it:
-    var dontActuallySend = (
-      sails.config.environment === 'test' || isToAddressConsideredFake
-    );
-
-    if (dontActuallySend) {
-      sails.log.info(
-        'Skipped sending email, either because the "To" email address ended in "@example.com"\n'+
-        'or because the current sails.config.environment is set to "test".\n'+
-        '\n'+
-        'But anyway, here is what WOULD have been sent:\n'+
-        '-=-=-=-=-=-=-=-=-=-=-=-=-= Email log =-=-=-=-=-=-=-=-=-=-=-=-=-\n'+
-        'To: '+to+'\n'+
-        'Subject: '+subject+'\n'+
-        '\n'+
-        'Body:\n'+
-        htmlEmailContents+'\n'+
-        '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'
-      );
-    } else {
-      var subjectLinePrefix = sails.config.environment === 'production' ? '' : sails.config.environment === 'staging' ? '[FROM STAGING] ' : '[FROM LOCALHOST] ';
-      var messageData = {
-        Destination: {
-          CcAddresses: bcc,
-          ToAddresses: [to]
-        },
-        Message: {
-          Body: {
-            Html:{
-              Charset: 'UTF-8',
-              Data: htmlEmailContents
-            }
-          },
-          Subject:{
-            Charset: 'UTF-8',
-            Data: subjectLinePrefix+subject
-          }
-        },
-        Source: 'Peepl Eat <support@itsaboutpeepl.com>',
-      };
-
-      var deferred = new AWS.SES().sendEmail(messageData).promise();
-
-      deferred.then(() => {
-      }).catch((err) => {
-        sails.log.error(
-                'Background instruction failed:  Could not deliver email:\n'+
-                util.inspect({template, templateData, to, toName, subject, from, fromName, layout, ensureAck, bcc, attachments},{depth:null})+'\n',
-                'Error details:\n'+
-                util.inspect(err)
+    var dontActuallySend = false;
+    try {
+      if (!_.startsWith(path.basename(template), "email-")) {
+        sails.log.warn(
+          'The "template" that was passed in to `sendTemplateEmail()` does not begin with ' +
+            '"email-" -- but by convention, all email template files in `views/emails/` should ' +
+            "be namespaced in this way.  (This makes it easier to look up email templates by " +
+            "filename; e.g. when using CMD/CTRL+P in Sublime Text.)\n" +
+            "Continuing regardless..."
         );
-      });
-    }//ﬁ
+      }
+
+      if (
+        _.startsWith(template, "views/") ||
+        _.startsWith(template, "emails/")
+      ) {
+        throw new Error(
+          'The "template" that was passed in to `sendTemplateEmail()` was prefixed with\n' +
+            "`emails/` or `views/` -- but that part is supposed to be omitted.  Instead, please\n" +
+            "just specify the path to the desired email template relative from `views/emails/`.\n" +
+            "For example:\n" +
+            "  template: 'email-reset-password'\n" +
+            "Or:\n" +
+            "  template: 'admin/email-contact-form'\n" +
+            " [?] If you're unsure or need advice, see https://sailsjs.com/support"
+        );
+      } //•
+
+      // Determine appropriate email layout and template to use.
+      var emailTemplatePath = path.join("emails/", template);
+      var emailTemplateLayout;
+      if (layout) {
+        emailTemplateLayout = path.relative(
+          path.dirname(emailTemplatePath),
+          path.resolve("layouts/", layout)
+        );
+      } else {
+        emailTemplateLayout = false;
+      }
+
+      // Compile HTML template.
+      // > Note that we set the layout, provide access to core `url` package (for
+      // > building links and image srcs, etc.), and also provide access to core
+      // > `util` package (for dumping debug data in internal emails).
+      var htmlEmailContents = await sails
+        .renderView(
+          emailTemplatePath,
+          _.extend({ layout: emailTemplateLayout, url, util }, templateData)
+        )
+        .intercept((err) => {
+          err.message =
+            "Could not compile view template.\n" +
+            "(Usually, this means the provided data is invalid, or missing a piece.)\n" +
+            "Details:\n" +
+            err.message;
+          return err;
+        });
+
+      // Sometimes only log info to the console about the email that WOULD have been sent.
+      // Specifically, if the "To" email address is anything "@example.com".
+      //
+      // > This is used below when determining whether to actually send the email,
+      // > for convenience during development, but also for safety.  (For example,
+      // > a special-cased version of "user@example.com" is used by Trend Micro Mars
+      // > scanner to "check apks for malware".)
+      var isToAddressConsideredFake = Boolean(to.match(/@example\.com$/i));
+
+      // If that's the case, or if we're in the "test" environment, then log
+      // the email instead of sending it:
+      dontActuallySend =
+        sails.config.environment === "test" ||
+        isToAddressConsideredFake ||
+        process.env.FIREBASE_AUTH_EMULATOR_HOST;
+
+      if (dontActuallySend) {
+        sails.log.info(
+          'Skipped sending email, either because the "To" email address ended in "@example.com"\n' +
+            'or because the current sails.config.environment is set to "test".\n' +
+            "\n" +
+            "But anyway, here is what WOULD have been sent:\n" +
+            "-=-=-=-=-=-=-=-=-=-=-=-=-= Email log =-=-=-=-=-=-=-=-=-=-=-=-=-\n" +
+            "To: " +
+            to +
+            "\n" +
+            "Subject: " +
+            subject +
+            "\n" +
+            "\n" +
+            "Body:\n" +
+            htmlEmailContents +
+            "\n" +
+            "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+        );
+      } else {
+        var subjectLinePrefix =
+          sails.config.environment === "production"
+            ? ""
+            : sails.config.environment === "staging"
+            ? "[FROM STAGING] "
+            : "[FROM LOCALHOST] ";
+        var messageData = {
+          Destination: {
+            CcAddresses: bcc,
+            ToAddresses: [to],
+          },
+          Message: {
+            Body: {
+              Html: {
+                Charset: "UTF-8",
+                Data: htmlEmailContents,
+              },
+            },
+            Subject: {
+              Charset: "UTF-8",
+              Data: subjectLinePrefix + subject,
+            },
+          },
+          Source: "Peepl Eat <support@itsaboutpeepl.com>",
+        };
+
+        try {
+          AWS.config.loadFromPath("config/aws.json");
+        } catch (error) {
+          sails.log.error("AWS email service not configured!!!!");
+          return exits.failed();
+        }
+
+        var deferred = new AWS.SES().sendEmail(messageData).promise();
+
+        deferred
+          .then(() => {})
+          .catch((err) => {
+            sails.log.error(
+              "Background instruction failed:  Could not deliver email:\n" +
+                util.inspect(
+                  {
+                    template,
+                    templateData,
+                    to,
+                    toName,
+                    subject,
+                    from,
+                    fromName,
+                    layout,
+                    ensureAck,
+                    bcc,
+                    attachments,
+                  },
+                  { depth: null }
+                ) +
+                "\n",
+              "Error details:\n" + util.inspect(err)
+            );
+          });
+      } //ﬁ
+    } catch (error) {
+      sails.log.error(`helpers.sendTemplateEmail errored: ${error}`);
+      return exits.failed();
+    }
 
     // All done!
-    return {
+    return exits.success({
       loggedInsteadOfSending: dontActuallySend,
-    };
+    });
   }
 };

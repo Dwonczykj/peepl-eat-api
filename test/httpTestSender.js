@@ -90,6 +90,7 @@ class ExpectResponse {
 class HttpTestSender {
   constructor({
     HTTP_TYPE = "get",
+    ACTION_PREFIX = "/api/v1",
     ACTION_PATH = "",
     ACTION_NAME = "",
     sendData = {},
@@ -98,13 +99,21 @@ class HttpTestSender {
     expectResponseCb = async (response, requestPayload) => {},
     expectStatusCode = 200,
   }) {
+    this.ACTION_PREFIX = ACTION_PREFIX;
     this.ACTION_PATH = ACTION_PATH;
     this.ACTION_NAME = ACTION_NAME;
     this.HTTP_TYPE = HTTP_TYPE;
     const relUrl = `${this.ACTION_PATH}/${this.ACTION_NAME}`;
-    const baseUrl = !relUrl
-      ? `/api/v1/${this.ACTION_PATH}/${this.ACTION_NAME}`
-      : `/api/v1/${relUrl}`;
+    let baseUrl = !relUrl
+      ? `${this.ACTION_PREFIX}/${this.ACTION_PATH}/${this.ACTION_NAME}`
+      : `${this.ACTION_PREFIX}/${relUrl}`;
+    for(const key of Object.keys(sendData)){
+      if(baseUrl.endsWith(`/:${key}`)){
+        baseUrl = baseUrl.replace(`:${key}`, sendData[key]);
+        delete sendData[key];
+        break;
+      }
+    }
     this.baseUrl = baseUrl;
     if (HTTP_TYPE.toLowerCase() === "get") {
       this.httpCall = () => supertest(sails.hooks.http.app).get(baseUrl);
@@ -140,29 +149,24 @@ class HttpTestSender {
         updatedPostDataWith,
         updatedPostDataWithOutKeys
       );
-      
-      if (this.HTTP_TYPE.toUpperCase() === "GET" && _sw){
-        console.log(
-          "We are going to add query params to get: " + util.inspect(_sw, {depth: 1})
-        );
 
-      }
+      // if (this.HTTP_TYPE.toUpperCase() === "GET" && _sw) {
+      //   console.log(
+      //     "We are going to add query params to get: " +
+      //       util.inspect(_sw, { depth: 1 })
+      //   );
+      // }
 
       const _makeCall = () =>
         this.HTTP_TYPE.toUpperCase() === "GET"
           ? this.httpCall().query(_sw)
           : this.httpCall().send(_sw);
-      
+
       const response = _makeCall()
         .set("Cookie", cookie)
         .set("Accept", "application/json");
 
-
-      console.log(
-        `Supertest: -> ${response.method} ${
-          response.url
-        }`
-      );
+      console.log(`Supertest: -> ${response.method} ${response.url}`);
 
       if (response.statusCode === 400 || response.statusCode >= 402) {
         // we might want to expect a 401
@@ -181,6 +185,7 @@ class HttpTestSender {
 class HttpAuthTestSender extends HttpTestSender {
   constructor({
     HTTP_TYPE = "get",
+    ACTION_PREFIX = "/api/v1",
     ACTION_PATH = "",
     ACTION_NAME = "",
     useAccount = "TEST_SERVICE",
@@ -192,6 +197,7 @@ class HttpAuthTestSender extends HttpTestSender {
   }) {
     super({
       HTTP_TYPE,
+      ACTION_PREFIX,
       ACTION_PATH,
       ACTION_NAME,
       sendData,
@@ -234,11 +240,11 @@ class HttpAuthTestSender extends HttpTestSender {
             ),
           false,
           otherLoginDetails || null
-        )
+      )
       : await self.makeCallWith("")(
           updatedPostDataWith,
           updatedPostDataWithOutKeys
-        );
+      );
   }
 }
 

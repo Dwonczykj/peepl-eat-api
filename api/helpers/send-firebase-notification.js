@@ -44,6 +44,15 @@ module.exports = {
 
 
   fn: async function (inputs, exits) {
+    var dontActuallySend =
+      sails.config.environment === "test" ||
+      process.env.FIREBASE_AUTH_EMULATOR_HOST;
+    if (dontActuallySend) {
+      sails.log
+        .info(`Running sails in test mode, helpers.sendFirebaseNotification will not send notifications.
+      Message would have been sent for firebase topic id: ${inputs.topic} with title ${inputs.title} with body: ${inputs.body}`);
+      return exits.success();
+    }
 
     const message = {
       data: inputs.data,
@@ -61,6 +70,7 @@ module.exports = {
         sails.log.warn(err);
         throw new Error(err);
       });
+    return exits.success();
 
   }
 

@@ -17,7 +17,11 @@ module.exports = {
 
   exits: {
     notFound: {
+      statusCode: 400,
       responseType: 'notFound'
+    },
+    success: {
+      statusCode: 200,
     }
   },
 
@@ -29,7 +33,7 @@ module.exports = {
       return exits.notFound();
     }
 
-    return {paymentStatus: order.paymentStatus, restaurantAcceptanceStatus: order.restaurantAcceptanceStatus};
+    return exits.success({paymentStatus: order.paymentStatus, restaurantAcceptanceStatus: order.restaurantAcceptanceStatus});
 
   }
 

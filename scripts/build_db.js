@@ -64,6 +64,7 @@ async function buildDb(sails, test) {
   if(test){
     await User.createEach(fixtures.users);
     await Order.createEach(fixtures.orders);
+    await OrderItem.createEach(fixtures.orderItems);
   } else {
     await User.createEach([
       {

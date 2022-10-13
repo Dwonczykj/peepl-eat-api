@@ -67,6 +67,12 @@ module.exports.routes = {
   "POST /api/v1/orders/peepl-pay-webhook": {
     action: "orders/peepl-pay-webhook",
   },
+  "POST /api/v1/orders/peepl-pay-update-paid-order-webhook": {
+    action: "orders/peepl-pay-update-paid-order-webhook",
+  },
+  "POST /api/v1/orders/peepl-pay-refund-webhook": {
+    action: "orders/peepl-pay-refund-webhook",
+  },
   "GET /api/v1/orders/get-order-details": {
     action: "orders/get-order-details",
   },

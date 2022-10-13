@@ -9,7 +9,8 @@ module.exports = {
 
   inputs: {
     publicId: {
-      type: 'string'
+      type: 'string',
+      description: 'the paymentIntentId as this is the publicId that the peeplPay api keeps'
     },
     status: {
       type: 'string'
@@ -18,6 +19,13 @@ module.exports = {
 
 
   exits: {
+    orderNotFound: {
+      statusCode: 404,
+      responseType: 'notFound',
+    },
+    success: {
+      statusCode: 200,
+    }
   },
 
 
@@ -26,22 +34,42 @@ module.exports = {
     var unixtime = Date.now();
 
     // Update order with payment ID and time
-    await Order.updateOne({paymentIntentId: inputs.publicId})
-    .set({
-      paymentStatus: 'paid',
-      paidDateTime: unixtime
-    });
-
-    var order = await Order.findOne({
+    var order = await Order.updateOne({
       paymentIntentId: inputs.publicId,
-      completedFlag: '',
+      completedFlag: "",
     })
-    .populate('vendor');
+      .set({
+        paymentStatus: inputs.status === "paid" ? "paid" : "failed",
+        paidDateTime: unixtime,
+      });
+    
+    if(!order){
+      return exits.orderNotFound();
+    }
+    
+    order = await Order.findOne(order.id)
+      .populate('vendor');
 
-    await sails.helpers.sendSmsNotification.with({
-      to: order.vendor.phoneNumber,
-      body: 'You have received a new order from vegi for delivery between ' + order.fulfilmentSlotFrom + ' and ' + order.fulfilmentSlotTo + '. To accept or decline: ' + sails.config.custom.baseUrl + '/admin/approve-order/' + order.publicId
-    });
+    try {
+	    if(order.paymentStatus === 'paid'){
+	      await sails.helpers.sendSmsNotification.with({
+	        to: order.vendor.phoneNumber,
+	        body: 'You have received a new order from vegi for delivery between ' + order.fulfilmentSlotFrom + ' and ' + order.fulfilmentSlotTo + '. To accept or decline: ' + sails.config.custom.baseUrl + '/admin/approve-order/' + order.publicId
+	      });
+	    } else {
+	      await sails.helpers.sendSmsNotification.with({
+	        to: order.deliveryPhoneNumber,
+	        body:
+	          "Your payment for a recent order failed. Details of order " +
+	          order.fulfilmentSlotFrom +
+	          " and " +
+	          order.fulfilmentSlotTo +
+	          ". Please review your payment method in the vegi app."
+	      });
+	    }
+    } catch (error) {
+      sails.log.error(`peepl-pay-webhook errored sending sms notification to vendor for paid order: ${error}`);
+    }
 
     // // Send order confirmation email
     // await sails.helpers.sendTemplateEmail.with({
@@ -53,7 +81,7 @@ module.exports = {
     // });
 
     // All done.
-    return;
+    return exits.success();
 
   }
 

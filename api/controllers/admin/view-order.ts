@@ -9,7 +9,7 @@ module.exports = {
   inputs: {
     orderId: {
       type: 'string',
-      description: 'The order to view.',
+      description: 'The public id of the order to view.',
       required: true
     }
   },
@@ -25,16 +25,23 @@ module.exports = {
     badRequest: {
       responseType: 'unauthorised',
       description: 'user not allowed to see vendor or vendor orders'
+    },
+    notFound: {
+      statusCode: 404,
     }
-
   },
 
   fn: async function (inputs, exits) {
+
     var order = await Order.findOne({
       publicId: inputs.orderId,
       completedFlag: ''
     })
     .populate('fulfilmentMethod&items.product&optionValues&optionValues.option&optionValue&vendor.id');
+
+    if(!order){
+      return exits.notFound();
+    }
 
     let user = await User.findOne(this.req.session.userId);
 

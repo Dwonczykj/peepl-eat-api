@@ -7,11 +7,54 @@ const _ = require("lodash");
 const moment = require("moment/moment");
 var util = require("util");
 require("ts-node/register");
+const { v4: uuidv4 } = require("uuid");
 const {
   HttpAuthTestSender,
   ExpectResponse,
 } = require("../../../httpTestSender");
 const {fixtures} = require('../../../../scripts/build_db');
+
+const DEFAULT_NEW_ORDER_OBJECT = (fixtures, overrides = {}) => ({
+  ...{
+    customerWalletAddress: "0xb98AEa2159e4855c8C703A19f57912ACAdCa3625",
+    items: [1, 6, 7],
+    total: 2800,
+    tipAmount: 0,
+    orderedDateTime: Date.now(),
+    restaurantAcceptanceStatus: "accepted",
+    marketingOptIn: false,
+    vendor: 1,
+    paidDateTime: null,
+    refundDateTime: null,
+    deliveryName: "Test Runner 1",
+    deliveryEmail: "adam@itsaboutpeepl.com",
+    deliveryPhoneNumber: "07901122212",
+    deliveryAddressLineOne: "11 Feck Street",
+    deliveryAddressLineTwo: "Subburb",
+    deliveryAddressCity: "Liverpool",
+    deliveryAddressPostCode: "L1 0AB",
+    deliveryAddressInstructions: "Leave it behind the bin",
+    fulfilmentMethod: 1,
+    fulfilmentSlotFrom: "2023-10-12 11:00:00",
+    fulfilmentSlotTo: "2023-10-12 12:00:00",
+    discount: null,
+    paymentStatus: "unpaid",
+    paymentIntentId: "",
+    deliveryId: "random_delivery_id",
+    deliveryPartnerAccepted: true,
+    deliveryPartnerConfirmed: true,
+    deliveryPartner: 1,
+    rewardsIssued: 0,
+    sentToDeliveryPartner: false,
+    completedFlag: "",
+    completedOrderFeedback: null,
+    deliveryPunctuality: null,
+    orderCondition: null,
+    unfulfilledItems: [], //Check using partial orders
+    parentOrder: null,
+  },
+  ...overrides,
+});
 
 class ExpectResponseDeliveryPartner extends ExpectResponse {
   constructor({
@@ -47,20 +90,26 @@ class ExpectResponseDeliveryPartner extends ExpectResponse {
 class HttpAuthTestSenderDeliveryPartner extends HttpAuthTestSender {
   constructor({
     HTTP_TYPE = "get",
+    ACTION_PREFIX = "/api/v1",
     ACTION_PATH = "",
     ACTION_NAME = "",
     useAccount = "TEST_SERVICE",
     sendData = {},
     expectResponse = {},
+    expectResponseCb = async (response, requestPayload) => {},
+    expectStatusCode = 200,
   }) {
     super({
       HTTP_TYPE,
+      ACTION_PREFIX,
       ACTION_PATH,
       ACTION_NAME,
       useAccount,
       sendData,
       expectResponse,
-      ExpectResponseDeliveryPartner,
+      ExpectResponseDeliveryPartner,      
+      expectResponseCb,
+      expectStatusCode,
     });
   }
 }
@@ -302,7 +351,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
             depth: null,
           })}`
         );
-        hats.expectedResponse.checkResponse(response);
+        await hats.expectedResponse.checkResponse(response);
       } catch (errs) {
         console.warn(errs);
         throw errs;
@@ -312,30 +361,21 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
   describe(`${CANCEL_DELIVERY(fixtures).ACTION_NAME}()`, () => {
     it(`DeliveryPartners can cancel delivery for an order`, async () => {
       try {
-        const parentOrder = await new HttpAuthTestSenderDeliveryPartner(
-          CREATE_ORDER(fixtures)
-        ).makeAuthCallWith(
-          {
-            deliveryId: "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_6",
+        const delvId =
+          "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_6" + uuidv4();
+        const parentOrder = await Order.create(
+          DEFAULT_NEW_ORDER_OBJECT(fixtures, {
+            deliveryId: delvId,
             deliveryPartnerAccepted: true,
             deliveryPartnerConfirmed: true,
-          },
-          []
-        );
+          })
+        ).fetch();
         const hats = new HttpAuthTestSenderDeliveryPartner(CANCEL_DELIVERY(fixtures));
         const response = await hats.makeAuthCallWith({
-          vegiOrderId: parentOrder.body.id,
-          deliveryId: "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_6"
+          vegiOrderId: parentOrder.id,
+          deliveryId: delvId
         }, []);
-
-        expect(response.statusCode).to.equal(200,
-          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
-            depth: null,
-          })} with trace: ${util.inspect(response.body.traceRef, {
-            depth: null,
-          })}`
-        );
-        // hats.expectedResponse.checkResponse(response);
+        await hats.expectedResponse.checkResponse(response);
       } catch (errs) {
         console.warn(errs);
         throw errs;
@@ -343,32 +383,23 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
     });
     it(`Non-DeliveryPartners cannot cancel delivery for an order`, async () => {
       try {
-        const parentOrder = await new HttpAuthTestSenderDeliveryPartner(
-          CREATE_ORDER(fixtures)
-        ).makeAuthCallWith(
-          {
-            deliveryId: "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_6",
+        const delvId =
+          "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_6" + uuidv4();
+        const parentOrder = await Order.create(
+          DEFAULT_NEW_ORDER_OBJECT(fixtures, {
+            deliveryId: delvId,
             deliveryPartnerAccepted: true,
             deliveryPartnerConfirmed: true,
-          },
-          []
-        );
+          })
+        ).fetch();
         const hats = new HttpAuthTestSenderDeliveryPartner(
           CANCEL_DELIVERY_NOT_ALLOWED_BY_USER(fixtures)
         );
         const response = await hats.makeAuthCallWith({
-          vegiOrderId: parentOrder.body.id,
-          deliveryId: "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_6"
+          vegiOrderId: parentOrder.id,
+          deliveryId: delvId
         }, []);
-
-        expect(response.statusCode).to.equal(401,
-          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
-            depth: null,
-          })} with trace: ${util.inspect(response.body.traceRef, {
-            depth: null,
-          })}`
-        );
-        // hats.expectedResponse.checkResponse(response);
+        await hats.expectedResponse.checkResponse(response);
       } catch (errs) {
         console.warn(errs);
         throw errs;
@@ -378,44 +409,33 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
   describe(`${ACCEPT_DELIVERY_CONFIRMATION_AS_ADMIN(fixtures).ACTION_NAME}()`, () => {
     it(`${ACCEPT_DELIVERY_CONFIRMATION_AS_ADMIN(fixtures).ACTION_NAME} returns 401 when already confirmed`, async () => {
       try {
-        const parentOrder = await new HttpAuthTestSenderDeliveryPartner(
-          CREATE_ORDER(fixtures)
-        ).makeAuthCallWith(
-          {
-            deliveryId: "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_3",
+        const delvId =
+          "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_3" + uuidv4();
+        const parentOrder = await Order.create(
+          DEFAULT_NEW_ORDER_OBJECT(fixtures, {
+            deliveryId: delvId,
             deliveryPartnerAccepted: true,
             deliveryPartnerConfirmed: true,
-          },
-          []
-        );
+          })
+        ).fetch();
         const hats = new HttpAuthTestSenderDeliveryPartner(
           ACCEPT_DELIVERY_CONFIRMATION_AS_DELIVERYPARTNER(fixtures)
         );
         const response = await hats.makeAuthCallWith({}, []);
-
-        expect(response.statusCode).to.equal(401,
-          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
-            depth: null,
-          })} with trace: ${util.inspect(response.body.traceRef, {
-            depth: null,
-          })}`
-        );
-        // hats.expectedResponse.checkResponse(response);
+        await hats.expectedResponse.checkResponse(response);
       } catch (errs) {
         console.warn(errs);
         throw errs;
       }
     });
     it(`${ACCEPT_DELIVERY_CONFIRMATION_AS_ADMIN(fixtures).ACTION_NAME} returns 401 when user is not a delivery partner`, async () => {
+      const delvId = "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_2_" + uuidv4();
       try {
-        const parentOrder = await new HttpAuthTestSenderDeliveryPartner(
-          CREATE_ORDER(fixtures)
-        ).makeAuthCallWith(
-          {
-            deliveryId: "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_2",
-          },
-          []
-        );
+        const parentOrder = await Order.create(
+          DEFAULT_NEW_ORDER_OBJECT(fixtures, {
+            deliveryId: delvId,
+          })
+        ).fetch();
         const hats = new HttpAuthTestSenderDeliveryPartner(
           ACCEPT_DELIVERY_CONFIRMATION_AS_USER_NOT_ALLOWED(fixtures)
         );
@@ -428,7 +448,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
             depth: null,
           })}`
         );
-        // hats.expectedResponse.checkResponse(response);
+        // await hats.expectedResponse.checkResponse(response);
       } catch (errs) {
         console.warn(errs);
         throw errs;
@@ -436,11 +456,13 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
     });
     it(`${ACCEPT_DELIVERY_CONFIRMATION_AS_ADMIN(fixtures).ACTION_NAME} returns 401 when order has a delivery partner registered to another delivery partner`, async () => {
       try {
+        const delvId =
+          "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_4_" + uuidv4();
         const parentOrder = await new HttpAuthTestSenderDeliveryPartner(
           CREATE_ORDER
         ).makeAuthCallWith(
           {
-            deliveryId: "A_DELIVERY_ID_SET_BY_OTHER_TEST_DELIVERY_PARTNER_4",
+            deliveryId: delvId,
             deliveryPartner: 2,
           },
           []
@@ -457,7 +479,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
             depth: null,
           })}`
         );
-        // hats.expectedResponse.checkResponse(response);
+        // await hats.expectedResponse.checkResponse(response);
       } catch (errs) {
         console.warn(errs);
         throw errs;
@@ -465,14 +487,13 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
     });
     it("Admin can successfully accept a delivery job for an order", async () => {
       try {
-        const parentOrder = await new HttpAuthTestSenderDeliveryPartner(
-          CREATE_ORDER(fixtures)
-        ).makeAuthCallWith(
-          {
-            deliveryId: "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_1",
-          },
-          []
-        );
+        const delvId =
+          "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_1_" + uuidv4();
+        const parentOrder = await Order.create(
+          DEFAULT_NEW_ORDER_OBJECT(fixtures, {
+            deliveryId: delvId,
+          })
+        ).fetch();
         const hats = new HttpAuthTestSenderDeliveryPartner(
           ACCEPT_DELIVERY_CONFIRMATION_AS_ADMIN(fixtures)
         );
@@ -488,7 +509,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
             depth: null,
           })}`
         );
-        // hats.expectedResponse.checkResponse(response);
+        // await hats.expectedResponse.checkResponse(response);
       } catch (errs) {
         console.warn(errs);
         throw errs;
@@ -496,14 +517,12 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
     });
     it("Admin can successfully accept a delivery job for an order", async () => {
       try {
-        const parentOrder = await new HttpAuthTestSenderDeliveryPartner(
-          CREATE_ORDER(fixtures)
-        ).makeAuthCallWith(
-          {
-            deliveryId: "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_3",
-          },
-          []
-        );
+        const devlId = "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_33_" + uuidv4();
+        const parentOrder = await Order.create(
+          DEFAULT_NEW_ORDER_OBJECT(fixtures, {
+            deliveryId: devlId,
+          })
+        ).fetch();
         const hats = new HttpAuthTestSenderDeliveryPartner(
           ACCEPT_DELIVERY_CONFIRMATION_AS_DELIVERYPARTNER(fixtures)
         );
@@ -519,7 +538,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
             depth: null,
           })}`
         );
-        // hats.expectedResponse.checkResponse(response);
+        // await hats.expectedResponse.checkResponse(response);
       } catch (errs) {
         console.warn(errs);
         throw errs;
@@ -527,14 +546,12 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
     });
     it("Admin can successfully accept a delivery job for an order", async () => {
       try {
-        const parentOrder = await new HttpAuthTestSenderDeliveryPartner(
-          CREATE_ORDER(fixtures)
-        ).makeAuthCallWith(
-          {
-            deliveryId: "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_2",
-          },
-          []
-        );
+        const devlId = "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_22_" + uuidv4();
+        const parentOrder = await Order.create(
+          DEFAULT_NEW_ORDER_OBJECT(fixtures, {
+            deliveryId: devlId,
+          })
+        ).fetch();
         const hats = new HttpAuthTestSenderDeliveryPartner(
           ACCEPT_DELIVERY_CONFIRMATION_AS_USER_NOT_ALLOWED(fixtures)
         );
@@ -550,7 +567,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
             depth: null,
           })}`
         );
-        // hats.expectedResponse.checkResponse(response);
+        // await hats.expectedResponse.checkResponse(response);
       } catch (errs) {
         console.warn(errs);
         throw errs;
@@ -560,17 +577,14 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
   describe(`${ADD_DELIVERY_DELIVERY_AVAILABILITY(fixtures).ACTION_NAME}()`, () => {
     it(`${ADD_DELIVERY_DELIVERY_AVAILABILITY(fixtures).ACTION_NAME} returns 200 as Delivery Partner for the order`, async () => {
       try {
-        const deliveryId = "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_10";
-        const parentOrder = await new HttpAuthTestSenderDeliveryPartner(
-          CREATE_ORDER(fixtures)
-        ).makeAuthCallWith(
-          {
+        const deliveryId = "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_10" + uuidv4();
+        const parentOrder = await Order.create(
+          DEFAULT_NEW_ORDER_OBJECT(fixtures, {
             deliveryId: deliveryId,
             deliveryPartnerAccepted: true,
             deliveryPartnerConfirmed: false,
-          },
-          []
-        );
+          })
+        ).fetch();
         const hats = new HttpAuthTestSenderDeliveryPartner(
           ADD_DELIVERY_DELIVERY_AVAILABILITY(fixtures)
         );
@@ -583,7 +597,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
             depth: null,
           })}`
         );
-        // hats.expectedResponse.checkResponse(response);
+        // await hats.expectedResponse.checkResponse(response);
         const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
         }).populate("deliveryPartner");
@@ -601,17 +615,14 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
     });
     it(`${ADD_DELIVERY_DELIVERY_AVAILABILITY(fixtures).ACTION_NAME} returns 200 as Delivery Partner for the order`, async () => {
       try {
-        const deliveryId = "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_11";
-        const parentOrder = await new HttpAuthTestSenderDeliveryPartner(
-          CREATE_ORDER(fixtures)
-        ).makeAuthCallWith(
-          {
+        const deliveryId = "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_11" + uuidv4();
+        const parentOrder = await Order.create(
+          DEFAULT_NEW_ORDER_OBJECT(fixtures, {
             deliveryId: deliveryId,
             deliveryPartnerAccepted: false,
             deliveryPartnerConfirmed: false,
-          },
-          []
-        );
+          })
+        ).fetch();
         const hats = new HttpAuthTestSenderDeliveryPartner(
           ADD_DELIVERY_DELIVERY_AVAILABILITY(fixtures)
         );
@@ -624,7 +635,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
             depth: null,
           })}`
         );
-        // hats.expectedResponse.checkResponse(response);
+        // await hats.expectedResponse.checkResponse(response);
         const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
         }).populate("deliveryPartner");
@@ -639,16 +650,14 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
     });
     it(`${ADD_DELIVERY_DELIVERY_AVAILABILITY(fixtures).ACTION_NAME} returns 401 if Order has already been ACCEPTED || CONFIRMED by ANY delivery partner`, async () => {
       try {
-        const parentOrder = await new HttpAuthTestSenderDeliveryPartner(
-          CREATE_ORDER(fixtures)
-        ).makeAuthCallWith(
-          {
-            deliveryId: "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_3",
+        const delvId =  "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_3" + uuidv4();
+        const parentOrder = await Order.create(
+          DEFAULT_NEW_ORDER_OBJECT(fixtures, {
+            deliveryId: delvId,
             deliveryPartnerAccepted: true,
             deliveryPartnerConfirmed: true,
-          },
-          []
-        );
+          })
+        ).fetch();
         const hats = new HttpAuthTestSenderDeliveryPartner(
           ADD_DELIVERY_DELIVERY_AVAILABILITY(fixtures)
         );
@@ -661,7 +670,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
             depth: null,
           })}`
         );
-        // hats.expectedResponse.checkResponse(response);
+        // await hats.expectedResponse.checkResponse(response);
         const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
         }).populate("deliveryPartner");
@@ -676,16 +685,14 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
     });
     it(`${ADD_DELIVERY_DELIVERY_AVAILABILITY_AS_USER_NOT_ALLOWED(fixtures).ACTION_NAME} returns 401 when not a delivery partner`, async () => {
       try {
-        const parentOrder = await new HttpAuthTestSenderDeliveryPartner(
-          CREATE_ORDER(fixtures)
-        ).makeAuthCallWith(
-          {
+        const delvId =  "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_3" + uuidv4();
+        const parentOrder = await Order.create(
+          DEFAULT_NEW_ORDER_OBJECT(fixtures, {
             deliveryId: "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_12",
             deliveryPartnerAccepted: false,
             deliveryPartnerConfirmed: false,
-          },
-          []
-        );
+          })
+        ).fetch();
         const hats = new HttpAuthTestSenderDeliveryPartner(
           ADD_DELIVERY_DELIVERY_AVAILABILITY_AS_USER_NOT_ALLOWED(fixtures)
         );
@@ -698,7 +705,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
             depth: null,
           })}`
         );
-        // hats.expectedResponse.checkResponse(response);
+        // await hats.expectedResponse.checkResponse(response);
         const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
         }).populate("deliveryPartner");
@@ -853,7 +860,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
             depth: null,
           })}`
         ); // because DeliveryPartner available slots are 11 -> 1
-        // hats.expectedResponse.checkResponse(response);
+        // await hats.expectedResponse.checkResponse(response);
         const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
         }).populate("deliveryPartner");
