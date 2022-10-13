@@ -35,7 +35,13 @@ describe(`Fetch ${ACTION_NAME} Tests`, () => {
       //     //   })
       //     //   .set("Cookie", cookie)
       //     //   .set("Accept", "application/json");
-      //     // expect(responseProduct.statusCode).to.equal(200);
+      //     // expect(responseProduct.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
           
       //   } catch (errs) {
       //     console.warn(errs);
@@ -70,7 +76,13 @@ describe(`Fetch ${ACTION_NAME} Tests`, () => {
             .send({ name: newProdName, values: [], product: newProduct.id })
             .set("Cookie", cookie)
             .set("Accept", "application/json");
-          expect(response.statusCode).to.equal(200);
+          expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
           for (prop of Object.keys(EXPECTED_RESPONSE)) {
             expect(response.body).to.have.property(prop);
           }
@@ -97,7 +109,13 @@ describe(`Fetch ${ACTION_NAME} Tests`, () => {
     //         .send({ name: "testing", values: [], product: 64, isRequired: true })
     //         .set("Cookie", cookie)
     //         .set("Accept", "application/json");
-    //       expect(response.statusCode).to.equal(200);
+    //       expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
     //       for (prop of Object.keys(EXPECTED_RESPONSE)) {
     //         expect(response.body).to.have.property(prop);
     //       }

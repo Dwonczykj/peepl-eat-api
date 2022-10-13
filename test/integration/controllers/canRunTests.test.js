@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable no-undef */
 // test/integration/controllers/UserController.test.js
+// var util = require("util");
 var supertest = require('supertest');
 
 describe('Is Logged In', () => {

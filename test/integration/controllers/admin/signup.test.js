@@ -3,7 +3,7 @@
 // test/integration/controllers/Vendors/view-all-vendors.test.js
 const { expect } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
 var supertest = require("supertest");
-
+var util = require("util");
 
 const genUserName = (id, busType) => `Can Signup Password ${busType} User${id}`;
 const genUserEmail = (id, busType) => `User${id}@example.com`;
@@ -18,7 +18,13 @@ describe("Signup Tests", () => {
         .set("Accept", "text/html")
         .expect(200)
         .then((response) => {
-          expect(response.statusCode).to.equal(200);
+          expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
           expect(response.text).to.have.string(
             '<div id="signup" class="admin" v-cloak>'
           );
@@ -55,7 +61,13 @@ describe("Signup Tests", () => {
     //       // console.log(response.res);
     //       // console.log(response._body);
     //       // console.log(Object.keys(response));
-    //       expect(response.statusCode).to.equal(200);
+    //       expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
     //       expect(response.body).to.have.property("data");
     //       expect(response.body["data"]).to.have.property("fbUid");
     //       done();
@@ -89,7 +101,13 @@ describe("Signup Tests", () => {
           // must be then, not a callback
           // console.log(response.res.session);
           // console.log(response.res);
-          expect(response.statusCode).to.equal(200);
+          expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
           expect(response._body).to.have.property("data");
           expect(response._body["data"]).to.deep.include({
             // firebaseSessionToken: "REGISTERING_USER", * These are hid from JSON remember
@@ -135,7 +153,13 @@ describe("Signup Tests", () => {
           // must be then, not a callback
           // console.log(response.res.session);
           // console.log(response.res);
-          expect(response.statusCode).to.equal(401);
+          expect(response.statusCode).to.equal(401,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
           expect(response.headers).to.have.property("x-exit");
           expect(response.headers).to.deep.include({ "x-exit": "userExists" });
           expect(response.headers).to.have.property("x-exit-description");

@@ -6,7 +6,6 @@ import 'mocha';
 import moment from 'moment';
 import { intersectSlotArrays, mergeOverlappingSlotsInArray, Slot } from '../../../../../api/interfaces/vendors/slot';
 
-
 const util = require('util');
 const expect = chai.expect;
 

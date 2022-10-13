@@ -114,7 +114,13 @@ describe("Fetch GET Routes from routes.js", async () => {
               .set("Cookie", cookie)
               .set("Accept", "application/json");
 
-            expect(response.statusCode).to.equal(200);
+            expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
             expect(response.body).not.to.have.property("data");
 
             console.info(

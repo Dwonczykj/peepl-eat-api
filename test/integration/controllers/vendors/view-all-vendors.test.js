@@ -16,7 +16,13 @@ describe("Fetch Vendors Controller Tests", () => {
           .expect(200)
           .then((response) => {
             console.log('StatusCode resonse was: ' + response.statusCode);
-            expect(response.statusCode).to.equal(200);
+            expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
             expect(response.body).to.have.property("vendors");
             expect(response.body['vendors']).to.have.lengthOf(1);
           })
@@ -35,7 +41,13 @@ describe("Fetch Vendors Controller Tests", () => {
           .set("Cookie", '')
           .expect(403)
           .then((response) => {
-            expect(response.statusCode).to.equal(403);
+            expect(response.statusCode).to.equal(403,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
           })
           .catch((errs) => {
             throw errs;

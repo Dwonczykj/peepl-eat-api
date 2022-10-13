@@ -1,8 +1,7 @@
-/* eslint-disable no-console */
 // test/integration/controllers/admin/create-product.test.js
 const { assert, expect } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
 // var supertest = require("supertest");
-const _ = require('lodash');
+// const _ = require('lodash');
 var util = require("util");
 const moment = require("moment/moment");
 require("ts-node/register");
@@ -687,7 +686,13 @@ describe(`Order Model Integration Tests`, () => {
           },
           []
         );
-        expect(response.statusCode).to.equal(400);
+        expect(response.statusCode).to.equal(400,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         expect(response.body).not.to.have.property("orderID");
       } catch (errs) {
         console.warn(errs);
@@ -727,7 +732,13 @@ describe(`Order Model Integration Tests`, () => {
           },
           []
         );
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         expect(response.body).to.have.property("orderID");
         const newOrder = await Order.findOne(response.body.orderID);
         expect(newOrder).to.have.property("deliveryAddressInstructions");
@@ -772,7 +783,13 @@ describe(`Order Model Integration Tests`, () => {
           },
           []
         );
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         expect(response.body).to.have.property("orderID");
         const newOrder = await Order.findOne(response.body.orderID).populate('items');
         expect(newOrder).to.have.property("items");
@@ -806,7 +823,13 @@ describe(`Order Model Integration Tests`, () => {
           },
           []
         );
-        expect(response.statusCode).to.equal(400);
+        expect(response.statusCode).to.equal(400,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         expect(response.body).not.to.have.property("orderID");
       } catch (errs) {
         console.warn(errs);
@@ -823,7 +846,13 @@ describe(`Order Model Integration Tests`, () => {
           {},
           []
         );
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         hats.expectedResponse.checkResponse(response.body);
       } catch (errs) {
         console.warn(errs);
@@ -852,7 +881,13 @@ describe(`Order Model Integration Tests`, () => {
           []
         );
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         assert.isArray(response.body);
         hats.expectedResponse.checkResponse(response.body);
         expect(response.body[0]).to.deep.equal(parentOrder.body);
@@ -881,7 +916,13 @@ describe(`Order Model Integration Tests`, () => {
           []
         );
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         const newOrder = await Order.findOne({publicId: parentOrder.body.publicId});
         expect(newOrder.paymentStatus).to.equal("paid");
       } catch (errs) {
@@ -907,7 +948,13 @@ describe(`Order Model Integration Tests`, () => {
           []
         );
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         const newOrder = await Order.findOne({publicId: parentOrder.body.publicId});
         expect(newOrder.paymentStatus).to.equal("failed");
         
@@ -929,7 +976,13 @@ describe(`Order Model Integration Tests`, () => {
           []
         );
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
         });
@@ -952,7 +1005,13 @@ describe(`Order Model Integration Tests`, () => {
           []
         );
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
         });
@@ -974,7 +1033,13 @@ describe(`Order Model Integration Tests`, () => {
           []
         );
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         hats.expectedResponse.checkResponse(response.body);
       } catch (errs) {
         console.warn(errs);
@@ -988,7 +1053,13 @@ describe(`Order Model Integration Tests`, () => {
         const hats = new HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_ACCEPTED);
         const response = await hats.makeAuthCallWith({}, []);
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         hats.expectedResponse.checkResponse(response.body);
       } catch (errs) {
         console.warn(errs);
@@ -1002,7 +1073,13 @@ describe(`Order Model Integration Tests`, () => {
         const hats = new HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_REJECTED);
         const response = await hats.makeAuthCallWith({}, []);
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         hats.expectedResponse.checkResponse(response.body);
       } catch (errs) {
         console.warn(errs);
@@ -1016,7 +1093,13 @@ describe(`Order Model Integration Tests`, () => {
         const hats = new HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_PENDING);
         const response = await hats.makeAuthCallWith({}, []);
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         hats.expectedResponse.checkResponse(response.body);
       } catch (errs) {
         console.warn(errs);
@@ -1030,7 +1113,13 @@ describe(`Order Model Integration Tests`, () => {
         const hats = new HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_DEFAULT);
         const response = await hats.makeAuthCallWith({}, []);
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         hats.expectedResponse.checkResponse(response.body);
       } catch (errs) {
         console.warn(errs);
@@ -1044,7 +1133,13 @@ describe(`Order Model Integration Tests`, () => {
         const hats = new HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_UPCOMING);
         const response = await hats.makeAuthCallWith({}, []);
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         hats.expectedResponse.checkResponse(response.body);
       } catch (errs) {
         console.warn(errs);
@@ -1058,7 +1153,13 @@ describe(`Order Model Integration Tests`, () => {
         const hats = new HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_PAST);
         const response = await hats.makeAuthCallWith({}, []);
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         hats.expectedResponse.checkResponse(response.body);
       } catch (errs) {
         console.warn(errs);
@@ -1072,7 +1173,13 @@ describe(`Order Model Integration Tests`, () => {
         const hats = new HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_NON_ADMIN);
         const response = await hats.makeAuthCallWith({}, []);
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         hats.expectedResponse.checkResponse(response.body);
       } catch (errs) {
         console.warn(errs);
@@ -1084,7 +1191,13 @@ describe(`Order Model Integration Tests`, () => {
         const hats = new HttpAuthTestSenderOrder(VIEW_ALL_ORDERS_NON_ADMIN);
         const response = await hats.makeAuthCallWith({}, []);
 
-        expect(response.statusCode).to.equal(401);
+        expect(response.statusCode).to.equal(401,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
       } catch (errs) {
         console.warn(errs);
         throw errs;
@@ -1108,7 +1221,13 @@ describe(`Order Model Integration Tests`, () => {
           orderId: parentOrder.body.publicId
         }, []);
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         hats.expectedResponse.checkResponse(response.body, parentOrder);
       } catch (errs) {
         console.warn(errs);
@@ -1178,7 +1297,13 @@ describe(`Order Model Integration Tests`, () => {
           []
         );
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         hats.expectedResponse.checkResponse(response.body);
       } catch (errs) {
         console.warn(errs);
@@ -1246,7 +1371,13 @@ describe(`Order Model Integration Tests`, () => {
           []
         );
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         hats.expectedResponse.checkResponse(response.body);
       } catch (errs) {
         console.warn(errs);
@@ -1314,7 +1445,13 @@ describe(`Order Model Integration Tests`, () => {
           []
         );
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         hats.expectedResponse.checkResponse(response.body);
       } catch (errs) {
         console.warn(errs);
@@ -1388,7 +1525,13 @@ describe(`Order Model Integration Tests`, () => {
           []
         );
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         // hats.expectedResponse.checkResponse(response.body);
         expect(response.body).to.have.property('orderId');
       } catch (errs) {
@@ -1457,7 +1600,13 @@ describe(`Order Model Integration Tests`, () => {
           []
         );
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         // hats.expectedResponse.checkResponse(response.body);
         const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
@@ -1535,7 +1684,13 @@ describe(`Order Model Integration Tests`, () => {
           []
         );
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         // hats.expectedResponse.checkResponse(response.body);
         const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
@@ -1613,7 +1768,13 @@ describe(`Order Model Integration Tests`, () => {
           []
         );
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         // hats.expectedResponse.checkResponse(response.body);
         const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
@@ -1693,7 +1854,13 @@ describe(`Order Model Integration Tests`, () => {
           []
         );
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         // hats.expectedResponse.checkResponse(response.body);
         const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
@@ -1774,7 +1941,13 @@ describe(`Order Model Integration Tests`, () => {
           []
         );
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         // hats.expectedResponse.checkResponse(response.body);
         const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
@@ -1850,7 +2023,13 @@ describe(`Order Model Integration Tests`, () => {
           []
         );
 
-        expect(response.statusCode).to.equal(400);
+        expect(response.statusCode).to.equal(400,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         // hats.expectedResponse.checkResponse(response.body);
         const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
@@ -1926,7 +2105,13 @@ describe(`Order Model Integration Tests`, () => {
           []
         );
 
-        expect(response.statusCode).to.equal(400);
+        expect(response.statusCode).to.equal(400,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         // hats.expectedResponse.checkResponse(response.body);
         const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
@@ -2004,7 +2189,13 @@ describe(`Order Model Integration Tests`, () => {
           []
         );
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         // hats.expectedResponse.checkResponse(response.body);
       } catch (errs) {
         console.warn(errs);
@@ -2072,7 +2263,13 @@ describe(`Order Model Integration Tests`, () => {
           []
         );
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         // hats.expectedResponse.checkResponse(response.body);
       } catch (errs) {
         console.warn(errs);

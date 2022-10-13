@@ -38,7 +38,13 @@ const login = async function (verbose=false) {
         // console.log(response.res);
         // console.log(response._body);
         // console.log(Object.keys(response));
-        // expect(response.statusCode).to.equal(200);
+        // expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         // expect(response.body).to.equal({ data: true });
         return response;
       })
@@ -55,7 +61,13 @@ const login = async function (verbose=false) {
       //   console.log(response.res);
       //   console.log(response._body);
       //   console.log(Object.keys(response));
-      //   expect(response.statusCode).to.equal(200);
+      //   expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
       //   expect(response._body).to.equal({ data: true });
       //   return response;
       // });

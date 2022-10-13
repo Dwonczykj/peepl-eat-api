@@ -8,6 +8,7 @@ const {
   HttpAuthTestSender,
   ExpectResponse,
 } = require("../../../httpTestSender");
+var util = require("util");
 
 // require("ts-node/register");
 
@@ -155,7 +156,13 @@ describe("Authentication Tests", () => {
         .set("Cookie", "")
         .expect(200)
         .then((response) => {
-          expect(response.statusCode).to.equal(200);
+          expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
           expect(response.text).to.have.string(
             '<div id="login" class="admin" v-cloak>'
           );
@@ -170,7 +177,13 @@ describe("Authentication Tests", () => {
       try {
 	      const response = await login();
 	        
-	      expect(response.statusCode).to.equal(200);
+	      expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
 	      expect(Object.keys(response.headers)).to.deep.include("set-cookie");
 	      expect(response.body).to.have.property("data");
 	      assert.isObject(response.body.data);
@@ -186,35 +199,65 @@ describe("Authentication Tests", () => {
       }
       const hats = new HttpAuthTestSenderLogin(LOGIN);
       const response = await hats.makeAuthCallWith({}, []);
-      expect(response.statusCode).to.equal(200);
+      expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
       hats.expectedResponse.checkResponse(response.body, {data: true});
       return;
     });
     it("POST login-with-secret as Customer User works", async () => {
       const hats = new HttpAuthTestSenderLogin(LOGIN_AS_USER);
       const response = await hats.makeAuthCallWith({}, []);
-      expect(response.statusCode).to.equal(200);
+      expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
       hats.expectedResponse.checkResponse(response.body, {data: true});
       return;
     });
     it("POST login-with-secret as Vendor works", async () => {
       const hats = new HttpAuthTestSenderLogin(LOGIN_AS_VENDOR);
       const response = await hats.makeAuthCallWith({}, []);
-      expect(response.statusCode).to.equal(200);
+      expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
       hats.expectedResponse.checkResponse(response.body, {data: true});
       return;
     });
     it("POST login-with-secret as Delivery Partner works", async () => {
       const hats = new HttpAuthTestSenderLogin(LOGIN_AS_DELIVERY_PARTNER);
       const response = await hats.makeAuthCallWith({}, []);
-      expect(response.statusCode).to.equal(200);
+      expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
       hats.expectedResponse.checkResponse(response.body, {data: true});
       return;
     });
     it("GET logged-in returns true when authenticated", async () => {
       const hats = new HttpAuthTestSenderLogin(IS_LOGGED_IN);
       const response = await hats.makeAuthCallWith({}, []);
-      expect(response.statusCode).to.equal(200);
+      expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
       hats.expectedResponse.checkResponse(response.body);
     });
     it("GET logged-in returns false when not signed in", async () => {
@@ -226,14 +269,26 @@ describe("Authentication Tests", () => {
       //       console.warn(errs);
       //       throw errs;
       //     }
-      //     expect(response.statusCode).to.equal(200);
+      //     expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
       //     expect(response._body).to.deep.equal({ data: false });
       //     return;
       //   });
 
       const hats = new HttpAuthTestSenderLogin(IS_LOGGED_IN_UNAUTHENTICATED);
       const response = await hats.makeAuthCallWith({}, []);
-      expect(response.statusCode).to.equal(200);
+      expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
       hats.expectedResponse.checkResponse(response.body);
     });
   });
@@ -248,7 +303,13 @@ describe("Authentication Tests", () => {
       //       console.warn(errs);
       //       throw errs;
       //     }
-      //     expect(response.statusCode).to.equal(200);
+      //     expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
       //     expect(response._body).to.deep.equal({ data: false });
       //     return;
       //   });
@@ -264,7 +325,13 @@ describe("Authentication Tests", () => {
       //       console.warn(errs);
       //       throw errs;
       //     }
-      //     expect(response.statusCode).to.equal(200);
+      //     expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
       //     expect(response._body).to.deep.equal({ data: false });
       //     return;
       //   });
@@ -272,7 +339,13 @@ describe("Authentication Tests", () => {
       //TODO: Ensure the emulator has started in headless mode and get the token from it when trying to auth with phone.
       const hats = new HttpAuthTestSenderLogin(IS_LOGGED_IN_UNAUTHENTICATED);
       const response = await hats.makeAuthCallWith({}, []);
-      expect(response.statusCode).to.equal(200);
+      expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
       hats.expectedResponse.checkResponse(response.body);
     });
   });

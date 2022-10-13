@@ -5,6 +5,7 @@ var supertest = require("supertest");
 const _ = require("lodash");
 // var util = require("util");
 const moment = require("moment/moment");
+var util = require("util");
 require("ts-node/register");
 const {
   HttpAuthTestSender,
@@ -249,7 +250,13 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
         const hats = new HttpAuthTestSenderDeliveryPartner(VIEW_DELIVERIES);
         const response = await hats.makeAuthCallWith({}, []);
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         hats.expectedResponse.checkResponse(response.body);
       } catch (errs) {
         console.warn(errs);
@@ -276,7 +283,13 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
           deliveryId: "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_6"
         }, []);
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         // hats.expectedResponse.checkResponse(response.body);
       } catch (errs) {
         console.warn(errs);
@@ -303,7 +316,13 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
           deliveryId: "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_6"
         }, []);
 
-        expect(response.statusCode).to.equal(401);
+        expect(response.statusCode).to.equal(401,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         // hats.expectedResponse.checkResponse(response.body);
       } catch (errs) {
         console.warn(errs);
@@ -329,7 +348,13 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
         );
         const response = await hats.makeAuthCallWith({}, []);
 
-        expect(response.statusCode).to.equal(401);
+        expect(response.statusCode).to.equal(401,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         // hats.expectedResponse.checkResponse(response.body);
       } catch (errs) {
         console.warn(errs);
@@ -351,7 +376,13 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
         );
         const response = await hats.makeAuthCallWith({}, []);
 
-        expect(response.statusCode).to.equal(401);
+        expect(response.statusCode).to.equal(401,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         // hats.expectedResponse.checkResponse(response.body);
       } catch (errs) {
         console.warn(errs);
@@ -374,7 +405,13 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
         );
         const response = await hats.makeAuthCallWith({}, []);
 
-        expect(response.statusCode).to.equal(401);
+        expect(response.statusCode).to.equal(401,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         // hats.expectedResponse.checkResponse(response.body);
       } catch (errs) {
         console.warn(errs);
@@ -399,7 +436,13 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
           []
         );
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         // hats.expectedResponse.checkResponse(response.body);
       } catch (errs) {
         console.warn(errs);
@@ -424,7 +467,13 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
           []
         );
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         // hats.expectedResponse.checkResponse(response.body);
       } catch (errs) {
         console.warn(errs);
@@ -449,7 +498,13 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
           []
         );
 
-        expect(response.statusCode).to.equal(401);
+        expect(response.statusCode).to.equal(401,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         // hats.expectedResponse.checkResponse(response.body);
       } catch (errs) {
         console.warn(errs);
@@ -476,7 +531,13 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
         );
         const response = await hats.makeAuthCallWith({}, []);
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         // hats.expectedResponse.checkResponse(response.body);
         const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
@@ -511,7 +572,13 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
         );
         const response = await hats.makeAuthCallWith({}, []);
 
-        expect(response.statusCode).to.equal(200);
+        expect(response.statusCode).to.equal(200,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         // hats.expectedResponse.checkResponse(response.body);
         const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
@@ -542,7 +609,13 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
         );
         const response = await hats.makeAuthCallWith({}, []);
 
-        expect(response.statusCode).to.equal(401);
+        expect(response.statusCode).to.equal(401,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         // hats.expectedResponse.checkResponse(response.body);
         const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
@@ -573,7 +646,13 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
         );
         const response = await hats.makeAuthCallWith({}, []);
 
-        expect(response.statusCode).to.equal(401);
+        expect(response.statusCode).to.equal(401,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        );
         // hats.expectedResponse.checkResponse(response.body);
         const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
@@ -722,7 +801,13 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
         );
         const response = await hats.makeAuthCallWith({}, []);
 
-        expect(response.statusCode).to.equal(404); // because DeliveryPartner available slots are 11 -> 1
+        expect(response.statusCode).to.equal(404,
+          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
+            depth: null,
+          })} with trace: ${util.inspect(response.body.traceRef, {
+            depth: null,
+          })}`
+        ); // because DeliveryPartner available slots are 11 -> 1
         // hats.expectedResponse.checkResponse(response.body);
         const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
