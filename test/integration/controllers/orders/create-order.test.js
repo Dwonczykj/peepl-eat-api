@@ -5,11 +5,14 @@ const { assert, expect } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
 var util = require("util");
 const moment = require("moment/moment");
 require("ts-node/register");
-const {fixtures} = require("../../../../scripts/build_db");
-const {getNextWeekday} = require("../../../utils");
-const { HttpAuthTestSender, ExpectResponse } = require('../../../httpTestSender');
+const { fixtures } = require("../../../../scripts/build_db");
+const { getNextWeekday } = require("../../../utils");
+const {
+  HttpAuthTestSender,
+  ExpectResponse,
+} = require("../../../httpTestSender");
 
-const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4 } = require("uuid");
 /* Check if string is valid UUID */
 function checkIfValidUUID(str) {
   // Regular expression to check if string is a valid UUID
@@ -20,47 +23,63 @@ function checkIfValidUUID(str) {
   return regexExp.test(str);
 }
 
-const DEFAULT_NEW_ORDER_OBJECT = (fixtures, overrides = {}) => ({
-  ...{
-    customerWalletAddress: "0xb98AEa2159e4855c8C703A19f57912ACAdCa3625",
-    items: [1, 6, 7],
-    total: 2800,
-    tipAmount: 0,
-    orderedDateTime: Date.now(),
-    restaurantAcceptanceStatus: "accepted",
-    marketingOptIn: false,
-    vendor: 1,
-    paidDateTime: null,
-    refundDateTime: null,
-    deliveryName: "Test Runner 1",
-    deliveryEmail: "adam@itsaboutpeepl.com",
-    deliveryPhoneNumber: "07901122212",
-    deliveryAddressLineOne: "11 Feck Street",
-    deliveryAddressLineTwo: "Subburb",
-    deliveryAddressCity: "Liverpool",
-    deliveryAddressPostCode: "L1 0AB",
-    deliveryAddressInstructions: "Leave it behind the bin",
-    fulfilmentMethod: 1,
-    fulfilmentSlotFrom: "2023-10-12 11:00:00",
-    fulfilmentSlotTo: "2023-10-12 12:00:00",
-    discount: null,
-    paymentStatus: "unpaid",
-    paymentIntentId: "",
-    deliveryId: "random_delivery_id",
-    deliveryPartnerAccepted: true,
-    deliveryPartnerConfirmed: true,
-    deliveryPartner: 1,
-    rewardsIssued: 0,
-    sentToDeliveryPartner: false,
-    completedFlag: "",
-    completedOrderFeedback: null,
-    deliveryPunctuality: null,
-    orderCondition: null,
-    unfulfilledItems: [], //Check using partial orders
-    parentOrder: null,
-  },
-  ...overrides,
-});
+const DEFAULT_NEW_ORDER_OBJECT = (fixtures, overrides = {}) => {
+  const vendor = fixtures.vendors[0];
+  const fulfilmentMethodVendor = fixtures.fulfilmentMethods.filter(
+    (fm) =>
+      fm.vendor === vendor.id &&
+      fm.methodType === "delivery" &&
+      fixtures.openingHours.filter(
+        (oh) => oh.fulfilmentMethod === fm.id && oh.isOpen === true
+      )
+  )[0];
+  const openAtHours = fixtures.openingHours.filter(
+    (openHrs) =>
+      openHrs.isOpen === true &&
+      openHrs.fulfilmentMethod === fulfilmentMethodVendor.id
+  )[0];
+  return {
+    ...{
+      customerWalletAddress: "0xb98AEa2159e4855c8C703A19f57912ACAdCa3625",
+      items: [1, 6, 7],
+      total: 2800,
+      tipAmount: 0,
+      orderedDateTime: Date.now(),
+      restaurantAcceptanceStatus: "accepted",
+      marketingOptIn: false,
+      vendor: vendor.id,
+      paidDateTime: null,
+      refundDateTime: null,
+      deliveryName: "Test Runner 1",
+      deliveryEmail: "adam@itsaboutpeepl.com",
+      deliveryPhoneNumber: "07901122212",
+      deliveryAddressLineOne: "11 Feck Street",
+      deliveryAddressLineTwo: "Subburb",
+      deliveryAddressCity: "Liverpool",
+      deliveryAddressPostCode: "L1 0AB",
+      deliveryAddressInstructions: "Leave it behind the bin",
+      fulfilmentMethod: fulfilmentMethodVendor.id,
+      fulfilmentSlotFrom: "2023-10-12 11:00:00",
+      fulfilmentSlotTo: "2023-10-12 12:00:00",
+      discount: null,
+      paymentStatus: "unpaid",
+      paymentIntentId: "",
+      deliveryId: "random_delivery_id",
+      deliveryPartnerAccepted: true,
+      deliveryPartnerConfirmed: true,
+      deliveryPartner: fixtures.deliveryPartners[0].id,
+      rewardsIssued: 0,
+      sentToDeliveryPartner: false,
+      completedFlag: "",
+      completedOrderFeedback: null,
+      deliveryPunctuality: null,
+      orderCondition: null,
+      unfulfilledItems: [], //Check using partial orders
+      parentOrder: null,
+    },
+    ...overrides,
+  };
+};
 
 class ExpectResponseOrder extends ExpectResponse {
   constructor({
@@ -126,7 +145,9 @@ const CREATE_ORDER = (fixtures) => {
     (fm) =>
       fm.vendor === vendor.id &&
       fm.methodType === "delivery" &&
-      fixtures.openingHours.filter((oh) => oh.fulfilmentMethod === fm.id && oh.isOpen === true)
+      fixtures.openingHours.filter(
+        (oh) => oh.fulfilmentMethod === fm.id && oh.isOpen === true
+      )
   )[0];
   const openAtHours = fixtures.openingHours.filter(
     (openHrs) =>
@@ -186,9 +207,9 @@ const CREATE_ORDER = (fixtures) => {
       fulfilmentSlotTo:
         getNextWeekday(openAtHours.dayOfWeek) +
         " " +
-        moment(openAtHours.openTime, "hh:mm")
+        moment(openAtHours.openTime, "HH:mm")
           .add(fulfilmentMethodVendor.slotLength, "minutes")
-          .format("hh:mm") +
+          .format("HH:mm") +
         ":00", // "2022-10-07 11:00:00"
       discountCode: fixtures.discountCodes[0].code,
     },
@@ -208,26 +229,33 @@ const CREATE_ORDER = (fixtures) => {
     },
   };
 };
-const GET_ORDER = (fixtures) => { return {
-  useAccount: "TEST_SERVICE",
-  HTTP_TYPE: "get",
-  ACTION_PATH: "orders",
-  ACTION_NAME: "get-order-details",
-  sendData: {
-    orderId: fixtures.orders[0].id,
-  },
-  expectResponse: fixtures.orders[0],
-  expectStatusCode: 200,
-  expectResponseCb: async (response, requestPayload) => {
-    expect(response.body).to.have.property("order");
-    expect(response.body.order).to.have.property("publicId");
-    const order = await Order.findOne(response.body.order.id).populate('items');
-    expect(order).to.have.property("items");
-    assert.isArray(order.items);
-    expect(order.items.length).to.be.greaterThan(0, util.inspect(order, {depth: null}));
-    return;
-  },
-};};
+const GET_ORDER = (fixtures) => {
+  return {
+    useAccount: "TEST_SERVICE",
+    HTTP_TYPE: "get",
+    ACTION_PATH: "orders",
+    ACTION_NAME: "get-order-details",
+    sendData: {
+      orderId: fixtures.orders[0].id,
+    },
+    expectResponse: fixtures.orders[0],
+    expectStatusCode: 200,
+    expectResponseCb: async (response, requestPayload) => {
+      expect(response.body).to.have.property("order");
+      expect(response.body.order).to.have.property("publicId");
+      const order = await Order.findOne(response.body.order.id).populate(
+        "items"
+      );
+      expect(order).to.have.property("items");
+      assert.isArray(order.items);
+      expect(order.items.length).to.be.greaterThan(
+        0,
+        util.inspect(order, { depth: null })
+      );
+      return;
+    },
+  };
+};
 const GET_ORDERS_BY_WALLETADDRESS = (fixtures) => {
   return {
     useAccount: "TEST_SERVICE",
@@ -339,279 +367,379 @@ const VIEW_ORDER = (fixtures) => {
   };
 };
 
-const VIEW_APPROVE_ORDER = (fixtures) => { return {
-  useAccount: "TEST_SERVICE",
-  HTTP_TYPE: "get",
-  ACTION_PREFIX: "",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "approve-order/:orderId",
-  sendData: {
-    orderId: fixtures.orders[0].publicId,
-  },
-  expectResponse: null,
-  expectStatusCode: 200,
-  expectResponseCb: async (response, requestPayload) => {
-    expect(response.body).to.have.property("order");
-    return;
-  },
-};};
+const VIEW_APPROVE_ORDER = (fixtures) => {
+  return {
+    useAccount: "TEST_SERVICE",
+    HTTP_TYPE: "get",
+    ACTION_PREFIX: "",
+    ACTION_PATH: "admin",
+    ACTION_NAME: "approve-order/:orderId",
+    sendData: {
+      orderId: fixtures.orders[0].publicId,
+    },
+    expectResponse: null,
+    expectStatusCode: 200,
+    expectResponseCb: async (response, requestPayload) => {
+      expect(response.body).to.have.property("order");
+      return;
+    },
+  };
+};
 
-const APPROVE_OR_DECLINE_ORDER_ACCEPT = (fixtures) => { return {
-  useAccount: "TEST_SERVICE",
-  HTTP_TYPE: "post",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "approve-or-decline-order",
-  sendData: {
-    orderId: null, // populate from parentOrder
-    orderFulfilled: "accept", //['accept', 'reject', 'partial'],
-    retainItems: [],
-    removeItems: [],
-  },
-  expectResponse: {},
-  expectStatusCode: 200,
-  expectResponseCb: async (response, requestPayload) => {
-    assert.isEmpty(response.body);
-    const order = await Order.findOne({
-      publicId: requestPayload.orderId,
-    });
-    expect(order.restaurantAcceptanceStatus).to.equal('accepted');
-    expect(order.rewardsIssued).to.be.greaterThan(0);
-    return;
-  },
-};};
-const APPROVE_OR_DECLINE_ORDER_REJECT = (fixtures) => { return {
-  useAccount: "TEST_SERVICE",
-  HTTP_TYPE: "post",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "approve-or-decline-order",
-  sendData: {
-    orderId: null,
-    orderFulfilled: "reject", //['accept', 'reject', 'partial'],
-    retainItems: [],
-    removeItems: [],
-  },
-  expectResponse: {},
-  expectStatusCode: 200,
-  expectResponseCb: async (response, requestPayload) => {
-    assert.isEmpty(response.body);
-    const order = await Order.findOne({
-      publicId: requestPayload.orderId,
-    });
-    expect(order.restaurantAcceptanceStatus).to.equal("rejected");
-    expect(order.rewardsIssued).to.be(0);
-    return;
-  },
-};};
-const APPROVE_OR_DECLINE_ORDER_PARTIAL = (fixtures) => { return {
-  useAccount: "TEST_SERVICE",
-  HTTP_TYPE: "post",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "approve-or-decline-order",
-  sendData: {
-    orderId: null,
-    orderFulfilled: "partial", //['accept', 'reject', 'partial'],
-    retainItems: [1, 2, 3],
-    removeItems: [8],
-  },
-  expectResponse: {},
-  expectStatusCode: 200,
-  expectResponseCb: async (response, requestPayload) => {
-    assert.isEmpty(response.body);
-    const order = await Order.findOne({
-      publicId: requestPayload.orderId,
-    });
-    expect(order.restaurantAcceptanceStatus).to.equal("partially fulfilled");
-    expect(order.completedFlag).to.equal("void");
-    expect(order.rewardsIssued).to.be(0);
-    const childOrder = await Order.findOne({
-      parentOrder: requestPayload.orderId,
-    }).populate('items');
-    assert.isNotEmpty(childOrder);
-    expect(
-      childOrder.items.filter((item) => item.unfulfilled !== true)
-    ).to.have.lengthOf(requestPayload.retainItems.length);
-    expect(
-      childOrder.items.filter((item) => item.unfulfilled === true)
-    ).to.have.lengthOf(requestPayload.removeItems.length);
-    return;
-  },
-};};
+const APPROVE_OR_DECLINE_ORDER_ACCEPT = (fixtures) => {
+  return {
+    useAccount: "TEST_SERVICE",
+    HTTP_TYPE: "post",
+    ACTION_PATH: "admin",
+    ACTION_NAME: "approve-or-decline-order",
+    sendData: {
+      orderId: null, // populate from parentOrder
+      orderFulfilled: "accept", //['accept', 'reject', 'partial'],
+      retainItems: [],
+      removeItems: [],
+    },
+    expectResponse: {},
+    expectStatusCode: 200,
+    expectResponseCb: async (response, requestPayload) => {
+      assert.isEmpty(response.body);
+      const order = await Order.findOne({
+        publicId: requestPayload.orderId,
+      });
+      expect(order.restaurantAcceptanceStatus).to.equal("accepted");
+      expect(order.rewardsIssued).to.be.greaterThan(0);
+      return;
+    },
+  };
+};
+const APPROVE_OR_DECLINE_ORDER_REJECT = (fixtures) => {
+  return {
+    useAccount: "TEST_SERVICE",
+    HTTP_TYPE: "post",
+    ACTION_PATH: "admin",
+    ACTION_NAME: "approve-or-decline-order",
+    sendData: {
+      orderId: null,
+      orderFulfilled: "reject", //['accept', 'reject', 'partial'],
+      retainItems: [],
+      removeItems: [],
+    },
+    expectResponse: {},
+    expectStatusCode: 200,
+    expectResponseCb: async (response, requestPayload) => {
+      assert.isEmpty(response.body);
+      const order = await Order.findOne({
+        publicId: requestPayload.orderId,
+      });
+      expect(order.restaurantAcceptanceStatus).to.equal("rejected");
+      expect(order.rewardsIssued).to.equal(0);
+      return;
+    },
+  };
+};
+const APPROVE_OR_DECLINE_ORDER_FAILS_IF_ALREADY_ACCEPTED = (fixtures) => {
+  return {
+    useAccount: "TEST_SERVICE",
+    HTTP_TYPE: "post",
+    ACTION_PATH: "admin",
+    ACTION_NAME: "approve-or-decline-order",
+    sendData: {
+      orderId: null,
+      orderFulfilled: "reject", //['accept', 'reject', 'partial'],
+      retainItems: [],
+      removeItems: [],
+    },
+    expectResponse: {},
+    expectStatusCode: 400,
+    expectResponseCb: async (response, requestPayload) => {
+      assert.isEmpty(response.body);
+      const order = await Order.findOne({
+        publicId: requestPayload.orderId,
+      });
+      expect(order.restaurantAcceptanceStatus).to.equal("rejected");
+      expect(order.rewardsIssued).to.equal(0);
+      return;
+    },
+  };
+};
+const APPROVE_OR_DECLINE_ORDER_FAILS_IF_NOT_PAID_FOR = (fixtures) => {
+  return {
+    useAccount: "TEST_SERVICE",
+    HTTP_TYPE: "post",
+    ACTION_PATH: "admin",
+    ACTION_NAME: "approve-or-decline-order",
+    sendData: {
+      orderId: null,
+      orderFulfilled: "reject", //['accept', 'reject', 'partial'],
+      retainItems: [],
+      removeItems: [],
+    },
+    expectResponse: {},
+    expectStatusCode: 400,
+    expectResponseCb: async (response, requestPayload) => {
+      assert.isEmpty(response.body);
+      const order = await Order.findOne({
+        publicId: requestPayload.orderId,
+      });
+      expect(order.restaurantAcceptanceStatus).to.equal("rejected");
+      expect(order.rewardsIssued).to.equal(0);
+      return;
+    },
+  };
+};
+const APPROVE_OR_DECLINE_ORDER_PARTIAL = (fixtures) => {
+  return {
+    useAccount: "TEST_SERVICE",
+    HTTP_TYPE: "post",
+    ACTION_PATH: "admin",
+    ACTION_NAME: "approve-or-decline-order",
+    sendData: {
+      orderId: null,
+      orderFulfilled: "partial", //['accept', 'reject', 'partial'],
+      retainItems: [1, 2, 3, 6],
+      removeItems: [8],
+    },
+    expectResponse: {},
+    expectStatusCode: 200,
+    expectResponseCb: async (response, requestPayload) => {
+      assert.isEmpty(response.body);
+      const order = await Order.findOne({
+        publicId: requestPayload.orderId,
+      });
+      expect(order.restaurantAcceptanceStatus).to.equal("partially fulfilled");
+      expect(order.completedFlag).to.equal("void");
+      expect(order.rewardsIssued).to.equal(0);
+      const childOrder = await Order.findOne({
+        parentOrder: order.id,
+      }).populate("items");
+      assert.exists(
+        childOrder,
+        `Unable to locate parentOrder with id: ${order.id}`
+      );
+      expect(childOrder).to.have.property('items');
+      expect(
+        childOrder.items.filter((item) => item.unfulfilled !== true)
+      ).to.have.lengthOf(requestPayload.retainItems.length);
+      expect(
+        childOrder.items.filter((item) => item.unfulfilled === true)
+      ).to.have.lengthOf(requestPayload.removeItems.length);
+      return;
+    },
+  };
+};
+const APPROVE_OR_DECLINE_ORDER_PARTIAL_FAIL_INCOMPLETE_ITEMS = (fixtures) => {
+  return {
+    useAccount: "TEST_SERVICE",
+    HTTP_TYPE: "post",
+    ACTION_PATH: "admin",
+    ACTION_NAME: "approve-or-decline-order",
+    sendData: {
+      orderId: null,
+      orderFulfilled: "partial", //['accept', 'reject', 'partial'],
+      retainItems: [1, 6],
+      removeItems: [8],
+    },
+    expectResponse: {},
+    expectStatusCode: 400,
+    expectResponseCb: async (response, requestPayload) => {
+      assert.isEmpty(response.body);
+      const order = await Order.findOne({
+        publicId: requestPayload.orderId,
+      });
+      expect(order.restaurantAcceptanceStatus).to.equal("pending");
+      expect(order.completedFlag).to.equal("");
+      expect(order.rewardsIssued).to.equal(0);
+      const childOrder = await Order.findOne({
+        parentOrder: order.id,
+      }).populate("items");
+      assert.notExists(childOrder);
+      return;
+    },
+  };
+};
 
-
-const USER_UPDATE_PAID_ORDER_SUCCESS = (fixtures) => { return {
-  useAccount: "TEST_SERVICE",
-  HTTP_TYPE: "post",
-  ACTION_PATH: "orders",
-  ACTION_NAME: "peepl-pay-update-paid-order-webhook",
-  sendData: {
-    publicId: null,
-    metadata: {
-      orderId: 1,
-      paymentIntentId: "",
+const USER_UPDATE_PAID_ORDER_SUCCESS = (fixtures) => {
+  return {
+    useAccount: "TEST_SERVICE",
+    HTTP_TYPE: "post",
+    ACTION_PATH: "orders",
+    ACTION_NAME: "peepl-pay-update-paid-order-webhook",
+    sendData: {
+      publicId: null,
+      metadata: {
+        orderId: 1,
+        paymentIntentId: "",
+        customerWalletAddress: "0x41190Dd82D43129C26955063fa2854350e14554B",
+      },
+      status: "success",
+    },
+    expectResponse: {},
+    expectStatusCode: 200,
+    expectResponseCb: async (response, requestPayload) => {
+      return;
+    },
+  };
+};
+const UPDATE_PAID_ORDER_FAILED = (fixtures) => {
+  return {
+    useAccount: "TEST_SERVICE",
+    HTTP_TYPE: "post",
+    ACTION_PATH: "orders",
+    ACTION_NAME: "peepl-pay-update-paid-order-webhook",
+    sendData: {
+      publicId: null,
+      metadata: {
+        orderId: 1,
+        paymentIntentId: "",
+        customerWalletAddress: "0x41190Dd82D43129C26955063fa2854350e14554B",
+      },
+      status: "failed",
+    },
+    expectResponse: {},
+    expectStatusCode: 200,
+    expectResponseCb: async (response, requestPayload) => {
+      return;
+    },
+  };
+};
+const CUSTOMER_UPDATE_PAID_ORDER = (fixtures) => {
+  return {
+    useAccount: "TEST_USER",
+    HTTP_TYPE: "post",
+    ACTION_PATH: "admin",
+    ACTION_NAME: "customer-update-paid-order",
+    sendData: {
+      orderId: null,
+      customerWalletAddress: "0x41190Dd82D43129C26955063fa2854350e14554B",
+      refundRequestGBPx: 5100, //TODO what wasnt in the refundRequestPPL
+      refundRequestPPL: 0, //TODO order.total before flat fees and stuff added, pull adam changes, * 5% (coln/delv)
+    },
+    expectResponse: {
+      orderId: null, //newOrderId
+    },
+    expectStatusCode: 200,
+    expectResponseCb: async (response, requestPayload) => {
+      return;
+    },
+  };
+};
+const CUSTOMER_CANCEL_ORDER = (fixtures) => {
+  return {
+    useAccount: "TEST_USER",
+    HTTP_TYPE: "post",
+    ACTION_PATH: "admin",
+    ACTION_NAME: "customer-cancel-order",
+    sendData: {
+      orderId: null, //TODO: Local DB updated by other tests, so replace this with a new create-order on each test
       customerWalletAddress: "0x41190Dd82D43129C26955063fa2854350e14554B",
     },
-    status: "success",
-  },
-  expectResponse: {},
-  expectStatusCode: 200,
-  expectResponseCb: async (response, requestPayload) => {
-    
-    return;
-  },
-};};
-const UPDATE_PAID_ORDER_FAILED = (fixtures) => { return {
-  useAccount: "TEST_SERVICE",
-  HTTP_TYPE: "post",
-  ACTION_PATH: "orders",
-  ACTION_NAME: "peepl-pay-update-paid-order-webhook",
-  sendData: {
-    publicId: null,
-    metadata: {
-      orderId: 1,
-      paymentIntentId: "",
-      customerWalletAddress: "0x41190Dd82D43129C26955063fa2854350e14554B",
+    expectResponse: {},
+    expectStatusCode: 200,
+    expectResponseCb: async (response, requestPayload) => {
+      return;
     },
-    status: "failed",
-  },
-  expectResponse: {},
-  expectStatusCode: 200,
-  expectResponseCb: async (response, requestPayload) => {
-    
-    return;
-  },
-};};
-const CUSTOMER_UPDATE_PAID_ORDER = (fixtures) => { return {
-  useAccount: "TEST_USER",
-  HTTP_TYPE: "post",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "customer-update-paid-order",
-  sendData: {
-    orderId: null,
-    customerWalletAddress: "0x41190Dd82D43129C26955063fa2854350e14554B",
-    refundRequestGBPx: 5100, //TODO what wasnt in the refundRequestPPL
-    refundRequestPPL: 0, //TODO order.total before flat fees and stuff added, pull adam changes, * 5% (coln/delv)
-  },
-  expectResponse: {
-    orderId: null, //newOrderId
-  },
-  expectStatusCode: 200,
-  expectResponseCb: async (response, requestPayload) => {
-    
-    return;
-  },
-};};
-const CUSTOMER_CANCEL_ORDER = (fixtures) => { return {
-  useAccount: "TEST_USER",
-  HTTP_TYPE: "post",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "customer-cancel-order",
-  sendData: {
-    orderId: null, //TODO: Local DB updated by other tests, so replace this with a new create-order on each test
-    customerWalletAddress: "0x41190Dd82D43129C26955063fa2854350e14554B",
-  },
-  expectResponse: {},
-  expectStatusCode: 200,
-  expectResponseCb: async (response, requestPayload) => {
-    
-    return;
-  },
-};};
-const CUSTOMER_RECEIVED_ORDER_GOOD = (fixtures) => { return {
-  useAccount: "TEST_SERVICE",
-  HTTP_TYPE: "post",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "customer-received-order",
-  sendData: {
-    orderId: null,
-    orderReceived: true,
-    orderCondition: 4,
-    deliveryPunctuality: 5,
-    feedback: "punctual and good condition",
-  },
-  expectResponse: {},
-  expectStatusCode: 200,
-  expectResponseCb: async (response, requestPayload) => {
-    
-    return;
-  },
-};};
-const CUSTOMER_RECEIVED_ORDER_POOR_CONDITION = (fixtures) => { return {
-  useAccount: "TEST_SERVICE",
-  HTTP_TYPE: "post",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "customer-received-order",
-  sendData: {
-    orderId: null,
-    orderReceived: true,
-    orderCondition: 0,
-    deliveryPunctuality: 5,
-    feedback: "punctual and good condition",
-  },
-  expectResponse: {},
-  expectStatusCode: 200,
-  expectResponseCb: async (response, requestPayload) => {
-    
-    return;
-  },
-};};
-const CUSTOMER_RECEIVED_ORDER_NOT_RECEIVED = (fixtures) => { return {
-  useAccount: "TEST_USER",
-  HTTP_TYPE: "post",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "customer-received-order",
-  sendData: {
-    orderId: null,
-    orderReceived: false,
-    orderCondition: 0,
-    deliveryPunctuality: 0,
-    feedback: "Order not received. Why?",
-  },
-  expectResponse: {},
-  expectStatusCode: 200,
-  expectResponseCb: async (response, requestPayload) => {
-    
-    return;
-  },
-};};
-const CUSTOMER_RECEIVED_ORDER_LATE_DELIVERY = (fixtures) => { return {
-  useAccount: "TEST_SERVICE",
-  HTTP_TYPE: "post",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "customer-received-order",
-  sendData: {
-    orderId: null,
-    orderReceived: true,
-    orderCondition: 4,
-    deliveryPunctuality: 0,
-    feedback: "delivery late and good condition",
-  },
-  expectResponse: {},
-  expectStatusCode: 200,
-  expectResponseCb: async (response, requestPayload) => {
-    
-    return;
-  },
-};};
-const CUSTOMER_RECEIVED_ORDER_BAD_INPUT_ORDER_COND = (fixtures) => { return {
-  useAccount: "TEST_SERVICE",
-  HTTP_TYPE: "post",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "customer-received-order",
-  sendData: {
-    orderId: null,
-    orderReceived: true,
-    orderCondition: -1,
-    deliveryPunctuality: 5,
-    feedback: "some feedback",
-  },
-  expectResponse: {},
-  expectStatusCode: 200,
-  expectResponseCb: async (response, requestPayload) => {
-    
-    return;
-  },
-};};
-const CUSTOMER_RECEIVED_ORDER_BAD_INPUT_DELV_PUNCT = (fixtures) => { 
+  };
+};
+const CUSTOMER_RECEIVED_ORDER_GOOD = (fixtures) => {
+  return {
+    useAccount: "TEST_SERVICE",
+    HTTP_TYPE: "post",
+    ACTION_PATH: "admin",
+    ACTION_NAME: "customer-received-order",
+    sendData: {
+      orderId: null,
+      orderReceived: true,
+      orderCondition: 4,
+      deliveryPunctuality: 5,
+      feedback: "punctual and good condition",
+    },
+    expectResponse: {},
+    expectStatusCode: 200,
+    expectResponseCb: async (response, requestPayload) => {
+      return;
+    },
+  };
+};
+const CUSTOMER_RECEIVED_ORDER_POOR_CONDITION = (fixtures) => {
+  return {
+    useAccount: "TEST_SERVICE",
+    HTTP_TYPE: "post",
+    ACTION_PATH: "admin",
+    ACTION_NAME: "customer-received-order",
+    sendData: {
+      orderId: null,
+      orderReceived: true,
+      orderCondition: 0,
+      deliveryPunctuality: 5,
+      feedback: "punctual and good condition",
+    },
+    expectResponse: {},
+    expectStatusCode: 200,
+    expectResponseCb: async (response, requestPayload) => {
+      return;
+    },
+  };
+};
+const CUSTOMER_RECEIVED_ORDER_NOT_RECEIVED = (fixtures) => {
+  return {
+    useAccount: "TEST_USER",
+    HTTP_TYPE: "post",
+    ACTION_PATH: "admin",
+    ACTION_NAME: "customer-received-order",
+    sendData: {
+      orderId: null,
+      orderReceived: false,
+      orderCondition: 0,
+      deliveryPunctuality: 0,
+      feedback: "Order not received. Why?",
+    },
+    expectResponse: {},
+    expectStatusCode: 200,
+    expectResponseCb: async (response, requestPayload) => {
+      return;
+    },
+  };
+};
+const CUSTOMER_RECEIVED_ORDER_LATE_DELIVERY = (fixtures) => {
+  return {
+    useAccount: "TEST_SERVICE",
+    HTTP_TYPE: "post",
+    ACTION_PATH: "admin",
+    ACTION_NAME: "customer-received-order",
+    sendData: {
+      orderId: null,
+      orderReceived: true,
+      orderCondition: 4,
+      deliveryPunctuality: 0,
+      feedback: "delivery late and good condition",
+    },
+    expectResponse: {},
+    expectStatusCode: 200,
+    expectResponseCb: async (response, requestPayload) => {
+      return;
+    },
+  };
+};
+const CUSTOMER_RECEIVED_ORDER_BAD_INPUT_ORDER_COND = (fixtures) => {
+  return {
+    useAccount: "TEST_SERVICE",
+    HTTP_TYPE: "post",
+    ACTION_PATH: "admin",
+    ACTION_NAME: "customer-received-order",
+    sendData: {
+      orderId: null,
+      orderReceived: true,
+      orderCondition: -1,
+      deliveryPunctuality: 5,
+      feedback: "some feedback",
+    },
+    expectResponse: {},
+    expectStatusCode: 200,
+    expectResponseCb: async (response, requestPayload) => {
+      return;
+    },
+  };
+};
+const CUSTOMER_RECEIVED_ORDER_BAD_INPUT_DELV_PUNCT = (fixtures) => {
   return {
     useAccount: "TEST_SERVICE",
     HTTP_TYPE: "post",
@@ -629,30 +757,36 @@ const CUSTOMER_RECEIVED_ORDER_BAD_INPUT_DELV_PUNCT = (fixtures) => {
 };
 
 describe(`Order Model Integration Tests`, () => {
-  describe(`${CREATE_ORDER(fixtures).ACTION_NAME}() returns a 200 with json when authenticated`, () => {
+  describe(`${
+    CREATE_ORDER(fixtures).ACTION_NAME
+  }() returns a 200 with json when authenticated`, () => {
     it("Returns a new order", async () => {
       try {
         const sendOrder = CREATE_ORDER(fixtures);
         const hats = new HttpAuthTestSenderOrder(sendOrder);
-        const response = await hats.makeAuthCallWith(
-          {},
-          []
-        );
+        const response = await hats.makeAuthCallWith({}, []);
         expect(response.statusCode).to.equal(
           200,
-          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
-            depth: null,
-          })} with trace: ${util.inspect(response.body.traceRef, {
+          `[${response.body.code}] -> response.body: ${util.inspect(
+            response.body,
+            {
+              depth: null,
+            }
+          )} with trace: ${util.inspect(response.body.traceRef, {
             depth: null,
           })}`
         );
         expect(response.body).to.have.property("orderID");
         expect(response.body).to.have.property("paymentIntentID");
         // await hats.expectedResponse.checkResponse(response);
-        const newOrder = await Order.findOne({id: response.body.orderID}).populate('items');
-        expect(newOrder).to.have.property('items');
+        const newOrder = await Order.findOne({
+          id: response.body.orderID,
+        }).populate("items");
+        expect(newOrder).to.have.property("items");
         assert.isArray(newOrder.items);
-        expect(newOrder.items).to.have.lengthOf(sendOrder.sendData.items.length);
+        expect(newOrder.items).to.have.lengthOf(
+          sendOrder.sendData.items.length
+        );
       } catch (errs) {
         console.warn(errs);
         throw errs;
@@ -704,10 +838,14 @@ describe(`Order Model Integration Tests`, () => {
           },
           []
         );
-        expect(response.statusCode).to.equal(400,
-          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
-            depth: null,
-          })} with trace: ${util.inspect(response.body.traceRef, {
+        expect(response.statusCode).to.equal(
+          400,
+          `[${response.body.code}] -> response.body: ${util.inspect(
+            response.body,
+            {
+              depth: null,
+            }
+          )} with trace: ${util.inspect(response.body.traceRef, {
             depth: null,
           })}`
         );
@@ -750,10 +888,14 @@ describe(`Order Model Integration Tests`, () => {
           },
           []
         );
-        expect(response.statusCode).to.equal(200,
-          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
-            depth: null,
-          })} with trace: ${util.inspect(response.body.traceRef, {
+        expect(response.statusCode).to.equal(
+          200,
+          `[${response.body.code}] -> response.body: ${util.inspect(
+            response.body,
+            {
+              depth: null,
+            }
+          )} with trace: ${util.inspect(response.body.traceRef, {
             depth: null,
           })}`
         );
@@ -775,7 +917,9 @@ describe(`Order Model Integration Tests`, () => {
           (fm) =>
             fm.vendor === fixtures.vendors[0].id &&
             fm.methodType === "delivery" &&
-            fixtures.openingHours.filter((oh) => oh.fulfilmentMethod === fm.id && oh.isOpen === true)
+            fixtures.openingHours.filter(
+              (oh) => oh.fulfilmentMethod === fm.id && oh.isOpen === true
+            )
         )[0];
         const openAtHours = fixtures.openingHours.filter(
           (openHrs) =>
@@ -794,22 +938,28 @@ describe(`Order Model Integration Tests`, () => {
             fulfilmentSlotTo:
               getNextWeekday(openAtHours.dayOfWeek) +
               " " +
-              moment(openAtHours.openTime, "hh:mm")
+              moment(openAtHours.openTime, "HH:mm")
                 .add(fulfilmentMethodVendor.slotLength, "minutes")
-                .format("hh:mm") +
+                .format("HH:mm") +
               ":00",
           },
           []
         );
-        expect(response.statusCode).to.equal(200,
-          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
-            depth: null,
-          })} with trace: ${util.inspect(response.body.traceRef, {
+        expect(response.statusCode).to.equal(
+          200,
+          `[${response.body.code}] -> response.body: ${util.inspect(
+            response.body,
+            {
+              depth: null,
+            }
+          )} with trace: ${util.inspect(response.body.traceRef, {
             depth: null,
           })}`
         );
         expect(response.body).to.have.property("orderID");
-        const newOrder = await Order.findOne(response.body.orderID).populate('items');
+        const newOrder = await Order.findOne(response.body.orderID).populate(
+          "items"
+        );
         expect(newOrder).to.have.property("items");
         assert.isArray(newOrder.items);
         expect(newOrder.items).to.have.lengthOf(
@@ -827,7 +977,9 @@ describe(`Order Model Integration Tests`, () => {
           (fm) =>
             fm.vendor === fixtures.vendors[0].id &&
             fm.methodType === "collection" &&
-            fixtures.openingHours.filter((oh) => oh.fulfilmentMethod === fm.id && oh.isOpen === true)
+            fixtures.openingHours.filter(
+              (oh) => oh.fulfilmentMethod === fm.id && oh.isOpen === true
+            )
         )[0];
         // const openAtHours = fixtures.openingHours.filter(
         //   (openHrs) =>
@@ -841,10 +993,14 @@ describe(`Order Model Integration Tests`, () => {
           },
           []
         );
-        expect(response.statusCode).to.equal(200,
-          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
-            depth: null,
-          })} with trace: ${util.inspect(response.body.traceRef, {
+        expect(response.statusCode).to.equal(
+          200,
+          `[${response.body.code}] -> response.body: ${util.inspect(
+            response.body,
+            {
+              depth: null,
+            }
+          )} with trace: ${util.inspect(response.body.traceRef, {
             depth: null,
           })}`
         );
@@ -867,18 +1023,21 @@ describe(`Order Model Integration Tests`, () => {
     });
   });
 
-  describe(`${GET_ORDER(fixtures).ACTION_NAME}() successfully gets order with id`, () => {
+  describe(`${
+    GET_ORDER(fixtures).ACTION_NAME
+  }() successfully gets order with id`, () => {
     it("Can GET Order", async () => {
       try {
         const hats = new HttpAuthTestSenderOrder(GET_ORDER(fixtures));
-        const response = await hats.makeAuthCallWith(
-          {},
-          []
-        );
-        expect(response.statusCode).to.equal(200,
-          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
-            depth: null,
-          })} with trace: ${util.inspect(response.body.traceRef, {
+        const response = await hats.makeAuthCallWith({}, []);
+        expect(response.statusCode).to.equal(
+          200,
+          `[${response.body.code}] -> response.body: ${util.inspect(
+            response.body,
+            {
+              depth: null,
+            }
+          )} with trace: ${util.inspect(response.body.traceRef, {
             depth: null,
           })}`
         );
@@ -896,7 +1055,7 @@ describe(`Order Model Integration Tests`, () => {
     it("Can View Single Order", async () => {
       try {
         const hats = new HttpAuthTestSenderOrder(VIEW_ORDER(fixtures));
-        const response = await hats.makeAuthCallWith({}, []);       
+        const response = await hats.makeAuthCallWith({}, []);
         await hats.expectedResponse.checkResponse(response);
       } catch (errs) {
         console.warn(errs);
@@ -905,10 +1064,14 @@ describe(`Order Model Integration Tests`, () => {
     });
   });
 
-  describe(`${GET_ORDERS_BY_WALLETADDRESS(fixtures).ACTION_NAME}() successfully gets orders for walletaddress`, () => {
+  describe(`${
+    GET_ORDERS_BY_WALLETADDRESS(fixtures).ACTION_NAME
+  }() successfully gets orders for walletaddress`, () => {
     it("Can GET 2 Orders by wallet address", async () => {
       try {
-        const parentOrder = await Order.create(DEFAULT_NEW_ORDER_OBJECT(fixtures, {})).fetch();
+        const parentOrder = await Order.create(
+          DEFAULT_NEW_ORDER_OBJECT(fixtures, {})
+        ).fetch();
         const hats = new HttpAuthTestSenderOrder(
           GET_ORDERS_BY_WALLETADDRESS(fixtures)
         );
@@ -919,9 +1082,11 @@ describe(`Order Model Integration Tests`, () => {
           []
         );
         await hats.expectedResponse.checkResponse(response);
-        expect(response.body).to.have.property('orders');
+        expect(response.body).to.have.property("orders");
         assert.isArray(response.body.orders);
-        assert.isNotEmpty(response.body.orders.filter(order => order.id === parentOrder.id));
+        assert.isNotEmpty(
+          response.body.orders.filter((order) => order.id === parentOrder.id)
+        );
       } catch (errs) {
         console.warn(errs);
         throw errs;
@@ -946,7 +1111,6 @@ describe(`Order Model Integration Tests`, () => {
 
         assert.isArray(response.body.orders);
         expect(response.body.orders).to.have.lengthOf(0);
-        
       } catch (errs) {
         console.warn(errs);
         throw errs;
@@ -963,9 +1127,12 @@ describe(`Order Model Integration Tests`, () => {
           })
         ).fetch();
         const hats = new HttpAuthTestSenderOrder(VIEW_APPROVE_ORDER(fixtures));
-        const response = await hats.makeAuthCallWith({
-          orderId: parentOrder.publicId
-        }, []);
+        const response = await hats.makeAuthCallWith(
+          {
+            orderId: parentOrder.publicId,
+          },
+          []
+        );
         hats.expectedResponse.checkResponse(response.body, parentOrder);
       } catch (errs) {
         console.warn(errs);
@@ -976,17 +1143,41 @@ describe(`Order Model Integration Tests`, () => {
   describe(`${APPROVE_OR_DECLINE_ORDER_ACCEPT(fixtures).ACTION_NAME}()`, () => {
     it("vendors can successfully accept an order from approve-or-decline-order action", async () => {
       try {
+        const vendor = fixtures.vendors[0];
+        const fulfilmentMethodVendor = fixtures.fulfilmentMethods.filter(
+          (fm) =>
+            fm.vendor === vendor.id &&
+            fm.methodType === "delivery" &&
+            fixtures.openingHours.filter(
+              (oh) => oh.fulfilmentMethod === fm.id && oh.isOpen === true
+            )
+        )[0];
+        const openAtHours = fixtures.openingHours.filter(
+          (openHrs) =>
+            openHrs.isOpen === true &&
+            openHrs.fulfilmentMethod === fulfilmentMethodVendor.id
+        )[0];
         const parentOrder = await Order.create(
           DEFAULT_NEW_ORDER_OBJECT(fixtures, {
+            restaurantAcceptanceStatus: "pending",
+            paymentStatus: "paid",
+            paymentIntentId: "dummy_payment_intent_id_" + uuidv4(),
             parentOrder: null,
             items: [1, 2, 3, 6, 8],
             total: 5300,
+            fulfilmentMethod: fulfilmentMethodVendor.id,
+            fulfilmentSlotFrom:
+              getNextWeekday(openAtHours.dayOfWeek) + " 11:00:00",
+            fulfilmentSlotTo:
+              getNextWeekday(openAtHours.dayOfWeek) + " 12:00:00",
           })
         ).fetch();
-        const hats = new HttpAuthTestSenderOrder(APPROVE_OR_DECLINE_ORDER_ACCEPT(fixtures));
+        const hats = new HttpAuthTestSenderOrder(
+          APPROVE_OR_DECLINE_ORDER_ACCEPT(fixtures)
+        );
         const response = await hats.makeAuthCallWith(
           {
-            orderId: parentOrder.id,
+            orderId: parentOrder.publicId,
           },
           []
         );
@@ -1000,15 +1191,20 @@ describe(`Order Model Integration Tests`, () => {
       try {
         const parentOrder = await Order.create(
           DEFAULT_NEW_ORDER_OBJECT(fixtures, {
+            restaurantAcceptanceStatus: "pending",
+            paymentStatus: "paid",
+            paymentIntentId: "dummy_payment_intent_id_" + uuidv4(),
             parentOrder: null,
             items: [1, 2, 3, 6, 8],
             total: 5300,
           })
         ).fetch();
-        const hats = new HttpAuthTestSenderOrder(APPROVE_OR_DECLINE_ORDER_REJECT(fixtures));
+        const hats = new HttpAuthTestSenderOrder(
+          APPROVE_OR_DECLINE_ORDER_REJECT(fixtures)
+        );
         const response = await hats.makeAuthCallWith(
           {
-            orderId: parentOrder.id,
+            orderId: parentOrder.publicId,
           },
           []
         );
@@ -1018,19 +1214,110 @@ describe(`Order Model Integration Tests`, () => {
         throw errs;
       }
     });
-    it("vendors can successfully partially accept an order from approve-or-decline-order action", async () => {
+    it("vendors cannot accept an order that has already been accepted from approve-or-decline-order action", async () => {
       try {
         const parentOrder = await Order.create(
           DEFAULT_NEW_ORDER_OBJECT(fixtures, {
+            restaurantAcceptanceStatus: "accepted",
+            paymentStatus: "paid",
+            paymentIntentId: "dummy_payment_intent_id_" + uuidv4(),
             parentOrder: null,
             items: [1, 2, 3, 6, 8],
             total: 5300,
           })
         ).fetch();
-        const hats = new HttpAuthTestSenderOrder(APPROVE_OR_DECLINE_ORDER_PARTIAL(fixtures));
+        const hats = new HttpAuthTestSenderOrder(
+          APPROVE_OR_DECLINE_ORDER_FAILS_IF_ALREADY_ACCEPTED(fixtures)
+        );
         const response = await hats.makeAuthCallWith(
           {
-            orderId: parentOrder.id,
+            orderId: parentOrder.publicId,
+          },
+          []
+        );
+        // await hats.expectedResponse.checkResponse(response);
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+    it("vendors cannot accept an order that has not been paid for from approve-or-decline-order action", async () => {
+      try {
+        const parentOrder = await Order.create(
+          DEFAULT_NEW_ORDER_OBJECT(fixtures, {
+            restaurantAcceptanceStatus: "accepted",
+            paymentStatus: "unpaid",
+            parentOrder: null,
+            items: [1, 2, 3, 6, 8],
+            total: 5300,
+          })
+        ).fetch();
+        const hats = new HttpAuthTestSenderOrder(
+          APPROVE_OR_DECLINE_ORDER_FAILS_IF_NOT_PAID_FOR(fixtures)
+        );
+        const response = await hats.makeAuthCallWith(
+          {
+            orderId: parentOrder.publicId,
+          },
+          []
+        );
+        // await hats.expectedResponse.checkResponse(response);
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+    it("vendors can partially accept an order from approve-or-decline-order action", async () => {
+      try {
+        const parentOrder = await Order.create(
+          DEFAULT_NEW_ORDER_OBJECT(fixtures, {
+            restaurantAcceptanceStatus: "pending",
+            paymentStatus: "paid",
+            paymentIntentId: "dummy_payment_intent_id_" + uuidv4(),
+            parentOrder: null,
+            items: [1, 2, 3, 6, 8],
+            total: 5300,
+          })
+        ).fetch();
+        const hats = new HttpAuthTestSenderOrder(
+          APPROVE_OR_DECLINE_ORDER_PARTIAL(fixtures)
+        );
+        const response = await hats.makeAuthCallWith(
+          {
+            orderId: parentOrder.publicId,
+            orderFulfilled: "partial", //['accept', 'reject', 'partial'],
+            retainItems: [1, 2, 3, 6],
+            removeItems: [8],
+          },
+          []
+        );
+        await hats.expectedResponse.checkResponse(response);
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+    it("vendors can partially accept an order from approve-or-decline-order action with items missing from the union of retain and remove orders payload", async () => {
+      try {
+        const parentOrder = await Order.create(
+          DEFAULT_NEW_ORDER_OBJECT(fixtures, {
+            restaurantAcceptanceStatus: "pending",
+            paymentStatus: "paid",
+            paymentIntentId: "dummy_payment_intent_id_" + uuidv4(),
+            parentOrder: null,
+            items: [1, 2, 3, 6, 8],
+            total: 5300,
+          })
+        ).fetch();
+        const hats = new HttpAuthTestSenderOrder(
+          APPROVE_OR_DECLINE_ORDER_PARTIAL_FAIL_INCOMPLETE_ITEMS(fixtures)
+        );
+        const response = await hats.makeAuthCallWith(
+          {
+            orderId: parentOrder.publicId,
+            orderFulfilled: "partial", //['accept', 'reject', 'partial'],
+            retainItems: [1, 6],
+            removeItems: [8],
           },
           []
         );
@@ -1052,10 +1339,12 @@ describe(`Order Model Integration Tests`, () => {
             total: 5300,
           })
         ).fetch();
-        const hats = new HttpAuthTestSenderOrder(CUSTOMER_UPDATE_PAID_ORDER(fixtures));
+        const hats = new HttpAuthTestSenderOrder(
+          CUSTOMER_UPDATE_PAID_ORDER(fixtures)
+        );
         const response = await hats.makeAuthCallWith(
           {
-            orderId: parentOrder.id,
+            orderId: parentOrder.publicId,
             retainItems: [1, 2, 3],
             removeItems: [6, 8],
             refundRequestGBPx: 5300, //TODO what wasnt in the refundRequestPPL
@@ -1064,7 +1353,7 @@ describe(`Order Model Integration Tests`, () => {
           []
         );
         await hats.expectedResponse.checkResponse(response);
-        expect(response.body).to.have.property('orderId');
+        expect(response.body).to.have.property("orderId");
       } catch (errs) {
         console.warn(errs);
         throw errs;
@@ -1079,10 +1368,12 @@ describe(`Order Model Integration Tests`, () => {
             total: 5300,
           })
         ).fetch();
-        const hats = new HttpAuthTestSenderOrder(CUSTOMER_CANCEL_ORDER(fixtures));
+        const hats = new HttpAuthTestSenderOrder(
+          CUSTOMER_CANCEL_ORDER(fixtures)
+        );
         const response = await hats.makeAuthCallWith(
           {
-            orderId: parentOrder.id,
+            orderId: parentOrder.publicId,
           },
           []
         );
@@ -1107,10 +1398,12 @@ describe(`Order Model Integration Tests`, () => {
             total: 5300,
           })
         ).fetch();
-        const hats = new HttpAuthTestSenderOrder(CUSTOMER_RECEIVED_ORDER_GOOD(fixtures));
+        const hats = new HttpAuthTestSenderOrder(
+          CUSTOMER_RECEIVED_ORDER_GOOD(fixtures)
+        );
         const response = await hats.makeAuthCallWith(
           {
-            orderId: parentOrder.id,
+            orderId: parentOrder.publicId,
             orderReceived: true,
             orderCondition: 4,
             deliveryPunctuality: 5,
@@ -1142,10 +1435,12 @@ describe(`Order Model Integration Tests`, () => {
             total: 5300,
           })
         ).fetch();
-        const hats = new HttpAuthTestSenderOrder(CUSTOMER_RECEIVED_ORDER_POOR_CONDITION(fixtures));
+        const hats = new HttpAuthTestSenderOrder(
+          CUSTOMER_RECEIVED_ORDER_POOR_CONDITION(fixtures)
+        );
         const response = await hats.makeAuthCallWith(
           {
-            orderId: parentOrder.id,
+            orderId: parentOrder.publicId,
             orderCondition: 0,
           },
           []
@@ -1174,10 +1469,12 @@ describe(`Order Model Integration Tests`, () => {
             total: 5300,
           })
         ).fetch();
-        const hats = new HttpAuthTestSenderOrder(CUSTOMER_RECEIVED_ORDER_LATE_DELIVERY(fixtures));
+        const hats = new HttpAuthTestSenderOrder(
+          CUSTOMER_RECEIVED_ORDER_LATE_DELIVERY(fixtures)
+        );
         const response = await hats.makeAuthCallWith(
           {
-            orderId: parentOrder.id,
+            orderId: parentOrder.publicId,
             orderCondition: 4,
             deliveryPunctuality: 0,
             feedback: "delivery late and good condition",
@@ -1209,10 +1506,12 @@ describe(`Order Model Integration Tests`, () => {
             total: 5300,
           })
         ).fetch();
-        const hats = new HttpAuthTestSenderOrder(CUSTOMER_RECEIVED_ORDER_NOT_RECEIVED(fixtures));
+        const hats = new HttpAuthTestSenderOrder(
+          CUSTOMER_RECEIVED_ORDER_NOT_RECEIVED(fixtures)
+        );
         const response = await hats.makeAuthCallWith(
           {
-            orderId: parentOrder.id,
+            orderId: parentOrder.publicId,
             orderReceived: false,
             orderCondition: 0,
             deliveryPunctuality: 0,
@@ -1221,7 +1520,6 @@ describe(`Order Model Integration Tests`, () => {
           []
         );
 
-        
         await hats.expectedResponse.checkResponse(response);
         const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
@@ -1244,16 +1542,17 @@ describe(`Order Model Integration Tests`, () => {
             total: 5300,
           })
         ).fetch();
-        const hats = new HttpAuthTestSenderOrder(CUSTOMER_RECEIVED_ORDER_BAD_INPUT_DELV_PUNCT(fixtures));
+        const hats = new HttpAuthTestSenderOrder(
+          CUSTOMER_RECEIVED_ORDER_BAD_INPUT_DELV_PUNCT(fixtures)
+        );
         const response = await hats.makeAuthCallWith(
           {
-            orderId: parentOrder.id,
+            orderId: parentOrder.publicId,
             deliveryPunctuality: 6,
           },
           []
         );
 
-        
         await hats.expectedResponse.checkResponse(response);
         const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
@@ -1276,16 +1575,17 @@ describe(`Order Model Integration Tests`, () => {
             total: 5300,
           })
         ).fetch();
-        const hats = new HttpAuthTestSenderOrder(CUSTOMER_RECEIVED_ORDER_BAD_INPUT_ORDER_COND(fixtures));
+        const hats = new HttpAuthTestSenderOrder(
+          CUSTOMER_RECEIVED_ORDER_BAD_INPUT_ORDER_COND(fixtures)
+        );
         const response = await hats.makeAuthCallWith(
           {
-            orderId: parentOrder.id,
+            orderId: parentOrder.publicId,
             orderCondition: -1,
           },
           []
         );
 
-        
         await hats.expectedResponse.checkResponse(response);
         const newOrder = await Order.findOne({
           publicId: parentOrder.body.publicId,
@@ -1311,15 +1611,16 @@ describe(`Order Model Integration Tests`, () => {
             total: 5300,
           })
         ).fetch();
-        const hats = new HttpAuthTestSenderOrder(USER_UPDATE_PAID_ORDER_SUCCESS(fixtures));
+        const hats = new HttpAuthTestSenderOrder(
+          USER_UPDATE_PAID_ORDER_SUCCESS(fixtures)
+        );
         const response = await hats.makeAuthCallWith(
           {
-            orderId: parentOrder.id,
+            orderId: parentOrder.publicId,
           },
           []
         );
 
-        
         await hats.expectedResponse.checkResponse(response);
       } catch (errs) {
         console.warn(errs);
@@ -1335,15 +1636,16 @@ describe(`Order Model Integration Tests`, () => {
             total: 5300,
           })
         ).fetch();
-        const hats = new HttpAuthTestSenderOrder(UPDATE_PAID_ORDER_FAILED(fixtures));
+        const hats = new HttpAuthTestSenderOrder(
+          UPDATE_PAID_ORDER_FAILED(fixtures)
+        );
         const response = await hats.makeAuthCallWith(
           {
-            orderId: parentOrder.id,
+            orderId: parentOrder.publicId,
           },
           []
         );
 
-        
         await hats.expectedResponse.checkResponse(response);
       } catch (errs) {
         console.warn(errs);

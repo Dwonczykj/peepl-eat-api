@@ -1,4 +1,5 @@
 const axios = require('axios').default;
+const { v4: uuidv4 } = require('uuid');
 
 module.exports = {
 
@@ -49,8 +50,20 @@ module.exports = {
 
 
   fn: async function (inputs, exits) {
+    var dontActuallySend =
+      sails.config.environment === "test" ||
+      process.env.FIREBASE_AUTH_EMULATOR_HOST;
+    if (dontActuallySend) {
+      sails.log
+        .info(`Running sails in test mode, helpers.revertPaymentFull will not request payment reversions.
+      Payment Refund would have been issued to ${inputs.refundFromName} for amount: ${inputs.paymentAmount}`);
+      return exits.success({
+        paymentIntentId: "dummy_refund_payment_id_" + uuidv4(),
+      });
+    }
+
     const instance = axios.create({
-      baseURL: sails.config.custom.peeplPayUrl,
+      baseURL: sails.config.custom.peeplPayUrl, //TODO: In test environment, override this...
       timeout: 2000,
       headers: { 'Authorization': 'Basic ' + sails.config.custom.peeplAPIKey }
     });

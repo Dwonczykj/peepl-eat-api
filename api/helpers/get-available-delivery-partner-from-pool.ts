@@ -166,11 +166,11 @@ module.exports = {
     var chosenDeliveryPartner: IDeliveryPartner = null;
     var deliverBefore = moment.utc(
       inputs.fulfilmentSlotFrom,
-      "YYYY-MM-dd hh:mm:ss"
+      "YYYY-MM-DD HH:mm:ss"
     );
     var deliverAfter = moment.utc(
       inputs.fulfilmentSlotTo,
-      "YYYY-MM-dd hh:mm:ss"
+      "YYYY-MM-DD HH:mm:ss"
     );
 
     const vendor = await Vendor.findOne({ id: inputs.pickupFromVendor });

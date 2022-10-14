@@ -129,10 +129,10 @@ async function populateDbData(done) {
     // await CategoryGroup.createEach(fixtures.categoryGroups);
     // console.info("Finished populating Category Groups");
 
-    // const vendorCategory = VendorCategory.findOne({
+    // const vendorCategory = await VendorCategory.findOne({
     //   name: "Cafes",
     // });
-    // const deliveryPartner = DeliveryPartner.findOne({
+    // const deliveryPartner = await DeliveryPartner.findOne({
     //   name: 'Agile',
     // });
     // console.log('Creating Vendor Delifonseca');

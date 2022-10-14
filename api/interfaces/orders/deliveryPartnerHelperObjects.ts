@@ -199,7 +199,7 @@ export abstract class DeliveryPartnerObject implements IDeliveryPartner {
   }
 
   async setDeliveryPartnerAcceptedOrder(inputs: DeliveryInformation, orderPublicId: number) {
-    const order = Order.findOne({
+    const order = await Order.findOne({
       publicId: orderPublicId,
     });
     const dPdeliverySlots: Slot[] = await sails.helpers
@@ -328,8 +328,8 @@ export class HttpDeliveryPartner extends DeliveryPartnerObject {
       );
     }
 
-    var deliverBefore = inputs.deliverBefore.format("dd-MM-YYYY hh:mm");
-    var deliverAfter = inputs.deliverAfter.format("dd-MM-YYYY hh:mm");
+    var deliverBefore = inputs.deliverBefore.format("dd-MM-YYYY HH:mm");
+    var deliverAfter = inputs.deliverAfter.format("dd-MM-YYYY HH:mm");
 
     var requestBody = {
       pickup: {
@@ -466,8 +466,8 @@ export class EmailDeliveryPartner extends DeliveryPartnerObject {
       );
     }
 
-    var deliverBefore = inputs.deliverBefore.format("dd-MM-YYYY hh:mm");
-    var deliverAfter = inputs.deliverAfter.format("dd-MM-YYYY hh:mm");
+    var deliverBefore = inputs.deliverBefore.format("dd-MM-YYYY HH:mm");
+    var deliverAfter = inputs.deliverAfter.format("dd-MM-YYYY HH:mm");
     var deliveryInformation = inputs;
     var requestBody = {
       vegiOrderId: deliveryInformation.vegiPublicOrderId, // * Needed for non-HTTP deliveryPartner clients

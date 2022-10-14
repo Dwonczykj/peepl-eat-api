@@ -109,8 +109,8 @@ describe("helpers.getAvailableDeliveryPartnerFromPool", () => {
     
     const result = sails.helpers.getAvailableDeliveryPartnerFromPool.with({
       pickupFromVendor: vendor.id,
-      deliverAfter: moment.utc(`${deliveryStart}:00`, "hh:mm:ss"), //moment.utc("01:15:00 PM", "h:mm:ss A")
-      deliverBefore: moment.utc(`${deliveryEnd}:00`, "hh:mm:ss"), //moment.utc("01:15:00 PM", "h:mm:ss A")
+      deliverAfter: moment.utc(`${deliveryStart}:00`, "HH:mm:ss"), //moment.utc("01:15:00 PM", "h:mm:ss A")
+      deliverBefore: moment.utc(`${deliveryEnd}:00`, "HH:mm:ss"), //moment.utc("01:15:00 PM", "h:mm:ss A")
 
       deliveryContactName: "Test Delivery John Smith",
       deliveryPhoneNumber: "0746564653",
@@ -214,8 +214,8 @@ describe("helpers.getAvailableDeliveryPartnerFromPool", () => {
     
     const result = sails.helpers.getAvailableDeliveryPartnerFromPool.with({
       pickupFromVendor: vendor.id,
-      deliverAfter: moment.utc(`${deliveryStart}:00`, "hh:mm:ss"), //moment.utc("01:15:00 PM", "h:mm:ss A")
-      deliverBefore: moment.utc(`${deliveryEnd}:00`, "hh:mm:ss"), //moment.utc("01:15:00 PM", "h:mm:ss A")
+      deliverAfter: moment.utc(`${deliveryStart}:00`, "HH:mm:ss"), //moment.utc("01:15:00 PM", "h:mm:ss A")
+      deliverBefore: moment.utc(`${deliveryEnd}:00`, "HH:mm:ss"), //moment.utc("01:15:00 PM", "h:mm:ss A")
 
       deliveryContactName: "Test Delivery John Smith",
       deliveryPhoneNumber: "0746564653",

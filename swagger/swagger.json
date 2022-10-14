@@ -786,7 +786,8 @@
             "enum": [
               "pending",
               "accepted",
-              "rejected"
+              "rejected",
+              "partially fulfilled"
             ],
             "example": "pending"
           },
@@ -4053,15 +4054,14 @@
         ],
         "responses": {
           "200": {
+            "description": "The requested resource"
+          },
+          "401": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
                   "oneOf": [
-                    {
-                      "type": "string",
-                      "description": "Order not found either because publicId does not exist or because the customerWalletAddress does not agree or because the order has already been flagged as completed."
-                    },
                     {
                       "type": "string",
                       "description": "Order has already been flagged as completed."
@@ -4076,7 +4076,7 @@
             }
           },
           "404": {
-            "description": "Resource not found"
+            "description": "Order not found either because publicId does not exist or because the customerWalletAddress does not agree or because the order has already been flagged as completed."
           },
           "500": {
             "description": "Internal server error"
@@ -4734,15 +4734,14 @@
                     {
                       "type": "string",
                       "description": "Success"
-                    },
-                    {
-                      "type": "string",
-                      "description": "delivery partner already exists"
                     }
                   ]
                 }
               }
             }
+          },
+          "400": {
+            "description": "delivery partner already exists"
           },
           "404": {
             "description": "Resource not found"
@@ -5770,6 +5769,9 @@
         ],
         "responses": {
           "200": {
+            "description": "Success"
+          },
+          "400": {
             "description": "Success",
             "content": {
               "application/json": {
@@ -5777,11 +5779,7 @@
                   "oneOf": [
                     {
                       "type": "string",
-                      "description": "Success"
-                    },
-                    {
-                      "type": "string",
-                      "description": "Order not found"
+                      "description": "Request failed to include retainItems or removeItems arrays"
                     },
                     {
                       "type": "string",
@@ -5801,10 +5799,10 @@
             }
           },
           "404": {
-            "description": "Resource not found"
+            "description": "Order not found"
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Success"
           }
         }
       }
@@ -5827,23 +5825,10 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "type": "string",
-                      "description": "Postal District already exists"
-                    },
-                    {
-                      "type": "string",
-                      "description": "Success"
-                    }
-                  ]
-                }
-              }
-            }
+            "description": "Success"
+          },
+          "401": {
+            "description": "Postal District already exists"
           },
           "404": {
             "description": "Resource not found"
@@ -6433,7 +6418,7 @@
               }
             }
           },
-          "400": {
+          "401": {
             "description": "user not allowed to see vendor or vendor orders"
           },
           "404": {

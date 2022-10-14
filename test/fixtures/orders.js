@@ -18,7 +18,6 @@ module.exports = [
     deliveryAddressCity: "Liverpool",
     deliveryAddressPostCode: "L1 0AB",
     deliveryAddressInstructions: "Leave it behind the bin",
-
     fulfilmentMethod: 1,
     fulfilmentSlotFrom: "2022-10-12 11:00:00",
     fulfilmentSlotTo: "2022-10-12 12:00:00",

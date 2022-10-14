@@ -29,7 +29,7 @@ module.exports = {
 
   exits: {
     success: {
-      statuscode: 200,
+      statusCode: 200,
       data: null,
       exampleOutput: {
         'data': {

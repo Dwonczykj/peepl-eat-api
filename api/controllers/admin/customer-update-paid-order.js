@@ -125,7 +125,7 @@ module.exports = {
       removeItems: inputs.removeItems
     });
 
-    if (!response || !response['validRequest']) {
+    if (!response || !response.data['validRequest']) {
       sails.log.warn('Bad partial fulfilment requested by consumer app on customer-update-order action');
       return exits.badRequest();
     }

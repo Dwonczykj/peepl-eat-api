@@ -24,15 +24,15 @@ module.exports = {
 
   exits: {
     orderNotFound: {
-      statuscode: 404,
+      statusCode: 404,
       description: 'Order not found either because publicId does not exist or because the customerWalletAddress does not agree or because the order has already been flagged as completed.'
     },
     orderAlreadyCompleted: {
-      statuscode: 401,
+      statusCode: 401,
       description: 'Order has already been flagged as completed.'
     },
     orderNotPaid: {
-      statuscode: 401,
+      statusCode: 401,
       description: 'order has not yet been paid for so no refund needs to be processed'
     }
   },

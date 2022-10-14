@@ -51,7 +51,7 @@ module.exports = {
       headers: { 'Authorization': 'Basic ' + sails.config.custom.peeplAPIKey }
     });
 
-    var order = Order.findOne({ publicId: inputs.orderId });
+    var order = await Order.findOne({ publicId: inputs.orderId });
 
     instance.post('/issue_rewards', { //TODO: Request this custom end point on PeeplPay,as it doesnt contain any GBPx moves, its just rewards, it should not connect to stripe and should just check for updates for reward issue transfer.
       amount: inputs.amountPPL,

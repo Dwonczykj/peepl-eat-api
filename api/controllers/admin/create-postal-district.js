@@ -17,12 +17,12 @@ module.exports = {
 
   exits: {
     postalDistrictAlreadyExists: {
-      statuscode: 401,
+      statusCode: 401,
       description: 'Postal District already exists'
     },
     success: {
       data: null,
-      statuscode: 200,
+      statusCode: 200,
     }
   },
 

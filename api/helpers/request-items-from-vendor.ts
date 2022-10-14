@@ -60,7 +60,7 @@ module.exports = {
   fn: async function (inputs, exits) {
     //TODO: Implement this function
 
-    const vendor = Vendor.findOne({id:inputs.vendor});
+    const vendor = await Vendor.findOne({id:inputs.vendor});
 
     return exits.notFound();
   }

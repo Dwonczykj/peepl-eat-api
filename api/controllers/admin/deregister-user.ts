@@ -42,7 +42,7 @@ module.exports = {
 
     const auth = getAuth();
 
-    const myUser = User.findOne({
+    const myUser = await User.findOne({
       id: this.req.session.userId
     });
 
@@ -50,7 +50,7 @@ module.exports = {
     let userFB: UserRecord;
 
     if (Object.keys(inputs).includes('id')) {
-      user = User.findOne({
+      user = await User.findOne({
         id: inputs.id
       });
       if (!user) {

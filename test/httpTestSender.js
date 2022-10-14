@@ -75,15 +75,17 @@ class ExpectResponse {
     let expectedResponse =
       overrideExpectedResponse || this.expectedResposeWithUpdates;
 
+    const filteredResponse = _.pick(responseBody, Object.keys(expectedResponse));
+
     for (var prop of Object.keys(expectedResponse)) {
-      expect(responseBody).to.have.property(prop);
+      expect(filteredResponse).to.have.property(prop);
     }
 
     if(this.customChecks){
       expectedResponse = this.customChecks({ responseBody, expectedResponse });
     }
 
-    expect(responseBody).to.deep.equal(expectedResponse);
+    expect(filteredResponse).to.deep.equal(expectedResponse);
   }
 }
 

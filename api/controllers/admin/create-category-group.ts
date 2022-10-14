@@ -35,7 +35,7 @@ module.exports = {
         },
         alreadyExists: {
             description: 'delivery partner already exists',
-            statuscode: 400,
+            statusCode: 400,
         }
     },
 
