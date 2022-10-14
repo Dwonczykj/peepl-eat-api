@@ -148,19 +148,25 @@ module.exports = {
       // > Note that we set the layout, provide access to core `url` package (for
       // > building links and image srcs, etc.), and also provide access to core
       // > `util` package (for dumping debug data in internal emails).
-      var htmlEmailContents = await sails
-        .renderView(
-          emailTemplatePath,
-          _.extend({ layout: emailTemplateLayout, url, util }, templateData)
-        )
-        .intercept((err) => {
-          err.message =
-            "Could not compile view template.\n" +
-            "(Usually, this means the provided data is invalid, or missing a piece.)\n" +
-            "Details:\n" +
-            err.message;
-          return err;
-        });
+      var htmlEmailContents = '';
+      try {
+	      htmlEmailContents = await sails
+          .renderView(
+            emailTemplatePath,
+            _.extend({ layout: emailTemplateLayout, url, util }, templateData)
+          )
+          .intercept((err) => {
+            err.message =
+              "Could not compile view template.\n" +
+              "(Usually, this means the provided data is invalid, or missing a piece.)\n" +
+              "Details:\n" +
+              err.message;
+            return err;
+          });
+      } catch (error) {
+        sails.log.error(`Error formatting the html email contents for template email with error: ${error}`);
+        throw error;
+      }
 
       // Sometimes only log info to the console about the email that WOULD have been sent.
       // Specifically, if the "To" email address is anything "@example.com".

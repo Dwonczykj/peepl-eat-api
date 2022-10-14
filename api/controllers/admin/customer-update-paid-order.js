@@ -1,34 +1,42 @@
-const OrderItem = require("../../models/OrderItem");
+const util = require("util");
 
 // const peeplPay = require('../../interfaces/peeplPay');
 
 const OrderTypeEnum = {
-  vegiEats: 'vegiEats',
-  vegiPays: 'vegiPays',
+  vegiEats: "vegiEats",
+  vegiPays: "vegiPays",
 };
 
 class MockPeeplPayPricingAPI {
   async getAmountInCurrency({
-    amount=0,
-    fromCurrency= "",
-    toCurrency= "",
-  }){
+    amount = 0,
+    fromCurrency = "",
+    toCurrency = "",
+  }) {
+    fromCurrency = fromCurrency.toUpperCase();
+    toCurrency = toCurrency.toUpperCase();
     if (fromCurrency === "GBP") {
       if (toCurrency === "PPL") {
         return amount * (sails.config.custom.PPLTokenValueInPence / 100.0);
-      } else if (toCurrency === 'GBPx'){
+      } else if (toCurrency === "GBPX") {
         return amount * 100.0;
       }
     } else if (fromCurrency === "PPL") {
       if (toCurrency === "GBP") {
         return amount / (sails.config.custom.PPLTokenValueInPence / 100.0);
+      } else if (toCurrency === "GBPX") {
+        return amount / sails.config.custom.PPLTokenValueInPence;
       }
     } else if (fromCurrency === "GBPX") {
-      if(toCurrency === "GBP"){
-        return amount * 100;
+      if (toCurrency === "GBP") {
+        return amount / 100;
+      } else if (toCurrency === "PPL") {
+        return amount * sails.config.custom.PPLTokenValueInPence;
       }
     }
-    throw new Error(`MockPeeplPayPricingAPI cant convert from ${fromCurrency} to ${toCurrency}`);
+    throw new Error(
+      `MockPeeplPayPricingAPI cant convert from ${fromCurrency} to ${toCurrency}`
+    );
   }
 }
 
@@ -37,152 +45,226 @@ const peeplPay = new MockPeeplPayPricingAPI();
 Object.freeze(OrderTypeEnum);
 
 module.exports = {
+  friendlyName: "Customer update paid order",
 
-
-  friendlyName: 'Customer update paid order',
-
-
-  description: 'A handle for customers to repond to requests to update their order when a vendor was unable to service an entire order.',
-
+  description:
+    "A handle for customers to repond to requests to update their order when a vendor was unable to service an entire order.",
 
   inputs: {
     orderId: {
-      type: 'string',
-      description: 'Public ID for the order.',
-      required: true
+      type: "string",
+      description: "Public ID for the order.",
+      required: true,
     },
     customerWalletAddress: {
-      type: 'string',
-      required: true
+      type: "string",
+      required: true,
     },
     retainItems: {
-      type: 'ref',
+      type: "ref",
       required: true,
-      description: 'array of internal ids for the items'
+      description: "array of internal ids for the items",
     },
     removeItems: {
-      type: 'ref',
+      type: "ref",
       required: true,
-      description: 'array of internal ids for the items'
+      description: "array of internal ids for the items",
     },
     refundRequestGBPx: {
-      type: 'ref',
+      type: "ref",
       required: true,
-      description: 'specification of how refund recipient would like their refund to be made from GBPx (GBP*100)'
+      description:
+        "specification of how refund recipient would like their refund to be made from GBPx (GBP*100)",
     },
     refundRequestPPL: {
-      type: 'ref',
+      type: "ref",
       required: true,
-      description: 'specification of how refund recipient would like their refund to be made from PPL'
+      description:
+        "specification of how refund recipient would like their refund to be made from PPL",
     },
   },
-
 
   exits: {
     badRequest: {
-      statusCode: 401,
-      description: 'likely caused by no items retained in the request',
-      responseType: 'badRequest'
+      statusCode: 400,
+      description: "likely caused by no items retained in the request",
     },
     orderNotAuthorised: {
-      description: 'thrown when the updated order has a larger total than the new order.',
+      description:
+        "thrown when the updated order has a larger total than the new order.",
       statusCode: 401,
-      responseType: 'badRequest'
+    },
+    orderNotFound: {
+      statusCode: 404,
+      description:
+        "Order not found either because publicId does not exist or because the customerWalletAddress does not agree or because the order has already been flagged as completed.",
+    },
+    orderAlreadyCompleted: {
+      statusCode: 401,
+      description: "Order has already been flagged as completed.",
+    },
+    orderNotPaid: {
+      statusCode: 401,
+      description:
+        "order has not yet been paid for so no refund needs to be processed",
     },
     noPaidOrderFound: {
       statusCode: 404,
-      responseType: 'notFound'
+    },
+    error: {
+      statusCode: 400,
+      error: null,
+    },
+    incompleteOrderInformationStoredDB: {
+      statusCode: 501,
+      description: 'the stored order doesnt have the paymentIntentId set'
     },
     success: {
       statusCode: 200,
-    }
+    },
   },
 
-
   fn: async function (inputs, exits) {
-
-    if (!inputs.removeItems || !inputs.retailItems) {
+    if (!inputs.removeItems || !inputs.retainItems) {
       return exits.badRequest();
     }
 
     var order = await Order.findOne({
       publicId: inputs.orderId,
       customerWalletAddress: inputs.customerWalletAddress,
-      paymentStatus: 'paid',
-      completedFlag: '',
     });
 
     if (!order) {
-      return exits.noPaidOrderFound();
+      return exits.orderNotFound();
     }
 
-    //TODO: this function to create a new order object with a reference to the id of the original order,
-    //TODO cont. flag the original as completedFlag: void and
+    if (order.completedFlag !== "") {
+      return exits.orderAlreadyCompleted();
+    }
+
+    if (order.paymentStatus !== "paid") {
+      return exits.orderNotPaid();
+    }
+
+    if (!order.paymentIntentId || !order.customerWalletAddress) {
+      return exits.incompleteOrderInformationStoredDB();
+    }
+
     var response = await sails.helpers.updateItemsForOrder.with({
       orderId: inputs.orderId,
       customerWalletAddress: inputs.customerWalletAddress,
       retainItems: inputs.retainItems,
-      removeItems: inputs.removeItems
+      removeItems: inputs.removeItems,
     });
 
-    if (!response || !response.data['validRequest']) {
-      sails.log.warn('Bad partial fulfilment requested by consumer app on customer-update-order action');
+    if (
+      !response ||
+      !response.data["validRequest"] ||
+      !response.data["orderId"]
+    ) {
+      sails.log.warn(
+        "Bad partial fulfilment requested by consumer app on customer-update-order action"
+      );
       return exits.badRequest();
     }
 
-    var newOrder = await Order.findOne({
-      publicId: inputs.orderId,
-      customerWalletAddress: inputs.customerWalletAddress,
-      paymentStatus: 'paid',
-      completedFlag: '',
-    });
-
-    var oldOrder = await Order.findOne({
-      publicId: inputs.orderId,
-      paymentStatus: 'paid',
-      customerWalletAddress: inputs.customerWalletAddress,
-      completedFlag: 'void',
+    const newOrder = await Order.findOne({
+      id: response.data.orderId,
       parentOrder: order.id,
-    });
+      paymentIntentID: response.data.paymentIntentId,
+      customerWalletAddress: inputs.customerWalletAddress,
+    }).populate('vendor');
 
+    if (!newOrder || !newOrder.vendor) {
+      return exits.orderNotFound();
+    }
+
+    const oldOrder = await Order.findOne(order.id);
+    if (!oldOrder) {
+      return exits.orderNotFound();
+    }
+    if (oldOrder.completedFlag !== "void") {
+      return exits.error(
+        new Error(
+          `helpers.updateItemsForOrder failed to update the original order's completed flag to void`
+        )
+      );
+    }
+    
     if (oldOrder.total < newOrder.total) {
+      const oldOrderItems = await OrderItem.find({
+        order: oldOrder.id
+      });
+      const newOrderItems = await OrderItem.find({
+        order: newOrder.id,
+      });
+      sails.log.warn(
+        `New order after customer update has a total greater than than the original order total. Items can only be retained or removed by the customer. Check! ${util.inspect(
+          {
+            oldOrderTotal: oldOrder.total,
+            newOrderTotal: newOrder.total,
+            oldOrderItems,
+            newOrderItems,
+          },
+          { depth: null }
+        )}`
+      );
       return exits.orderNotAuthorised();
     }
 
-    //TODO: Mock the below endpoints using the hardcoded token values in custom.js
-    var gbpxPortion = await peeplPay.getAmountInCurrency.with({
-      amount: inputs.refundRequestGBPx,
-      fromCurrency: 'GBPx',
-      toCurrency: 'GBP'
-    });
-    var pplPortion = await peeplPay.getAmountInCurrency.with({
-      amount: inputs.refundRequestPPL,
-      fromCurrency: 'PPL',
-      toCurrency: 'GBP'
-    });
-    if ((oldOrder.total - newOrder.total) - (gbpxPortion + pplPortion) > 0.01) {
-      // requested refund is more than 1p out of change in order value.
-      return exits.badRequest();
+    try {
+      sails.log.warn(
+        `Using MockPeeplPayPricingAPI to get PPL and GBPx currency conversions in admin/customer-update-paid-order`
+      );
+      var gbpxPortion = await peeplPay.getAmountInCurrency({
+        amount: inputs.refundRequestGBPx,
+        fromCurrency: "GBPx",
+        toCurrency: "GBP",
+      });
+      var pplPortion = await peeplPay.getAmountInCurrency({
+        amount: inputs.refundRequestPPL,
+        fromCurrency: "PPL",
+        toCurrency: "GBP",
+      });
+      sails.log(`gbpx -> ${gbpxPortion}; ppl -> ${pplPortion}`);
+      if (oldOrder.total - newOrder.total - (gbpxPortion + pplPortion) > 0.01) {
+        // requested refund is more than 1p out of change in order value.
+        return exits.badRequest();
+      }
+    } catch (error) {
+      sails.log.error(
+        `admin/customer-update-paid-order failed to check if partial refund amonut is within 1p of change to order value: ${error}`
+      );
+      return exits.error(
+        new Error(
+          `admin/customer-update-paid-order failed to check if partial refund amonut is within 1p of change to order value: ${error}`
+        )
+      );
     }
-
-    var say;
-    if (newOrder.fulfilmentMethod.methodType === 'delivery') {
-      say = `Your vegi order for delivery between ${order.fulfilmentSlotFrom} and ${order.fulfilmentSlotTo} has bene updated. To view: ${sails.config.custom.baseUrl}/admin/order/${order.publicId}`;
+    var customerUpdatedOrderMsgToVendor;
+    if (newOrder.fulfilmentMethod.methodType === "delivery") {
+      customerUpdatedOrderMsgToVendor = `Your vegi order for delivery between ${order.fulfilmentSlotFrom} and ${order.fulfilmentSlotTo} has bene updated. To view: ${sails.config.custom.baseUrl}/admin/order/${order.publicId}`;
     } else {
-      say = `Your vegi order for collection between ${order.fulfilmentSlotFrom} and ${order.fulfilmentSlotTo} has bene updated. To view: ${sails.config.custom.baseUrl}/admin/order/${order.publicId}`;
+      customerUpdatedOrderMsgToVendor = `Your vegi order for collection between ${order.fulfilmentSlotFrom} and ${order.fulfilmentSlotTo} has bene updated. To view: ${sails.config.custom.baseUrl}/admin/order/${order.publicId}`;
     }
-    await sails.helpers.sendSmsNotification.with({
-      to: newOrder.vendor.phoneNumber,
-      body: say
-    });
 
-    return exits.success({ orderID: newOrder.id });
+    try {
+	    await sails.helpers.sendSmsNotification.with({
+	      to: newOrder.vendor.phoneNumber,
+	      body: customerUpdatedOrderMsgToVendor,
+	    });
+    } catch (error) {
+      sails.log.error(`admin/customer-update-paid-order failed to send sms to new vendor: ${error}`);
+    }
+
+    return exits.success({ orderId: newOrder.id });
 
     // revert the token issuance
-    //TODO: Remove this as this is done by walletAPI of consumer app - get the acmount calc form in here and check it vs the inputs.
+    // this is done by walletAPI of consumer app - get the acmount calc form in here and check it vs the inputs.
     // await sails.helpers.revertPeeplRewardIssue.with({
     //   peeplPayPaymentIntentId: newOrder.paymentIntentId,
     //   recipient: newOrder.customerWalletAddress,
+    //   rewardsIssued: ...
     //   paymentAmountBeingRefunded: oldOrder.total - newOrder.total //! this part calls sails.helpers.calculatePPLReward internally
     // });
 
@@ -212,10 +294,7 @@ module.exports = {
     //   .set({ paymentIntentId: newPaymentIntent.paymentIntentId });
 
     // All done.
-    // return exits.success({ orderID: newOrder.id, paymentIntentID: newPaymentIntent.paymentIntentId });
+    // return exits.success({ orderId: newOrder.id, paymentIntentID: newPaymentIntent.paymentIntentId });
     //TODO: Store the above info against the refund in the db, could have a new refunds object, then add the below to the webhook once receival of reverted rewards tokens has been confirmed / completed by peeplPay
-
-
-  }
-
+  },
 };

@@ -32,7 +32,8 @@ module.exports = {
     var workingTotal = 0;
 
     // Add together product totals w/ options
-    for(var item in order.items) {
+    const fulfilledItems = order.items.filter(item => item.fulfilled !== false);
+    for(var item in fulfilledItems) {
       var productTotal = order.items[item].product.basePrice;
 
       for(var optionValue in order.items[item].optionValues) {

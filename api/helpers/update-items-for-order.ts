@@ -223,7 +223,7 @@ module.exports = {
             originalOrderItem.unfulfilledOnOrderId = originalOrder.id;
           } else {
             originalOrderItem.unfulfilled = false;
-            originalOrderItem.unfulfilledOnOrderId = '';
+            originalOrderItem.unfulfilledOnOrderId = null;
           }
           originalOrderItem.order = newOrder.id;
 
@@ -269,7 +269,7 @@ module.exports = {
         }
 
         await wrapWithDb(db, () =>
-          Order.updateOne(findOrderCriteria).set({
+          Order.updateOne(originalOrder.id).set({
             restaurantAcceptanceStatus: "partially fulfilled",
             completedFlag: "void",
           })
@@ -285,7 +285,7 @@ module.exports = {
         return {
           validRequest: true,
           calculatedOrderTotal: calculatedOrderTotal.finalAmount,
-          orderID: newOrder.id,
+          orderId: newOrder.id,
           paymentIntentID: newOrder.paymentIntentId,
         };
       };

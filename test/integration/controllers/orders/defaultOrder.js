@@ -1,27 +1,8 @@
-// test/integration/controllers/admin/create-product.test.js
-const { assert, expect } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
-// var supertest = require("supertest");
-// const _ = require('lodash');
-var util = require("util");
-const moment = require("moment/moment");
-require("ts-node/register");
-const { fixtures } = require("../../../../scripts/build_db");
-const { getNextWeekday } = require("../../../utils");
 const {
   HttpAuthTestSender,
   ExpectResponse,
 } = require("../../../httpTestSender");
-
-const { v4: uuidv4 } = require("uuid");
-/* Check if string is valid UUID */
-function checkIfValidUUID(str) {
-  // Regular expression to check if string is a valid UUID
-  // ~ https://melvingeorge.me/blog/check-if-string-valid-uuid-regex-javascript
-  const regexExp =
-    /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/gi;
-
-  return regexExp.test(str);
-}
+const { assert, expect } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
 
 const DEFAULT_NEW_ORDER_OBJECT = (fixtures, overrides = {}) => {
   const vendor = fixtures.vendors[0];
@@ -81,6 +62,16 @@ const DEFAULT_NEW_ORDER_OBJECT = (fixtures, overrides = {}) => {
   };
 };
 
+/* Check if string is valid UUID */
+function checkIfValidUUID(str) {
+  // Regular expression to check if string is a valid UUID
+  // ~ https://melvingeorge.me/blog/check-if-string-valid-uuid-regex-javascript
+  const regexExp =
+    /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/gi;
+
+  return regexExp.test(str);
+}
+
 class ExpectResponseOrder extends ExpectResponse {
   constructor({
     HTTP_TYPE = "get",
@@ -139,3 +130,8 @@ class HttpAuthTestSenderOrder extends HttpAuthTestSender {
   }
 }
 
+module.exports = {
+  DEFAULT_NEW_ORDER_OBJECT,
+  ExpectResponseOrder,
+  HttpAuthTestSenderOrder,
+};

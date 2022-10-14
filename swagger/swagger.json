@@ -923,9 +923,10 @@
             "description": "flag to show that item was unfulfilled from an order"
           },
           "unfulfilledOnOrderId": {
-            "type": "string",
-            "default": "",
-            "description": "Used to track the original order id of the parent order when an item is flagged as unfulfilled on an order, it is not removed from the order, it is just flagged as unfulfilled for tracking purposes."
+            "type": "number",
+            "format": "double",
+            "nullable": true,
+            "description": "Used to track the original order internal id of the parent order when an item is flagged as unfulfilled on an order, it is not removed from the order, it is just flagged as unfulfilled for tracking purposes."
           },
           "order": {
             "description": "The order to which the item belongs JSON dictionary representing the **order** instance or FK when creating / updating / not populated",
@@ -3110,6 +3111,9 @@
           "200": {
             "description": "Success"
           },
+          "400": {
+            "description": "Success"
+          },
           "404": {
             "description": "Success"
           },
@@ -4080,6 +4084,9 @@
           },
           "500": {
             "description": "Internal server error"
+          },
+          "501": {
+            "description": "the stored order doesnt have the paymentIntentId set"
           }
         }
       }
@@ -4142,7 +4149,7 @@
           "200": {
             "description": "Success"
           },
-          "401": {
+          "400": {
             "description": "Bad request",
             "content": {
               "application/json": {
@@ -4154,7 +4161,30 @@
                     },
                     {
                       "type": "string",
+                      "description": "Server error"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
                       "description": "thrown when the updated order has a larger total than the new order."
+                    },
+                    {
+                      "type": "string",
+                      "description": "Order has already been flagged as completed."
+                    },
+                    {
+                      "type": "string",
+                      "description": "order has not yet been paid for so no refund needs to be processed"
                     }
                   ]
                 }
@@ -4162,10 +4192,29 @@
             }
           },
           "404": {
-            "description": "Success"
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Order not found either because publicId does not exist or because the customerWalletAddress does not agree or because the order has already been flagged as completed."
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal server error"
+          },
+          "501": {
+            "description": "the stored order doesnt have the paymentIntentId set"
           }
         }
       }
@@ -4254,7 +4303,7 @@
             "description": "Order not found"
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Server error"
           }
         }
       }

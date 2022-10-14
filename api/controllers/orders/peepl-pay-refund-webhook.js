@@ -50,9 +50,7 @@ module.exports = {
       return exits.orderNotFound();
     }
 
-    var formulateMoney = function (amount) {
-      "£" + (amount / 100.0).toFixed(2);
-    };
+    const formulateMoney = (amount) => "£" + (amount / 100.0).toFixed(2);
 
     var refundStr = refundSucceeded ? "success" : "failure";
     var refundWorked = refundSucceeded

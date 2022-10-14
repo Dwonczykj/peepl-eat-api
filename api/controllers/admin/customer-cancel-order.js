@@ -1,65 +1,71 @@
 const OrderItem = require("../../models/OrderItem");
 
 module.exports = {
+  friendlyName: "Customer cancel order",
 
-
-  friendlyName: 'Customer cancel order',
-
-
-  description: 'A handle for customers to repond to requests to cancel their order when a vendor was unable to service parts or all of an order.',
-
+  description:
+    "A handle for customers to repond to requests to cancel their order when a vendor was unable to service parts or all of an order.",
 
   inputs: {
     orderId: {
-      type: 'string',
-      description: 'Public ID for the order.',
-      required: true
+      type: "string",
+      description: "Public ID for the order.",
+      required: true,
     },
     customerWalletAddress: {
-      type: 'string',
-      required: true
-    }
+      type: "string",
+      required: true,
+    },
   },
-
 
   exits: {
     orderNotFound: {
       statusCode: 404,
-      description: 'Order not found either because publicId does not exist or because the customerWalletAddress does not agree or because the order has already been flagged as completed.'
+      description:
+        "Order not found either because publicId does not exist or because the customerWalletAddress does not agree or because the order has already been flagged as completed.",
     },
     orderAlreadyCompleted: {
       statusCode: 401,
-      description: 'Order has already been flagged as completed.'
+      description: "Order has already been flagged as completed.",
     },
     orderNotPaid: {
       statusCode: 401,
-      description: 'order has not yet been paid for so no refund needs to be processed'
+      description:
+        "order has not yet been paid for so no refund needs to be processed",
+    },
+    incompleteOrderInformationStoredDB: {
+      statusCode: 501,
+      description: 'the stored order doesnt have the paymentIntentId set'
     }
   },
-
 
   fn: async function (inputs, exits) {
     var order = await Order.findOne({
       publicId: inputs.orderId,
       customerWalletAddress: inputs.customerWalletAddress,
-    });
+    }).populate('vendor');
 
-    if (!order) {
+    if (!order || !order.vendor) {
       return exits.orderNotFound();
     }
 
-    if (order.completedFlag !== '') {
+    if (order.completedFlag !== "") {
       return exits.orderAlreadyCompleted();
     }
 
-    //Flag the order as cancelled
-    await Order.updateOne({ publicId: inputs.orderId })
-      .set({ completedFlag: 'cancelled' });
+    const formulateMoney = (amount) => ("£" + (amount / 100.0).toFixed(2));
 
-    if (order.paymentStatus === 'paid') {
-      // Request a reversion of the full payment from the paymentId, 
-      // ! dont use order total as this may bne updated from updating the items on the order
-      //TODO: Implement the below helper method
+    //Flag the order as cancelled
+    await Order.updateOne({ publicId: inputs.orderId }).set({
+      completedFlag: "cancelled",
+    });
+
+    if (!order.paymentIntentId || !order.customerWalletAddress) {
+      return exits.incompleteOrderInformationStoredDB();
+    }
+
+    if (order.paymentStatus === "paid") {
+      // Request a reversion of the full payment from the paymentId,
       await sails.helpers.revertPaymentFull.with({
         paymentId: order.paymentIntentId,
         refundAmount: order.total,
@@ -67,27 +73,32 @@ module.exports = {
         recipientName: order.deliveryName,
         refundFromName: order.vendor.name,
       });
-
       // revert the token issuance
-      //TODO: Implement the below helper method
-      await sails.helpers.revertPeeplRewardIssue.with({
-        peeplPayPaymentIntentId: order.paymentIntentId,
-        recipient: order.customerWalletAddress,
-        paymentAmountBeingRefunded: order.total
-      });
+      if (
+        order.rewardsIssued > 0 &&
+        (order.restaurantAcceptanceStatus === "accepted" ||
+          order.restaurantAcceptanceStatus === "partially fulfilled")
+      ) {
+        await sails.helpers.revertPeeplRewardIssue.with({
+          paymentId: order.paymentIntentId,
+          recipient: order.customerWalletAddress,
+          paymentAmountBeingRefunded: order.total,
+          rewardsIssued: order.rewardsIssued,
+        });
+      }
 
       await sails.helpers.sendFirebaseNotification.with({
-        topic: 'order-' + order.publicId,
-        title: 'Order update',
-        body: 'Your refund has been requested 😎.'
+        topic: "order-" + order.publicId,
+        title: "Order update",
+        body: `Your refund for ${formulateMoney(
+          order.total
+        )} has been requested 😎.`,
       });
     } else {
       return exits.orderNotPaid();
     }
 
     // All done.
-    return;
-
-  }
-
+    return exits.success();
+  },
 };

@@ -7,135 +7,178 @@ const moment = require("moment/moment");
 require("ts-node/register");
 const { fixtures } = require("../../../../scripts/build_db");
 const { getNextWeekday } = require("../../../utils");
-const {
-  HttpAuthTestSender,
-  ExpectResponse,
-} = require("../../../httpTestSender");
 
 const { v4: uuidv4 } = require("uuid");
-/* Check if string is valid UUID */
-function checkIfValidUUID(str) {
-  // Regular expression to check if string is a valid UUID
-  // ~ https://melvingeorge.me/blog/check-if-string-valid-uuid-regex-javascript
-  const regexExp =
-    /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/gi;
 
-  return regexExp.test(str);
-}
+const {
+  DEFAULT_NEW_ORDER_OBJECT,
+  ExpectResponseOrder,
+  HttpAuthTestSenderOrder,
+} = require("./defaultOrder");
 
-const DEFAULT_NEW_ORDER_OBJECT = (fixtures, overrides = {}) => {
-  const vendor = fixtures.vendors[0];
-  const fulfilmentMethodVendor = fixtures.fulfilmentMethods.filter(
-    (fm) =>
-      fm.vendor === vendor.id &&
-      fm.methodType === "delivery" &&
-      fixtures.openingHours.filter(
-        (oh) => oh.fulfilmentMethod === fm.id && oh.isOpen === true
-      )
-  )[0];
-  const openAtHours = fixtures.openingHours.filter(
-    (openHrs) =>
-      openHrs.isOpen === true &&
-      openHrs.fulfilmentMethod === fulfilmentMethodVendor.id
-  )[0];
+const USER_UPDATE_PAID_ORDER_SUCCESS = (fixtures) => {
   return {
-    ...{
-      customerWalletAddress: "0xb98AEa2159e4855c8C703A19f57912ACAdCa3625",
-      items: [1, 6, 7],
-      total: 2800,
-      tipAmount: 0,
-      orderedDateTime: Date.now(),
-      restaurantAcceptanceStatus: "accepted",
-      marketingOptIn: false,
-      vendor: vendor.id,
-      paidDateTime: null,
-      refundDateTime: null,
-      deliveryName: "Test Runner 1",
-      deliveryEmail: "adam@itsaboutpeepl.com",
-      deliveryPhoneNumber: "07901122212",
-      deliveryAddressLineOne: "11 Feck Street",
-      deliveryAddressLineTwo: "Subburb",
-      deliveryAddressCity: "Liverpool",
-      deliveryAddressPostCode: "L1 0AB",
-      deliveryAddressInstructions: "Leave it behind the bin",
-      fulfilmentMethod: fulfilmentMethodVendor.id,
-      fulfilmentSlotFrom: "2023-10-12 11:00:00",
-      fulfilmentSlotTo: "2023-10-12 12:00:00",
-      discount: null,
-      paymentStatus: "unpaid",
-      paymentIntentId: "",
-      deliveryId: "random_delivery_id",
-      deliveryPartnerAccepted: true,
-      deliveryPartnerConfirmed: true,
-      deliveryPartner: fixtures.deliveryPartners[0].id,
-      rewardsIssued: 0,
-      sentToDeliveryPartner: false,
-      completedFlag: "",
-      completedOrderFeedback: null,
-      deliveryPunctuality: null,
-      orderCondition: null,
-      unfulfilledItems: [], //Check using partial orders
-      parentOrder: null,
+    useAccount: "TEST_SERVICE",
+    HTTP_TYPE: "post",
+    ACTION_PATH: "orders",
+    ACTION_NAME: "peepl-pay-update-paid-order-webhook",
+    sendData: {
+      publicId: null,
+      metadata: {
+        orderId: 1,
+        paymentIntentId: "",
+        customerWalletAddress: "0x41190Dd82D43129C26955063fa2854350e14554B",
+      },
+      status: "success",
     },
-    ...overrides,
+    expectResponse: {},
+    expectStatusCode: 200,
+    expectResponseCb: async (response, requestPayload) => {
+      return;
+    },
+  };
+};
+const UPDATE_PAID_ORDER_FAILED = (fixtures) => {
+  return {
+    useAccount: "TEST_SERVICE",
+    HTTP_TYPE: "post",
+    ACTION_PATH: "orders",
+    ACTION_NAME: "peepl-pay-update-paid-order-webhook",
+    sendData: {
+      publicId: null,
+      metadata: {
+        orderId: 1,
+        paymentIntentId: "",
+        customerWalletAddress: "0x41190Dd82D43129C26955063fa2854350e14554B",
+      },
+      status: "failed",
+    },
+    expectResponse: {},
+    expectStatusCode: 200,
+    expectResponseCb: async (response, requestPayload) => {
+      return;
+    },
+  };
+};
+const CUSTOMER_UPDATE_PAID_ORDER = (fixtures) => {
+  return {
+    useAccount: "TEST_USER",
+    HTTP_TYPE: "post",
+    ACTION_PATH: "admin",
+    ACTION_NAME: "customer-update-paid-order",
+    sendData: {
+      orderId: null,
+      customerWalletAddress: null,
+      retainItems: [],
+      removeItems: [],
+      refundRequestGBPx: 5100,
+      refundRequestPPL: 0,
+    },
+    expectResponse: {
+      orderId: null, //newOrderId
+    },
+    expectStatusCode: 200,
+    expectResponseCb: async (response, requestPayload) => {
+      return;
+    },
   };
 };
 
-class ExpectResponseOrder extends ExpectResponse {
-  constructor({
-    HTTP_TYPE = "get",
-    ACTION_PATH = "",
-    ACTION_NAME = "",
-    sendData = {},
-    expectResponse = {},
-  }) {
-    super({
-      HTTP_TYPE,
-      ACTION_PATH,
-      ACTION_NAME,
-      sendData,
-      expectResponse,
-    });
-  }
+describe(`${CUSTOMER_UPDATE_PAID_ORDER(fixtures).ACTION_NAME}()`, () => {
+  it("users can successfully UPDATE ITEMS on an order after getting a partial fulfillment back from a vendor", async () => {
+    try {
+      const parentOrder = await Order.create(
+        DEFAULT_NEW_ORDER_OBJECT(fixtures, {
+          paymentStatus: "paid",
+          paymentIntentId: "dummy_payint_id_" + uuidv4(),
+          completedFlag: "",
+          parentOrder: null,
+          items: [1, 2, 3, 6, 8],
+          total: 5425,
+        })
+      ).fetch();
+      const hats = new HttpAuthTestSenderOrder(
+        CUSTOMER_UPDATE_PAID_ORDER(fixtures)
+      );
+      const response = await hats.makeAuthCallWith(
+        {
+          orderId: parentOrder.publicId,
+          customerWalletAddress: parentOrder.customerWalletAddress,
+          retainItems: [1, 2, 3],
+          removeItems: [6, 8],
+          refundRequestGBPx: 5425, //TODO what wasnt in the refundRequestPPL
+          refundRequestPPL: 0, //TODO order.total before flat fees and stuff added, pull adam changes, * 5% (coln/delv)
+        },
+        []
+      );
+      await hats.expectedResponse.checkResponse(response);
+      expect(response.body).to.have.property("orderId");
+    } catch (errs) {
+      console.warn(errs);
+      throw errs;
+    }
+  });
+});
 
-  customChecks({ responseBody, expectedResponse }) {
-    expect(responseBody.orderedDateTime).closeTo(
-      expectedResponse.orderedDateTime,
-      100,
-      "OrderedDateTime should be within 100s of test."
-    );
-    // ~ https://devenum.com/delete-property-from-objects-array-in-javascript/#:~:text=Delete%20property%20from%20objects%20Array%20in%20Javascript%20%286,to%20Delete%20property%20from%20objects%20array%20in%20Javascript
-    delete expectedResponse.orderedDateTime;
-    expect(checkIfValidUUID(responseBody.publicId)).to.equal(true);
-    delete expectedResponse.publicId;
-    return expectedResponse;
-  }
-}
-
-class HttpAuthTestSenderOrder extends HttpAuthTestSender {
-  constructor({
-    HTTP_TYPE = "get",
-    ACTION_PREFIX = "/api/v1",
-    ACTION_PATH = "",
-    ACTION_NAME = "",
-    useAccount = "TEST_SERVICE",
-    sendData = {},
-    expectResponse = {},
-    expectResponseCb = async (response, requestPayload) => {},
-    expectStatusCode = 200,
-  }) {
-    super({
-      HTTP_TYPE,
-      ACTION_PREFIX,
-      ACTION_PATH,
-      ACTION_NAME,
-      useAccount,
-      sendData,
-      expectResponse,
-      ExpectResponseOrder,
-      expectResponseCb,
-      expectStatusCode,
-    });
-  }
-}
-
+describe(`${USER_UPDATE_PAID_ORDER_SUCCESS(fixtures).ACTION_NAME}()`, () => {
+  it("PeeplPay Service can successfully send notifications when a payment succeeds for an order", async () => {
+    try {
+      const paidOrder = await Order.create(
+        DEFAULT_NEW_ORDER_OBJECT(fixtures, {
+          parentOrder: null,
+          items: [1, 2, 3, 6, 8],
+          total: 5425,
+        })
+      ).fetch();
+      const hats = new HttpAuthTestSenderOrder(
+        USER_UPDATE_PAID_ORDER_SUCCESS(fixtures)
+      );
+      const response = await hats.makeAuthCallWith(
+        {
+          publicId: paidOrder.publicId,
+          metadata: {
+            orderId: paidOrder.publicId,
+            paymentIntentId: paidOrder.paymentIntentId,
+            customerWalletAddress: paidOrder.customerWalletAddress,
+          },
+          status: "success",
+        },
+        []
+      );
+      await hats.expectedResponse.checkResponse(response);
+    } catch (errs) {
+      console.warn(errs);
+      throw errs;
+    }
+  });
+  it("PeeplPay Service can successfully send notifications when a payment fails for an order", async () => {
+    try {
+      const paidOrder = await Order.create(
+        DEFAULT_NEW_ORDER_OBJECT(fixtures, {
+          parentOrder: null,
+          items: [1, 2, 3, 6, 8],
+          total: 5425,
+        })
+      ).fetch();
+      const hats = new HttpAuthTestSenderOrder(
+        UPDATE_PAID_ORDER_FAILED(fixtures)
+      );
+      const response = await hats.makeAuthCallWith(
+        {
+          publicId: paidOrder.publicId,
+          metadata: {
+            orderId: paidOrder.publicId,
+            paymentIntentId: paidOrder.paymentIntentId,
+            customerWalletAddress: paidOrder.customerWalletAddress,
+          },
+          status: "success",
+        },
+        []
+      );
+      await hats.expectedResponse.checkResponse(response);
+    } catch (errs) {
+      console.warn(errs);
+      throw errs;
+    }
+  });
+});

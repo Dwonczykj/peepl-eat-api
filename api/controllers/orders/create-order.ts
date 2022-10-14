@@ -304,7 +304,7 @@ module.exports = {
 
         // All done.
         return {
-          orderID: order.id,
+          orderId: order.id,
           paymentIntentID: newPaymentIntent.paymentIntentId,
         };
       };

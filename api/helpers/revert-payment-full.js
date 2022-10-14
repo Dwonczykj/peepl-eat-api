@@ -56,7 +56,7 @@ module.exports = {
     if (dontActuallySend) {
       sails.log
         .info(`Running sails in test mode, helpers.revertPaymentFull will not request payment reversions.
-      Payment Refund would have been issued to ${inputs.refundFromName} for amount: ${inputs.paymentAmount}`);
+      Payment Refund would have been issued to ${inputs.refundFromName} for amount: ${inputs.refundAmount}`);
       return exits.success({
         paymentIntentId: "dummy_refund_payment_id_" + uuidv4(),
       });
@@ -69,9 +69,9 @@ module.exports = {
     });
 
     //TODO: request refund for full amount of order from peeplPay community manager wallet address back to the customer.
-    //TODO: Assert that the paymentAmount == the sum of value of the items (+ % of service charge?) - discount
+    //TODO: Assert that the refundAmount == the sum of value of the items (+ % of service charge?) - discount
     instance.post('/payment_refunds', {
-      amount: inputs.paymentAmount,
+      amount: inputs.refundAmount,
       recipientWalletAddress: inputs.refundRecipientWalletAddress,
       vendorDisplayName: inputs.refundFromName,
       webhookAddress: sails.config.custom.peeplPayRefundWebhookAddress

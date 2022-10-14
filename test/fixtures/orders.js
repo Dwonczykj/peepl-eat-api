@@ -2,7 +2,7 @@ module.exports = [
   {
     id: 1,
     items: [1, 2, 3, 6, 8],
-    total: 5300,
+    total: 5425, //* represent item values of 5300 and 124 of platform fee and 0 delivery fee base price addition
     tipAmount: 0,
     orderedDateTime: Date.now(),
     marketingOptIn: false,

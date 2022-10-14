@@ -58,20 +58,17 @@ module.exports = {
     sails.log(`Send email to vegi support`);
     try {
 	    await sails.helpers.sendTemplateEmail.with({
-	      to: sails.config.custom.internalEmailAddress,
-	      subject: title,
 	      template: 'email-support-request',
 	      templateData: {
 	        orderId: inputs.orderId,
 	        message: inputs.message
 	      },
+	      to: sails.config.custom.internalEmailAddress,
+	      subject: title,
 	      layout: false,
-	    }).intercept('', (err) => {
-	      sails.log.info('Error sending a support request!');
-	      sails.log.warn(err);
 	    });
     } catch (error) {
-      sails.log.error('Error occurred in helpers/raiseVegiSupportIssue trying to send template email to internal vegi email address.');
+      sails.log.error(`Error occurred in helpers/raiseVegiSupportIssue trying to send template email to internal vegi email address.\n    Error: ${error}`);
       return exits.emailFailed(error);
     }
 

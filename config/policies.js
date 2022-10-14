@@ -46,17 +46,20 @@ module.exports.policies = {
   "admin/view-postal-districts": "is-super-admin",
   "admin/view-approve-order": true, //TODO: add 'is-logged-in' and 'is-vendor' poligices to this
   "admin/approve-or-decline-order": true, //TODO: add 'is-logged-in' and 'is-vendor' poligices to this
+  "admin/customer-update-paid-order": true, //TODO: add 'is-logged-in' and 'is-vendor' poligices to this
+  "admin/customer-cancel-order": true, //TODO: add 'is-logged-in' and 'is-vendor' poligices to this
+  "admin/customer-received-order": true, //TODO: add 'is-logged-in' and 'is-vendor' poligices to this
   "admin/*": "is-logged-in",
   "discounts/*": true, // ['localize', 'firebase', 'firebase-auth', 'is-logged-in'],
   "orders/*": true, // ["localize", "firebase", "firebase-auth", "is-logged-in"],
   "products/*": true, // ["localize", "firebase", "firebase-auth", "is-logged-in"],
-  "vendors/*": true, /*[
+  "vendors/*": true /*[
     "localize",
     "firebase",
     "firebase-auth",
     "is-logged-in",
     "is-vendor",
-  ],*/
+  ],*/,
   "couriers/*": true, // ["is-logged-in", "is-delivery-partner"],
   "*": true, // "is-logged-in",
 };

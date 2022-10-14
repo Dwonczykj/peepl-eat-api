@@ -176,10 +176,6 @@ module.exports = {
     const vendor = await Vendor.findOne({ id: inputs.pickupFromVendor });
 
     for (const deliveryPartner of deliveryPartnerHelpers) {
-      sails.log(
-        "getAvailableDeliveryPartnerFromPool -> requestProvisionalDeliveryAvailability for " +
-          deliveryPartner.deliveryPartnerName
-      );
       const deliveryAvailability =
         await deliveryPartner.requestProvisionalDeliveryAvailability(
           new DeliveryInformation(
@@ -199,17 +195,15 @@ module.exports = {
             inputs.deliveryAddressPostCode
           )
         );
-      sails.log(
-        `${deliveryPartner.deliveryPartnerName} ${deliveryAvailability.status} delivery`
-      );
+      // sails.log.info(
+      //   `${deliveryPartner.deliveryPartnerName} ${deliveryAvailability.status} delivery`
+      // );
       if (!deliveryPartner.requestDeliveryAvailability) {
         chosenDeliveryPartner = deliveryPartner;
-        sails.log("DONE getAvailableDeliveryPartnerFromPool");
         return exits.success(chosenDeliveryPartner.deliveryPartner);
       }
       if (deliveryAvailability.status === "accepted") {
         chosenDeliveryPartner = deliveryPartner;
-        sails.log("DONE getAvailableDeliveryPartnerFromPool");
         return exits.success(chosenDeliveryPartner.deliveryPartner);
       } else if (
         deliveryAvailability.status === "pending" &&
@@ -218,7 +212,6 @@ module.exports = {
         chosenDeliveryPartner = deliveryPartner;
       }
     }
-    sails.log("DONE getAvailableDeliveryPartnerFromPool");
     return exits.success(chosenDeliveryPartner.deliveryPartner);
   },
 };
