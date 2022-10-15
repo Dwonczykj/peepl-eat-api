@@ -249,28 +249,6 @@ module.exports = {
     const gbpxPortionToRefundToCustomer = _gbpxPortion;
     const pplPortionToRefundToCustomer = _pplPortion;
 
-    //TODO: Create a new Refund Object Model in the db so that we can
-    //todo 1. Check for any outstanding refunds -> add a controller to get all outstanding refunds for super-admins
-    
-    //todo 2. Test that the method is correctly creating the refund.
-    //todo 3. Have  the webhook update the refund object using the paymentIntentId when the refund has been compelted by peeplPay api
-
-    // ! Currently, this code only creates a child order with updated items for the vendor to then send the SMS to vendor:
-    //tododone: SMS needs to ask the vendor to re-accept the child order which should have a restaurantAcceptedStatus flag of '' on creation here. 
-    //tododone then update the sms to inclde the apporive-or-decline order handle for teh child order
-    //todo unit test this and then update the sms to inclde the apporive-or-decline order handle for teh child order
-
-    //TODOdone: Send a request to adam to issue the request to refund the value of the items that were removed by vendor & customer combined
-    //TODOdone: Adams code should then call the peepl-pay-update-paid-order-webhook only once this amount has been refunded back. Or shoudl we be calling the peepl-pay-refund-webhook instead which will be called for the amount that should be refunded (the partial amount fo the original order)
-
-    //TODOdone: For cancellations, there are also no PPL Rewards Issues to be reverted (this is not the same as PPL used to pay for the order which need to be sent back to the customer)
-    //todo as the original order was never accepted by the vendor.
-    //TODOdone: But a refund object should be created in the customer-cancel-order action so that the refund can be issued by adam
-    
-    //TODOdone: So add await Refund.create() to helpers.revertPaymentPartial|Full
-
-    //tododone: This should be called from the customer-update-paid-order controller and the webhook just notifies 
-    //tododone the user that the partial refund succeeded.
     try {
       // send a refund to the user:
       await sails.helpers.revertPaymentPartial.with({
@@ -287,7 +265,6 @@ module.exports = {
       );
     }
 
-    //todo add test to check that this sms is sent and notification created in the db of type sms
     // create a new request for the vendor to check that they can service the updated order.
     await sails.helpers.sendSmsNotification.with({
       to: newOrder.vendor.phoneNumber,
@@ -302,28 +279,6 @@ module.exports = {
         orderId: newOrder.id
       },
     });
-
-    //TODO: Remove the below and smsNotification as already done above, 
-    // var customerUpdatedOrderMsgToVendor;
-    // if (newOrder.fulfilmentMethod.methodType === "delivery") {
-    //   customerUpdatedOrderMsgToVendor = `Your vegi order for delivery between ${order.fulfilmentSlotFrom} and ${order.fulfilmentSlotTo} has bene updated. To view: ${sails.config.custom.baseUrl}/admin/order/${order.publicId}`;
-    // } else {
-    //   customerUpdatedOrderMsgToVendor = `Your vegi order for collection between ${order.fulfilmentSlotFrom} and ${order.fulfilmentSlotTo} has bene updated. To view: ${sails.config.custom.baseUrl}/admin/order/${order.publicId}`;
-    // }
-
-    // try {
-    //   await sails.helpers.sendSmsNotification.with({
-    //     to: newOrder.vendor.phoneNumber,
-    //     body: customerUpdatedOrderMsgToVendor,
-    // data: {
-    //     orderId: newOrder.id
-    //   },
-    //   });
-    // } catch (error) {
-    //   sails.log.error(
-    //     `admin/customer-update-paid-order failed to send sms to new vendor: ${error}`
-    //   );
-    // }
 
     return exits.success({ orderId: newOrder.id });
 
@@ -363,6 +318,5 @@ module.exports = {
 
     // All done.
     // return exits.success({ orderId: newOrder.id, paymentIntentID: newPaymentIntent.paymentIntentId });
-    //TODO: Store the above info against the refund in the db, could have a new refunds object, then add the below to the webhook once receival of reverted rewards tokens has been confirmed / completed by peeplPay
   },
 };

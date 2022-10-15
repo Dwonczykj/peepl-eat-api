@@ -118,7 +118,6 @@ module.exports = {
     let customerNotifiedFirebase = false;
     let vendorNotified = false;
     try {
-      // TODO: Add test to check that this notification was created in the db.
       await sails.helpers.sendFirebaseNotification.with({
         topic: "order-" + paidOrder.publicId,
         title: "Order Partially Refunded",

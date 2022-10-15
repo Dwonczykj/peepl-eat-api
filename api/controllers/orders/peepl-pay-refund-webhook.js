@@ -11,7 +11,6 @@ module.exports = {
     },
     status: {
       type: "string",
-      // isIn: ["success", "failure"],
     },
   },
 

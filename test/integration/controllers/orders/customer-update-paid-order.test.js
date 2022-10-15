@@ -16,7 +16,7 @@ const {
   HttpAuthTestSenderOrder,
 } = require("./defaultOrder");
 
-const USER_UPDATE_PAID_ORDER_SUCCESS = (fixtures) => {
+const USER_UPDATED_PAID_ORDER_SUCCEEDED = (fixtures) => {
   return {
     useAccount: "TEST_SERVICE",
     HTTP_TYPE: "post",
@@ -34,11 +34,31 @@ const USER_UPDATE_PAID_ORDER_SUCCESS = (fixtures) => {
     expectResponse: {},
     expectStatusCode: 200,
     expectResponseCb: async (response, requestPayload) => {
+      const refunds = await Refund.find({
+        paymentIntentId: requestPayload.publicId,
+      });
+      for (const refund of refunds){
+        expect(refund.refundStatus).to.equal('paid', `Refund Status not set correctly on: ${util.inspect(refund, {depth: null})}`);
+      }
+      const firebaseNotifications = await Notification.find({
+        recipient: "order-" + requestPayload.publicId,
+        type: 'push'
+      });
+      assert.isNotEmpty(firebaseNotifications);
+      const order = await Order.findOne({
+        paymentIntentId: requestPayload.publicId
+      });
+      assert.isNotNull(order);
+      const smsNotifications = await Notification.find({
+        recipient: order.deliveryPhoneNumber,
+        type: "sms",
+      });
+      assert.isNotEmpty(smsNotifications);
       return;
     },
   };
 };
-const UPDATE_PAID_ORDER_FAILED = (fixtures) => {
+const UPDATED_PAID_ORDER_FAILED = (fixtures) => {
   return {
     useAccount: "TEST_SERVICE",
     HTTP_TYPE: "post",
@@ -56,6 +76,31 @@ const UPDATE_PAID_ORDER_FAILED = (fixtures) => {
     expectResponse: {},
     expectStatusCode: 200,
     expectResponseCb: async (response, requestPayload) => {
+      const refunds = await Refund.find({
+        paymentIntentId: requestPayload.publicId,
+      });
+      for (const refund of refunds) {
+        expect(refund.refundStatus).to.equal(
+          "failed",
+          `Refund Status not set correctly on: ${util.inspect(refund, {
+            depth: null,
+          })}`
+        );
+      }
+      const firebaseNotifications = await Notification.find({
+        recipient: "order-" + requestPayload.publicId,
+        type: "push",
+      });
+      assert.isNotEmpty(firebaseNotifications);
+      const order = await Order.findOne({
+        paymentIntentId: requestPayload.publicId,
+      });
+      assert.isNotNull(order);
+      const smsNotifications = await Notification.find({
+        recipient: order.deliveryPhoneNumber,
+        type: "sms",
+      });
+      assert.isNotEmpty(smsNotifications);
       return;
     },
   };
@@ -79,6 +124,27 @@ const CUSTOMER_UPDATE_PAID_ORDER = (fixtures) => {
     },
     expectStatusCode: 200,
     expectResponseCb: async (response, requestPayload) => {
+      const refunds = await Refund.find({
+        paymentIntentId: requestPayload.publicId,
+      });
+      for (const refund of refunds) {
+        expect(refund.refundStatus).to.equal(
+          "unpaid",
+          `Refund Status not set correctly on: ${util.inspect(refund, {
+            depth: null,
+          })}`
+        );
+      }
+      
+      const order = await Order.findOne({
+        paymentIntentId: requestPayload.publicId,
+      });
+      assert.isNotNull(order);
+      const smsNotifications = await Notification.find({
+        recipient: order.vendor.phoneNumber,
+        type: "sms",
+      });
+      assert.isNotEmpty(smsNotifications);
       return;
     },
   };
@@ -120,7 +186,7 @@ describe(`${CUSTOMER_UPDATE_PAID_ORDER(fixtures).ACTION_NAME}()`, () => {
   });
 });
 
-describe(`${USER_UPDATE_PAID_ORDER_SUCCESS(fixtures).ACTION_NAME}()`, () => {
+describe(`${USER_UPDATED_PAID_ORDER_SUCCEEDED(fixtures).ACTION_NAME}()`, () => {
   it("PeeplPay Service can successfully send notifications when a payment succeeds for an order", async () => {
     try {
       const paidOrder = await Order.create(
@@ -132,7 +198,7 @@ describe(`${USER_UPDATE_PAID_ORDER_SUCCESS(fixtures).ACTION_NAME}()`, () => {
         })
       ).fetch();
       const hats = new HttpAuthTestSenderOrder(
-        USER_UPDATE_PAID_ORDER_SUCCESS(fixtures)
+        USER_UPDATED_PAID_ORDER_SUCCEEDED(fixtures)
       );
       console.log(`paymentIntentId: ${paidOrder.paymentIntentId}`);
       const response = await hats.makeAuthCallWith(
@@ -163,7 +229,7 @@ describe(`${USER_UPDATE_PAID_ORDER_SUCCESS(fixtures).ACTION_NAME}()`, () => {
         })
       ).fetch();
       const hats = new HttpAuthTestSenderOrder(
-        UPDATE_PAID_ORDER_FAILED(fixtures)
+        UPDATED_PAID_ORDER_FAILED(fixtures)
       );
       const response = await hats.makeAuthCallWith(
         {

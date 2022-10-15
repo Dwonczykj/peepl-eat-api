@@ -67,6 +67,32 @@ const MARK_ORDER_AS_REFUNDED_SUCCESS = (fixtures) => {
     expectResponse: {},
     expectStatusCode: 200,
     expectResponseCb: async (response, requestPayload) => {
+      const refunds = await Refund.find({
+        paymentIntentId: requestPayload.publicId,
+      });
+      for (const refund of refunds) {
+        expect(refund.refundStatus).to.equal(
+          "paid",
+          `Refund Status not set correctly on: ${util.inspect(refund, {
+            depth: null,
+          })}`
+        );
+      }
+
+      const order = await Order.findOne({
+        paymentIntentId: requestPayload.publicId,
+      });
+      assert.isNotNull(order);
+      const smsNotificationsToCustomer = await Notification.find({
+        recipient: order.deliveryPhoneNumber,
+        type: "sms",
+      });
+      assert.isNotEmpty(smsNotificationsToCustomer);
+      const smsNotificationsToVendor = await Notification.find({
+        recipient: order.vendor.phoneNumber,
+        type: "sms",
+      });
+      assert.isNotEmpty(smsNotificationsToVendor);
       return;
     },
   };
@@ -84,6 +110,32 @@ const MARK_ORDER_AS_REFUNDED_FAILED = (fixtures) => {
     expectResponse: {},
     expectStatusCode: 200,
     expectResponseCb: async (response, requestPayload) => {
+      const refunds = await Refund.find({
+        paymentIntentId: requestPayload.publicId,
+      });
+      for (const refund of refunds) {
+        expect(refund.refundStatus).to.equal(
+          "failed",
+          `Refund Status not set correctly on: ${util.inspect(refund, {
+            depth: null,
+          })}`
+        );
+      }
+
+      const order = await Order.findOne({
+        paymentIntentId: requestPayload.publicId,
+      });
+      assert.isNotNull(order);
+      const smsNotificationsToCustomer = await Notification.find({
+        recipient: order.deliveryPhoneNumber,
+        type: "sms",
+      });
+      assert.isNotEmpty(smsNotificationsToCustomer);
+      const smsNotificationsToVendor = await Notification.find({
+        recipient: order.vendor.phoneNumber,
+        type: "sms",
+      });
+      assert.isNotEmpty(smsNotificationsToVendor);
       return;
     },
   };
