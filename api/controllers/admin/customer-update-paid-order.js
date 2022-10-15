@@ -298,6 +298,9 @@ module.exports = {
         sails.config.custom.baseUrl +
         "/admin/approve-order/" +
         newOrder.publicId,
+      data: {
+        orderId: newOrder.id
+      },
     });
 
     //TODO: Remove the below and smsNotification as already done above, 
@@ -312,6 +315,9 @@ module.exports = {
     //   await sails.helpers.sendSmsNotification.with({
     //     to: newOrder.vendor.phoneNumber,
     //     body: customerUpdatedOrderMsgToVendor,
+    // data: {
+    //     orderId: newOrder.id
+    //   },
     //   });
     // } catch (error) {
     //   sails.log.error(

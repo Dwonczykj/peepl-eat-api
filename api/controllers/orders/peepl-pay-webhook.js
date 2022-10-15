@@ -54,7 +54,10 @@ module.exports = {
 	    if(order.paymentStatus === 'paid'){
 	      await sails.helpers.sendSmsNotification.with({
 	        to: order.vendor.phoneNumber,
-	        body: 'You have received a new order from vegi for delivery between ' + order.fulfilmentSlotFrom + ' and ' + order.fulfilmentSlotTo + '. To accept or decline: ' + sails.config.custom.baseUrl + '/admin/approve-order/' + order.publicId
+	        body: 'You have received a new order from vegi for delivery between ' + order.fulfilmentSlotFrom + ' and ' + order.fulfilmentSlotTo + '. To accept or decline: ' + sails.config.custom.baseUrl + '/admin/approve-order/' + order.publicId,
+          data: {
+            orderId: order.id,
+          },
 	      });
 	    } else {
 	      await sails.helpers.sendSmsNotification.with({
@@ -64,7 +67,10 @@ module.exports = {
 	          order.fulfilmentSlotFrom +
 	          " and " +
 	          order.fulfilmentSlotTo +
-	          ". Please review your payment method in the vegi app."
+	          ". Please review your payment method in the vegi app.",
+          data: {
+            orderId: order.id
+          },
 	      });
 	    }
     } catch (error) {

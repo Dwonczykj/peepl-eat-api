@@ -85,6 +85,9 @@ module.exports = {
           order.publicId +
           ` ${refundWorked} for ` +
           formulateMoney(order.total),
+        data: {
+          orderId: order.id,
+        },
       });
       await sails.helpers.sendSmsNotification.with({
         to: order.vendor.phoneNumber,
@@ -95,6 +98,9 @@ module.exports = {
           refundWorked +
           " to customer for " +
           formulateMoney(order.total),
+        data: {
+          orderId: order.id,
+        },
       });
 
       await sails.helpers.raiseVegiSupportIssue.with({

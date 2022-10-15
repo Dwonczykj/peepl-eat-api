@@ -131,11 +131,17 @@ module.exports = {
       await sails.helpers.sendSmsNotification.with({
         to: paidOrder.deliveryPhoneNumber,
         body: msgBodyCustomer,
+        data: {
+          orderId: paidOrder.id,
+        },
       });
       customerNotified = true;
       await sails.helpers.sendSmsNotification.with({
         to: paidOrder.vendor.phoneNumber,
         body: msgBodyVendor,
+        data: {
+          orderId: paidOrder.id,
+        },
       });
       vendorNotified = true;
       await sails.helpers.raiseVegiSupportIssue.with({
