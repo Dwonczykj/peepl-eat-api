@@ -140,7 +140,7 @@ module.exports = {
     completedFlag: {
       type: "string",
       defaultsTo: "",
-      isIn: ["", "completed", "cancelled", "refunded", "void"],
+      isIn: ["", "completed", "cancelled", "refunded", "partially refunded", "void"],
     },
     completedOrderFeedback: {
       type: "string",

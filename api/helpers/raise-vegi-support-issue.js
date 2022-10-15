@@ -45,11 +45,28 @@ module.exports = {
     if (inputs.orderId) {
       title = `${title} - OrderId: ${inputs.orderId}`;
     }
+
+    var orderInternalId;
+    try {
+      const order = await Order.findOne({
+        publicId: inputs.orderId
+      });
+      if(order){
+        orderInternalId = order.id;
+      }else{
+        orderInternalId = null;
+      }
+    } catch (error) {
+      orderInternalId = null;
+    }
     
     try {
 	    await sails.helpers.sendSmsNotification.with({
         to: sails.config.custom.internalPhoneNumber,
         body: `${title}\n${inputs.message}`,
+        data: orderInternalId ? {
+          orderId: orderInternalId,
+        } : {},
       });
     } catch (error) {
       sails.log.error(`Error occurred in helpers/raiseVegiSupportIssue trying to send SMS: ${error}`);

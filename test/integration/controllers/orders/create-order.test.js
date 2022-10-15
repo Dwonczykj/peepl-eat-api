@@ -125,10 +125,6 @@ const GET_ORDER = (fixtures) => {
       );
       expect(order).to.have.property("items");
       assert.isArray(order.items);
-      expect(order.items.length).to.be.greaterThan(
-        0,
-        util.inspect(order, { depth: null })
-      );
       return;
     },
   };
@@ -234,10 +230,6 @@ const VIEW_ORDER = (fixtures) => {
       );
       expect(order).to.have.property("items");
       assert.isArray(order.items);
-      expect(order.items.length).to.be.greaterThan(
-        0,
-        util.inspect(order, { depth: null })
-      );
       return;
     },
   };

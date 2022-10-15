@@ -126,6 +126,7 @@ describe(`${USER_UPDATE_PAID_ORDER_SUCCESS(fixtures).ACTION_NAME}()`, () => {
       const paidOrder = await Order.create(
         DEFAULT_NEW_ORDER_OBJECT(fixtures, {
           parentOrder: null,
+          paymentIntentId: 'dummy_payment_intent_id_' + uuidv4(),
           items: [1, 2, 3, 6, 8],
           total: 5425,
         })
@@ -133,9 +134,10 @@ describe(`${USER_UPDATE_PAID_ORDER_SUCCESS(fixtures).ACTION_NAME}()`, () => {
       const hats = new HttpAuthTestSenderOrder(
         USER_UPDATE_PAID_ORDER_SUCCESS(fixtures)
       );
+      console.log(`paymentIntentId: ${paidOrder.paymentIntentId}`);
       const response = await hats.makeAuthCallWith(
         {
-          publicId: paidOrder.publicId,
+          publicId: paidOrder.paymentIntentId,
           metadata: {
             orderId: paidOrder.publicId,
             paymentIntentId: paidOrder.paymentIntentId,

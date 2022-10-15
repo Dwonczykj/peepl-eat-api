@@ -54,6 +54,24 @@ module.exports = {
 
 
   fn: async function (inputs, exits) {
+    const requestedAt = Date.now();
+    const newRefundGBPx = await Refund.create({
+      paymentIntentId: inputs.paymentId,
+      currency: sails.config.custom.vegiDigitalStableCurrencyTicker,
+      amount: inputs.refundRequestGBPx,
+      recipientWalletAddress: inputs.refundRecipientWalletAddress,
+      requestedAt: requestedAt,
+      refundStatus: "unpaid",
+    }).fetch();
+    const newRefundPPL = await Refund.create({
+      paymentIntentId: inputs.paymentId,
+      currency: sails.config.custom.vegiGreenPointsTicker,
+      amount: inputs.refundRequestGBPx,
+      recipientWalletAddress: inputs.refundRecipientWalletAddress,
+      requestedAt: requestedAt,
+      refundStatus: "unpaid",
+    }).fetch();
+
     const instance = axios.create({
       baseURL: sails.config.custom.peeplPayUrl,
       timeout: 2000,
@@ -62,12 +80,15 @@ module.exports = {
 
     //TODO: request refund for partial amount of order from peeplPay community manager wallet address back to the customer.
     //TODO: Assert that the paymentAmount == the sum of value of the items (+ % of service charge?) - discount
-    instance.post('/payment_refunds', {
-      amount: inputs.paymentAmount,
-      recipientWalletAddress: inputs.refundRecipientWalletAddress,
-      vendorDisplayName: inputs.refundFromName,
-      webhookAddress: sails.config.custom.peeplPayRefundWebhookAddress
-    })
+    instance
+      .post("/payment_refunds", {
+        amount: inputs.paymentAmount,
+        originalPaymentIntentId: inputs.paymentId,
+        recipientWalletAddress: inputs.refundRecipientWalletAddress,
+        vendorDisplayName: inputs.refundFromName,
+        webhookAddress:
+          sails.config.custom.peeplWebhookAddressCustomerUpdatePaidOrder,
+      })
       .then(async (response) => {
         // TODO: Check whether request for refund was accepted and can be fulfilled by the peeplPay service.
         var paymentIntentId = response.data.paymentIntent.publicId;

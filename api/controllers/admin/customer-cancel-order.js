@@ -79,12 +79,13 @@ module.exports = {
         (order.restaurantAcceptanceStatus === "accepted" ||
           order.restaurantAcceptanceStatus === "partially fulfilled")
       ) {
-        await sails.helpers.revertPeeplRewardIssue.with({
-          paymentId: order.paymentIntentId,
-          recipient: order.customerWalletAddress,
-          paymentAmountBeingRefunded: order.total,
-          rewardsIssued: order.rewardsIssued,
-        });
+        // ! This should not be possible as we shouldnt allow customers to cancel original orders that were accepted by the venodr, and if partially fulfilled, then no rewards are issued before the child order is accepted.
+        // await sails.helpers.revertPeeplRewardIssue.with({
+        //   paymentId: order.paymentIntentId,
+        //   recipient: order.customerWalletAddress,
+        //   paymentAmountBeingRefunded: order.total,
+        //   rewardsIssued: order.rewardsIssued,
+        // });
       }
 
       await sails.helpers.sendFirebaseNotification.with({

@@ -117,7 +117,7 @@ module.exports = {
     },
     incompleteOrderInformationStoredDB: {
       statusCode: 501,
-      description: 'the stored order doesnt have the paymentIntentId set'
+      description: "the stored order doesnt have the paymentIntentId set",
     },
     success: {
       statusCode: 200,
@@ -173,7 +173,7 @@ module.exports = {
       parentOrder: order.id,
       paymentIntentID: response.data.paymentIntentId,
       customerWalletAddress: inputs.customerWalletAddress,
-    }).populate('vendor');
+    }).populate("vendor");
 
     if (!newOrder || !newOrder.vendor) {
       return exits.orderNotFound();
@@ -190,10 +190,10 @@ module.exports = {
         )
       );
     }
-    
+
     if (oldOrder.total < newOrder.total) {
       const oldOrderItems = await OrderItem.find({
-        order: oldOrder.id
+        order: oldOrder.id,
       });
       const newOrderItems = await OrderItem.find({
         order: newOrder.id,
@@ -211,23 +211,27 @@ module.exports = {
       );
       return exits.orderNotAuthorised();
     }
-
+    let _gbpxPortion;
+    let _pplPortion;
     try {
       sails.log.warn(
         `Using MockPeeplPayPricingAPI to get PPL and GBPx currency conversions in admin/customer-update-paid-order`
       );
-      var gbpxPortion = await peeplPay.getAmountInCurrency({
+      _gbpxPortion = await peeplPay.getAmountInCurrency({
         amount: inputs.refundRequestGBPx,
         fromCurrency: "GBPx",
         toCurrency: "GBP",
       });
-      var pplPortion = await peeplPay.getAmountInCurrency({
+      _pplPortion = await peeplPay.getAmountInCurrency({
         amount: inputs.refundRequestPPL,
         fromCurrency: "PPL",
         toCurrency: "GBP",
       });
-      sails.log(`gbpx -> ${gbpxPortion}; ppl -> ${pplPortion}`);
-      if (oldOrder.total - newOrder.total - (gbpxPortion + pplPortion) > 0.01) {
+      sails.log(`gbpx -> ${_gbpxPortion}; ppl -> ${_pplPortion}`);
+      if (
+        oldOrder.total - newOrder.total - (_gbpxPortion + _pplPortion) >
+        0.01
+      ) {
         // requested refund is more than 1p out of change in order value.
         return exits.badRequest();
       }
@@ -241,21 +245,79 @@ module.exports = {
         )
       );
     }
-    var customerUpdatedOrderMsgToVendor;
-    if (newOrder.fulfilmentMethod.methodType === "delivery") {
-      customerUpdatedOrderMsgToVendor = `Your vegi order for delivery between ${order.fulfilmentSlotFrom} and ${order.fulfilmentSlotTo} has bene updated. To view: ${sails.config.custom.baseUrl}/admin/order/${order.publicId}`;
-    } else {
-      customerUpdatedOrderMsgToVendor = `Your vegi order for collection between ${order.fulfilmentSlotFrom} and ${order.fulfilmentSlotTo} has bene updated. To view: ${sails.config.custom.baseUrl}/admin/order/${order.publicId}`;
+
+    const gbpxPortionToRefundToCustomer = _gbpxPortion;
+    const pplPortionToRefundToCustomer = _pplPortion;
+
+    //TODO: Create a new Refund Object Model in the db so that we can
+    //todo 1. Check for any outstanding refunds -> add a controller to get all outstanding refunds for super-admins
+    
+    //todo 2. Test that the method is correctly creating the refund.
+    //todo 3. Have  the webhook update the refund object using the paymentIntentId when the refund has been compelted by peeplPay api
+
+    // ! Currently, this code only creates a child order with updated items for the vendor to then send the SMS to vendor:
+    //tododone: SMS needs to ask the vendor to re-accept the child order which should have a restaurantAcceptedStatus flag of '' on creation here. 
+    //tododone then update the sms to inclde the apporive-or-decline order handle for teh child order
+    //todo unit test this and then update the sms to inclde the apporive-or-decline order handle for teh child order
+
+    //TODOdone: Send a request to adam to issue the request to refund the value of the items that were removed by vendor & customer combined
+    //TODOdone: Adams code should then call the peepl-pay-update-paid-order-webhook only once this amount has been refunded back. Or shoudl we be calling the peepl-pay-refund-webhook instead which will be called for the amount that should be refunded (the partial amount fo the original order)
+
+    //TODOdone: For cancellations, there are also no PPL Rewards Issues to be reverted (this is not the same as PPL used to pay for the order which need to be sent back to the customer)
+    //todo as the original order was never accepted by the vendor.
+    //TODOdone: But a refund object should be created in the customer-cancel-order action so that the refund can be issued by adam
+    
+    //TODOdone: So add await Refund.create() to helpers.revertPaymentPartial|Full
+
+    //tododone: This should be called from the customer-update-paid-order controller and the webhook just notifies 
+    //tododone the user that the partial refund succeeded.
+    try {
+      // send a refund to the user:
+      await sails.helpers.revertPaymentPartial.with({
+        paymentId: oldOrder.paymentIntentId, //same as newOrder.paymentIntentId
+        refundAmountGBPx: gbpxPortionToRefundToCustomer,
+        refundRequestPPL: pplPortionToRefundToCustomer,
+        refundRecipientWalletAddress: oldOrder.customerWalletAddress,
+        recipientName: newOrder.deliveryName,
+        refundFromName: newOrder.vendor.name,
+      });
+    } catch (error) {
+      sails.log.error(
+        `peepl-pay-update-paid-order-webhook failed to partially revert the payment (helpers.revertPaymentPartial): ${error}`
+      );
     }
 
-    try {
-	    await sails.helpers.sendSmsNotification.with({
-	      to: newOrder.vendor.phoneNumber,
-	      body: customerUpdatedOrderMsgToVendor,
-	    });
-    } catch (error) {
-      sails.log.error(`admin/customer-update-paid-order failed to send sms to new vendor: ${error}`);
-    }
+    //todo add test to check that this sms is sent and notification created in the db of type sms
+    // create a new request for the vendor to check that they can service the updated order.
+    await sails.helpers.sendSmsNotification.with({
+      to: newOrder.vendor.phoneNumber,
+      body:
+        `You have received an updated order from vegi resulting from the partial fulfillment of order: ${newOrder.parentOrder.publicId}. ` +
+        `The updated order is scheduled for delivery between ${newOrder.fulfilmentSlotFrom} and ${newOrder.fulfilmentSlotTo}. ` +
+        `Please accept or decline the update: ` +
+        sails.config.custom.baseUrl +
+        "/admin/approve-order/" +
+        newOrder.publicId,
+    });
+
+    //TODO: Remove the below and smsNotification as already done above, 
+    // var customerUpdatedOrderMsgToVendor;
+    // if (newOrder.fulfilmentMethod.methodType === "delivery") {
+    //   customerUpdatedOrderMsgToVendor = `Your vegi order for delivery between ${order.fulfilmentSlotFrom} and ${order.fulfilmentSlotTo} has bene updated. To view: ${sails.config.custom.baseUrl}/admin/order/${order.publicId}`;
+    // } else {
+    //   customerUpdatedOrderMsgToVendor = `Your vegi order for collection between ${order.fulfilmentSlotFrom} and ${order.fulfilmentSlotTo} has bene updated. To view: ${sails.config.custom.baseUrl}/admin/order/${order.publicId}`;
+    // }
+
+    // try {
+    //   await sails.helpers.sendSmsNotification.with({
+    //     to: newOrder.vendor.phoneNumber,
+    //     body: customerUpdatedOrderMsgToVendor,
+    //   });
+    // } catch (error) {
+    //   sails.log.error(
+    //     `admin/customer-update-paid-order failed to send sms to new vendor: ${error}`
+    //   );
+    // }
 
     return exits.success({ orderId: newOrder.id });
 

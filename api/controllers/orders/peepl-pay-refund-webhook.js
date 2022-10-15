@@ -28,12 +28,33 @@ module.exports = {
 
   fn: async function (inputs, exits) {
     var refundSucceeded = inputs.status === "success";
-    
+
     var unixtime = Date.now();
+
+    const refundGBPx = await Refund.findOne({
+      paymentIntentId: inputs.publicId,
+      currency: sails.config.custom.vegiDigitalStableCurrencyTicker,
+    });
+    const refundPPL = await Refund.findOne({
+      paymentIntentId: inputs.publicId,
+      currency: sails.config.custom.vegiGreenPointsTicker,
+    });
+    if (refundGBPx) {
+      await Refund.updateOne(refundGBPx.id).set({
+        refundStatus: refundSucceeded ? "paid" : "failed",
+      });
+    }
+    if (refundPPL) {
+      await Refund.updateOne(refundPPL.id).set({
+        refundStatus: refundSucceeded ? "paid" : "failed",
+      });
+    }
 
     // Update order with payment ID and time
     if (refundSucceeded) {
-      const order = await Order.updateOne({ paymentIntentId: inputs.publicId }).set({
+      const order = await Order.updateOne({
+        paymentIntentId: inputs.publicId,
+      }).set({
         completedFlag: "refunded",
         refundDateTime: unixtime,
       });
@@ -45,7 +66,7 @@ module.exports = {
     var order = await Order.findOne({
       paymentIntentId: inputs.publicId,
     }).populate("vendor");
-    
+
     if (!order) {
       return exits.orderNotFound();
     }
@@ -57,33 +78,33 @@ module.exports = {
       ? "has been successfully refunded"
       : "failed to be refunded";
     try {
-	    await sails.helpers.sendSmsNotification.with({
-	      to: order.deliveryPhoneNumber,
-	      body:
-	        "Your vegi order: " +
-	        order.publicId +
-	        ` ${refundWorked} for ` +
-	        formulateMoney(order.total),
-	    });
-	    await sails.helpers.sendSmsNotification.with({
-	      to: order.vendor.phoneNumber,
-	      body:
-	        "Refund complete for vegi order: " +
-	        order.publicId +
-	        ". Order " +
-	        refundWorked +
-	        " to customer for " +
-	        formulateMoney(order.total),
-	    });
-	    
-	    await sails.helpers.raiseVegiSupportIssue.with({
-	      orderId: order.publicId,
-	      title: "order_refund_" + refundStr,
-	      message:
-	        `Order Refund ${refundStr}: ${order.publicId} ${refundWorked} to wallet '${order.customerWalletAddress}' for ` +
-	        formulateMoney(order.total) +
-	        ".",
-	    });
+      await sails.helpers.sendSmsNotification.with({
+        to: order.deliveryPhoneNumber,
+        body:
+          "Your vegi order: " +
+          order.publicId +
+          ` ${refundWorked} for ` +
+          formulateMoney(order.total),
+      });
+      await sails.helpers.sendSmsNotification.with({
+        to: order.vendor.phoneNumber,
+        body:
+          "Refund complete for vegi order: " +
+          order.publicId +
+          ". Order " +
+          refundWorked +
+          " to customer for " +
+          formulateMoney(order.total),
+      });
+
+      await sails.helpers.raiseVegiSupportIssue.with({
+        orderId: order.publicId,
+        title: "order_refund_" + refundStr,
+        message:
+          `Order Refund ${refundStr}: ${order.publicId} ${refundWorked} to wallet '${order.customerWalletAddress}' for ` +
+          formulateMoney(order.total) +
+          ".",
+      });
     } catch (error) {
       sails.log.error(`failed to contact vegi support with error: ${error}`);
     }

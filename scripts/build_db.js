@@ -65,6 +65,10 @@ async function buildDb(sails, test) {
     await User.createEach(fixtures.users);
     await Order.createEach(fixtures.orders);
     await OrderItem.createEach(fixtures.orderItems);
+    // for(const item of fixtures.orderItems){
+    //   console.log(`orderItem.order = ${item.order}`);
+    //   await Order.addToCollection(item.order, "items", [item.id]);
+    // }
   } else {
     await User.createEach([
       {

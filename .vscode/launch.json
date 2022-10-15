@@ -95,7 +95,7 @@
                 // "999999",
                 "--colors",
                 // "${workspaceFolder}/test/integration/**/*.test.js",
-                "${workspaceFolder}/test/integration/controllers/orders/create-order.test.js",
+                "${workspaceFolder}/test/integration/controllers/orders/*.test.js",
             ],
             "internalConsoleOptions": "openOnSessionStart",
             "skipFiles": [

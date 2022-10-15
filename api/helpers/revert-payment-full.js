@@ -50,6 +50,15 @@ module.exports = {
 
 
   fn: async function (inputs, exits) {
+    const newRefund = await Refund.create({
+      paymentIntentId: inputs.paymentId,
+      currency: sails.config.custom.vegiDigitalStableCurrencyTicker, //! for now refund the whole amount in GBPx
+      amount: inputs.refundAmount,
+      recipientWalletAddress: inputs.refundRecipientWalletAddress,
+      requestedAt: Date.now(),
+      refundStatus: "unpaid",
+    }).fetch();
+
     var dontActuallySend =
       sails.config.environment === "test" ||
       process.env.FIREBASE_AUTH_EMULATOR_HOST;
@@ -72,6 +81,7 @@ module.exports = {
     //TODO: Assert that the refundAmount == the sum of value of the items (+ % of service charge?) - discount
     instance.post('/payment_refunds', {
       amount: inputs.refundAmount,
+      originalPaymentIntentId: inputs.paymentId,
       recipientWalletAddress: inputs.refundRecipientWalletAddress,
       vendorDisplayName: inputs.refundFromName,
       webhookAddress: sails.config.custom.peeplPayRefundWebhookAddress

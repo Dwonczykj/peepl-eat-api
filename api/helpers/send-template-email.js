@@ -179,6 +179,13 @@ module.exports = {
 
       // If that's the case, or if we're in the "test" environment, then log
       // the email instead of sending it:
+      const newNotification = await Notification.create({
+        recipient: to,
+        type: "email",
+        sentAt: Date.now(),
+        title: subject,
+      }).fetch();
+
       dontActuallySend =
         sails.config.environment === "test" ||
         isToAddressConsideredFake ||

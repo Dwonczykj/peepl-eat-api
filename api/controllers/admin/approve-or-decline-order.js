@@ -138,7 +138,7 @@ module.exports = {
           });
         } catch (error) {
           sails.log.error(
-            "failed to raise vegi support issue to log a failed rewards points issue for an accepted order"
+            `failed to raise vegi support issue to log a failed rewards points issue for an accepted order: ${error}`
           );
         }
       }
@@ -155,6 +155,8 @@ module.exports = {
       if (order.paymentStatus === "paid") {
         try {
           // send a refund to the user:
+          //todo vegi has no idea how much of payment was funded by PPL and GBPx split?
+          //! for now refund all in GBPx for order cancellation so that do not need to ask custoemr.
           await sails.helpers.revertPaymentFull.with({
             paymentId: order.paymentIntentId,
             refundAmount: order.total,

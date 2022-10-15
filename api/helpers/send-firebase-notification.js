@@ -44,6 +44,15 @@ module.exports = {
 
 
   fn: async function (inputs, exits) {
+
+    const newNotification = await Notification.create({
+      recipient: inputs.topic,
+      type: 'push',
+      sentAt: Date.now(),
+      title: inputs.title,
+      order: inputs.data && inputs.data.orderId || null,
+    }).fetch();
+
     var dontActuallySend =
       sails.config.environment === "test" ||
       process.env.FIREBASE_AUTH_EMULATOR_HOST;
