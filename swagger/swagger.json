@@ -2707,13 +2707,13 @@
         ],
         "responses": {
           "200": {
-            "description": "The requested resource"
+            "description": "Success"
           },
           "404": {
-            "description": "Resource not found"
+            "description": "Success"
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Success"
           }
         }
       }

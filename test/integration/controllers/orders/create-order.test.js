@@ -244,17 +244,6 @@ describe(`Order Model Integration Tests`, () => {
         const sendOrder = CREATE_ORDER(fixtures);
         const hats = new HttpAuthTestSenderOrder(sendOrder);
         const response = await hats.makeAuthCallWith({}, []);
-        expect(response.statusCode).to.equal(
-          200,
-          `[${response.body.code}] -> response.body: ${util.inspect(
-            response.body,
-            {
-              depth: null,
-            }
-          )} with trace: ${util.inspect(response.body.traceRef, {
-            depth: null,
-          })}`
-        );
         expect(response.body).to.have.property("orderId");
         expect(response.body).to.have.property("paymentIntentID");
         // await hats.expectedResponse.checkResponse(response);

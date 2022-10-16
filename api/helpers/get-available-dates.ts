@@ -49,10 +49,10 @@ module.exports = {
     var fulfilmentMethod = await FulfilmentMethod.findOne(inputs.fulfilmentMethodId);
 
     if (!fulfilmentMethod){
-      return {
+      return exits.success({
         availableDaysOfWeek,
         availableSpecialDates
-      };
+      });
     }
     /* var fulfilmentMethod = {
       fulfilmentType: 'delivery',
@@ -93,10 +93,10 @@ module.exports = {
     });
 
     // Send back the result through the success exit.
-    return {
+    return exits.success({
       availableDaysOfWeek,
       availableSpecialDates
-    };
+    });
   }
 };
 

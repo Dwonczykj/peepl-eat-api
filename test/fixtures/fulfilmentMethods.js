@@ -26,4 +26,11 @@ module.exports = [
     methodType: "collection",
     name: "Delifonseca's collection Fulfilment Slot",
   },
+  {
+    id: 105,
+    deliveryPartner: 3, //CoopCycle
+    methodType: "delivery",
+    name: "CoopCycle delivery Fulfilment Slot",
+    priceModifier: 100,
+  },
 ];

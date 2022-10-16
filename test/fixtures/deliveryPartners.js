@@ -8,6 +8,7 @@ module.exports = [
     imageUrl:
       "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
     status: "active",
+    deliveryFulfilmentMethod: 101,
   },
   {
     name: "urb-it",
@@ -28,6 +29,7 @@ module.exports = [
     imageUrl:
       "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
     status: "inactive",
+    deliveryFulfilmentMethod: 105,
   },
   {
     name: "Shocal",
@@ -38,5 +40,6 @@ module.exports = [
     imageUrl:
       "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
     status: "active",
+    deliveryFulfilmentMethod: 103,
   },
 ];

@@ -107,7 +107,9 @@ class HttpTestSender {
     this.HTTP_TYPE = HTTP_TYPE;
     const relUrl = `${this.ACTION_PATH}/${this.ACTION_NAME}`;
     let baseUrl = !relUrl
-      ? `${this.ACTION_PREFIX}/${this.ACTION_PATH}/${this.ACTION_NAME}`
+      ? this.ACTION_NAME === ""
+        ? `${this.ACTION_PREFIX}/${this.ACTION_PATH}`
+        : `${this.ACTION_PREFIX}/${this.ACTION_PATH}/${this.ACTION_NAME}`
       : `${this.ACTION_PREFIX}/${relUrl}`;
     for(const key of Object.keys(sendData)){
       if(baseUrl.endsWith(`/:${key}`)){

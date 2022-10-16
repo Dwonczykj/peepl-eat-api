@@ -166,7 +166,7 @@ module.exports = {
           (!openingHours
             ? `no opening hours exist with date: ${dt || dayOfWeek}`
             : !openingHours.isOpen
-            ? "opening hours are closed"
+            ? "store are closed"
             : isAfterCutoff
             ? "slot is after opening hours cutoff"
             : "no idea why")

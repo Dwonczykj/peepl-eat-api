@@ -4,55 +4,111 @@
 const { expect } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
 var supertest = require("supertest");
 const { logoutCbLogin, callAuthActionWithCookie } = require("../../../utils");
+const util = require('util');
+
+const { fixtures } = require("../../../../scripts/build_db");
+
+const { v4: uuidv4 } = require("uuid");
+
+const EXAMPLE_RESPONSE = {
+  collectionMethod: {},
+  deliveryMethod: {},
+  collectionSlots: {},
+  deliverySlots: {},
+  eligibleCollectionDates: {},
+  eligibleDeliveryDates: {},
+};
+
+const {
+  DEFAULT_NEW_VENDOR_OBJECT,
+  ExpectResponseVendor,
+  HttpAuthTestSenderVendor,
+} = require("./defaultVendor");
+
+const CAN_GET_VENDORS = (fixtures) => {
+  return {
+    useAccount: "TEST_VENDOR",
+    HTTP_TYPE: "get",
+    ACTION_PATH: "vendors",
+    ACTION_NAME: "",
+    sendData: {
+      outcode: fixtures.postalDistricts[0].outcode,
+    },
+    expectResponse: {},
+    expectStatusCode: 200,
+    expectResponseCb: async (response, requestPayload) => {
+      
+
+      return;
+    },
+  };
+};
+const CAN_NOT_VIEW_VENDORS_WHEN_UNAUTH = (fixtures) => {
+  return {
+    useAccount: "TEST_UNAUTHENTICATED",
+    HTTP_TYPE: "get",
+    ACTION_PATH: "vendors",
+    ACTION_NAME: "",
+    sendData: {
+      outcode: fixtures.postalDistricts[0].outcode,
+    },
+    expectResponse: {},
+    expectStatusCode: 200,
+    expectResponseCb: async (response, requestPayload) => {
+      return;
+    },
+  };
+};
 
 describe("Fetch Vendors Controller Tests", () => {
-  describe("view-all-vendors() returns a 200 with json when authenticated", () => {
-    it("Returns All Vendors (1)", async () => {
-      const cb = (cookie) =>
-        supertest(sails.hooks.http.app)
-          .get("/api/v1/vendors?outcode=L1")
-          .set("Cookie", cookie)
-          .set("Accept", "application/json")
-          .expect(200)
-          .then((response) => {
-            console.log('StatusCode resonse was: ' + response.statusCode);
-            expect(response.statusCode).to.equal(200,
-              `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
-                depth: null,
-              })} with trace: ${util.inspect(response.body.traceRef, {
-                depth: null,
-              })}`
-            );
-            expect(response.body).to.have.property("vendors");
-            expect(response.body['vendors']).to.have.lengthOf(1);
-          })
-          .catch((errs) => {
-            throw errs;
-          });
-      await callAuthActionWithCookie(cb);
+  describe(`${
+    CAN_GET_VENDORS(fixtures).ACTION_PATH
+  }/:outcode (view-all-vendors) returns a 200 with json when authenticated`, () => {
+    it("Returns All Vendors", async () => {
+      try {
+        let vendor = await Vendor.create(
+          DEFAULT_NEW_VENDOR_OBJECT(fixtures, {})
+        ).fetch();
+        const postalDistrict = await PostalDistrict.create({
+          outcode: "L5",
+        }).fetch();
+        await Vendor.addToCollection(
+          vendor.id,
+          "fulfilmentPostalDistricts"
+        ).members([postalDistrict.id]);
+        const hats = new HttpAuthTestSenderVendor(CAN_GET_VENDORS(fixtures));
+        const response = await hats.makeAuthCallWith(
+          {
+            outCode: postalDistrict.outcode,
+          },
+          []
+        );
+        await hats.expectedResponse.checkResponse(response);
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
     });
   });
-  describe("view-all-vendors() returns a 403 with a view when unAuthenticated", () => {
-    it("GET return 403", () => {
-      const cb = () =>
-        supertest(sails.hooks.http.app)
-          .get("/api/v1/vendors")
-          .set("Accept", "application/json")
-          .set("Cookie", '')
-          .expect(403)
-          .then((response) => {
-            expect(response.statusCode).to.equal(403,
-              `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
-                depth: null,
-              })} with trace: ${util.inspect(response.body.traceRef, {
-                depth: null,
-              })}`
-            );
-          })
-          .catch((errs) => {
-            throw errs;
-          });
-      cb();
+  describe(`${
+    CAN_NOT_VIEW_VENDORS_WHEN_UNAUTH(fixtures).ACTION_PATH
+  }/:outcode (view-all-vendors) returns a ${CAN_NOT_VIEW_VENDORS_WHEN_UNAUTH(fixtures).expectStatusCode} with a view when unAuthenticated`, () => {
+    it("GET return 403", async () => {
+      try {
+        const hats = new HttpAuthTestSenderVendor(
+          CAN_NOT_VIEW_VENDORS_WHEN_UNAUTH(fixtures)
+        );
+        const response = await hats.makeAuthCallWith(
+          {
+            outCode: fixtures.postalDistricts[0].outcode,
+          },
+          []
+        );
+        await hats.expectedResponse.checkResponse(response);
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
     });
   });
 });
