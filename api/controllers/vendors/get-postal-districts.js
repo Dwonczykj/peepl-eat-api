@@ -17,7 +17,9 @@ module.exports = {
 
 
   exits: {
-
+    success: {
+      statusCode: 200,
+    }
   },
 
 
@@ -26,7 +28,7 @@ module.exports = {
       .populate('fulfilmentPostalDistricts');
 
     // All done.
-    return vendor.fulfilmentPostalDistricts;
+    return exits.success(vendor.fulfilmentPostalDistricts);
 
   }
 

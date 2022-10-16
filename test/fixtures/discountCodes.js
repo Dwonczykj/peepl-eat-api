@@ -4,5 +4,9 @@ module.exports = [
     code: "DELI10",
     percentage: 10,
     isEnabled: true,
+    expiryDateTime: 0,
+    timesUsed: 0,
+    maxUses: 0,
+    vendor: null,
   },
 ];
