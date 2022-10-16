@@ -575,6 +575,78 @@
           }
         }
       },
+      "notification": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/notification-without-required-constraint"
+          },
+          {
+            "required": [
+              "recipient",
+              "sentAt"
+            ]
+          }
+        ]
+      },
+      "notification-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **Notification**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "recipient": {
+            "type": "string",
+            "description": "The number, email or firebase topicid of the recipient"
+          },
+          "type": {
+            "type": "string",
+            "description": "The URL of the vendor category image.",
+            "enum": [
+              "sms",
+              "email",
+              "push"
+            ]
+          },
+          "sentAt": {
+            "type": "number",
+            "format": "double",
+            "description": "The unixtime when the notification was sent."
+          },
+          "publicId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {},
+            "default": {},
+            "example": {}
+          },
+          "order": {
+            "description": "the linked order if there was an order linked to this notification (nullable) JSON dictionary representing the **order** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/order"
+              }
+            ]
+          }
+        }
+      },
       "openinghours": {
         "type": "object",
         "allOf": [
@@ -808,6 +880,7 @@
               "completed",
               "cancelled",
               "refunded",
+              "partially refunded",
               "void"
             ]
           },
@@ -1333,6 +1406,81 @@
             "oneOf": [
               {
                 "$ref": "#/components/schemas/productoption"
+              }
+            ]
+          }
+        }
+      },
+      "refund": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/refund-without-required-constraint"
+          },
+          {
+            "required": [
+              "paymentIntentId",
+              "currency",
+              "amount",
+              "requestedAt",
+              "recipientWalletAddress"
+            ]
+          }
+        ]
+      },
+      "refund-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **Refund**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "paymentIntentId": {
+            "type": "string",
+            "description": "The paymentIntentId of the ORIGINAL payment"
+          },
+          "currency": {
+            "type": "string",
+            "description": "The UPPERCASE asset or numeraire used in the trade to buy the order items from the seller"
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          },
+          "requestedAt": {
+            "type": "number",
+            "format": "double",
+            "description": "The unixtime when the refund was requested."
+          },
+          "refundStatus": {
+            "type": "string",
+            "default": "unpaid",
+            "enum": [
+              "unpaid",
+              "paid",
+              "failed"
+            ],
+            "example": "unpaid"
+          },
+          "recipientWalletAddress": {
+            "type": "string"
+          },
+          "order": {
+            "description": "the linked order if there was an order linked to this notification (nullable) JSON dictionary representing the **order** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/order"
               }
             ]
           }

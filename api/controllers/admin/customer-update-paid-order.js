@@ -253,7 +253,7 @@ module.exports = {
       // send a refund to the user:
       await sails.helpers.revertPaymentPartial.with({
         paymentId: oldOrder.paymentIntentId, //same as newOrder.paymentIntentId
-        refundAmountGBPx: gbpxPortionToRefundToCustomer,
+        refundRequestGBPx: gbpxPortionToRefundToCustomer,
         refundRequestPPL: pplPortionToRefundToCustomer,
         refundRecipientWalletAddress: oldOrder.customerWalletAddress,
         recipientName: newOrder.deliveryName,

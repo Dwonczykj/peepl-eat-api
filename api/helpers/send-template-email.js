@@ -105,6 +105,9 @@ module.exports = {
     var util = require('util');
     var AWS = require('aws-sdk');
     var dontActuallySend = false;
+    const result = {
+      loggedInsteadOfSending: dontActuallySend,
+    };
     try {
       if (!_.startsWith(path.basename(template), "email-")) {
         sails.log.warn(
@@ -185,12 +188,14 @@ module.exports = {
         sentAt: Date.now(),
         title: subject,
       }).fetch();
+      result.notification = newNotification;
 
       dontActuallySend =
         sails.config.environment === "test" ||
         isToAddressConsideredFake ||
         process.env.FIREBASE_AUTH_EMULATOR_HOST;
 
+      result.loggedInsteadOfSending = dontActuallySend;
       if (dontActuallySend) {
         sails.log.info(
           'Skipped sending email, either because the "To" email address ended in "@example.com"\n' +
@@ -278,8 +283,6 @@ module.exports = {
     }
 
     // All done!
-    return exits.success({
-      loggedInsteadOfSending: dontActuallySend,
-    });
+    return exits.success(result);
   }
 };

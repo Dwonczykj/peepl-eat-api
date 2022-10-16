@@ -41,8 +41,8 @@ module.exports = {
     // });
     var paidOrder = await Order.findOne({
       paymentIntentId: inputs.publicId,
-      parentOrder: null,
-    });
+      parentOrder: {"!=": null},
+    }).populate('vendor');
 
     if (!paidOrder) {
       return exits.orderNotFound();
@@ -101,22 +101,27 @@ module.exports = {
         return exits.orderNotFound();
       }
     }
-
+    
     var refundStr = refundSucceeded ? "success" : "failure";
     var refundWorked = refundSucceeded
       ? "has been partially refunded"
       : "failed to be partially refunded";
-    const msgBody = `vegi order [${
-      paidOrder.publicId
-    }] ${refundWorked} with: ${formulateMoney(refundGBPx.amount)} and ${
-      refundPPL.amount
-    } vegi rewards points transferred back to`;
+    var moneyFormatted = `with funds transferred back to`;
+    if(refundGBPx && refundPPL){
+      moneyFormatted = `with: ${formulateMoney(refundGBPx.amount)} and ${
+        refundPPL.amount
+      } vegi rewards points transferred back to`;
+    }
+    
+    const msgBody = `vegi order [${paidOrder.publicId}] ${refundWorked} ${moneyFormatted}`;
+    sails.log("built message");
     const msgBodyCustomer = `Your ${msgBody} your wallet 😎.`;
     const msgBodyVendor = `Your customer's ${msgBody} their wallet 😎.`;
     const msgBodySupport = `Your customer's ${msgBody} the customer's wallet: '${paidOrder.customerWalletAddress}'.`;
     let customerNotified = false;
     let customerNotifiedFirebase = false;
     let vendorNotified = false;
+    sails.log('notify users');
     try {
       await sails.helpers.sendFirebaseNotification.with({
         topic: "order-" + paidOrder.publicId,

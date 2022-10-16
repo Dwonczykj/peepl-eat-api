@@ -16,6 +16,72 @@ const {
   HttpAuthTestSenderOrder,
 } = require("./defaultOrder");
 
+const CUSTOMER_CAN_UPDATE_ITEMS_ON_PAID_ORDER = (fixtures) => {
+  return {
+    useAccount: "TEST_USER",
+    HTTP_TYPE: "post",
+    ACTION_PATH: "admin",
+    ACTION_NAME: "customer-update-paid-order",
+    sendData: {
+      orderId: null,
+      customerWalletAddress: null,
+      retainItems: [],
+      removeItems: [],
+      refundRequestGBPx: 5100,
+      refundRequestPPL: 0,
+    },
+    expectResponse: {
+      orderId: null, //newOrderId
+    },
+    expectStatusCode: 200,
+    expectResponseCb: async (response, requestPayload) => {
+      const parentOrder = await Order.findOne({
+        publicId: requestPayload.orderId,
+        // parentOrder: null,
+      }).populate("vendor");
+
+      assert.isNotNull(parentOrder);
+      assert.isNotEmpty(parentOrder);
+      assert.isNull(parentOrder.parentOrder);
+
+      const childOrder = await Order.findOne({
+        paymentIntentId: parentOrder.paymentIntentId,
+        parentOrder: parentOrder.id,
+      }).populate("vendor");
+      assert.isNotNull(childOrder);
+      assert.isNotEmpty(childOrder);
+
+      const refunds = await Refund.find({
+        paymentIntentId: parentOrder.paymentIntentId,
+      });
+      for (const refund of refunds) {
+        expect(refund.refundStatus).to.equal(
+          "unpaid",
+          `Refund Status not set correctly on: ${util.inspect(refund, {
+            depth: null,
+          })}`
+        );
+      }
+
+      const orders = await Order.find({
+        paymentIntentId: parentOrder.paymentIntentId,
+      });
+      assert.isArray(orders);
+      expect(orders).to.have.lengthOf(
+        2,
+        `Expect number of orders with paymentIntentId of ${requestPayload.orderId} to be 2, got ${orders.length} orders`
+      );
+
+      const smsNotifications = await Notification.find({
+        recipient: parentOrder.vendor.phoneNumber,
+        type: "sms",
+      });
+      assert.isNotEmpty(smsNotifications);
+      return;
+    },
+  };
+};
+
 const USER_UPDATED_PAID_ORDER_SUCCEEDED = (fixtures) => {
   return {
     useAccount: "TEST_SERVICE",
@@ -34,6 +100,22 @@ const USER_UPDATED_PAID_ORDER_SUCCEEDED = (fixtures) => {
     expectResponse: {},
     expectStatusCode: 200,
     expectResponseCb: async (response, requestPayload) => {
+      const parentOrder = await Order.findOne({
+        paymentIntentId: requestPayload.publicId,
+        parentOrder: null,
+      }).populate("vendor");
+
+      assert.isNotNull(parentOrder);
+      assert.isNotEmpty(parentOrder);
+      assert.isNull(parentOrder.parentOrder);
+
+      const childOrder = await Order.findOne({
+        paymentIntentId: parentOrder.paymentIntentId,
+        parentOrder: parentOrder.id,
+      }).populate("vendor");
+      assert.isNotNull(childOrder);
+      assert.isNotEmpty(childOrder);
+
       const refunds = await Refund.find({
         paymentIntentId: requestPayload.publicId,
       });
@@ -41,19 +123,51 @@ const USER_UPDATED_PAID_ORDER_SUCCEEDED = (fixtures) => {
         expect(refund.refundStatus).to.equal('paid', `Refund Status not set correctly on: ${util.inspect(refund, {depth: null})}`);
       }
       const firebaseNotifications = await Notification.find({
-        recipient: "order-" + requestPayload.publicId,
+        recipient: "order-" + childOrder.publicId,
         type: 'push'
       });
       assert.isNotEmpty(firebaseNotifications);
-      const order = await Order.findOne({
-        paymentIntentId: requestPayload.publicId
-      });
-      assert.isNotNull(order);
       const smsNotifications = await Notification.find({
-        recipient: order.deliveryPhoneNumber,
+        recipient: childOrder.deliveryPhoneNumber,
         type: "sms",
       });
       assert.isNotEmpty(smsNotifications);
+      return;
+    },
+  };
+};
+const USER_UPDATED_PAID_ORDER_FAILS_WHEN_ORDER_NOT_UPDATED = (fixtures) => {
+  return {
+    useAccount: "TEST_SERVICE",
+    HTTP_TYPE: "post",
+    ACTION_PATH: "orders",
+    ACTION_NAME: "peepl-pay-update-paid-order-webhook",
+    sendData: {
+      publicId: null,
+      metadata: {
+        orderId: 1,
+        paymentIntentId: "",
+        customerWalletAddress: "0x41190Dd82D43129C26955063fa2854350e14554B",
+      },
+      status: "success",
+    },
+    expectResponse: {},
+    expectStatusCode: 404,
+    expectResponseCb: async (response, requestPayload) => {
+      const parentOrder = await Order.findOne({
+        paymentIntentId: requestPayload.publicId,
+        // parentOrder: null,
+      }).populate("vendor");
+
+      assert.isNotNull(parentOrder);
+      assert.isNotEmpty(parentOrder);
+      assert.isNull(parentOrder.parentOrder);
+
+      const childOrder = await Order.findOne({
+        paymentIntentId: parentOrder.paymentIntentId,
+        parentOrder: parentOrder.id,
+      });
+      assert.isUndefined(childOrder);
       return;
     },
   };
@@ -76,6 +190,22 @@ const UPDATED_PAID_ORDER_FAILED = (fixtures) => {
     expectResponse: {},
     expectStatusCode: 200,
     expectResponseCb: async (response, requestPayload) => {
+      const parentOrder = await Order.findOne({
+        paymentIntentId: requestPayload.publicId,
+        parentOrder: null,
+      }).populate("vendor");
+
+      assert.isNotNull(parentOrder);
+      assert.isNotEmpty(parentOrder);
+      assert.isNull(parentOrder.parentOrder);
+
+      const childOrder = await Order.findOne({
+        paymentIntentId: parentOrder.paymentIntentId,
+        parentOrder: parentOrder.id,
+      }).populate("vendor");
+      assert.isNotNull(childOrder);
+      assert.isNotEmpty(childOrder);
+
       const refunds = await Refund.find({
         paymentIntentId: requestPayload.publicId,
       });
@@ -88,60 +218,13 @@ const UPDATED_PAID_ORDER_FAILED = (fixtures) => {
         );
       }
       const firebaseNotifications = await Notification.find({
-        recipient: "order-" + requestPayload.publicId,
+        recipient: "order-" + childOrder.publicId,
         type: "push",
       });
       assert.isNotEmpty(firebaseNotifications);
-      const order = await Order.findOne({
-        paymentIntentId: requestPayload.publicId,
-      });
-      assert.isNotNull(order);
-      const smsNotifications = await Notification.find({
-        recipient: order.deliveryPhoneNumber,
-        type: "sms",
-      });
-      assert.isNotEmpty(smsNotifications);
-      return;
-    },
-  };
-};
-const CUSTOMER_UPDATE_PAID_ORDER = (fixtures) => {
-  return {
-    useAccount: "TEST_USER",
-    HTTP_TYPE: "post",
-    ACTION_PATH: "admin",
-    ACTION_NAME: "customer-update-paid-order",
-    sendData: {
-      orderId: null,
-      customerWalletAddress: null,
-      retainItems: [],
-      removeItems: [],
-      refundRequestGBPx: 5100,
-      refundRequestPPL: 0,
-    },
-    expectResponse: {
-      orderId: null, //newOrderId
-    },
-    expectStatusCode: 200,
-    expectResponseCb: async (response, requestPayload) => {
-      const refunds = await Refund.find({
-        paymentIntentId: requestPayload.publicId,
-      });
-      for (const refund of refunds) {
-        expect(refund.refundStatus).to.equal(
-          "unpaid",
-          `Refund Status not set correctly on: ${util.inspect(refund, {
-            depth: null,
-          })}`
-        );
-      }
       
-      const order = await Order.findOne({
-        paymentIntentId: requestPayload.publicId,
-      });
-      assert.isNotNull(order);
       const smsNotifications = await Notification.find({
-        recipient: order.vendor.phoneNumber,
+        recipient: childOrder.deliveryPhoneNumber,
         type: "sms",
       });
       assert.isNotEmpty(smsNotifications);
@@ -150,7 +233,8 @@ const CUSTOMER_UPDATE_PAID_ORDER = (fixtures) => {
   };
 };
 
-describe(`${CUSTOMER_UPDATE_PAID_ORDER(fixtures).ACTION_NAME}()`, () => {
+
+describe(`${CUSTOMER_CAN_UPDATE_ITEMS_ON_PAID_ORDER(fixtures).ACTION_NAME}()`, () => {
   it("users can successfully UPDATE ITEMS on an order after getting a partial fulfillment back from a vendor", async () => {
     try {
       const parentOrder = await Order.create(
@@ -164,7 +248,7 @@ describe(`${CUSTOMER_UPDATE_PAID_ORDER(fixtures).ACTION_NAME}()`, () => {
         })
       ).fetch();
       const hats = new HttpAuthTestSenderOrder(
-        CUSTOMER_UPDATE_PAID_ORDER(fixtures)
+        CUSTOMER_CAN_UPDATE_ITEMS_ON_PAID_ORDER(fixtures)
       );
       const response = await hats.makeAuthCallWith(
         {
@@ -189,16 +273,76 @@ describe(`${CUSTOMER_UPDATE_PAID_ORDER(fixtures).ACTION_NAME}()`, () => {
 describe(`${USER_UPDATED_PAID_ORDER_SUCCEEDED(fixtures).ACTION_NAME}()`, () => {
   it("PeeplPay Service can successfully send notifications when a payment succeeds for an order", async () => {
     try {
+      const voidParentOrder = await Order.create(
+        DEFAULT_NEW_ORDER_OBJECT(fixtures, {
+          parentOrder: null,
+          paymentIntentId: "dummy_payment_intent_id_" + uuidv4(),
+          items: [1, 2, 3, 6, 8],
+          total: 5425, //5300 + 125
+        })
+      ).fetch();
+      const paidUpdatedOrder = await Order.create(
+        DEFAULT_NEW_ORDER_OBJECT(fixtures, {
+          parentOrder: voidParentOrder.id,
+          paymentIntentId: voidParentOrder.paymentIntentId,
+          items: [1, 2, 3, 6],
+          total: 3225,
+        })
+      ).fetch();
+      await Refund.createEach([
+        {
+          paymentIntentId: paidUpdatedOrder.paymentIntentId,
+          currency: sails.config.custom.vegiDigitalStableCurrencyTicker,
+          amount: voidParentOrder.total - paidUpdatedOrder.total,
+          recipientWalletAddress: paidUpdatedOrder.customerWalletAddress,
+          requestedAt: Date.now(),
+          refundStatus: "unpaid",
+        },
+      ]);
+      const hats = new HttpAuthTestSenderOrder(
+        USER_UPDATED_PAID_ORDER_SUCCEEDED(fixtures)
+      );
+      console.log(`paymentIntentId: ${paidUpdatedOrder.paymentIntentId}`);
+      const response = await hats.makeAuthCallWith(
+        {
+          publicId: paidUpdatedOrder.paymentIntentId,
+          metadata: {
+            orderId: paidUpdatedOrder.publicId,
+            paymentIntentId: paidUpdatedOrder.paymentIntentId,
+            customerWalletAddress: paidUpdatedOrder.customerWalletAddress,
+          },
+          status: "success",
+        },
+        []
+      );
+      await hats.expectedResponse.checkResponse(response);
+    } catch (errs) {
+      console.warn(errs);
+      throw errs;
+    }
+  });
+  it("PeeplPay Service returns a 404 when the linked order has no", async () => {
+    try {
       const paidOrder = await Order.create(
         DEFAULT_NEW_ORDER_OBJECT(fixtures, {
           parentOrder: null,
-          paymentIntentId: 'dummy_payment_intent_id_' + uuidv4(),
+          paymentIntentId: "dummy_payment_intent_id_" + uuidv4(),
           items: [1, 2, 3, 6, 8],
           total: 5425,
         })
       ).fetch();
+      await Refund.createEach([
+        {
+          paymentIntentId: paidOrder.paymentIntentId,
+          currency: sails.config.custom.vegiDigitalStableCurrencyTicker,
+          amount: paidOrder.total,
+          recipientWalletAddress: paidOrder.customerWalletAddress,
+          requestedAt: Date.now(),
+          refundStatus: "unpaid",
+        },
+      ]);
       const hats = new HttpAuthTestSenderOrder(
-        USER_UPDATED_PAID_ORDER_SUCCEEDED(fixtures)
+        USER_UPDATED_PAID_ORDER_FAILS_WHEN_ORDER_NOT_UPDATED(fixtures)
       );
       console.log(`paymentIntentId: ${paidOrder.paymentIntentId}`);
       const response = await hats.makeAuthCallWith(
@@ -221,25 +365,45 @@ describe(`${USER_UPDATED_PAID_ORDER_SUCCEEDED(fixtures).ACTION_NAME}()`, () => {
   });
   it("PeeplPay Service can successfully send notifications when a payment fails for an order", async () => {
     try {
-      const paidOrder = await Order.create(
+      const voidParentOrder = await Order.create(
         DEFAULT_NEW_ORDER_OBJECT(fixtures, {
           parentOrder: null,
+          paymentIntentId: "dummy_payment_intent_id_" + uuidv4(),
           items: [1, 2, 3, 6, 8],
-          total: 5425,
+          total: 5425, //5300 + 125
         })
       ).fetch();
+      const paidUpdatedOrder = await Order.create(
+        DEFAULT_NEW_ORDER_OBJECT(fixtures, {
+          parentOrder: voidParentOrder.id,
+          paymentIntentId: voidParentOrder.paymentIntentId,
+          items: [1, 2, 3, 6],
+          total: 3225,
+        })
+      ).fetch();
+      await Refund.createEach([
+        {
+          paymentIntentId: paidUpdatedOrder.paymentIntentId,
+          currency: sails.config.custom.vegiDigitalStableCurrencyTicker,
+          amount: voidParentOrder.total - paidUpdatedOrder.total,
+          recipientWalletAddress: paidUpdatedOrder.customerWalletAddress,
+          requestedAt: Date.now(),
+          refundStatus: "unpaid",
+        },
+      ]);
       const hats = new HttpAuthTestSenderOrder(
         UPDATED_PAID_ORDER_FAILED(fixtures)
       );
+      console.log(`paymentIntentId: ${paidUpdatedOrder.paymentIntentId}`);
       const response = await hats.makeAuthCallWith(
         {
-          publicId: paidOrder.publicId,
+          publicId: paidUpdatedOrder.paymentIntentId,
           metadata: {
-            orderId: paidOrder.publicId,
-            paymentIntentId: paidOrder.paymentIntentId,
-            customerWalletAddress: paidOrder.customerWalletAddress,
+            orderId: paidUpdatedOrder.publicId,
+            paymentIntentId: paidUpdatedOrder.paymentIntentId,
+            customerWalletAddress: paidUpdatedOrder.customerWalletAddress,
           },
-          status: "success",
+          status: "failed",
         },
         []
       );

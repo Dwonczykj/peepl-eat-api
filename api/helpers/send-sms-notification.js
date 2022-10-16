@@ -35,6 +35,16 @@ module.exports = {
       sentAt: Date.now(),
       title: inputs.body,
       order: (inputs.data && inputs.data.orderId) || null,
+      metadata:
+        inputs.data && inputs.data.orderId
+          ? {
+            model: "order",
+            id: inputs.data.orderId,
+          }
+          : {
+            model: "",
+            id: null,
+          },
     }).fetch();
 
     var dontActuallySend =
@@ -64,7 +74,7 @@ module.exports = {
         throw new Error(err.message);
       });
 
-    return exits.success();
+    return exits.success({notification: newNotification});
   },
 };
 

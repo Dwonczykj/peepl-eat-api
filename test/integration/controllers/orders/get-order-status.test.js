@@ -34,7 +34,7 @@ const GET_ORDER_STATUS = (fixtures) => {
     expectResponseCb: async (response, requestPayload) => {
       expect(response.body).to.have.property("paymentStatus");
       expect(response.body).to.have.property("restaurantAcceptanceStatus");
-      assert.isBoolean(response.body.restaurantAcceptanceStatus);
+      expect(response.body.restaurantAcceptanceStatus).to.equal('pending');
       return;
     },
   };
