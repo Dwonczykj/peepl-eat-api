@@ -11,7 +11,7 @@ var util = require("util");
 require("ts-node/register");
 
 
-const { callAuthActionWithCookie } = require("../../utils");
+const { callAuthActionWithCookie, getNextWeekday } = require("../../utils");
 
 
 const cwd = process.cwd();
@@ -29,6 +29,8 @@ const regAction = /\/([^/:?]+)$/;
 const ids = {
   vendorId: 1,
   vendorid: 1,
+  vendor: 1,
+  date: getNextWeekday('thursday'),
   productId: 1,
   orderId: 1,
   deliveryPartnerId: 1,
@@ -36,6 +38,22 @@ const ids = {
   outCode: "L1",
   discountCode: "DELI10",
 };
+
+const GET_ROUTE_PARAMS = {
+  "vendors/get-fulfilment-slots": {
+    'params': {
+      vendor: 1,
+      date: getNextWeekday("thursday"),
+    },
+    "statusCode": 200,
+  },
+  "admin/logout": {
+    'params': {},
+    "statusCode": 302,
+  }
+};
+
+const IGNORE_ROUTES = ["admin/view-order"];
 
 const routes_read = require(cwd + "/config/routes.js")['routes'];
 const policies = require(cwd + "/test/config/policies.js")['policies']; //!this checks that are polices were not updated incorrectly by forcing a dounle change to the test file.
@@ -83,17 +101,42 @@ _.each(Object.keys(routes_read), function (route_key) {
   }else{
     actionName = actionNames[0];
   }
+  let routeParams = {};
+  if (GET_ROUTE_PARAMS[actionRelPath]) {
+    routeParams = GET_ROUTE_PARAMS[actionRelPath];
+  } else {
+    try {
+      const { inputs } = require(actionPath);
+      if (inputs && Object.keys(inputs).length > 0) {
+        // route requires params
+        for (var key of Object.keys(inputs)) {
+          routeParams[key] = ""; //todo set correctly
+        }
+      }
+    } catch (error) {
+      //ignore
+    }
+  }
   
-  actionsToTest[routeHttp].push({
-    routeHttp: routeHttp,
-    routePath: routePath.replace(reg, "?$1=" + mVar),
-    actionPath: actionPath,
-    actionName: actionName,
-    actionRelPath: actionRelPath,
-    // "action": require(actionPath),
-    queryParams: queryParamsTestConfig || routePath.replace(reg, "?$1=" + mVar),
-    policy: policyVar,
-  });
+  if (IGNORE_ROUTES.indexOf(actionRelPath) > -1) {
+    console.log(`removed checking of ${actionName} route as already tested and requires more setup to use`);
+  } else if (Object.keys(routeParams).length === 0) {
+    actionsToTest[routeHttp].push({
+      routeHttp: routeHttp,
+      routePathNoQry: routePath,
+      routePath: routePath.replace(reg, "?$1=" + mVar),
+      actionPath: actionPath,
+      actionName: actionName,
+      actionRelPath: actionRelPath,
+      // "action": require(actionPath),
+      routeParams: routeParams,
+      queryParams:
+        queryParamsTestConfig || routePath.replace(reg, "?$1=" + mVar),
+      policy: policyVar,
+    });
+  } else {
+    console.log(`removed checking of ${actionName} route as has query params`);
+  }
 });
 
 // ~ https://www.chaijs.com/api/bdd/
@@ -101,26 +144,40 @@ _.each(Object.keys(routes_read), function (route_key) {
 // ~ https://mochajs.org/#asynchronous-code
 describe("Fetch GET Routes from routes.js", async () => {
   for (const testObj of actionsToTest["GET"]) {
-    describe(`${testObj["actionRelPath"]}() returns a 200 with json when authenticated`, () => {
-      it(`${testObj["routeHttp"]} ${testObj["actionRelPath"]} returns data`, async () => {
+    describe(`${testObj.actionRelPath}() returns a 200 with json when authenticated`, () => {
+      it(`${testObj.routeHttp} ${testObj.actionRelPath} returns data`, async () => {
         const cb = async (cookie) => {
           if (testObj["actionName"].toLowerCase().includes("login")) {
             return;
           }
           try {
             console.info(`GET -> ${testObj["routePath"]}`);
-            const response = await supertest(sails.hooks.http.app)
-              .get(testObj["routePath"]) //TODO: Set the path parameters for GETS with params.
-              .set("Cookie", cookie)
-              .set("Accept", "application/json");
-
-            expect(response.statusCode).to.equal(200,
-          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
-            depth: null,
-          })} with trace: ${util.inspect(response.body.traceRef, {
-            depth: null,
-          })}`
-        );
+            let response;
+            if(testObj.routeParams){
+              response = await supertest(sails.hooks.http.app)
+                .get(testObj.routePathNoQry)
+                .query(testObj.routeParams)
+                .set("Cookie", cookie)
+                .set("Accept", "application/json");
+            } else {
+              response = await supertest(sails.hooks.http.app)
+                .get(testObj.routePath)
+                .set("Cookie", cookie)
+                .set("Accept", "application/json");
+            }
+            expect(response.statusCode).to.equal(
+              GET_ROUTE_PARAMS[testObj.actionRelPath]
+                ? GET_ROUTE_PARAMS[testObj.actionRelPath].statusCode
+                : 200,
+              `[${response.body.code}] -> response.body: ${util.inspect(
+                response.body,
+                {
+                  depth: null,
+                }
+              )} with trace: ${util.inspect(response.body.traceRef, {
+                depth: null,
+              })}`
+            );
             expect(response.body).not.to.have.property("data");
 
             console.info(

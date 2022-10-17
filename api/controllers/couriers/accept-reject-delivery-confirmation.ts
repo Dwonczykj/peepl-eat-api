@@ -13,12 +13,19 @@ module.exports = {
       type: "boolean",
       required: true,
     },
+    deliveryPartnerId: {
+      type: "number",
+      required: true,
+    }
   },
 
   exits: {
     notFound: {
       statusCode: 404,
       description: "No order found for deliveryPartner delivery id",
+    },
+    forbidden: {
+      statusCode: 401,
     },
     deliveryPartnerAlreadyConfirmedOrder: {
       statusCode: 401,
@@ -45,44 +52,25 @@ module.exports = {
       return exits.notFound();
     }
 
-    if (
-      order.deliveryPartner.id !== null &&
-      order.deliveryPartner.id !== undefined &&
-      order.deliveryPartner.id !== this.req.session.userId
-    ) {
-      return exits.otherDeliveryPartnerRegisteredToOrder();
-    } else if (
-      order.deliveryPartner.id === this.req.session.userId &&
-      order.deliveryPartnerConfirmed
-    ) {
+    const isAuthorisedToCancel =
+      await sails.helpers.isAuthorisedForDeliveryPartner.with({
+        userId: this.req.session.userId,
+        deliveryPartnerId: inputs.deliveryPartnerId,
+      });
+    if (!isAuthorisedToCancel) {
+      return exits.forbidden();
+    } else if (order.deliveryPartnerConfirmed) {
       // This DeliveryPartner has previously confirmed the delivery, they cannot cancel the delivery after this.
-      return exits.deliveryPartnerAlreadyConfirmedOrder();
+      return exits.deliveryPartnerAlreadyConfirmedOrder(); //NOTE: cannot be cancelled after this stage
     }
 
-    const user = await User.findOne(this.req.session.userId).populate(
-      "deliveryPartner"
-    );
-
-    if (!user.deliveryPartner) {
-      // * Super admins should use a specific superadmin deliverypartner user account set up to manage deliveries on this delivery partner.
-      return exits.noDeliveryPartnerRegisteredToUser();
-    }
-
-    await Order.updateOne({ deliveryId: inputs.deliveryId }).set({
+    await Order.updateOne(order.id).set({
       deliveryPartnerAccepted: inputs.deliveryPartnerConfirmed,
       deliveryPartner: inputs.deliveryPartnerConfirmed
-        ? user.deliveryPartner.id
+        ? inputs.deliveryPartnerId
         : null,
       deliveryPartnerConfirmed: inputs.deliveryPartnerConfirmed,
     });
-
-    //! No need to send notification to customer about deliveryPartner accepted/declined as waiting for vendor.
-    //TODO: Replace SMS after vendor accepts with an SMS after the deliveryPartner then confirms its delivery.
-    // await sails.helpers.sendFirebaseNotification.with({
-    //   topic: 'order-' + order.publicId,
-    //   title: 'Order update',
-    //   body: 'Your order has been ' + (inputs.deliveryPartnerAccepted ? 'accepted 😎' : 'declined 😔') + '.'
-    // });
 
     // All done.
     return exits.success();

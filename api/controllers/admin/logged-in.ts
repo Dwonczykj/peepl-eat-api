@@ -24,7 +24,7 @@ module.exports = {
 
 
   fn: async function (inputs, exits) {
-    return exits.success({data:!!this.req.session.userId});
+    return exits.success({authenticated:!!this.req.session.userId});
   }
 
 

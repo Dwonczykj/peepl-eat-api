@@ -6,7 +6,7 @@ module.exports = {
 
   inputs: {
     deliveryPartnerId: {
-      type: "string",
+      type: "number",
       required: true,
     },
   },
@@ -28,14 +28,15 @@ module.exports = {
       ],
       completedFlag: "",
     }).populate(
-      "deliveryId&vendor&fulfilmentSlotFrom&fulfilmentSlotTo&deliveryAddressLineOne&deliveryAddressLineTwo&deliveryAddressCity&deliveryAddressPostCode"
+      "deliveryId&deliveryPartner&vendor&fulfilmentSlotFrom&fulfilmentSlotTo&deliveryAddressLineOne&deliveryAddressLineTwo&deliveryAddressCity&deliveryAddressPostCode"
     ); // https://sailsjs.com/documentation/concepts/models-and-orm/associations#?associations-in-retrieved-records
-
+    
     const yourOrders = orders.filter(
-      (order) => order.deliveryPartner.id === inputs.deliveryPartnerId
+      (order) => order.deliveryPartner && order.deliveryPartner.id === inputs.deliveryPartnerId
     );
+    
     const otherOrders = orders.filter((order) => order.deliveryPartner === null);
-
+    
     // Respond with view or JSON.
     if (this.req.wantsJSON) {
       return exits.successJSON({ yourOrders, otherOrders });

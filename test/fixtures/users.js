@@ -12,6 +12,16 @@ module.exports = [
     firebaseSessionToken: "DUMMY_FIREBASE_TOKEN",
   },
   {
+    email: "test.admin@example.com",
+    phoneNoCountry: 9993337777,
+    phoneCountryCode: 44,
+    name: "TEST_ADMIN",
+    isSuperAdmin: true,
+    role: "admin",
+    firebaseSessionToken: "DUMMY_FIREBASE_TOKEN",
+    secret: envConfig["test_TEST_SERVICE_secret"],
+  },
+  {
     email: "test.service@example.com",
     phoneNoCountry: 9993137777,
     phoneCountryCode: 44,
@@ -49,7 +59,7 @@ module.exports = [
     email: "test_vendor_sales.service@example.com",
     phoneNoCountry: 9991135555,
     phoneCountryCode: 1,
-    name: "TEST_VENDOR",
+    name: "TEST_VENDOR_SALES",
     isSuperAdmin: false,
     role: "vendor",
     vendor: 1, //delifonseca

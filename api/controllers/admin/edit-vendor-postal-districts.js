@@ -27,6 +27,9 @@ module.exports = {
     },
     unauthorised:{
       responseType: 'unauthorised'
+    },
+    success: {
+      statusCode: 200,
     }
   },
 
@@ -35,7 +38,7 @@ module.exports = {
     // Check whether user is authorised for vendor.
     let vendor = await Vendor.findOne({id: inputs.vendorId});
     if(!vendor){
-      throw 'Vendor not found';
+      return exits.notFound();
     }
 
     // Check if user is authorised to edit product option.
@@ -48,10 +51,14 @@ module.exports = {
       return exits.unauthorised();
     }
 
-    var updatedVendor = await Vendor.replaceCollection(inputs.vendorId, 'fulfilmentPostalDistricts')
+    await Vendor.replaceCollection(vendor.id, 'fulfilmentPostalDistricts')
     .members(inputs.districts);
 
-    return updatedVendor;
+    vendor = await Vendor.findOne(vendor.id).populate(
+      "fulfilmentPostalDistricts"
+    );
+
+    return exits.success(vendor);
   }
 
 

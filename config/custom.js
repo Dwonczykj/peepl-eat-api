@@ -35,12 +35,13 @@ module.exports.custom = {
   peeplPayUrl: "https://pay.itsaboutpeepl.com/api/v1",
   amazonS3BucketUrl: "https://vegiapp-1.s3.us-east-1.amazonaws.com/",
   amazonS3Bucket: "vegiapp-1",
+  amazonS3MaxUploadSizeBytes: 30000000,
   passwordSaltRounds: envConfig["saltRounds"],
   vegiEatsRewardPcnt: 0.05,
   vegiPayRewardPcnt: 0.005, // TODO v2.0: To be 0 <= x <= 0.01 based on ESC measure value
   PPLTokenValueInPence: 10, // TODO: GET this value from the PeeplPay API @TheAdamGalloway
-  vegiGreenPointsTicker: 'PPL',
-  vegiDigitalStableCurrencyTicker: 'GBPX',
+  vegiGreenPointsTicker: "PPL",
+  vegiDigitalStableCurrencyTicker: "GBPX",
   requestDeliveryAvailability: false, // * This if true, checks if there is a courier available before asking vendor to fulfil. Only works when vendors have automated fulfilment processes.
 
   /**************************************************************************

@@ -19,62 +19,38 @@ assert.containsAllKeys(
     util.inspect(envConfig, { depth: 1 })
 );
 
-const login = async function (verbose=false) {
+const loginAsUser = async function (name, secret, verbose=false) {
   try {
     if(verbose){
-      console.log('Login with Test Account');
+      console.log(`Login with ${name}'s Account`);
     }
 
     return request(sails.hooks.http.app)
       .post("/api/v1/admin/login-with-secret")
       .send({
-        name: "TEST_SERVICE",
-        secret: envConfig["test_TEST_SERVICE_secret"],
+        name: name,
+        secret: secret,
       })
       .expect(200)
       .then((response) => {
-        // must be then, not a callback
-        // console.log(response.res.session);
-        // console.log(response.res);
-        // console.log(response._body);
-        // console.log(Object.keys(response));
-        // expect(response.statusCode).to.equal(200,
-        //   `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
-        //     depth: null,
-        //   })} with trace: ${util.inspect(response.body.traceRef, {
-        //     depth: null,
-        //   })}`
-        // );
-        // expect(response.body).to.equal({ data: true });
         return response;
       })
       .catch((errs) => {
         console.warn(errs);
         throw errs;
       });
-    // .end((errs, response) => { //dont use end here as we want to use the response in the call back function maybe later.
-    //   if (errs) {
-    //     console.warn(errs);
-    //     throw errs;
-    //   }
-    //   console.log(response.res.session);
-    //   console.log(response.res);
-    //   console.log(response._body);
-    //   console.log(Object.keys(response));
-    //   expect(response.statusCode).to.equal(200,
-    //   `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
-    //     depth: null,
-    //   })} with trace: ${util.inspect(response.body.traceRef, {
-    //     depth: null,
-    //   })}`
-    // );
-    //   expect(response._body).to.equal({ data: true });
-    //   return response;
-    // });
   } catch (loginErr) {
     console.warn('test/utils.js: Lifecycle.test failed to login with test service account: ' + loginErr);
     return loginErr;
   }
+};
+
+const login = async function (verbose = false) {
+  return await loginAsUser(
+    "TEST_SERVICE",
+    envConfig["test_TEST_SERVICE_secret"],
+    verbose
+  );
 };
 
 const logout = async function (verbose=false) {
@@ -119,6 +95,26 @@ const callAuthActionWithCookie = async (cb, verbose=false, data={}) =>
       }
       return cb(sessionCookie);
     });
+
+const callAuthActionWithCookieAndUser = async (
+  cb,
+  name, secret,
+  verbose = false,
+  data = {}
+) =>
+  loginAsUser(name, secret, verbose).then((response) => {
+    expect(response.statusCode).to.equal(
+      200,
+      "Login-with-secret wrapper failed to login: " +
+        util.inspect(response, { depth: null })
+    );
+    expect(Object.keys(response.headers)).to.deep.include("set-cookie");
+    const sessionCookie = response.headers["set-cookie"];
+    if (verbose) {
+      console.log('SESSION COOKIE: "' + sessionCookie + '"');
+    }
+    return cb(sessionCookie);
+  });
 
 function getNextWeekday(weekday) {
   // ~ https://stackoverflow.com/a/25493271
@@ -177,6 +173,7 @@ module.exports = {
   logout,
   logoutCbLogin,
   callAuthActionWithCookie,
+  callAuthActionWithCookieAndUser,
   envConfig,
   getNextWeekday,
 };

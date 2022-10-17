@@ -81,7 +81,7 @@ module.exports = {
         key: sails.config.custom.amazonS3AccessKey,
         secret: sails.config.custom.amazonS3Secret,
         bucket: sails.config.custom.amazonS3Bucket,
-        maxBytes: 30000000,
+        maxBytes: sails.config.custom.amazonS3MaxUploadSizeBytes,
       })
       .intercept("E_EXCEEDS_UPLOAD_LIMIT", "tooBig")
       .intercept((err) => new Error("The photo upload failed! " + err.message));

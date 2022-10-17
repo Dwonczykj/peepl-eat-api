@@ -23,6 +23,10 @@ module.exports = {
       type: "boolean",
       required: true,
     },
+    deliveryPartnerId: {
+      type: "number",
+      required: true,
+    }
   },
 
   exits: {
@@ -38,7 +42,7 @@ module.exports = {
       statusCode: 404,
       description: "No order found for order id",
     },
-    unauthorisedUser: {
+    forbidden: {
       statusCode: 401,
       description: "A deliveryPartner has already accepted this order",
     },
@@ -50,8 +54,7 @@ module.exports = {
     try {
       order = await Order.findOne({
         publicId: inputs.vegiOrderId,
-        completedFlag: "",
-      }).populate("fulfilmentMethod&deliveryPartner");
+      });
     } catch (error) {
       sails.log.error(
         `Request to add delivery availability for order with vegi public id: ${inputs.vegiOrderId} -> failed to find this order. Error: ${error}`
@@ -64,53 +67,64 @@ module.exports = {
       return exits.notFound();
     }
 
-    if (
+    const isAuthorisedForDPOps =
+      await sails.helpers.isAuthorisedForDeliveryPartner.with({
+        userId: this.req.session.userId,
+        deliveryPartnerId: inputs.deliveryPartnerId,
+      });
+    if (!isAuthorisedForDPOps) {
+      return exits.forbidden();
+    } else if (
       order.deliveryPartnerAccepted ||
       order.deliveryPartnerConfirmed ||
       order.deliveryPartner
     ) {
-      // throw new Error('A deliveryPartner has already accepted this order.');
-      return exits.orderAlreadyHasDeliveryPartner();
+      // This DeliveryPartner has previously confirmed the delivery, they cannot cancel the delivery after this.
+      return exits.orderAlreadyHasDeliveryPartner(); //NOTE: cannot be cancelled after this stage
     }
 
-    //TODO: Check that the Fulfilment Slots of delivery partner accepting this request include the order delivery slot
-    let deliveryPartner;
+    const deliveryPartner = await DeliveryPartner.findOne(
+      inputs.deliveryPartnerId
+    ).populate('deliveryFulfilmentMethod');
+    if(!deliveryPartner){
+      return exits.notFound();
+    }
+
     try {
-      deliveryPartner = await DeliveryPartner.findOne({
-        users: { contains: this.req.session.userId },
-      }).populate("deliveryFulfilmentMethod");
+	    if (deliveryPartner.deliveryFulfilmentMethod) {
+	      // Check that delivery partner can service this delivery slot
+	      const dPdeliverySlots: Slot[] = await sails.helpers
+          .getAvailableSlots(
+            moment
+              .utc(order.fulfilmentSlotFrom, "YYYY-MM-DD HH:mm:ss")
+              .format("YYYY-MM-DD"),
+            deliveryPartner.deliveryFulfilmentMethod.id
+          )
+          .map((slot) => Slot.from(slot));
+	      const slotOk =
+	        dPdeliverySlots.filter((slot) => {
+	          moment
+              .utc(order.fulfilmentSlotFrom, "YYYY-MM-DD HH:mm:ss")
+              .isSameOrAfter(slot.startTime) &&
+              moment
+                .utc(order.fulfilmentSlotFrom, "YYYY-MM-DD HH:mm:ss")
+                .isSameOrBefore(slot.endTime) &&
+              moment
+                .utc(order.fulfilmentSlotTo, "YYYY-MM-DD HH:mm:ss")
+                .isSameOrAfter(slot.startTime) &&
+              moment
+                .utc(order.fulfilmentSlotTo, "YYYY-MM-DD HH:mm:ss")
+                .isSameOrBefore(slot.endTime);
+	        }).length > 0;
+	      if (!slotOk) {
+	        return exits.deliveryPartnerUnableToServiceSlot();
+	      }
+	    }
     } catch (error) {
-      sails.log.error(
-        `Request to add delivery availability for order with vegi public id: ${inputs.vegiOrderId} -> failed to find the delivery partner for this user. Error: ${error}`
-      );
-      deliveryPartner = null;
-      return exits.notFound();
+      sails.log.error(`Unable to check available slots for delivery partner to accept order for error: ${error}`);
     }
 
-    if (!deliveryPartner) {
-      return exits.notFound();
-    }
-    if (deliveryPartner.deliveryFulfilmentMethod) {
-      // Check that delivery partner can service this delivery slot
-      const dPdeliverySlots: Slot[] = await sails.helpers
-        .getAvailableSlots(
-          inputs.date,
-          deliveryPartner.deliveryFulfilmentMethod.id
-        )
-        .map((slot) => Slot.from(slot));
-      const slotOk =
-        dPdeliverySlots.filter((slot) => {
-          moment.utc(order.fulfilmentSlotFrom).isSameOrAfter(slot.startTime) &&
-            moment.utc(order.fulfilmentSlotFrom).isSameOrBefore(slot.endTime) &&
-            moment.utc(order.fulfilmentSlotTo).isSameOrAfter(slot.startTime) &&
-            moment.utc(order.fulfilmentSlotTo).isSameOrBefore(slot.endTime);
-        }).length > 0;
-      if (!slotOk) {
-        return exits.deliveryPartnerUnableToServiceSlot();
-      }
-    }
-
-    await Order.updateOne({ publicId: inputs.vegiOrderId }).set({
+    await Order.updateOne(order.id).set({
       deliveryPartnerAccepted: inputs.deliveryPartnerAccepted,
       deliveryPartner: inputs.deliveryPartnerAccepted
         ? deliveryPartner.id

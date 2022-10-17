@@ -90,11 +90,13 @@ const IS_LOGGED_IN = (fixtures) => { return {
     
   },
   expectResponse: {
-    data: true,
+    authenticated: true,
   },
   expectStatusCode: 200,
-  expectResponseCb: (responseBody) => {
-    
+  expectResponseCb: (response) => {
+    expect(response.body).to.deep.equal({
+      authenticated: true
+    });
     return;
   },
 };};
@@ -105,11 +107,13 @@ const IS_LOGGED_IN_UNAUTHENTICATED = (fixtures) => { return {
   ACTION_NAME: "logged-in",
   sendData: {},
   expectResponse: {
-    data: false,
+    authenticated: false,
   },
   expectStatusCode: 200,
-  expectResponseCb: (responseBody) => {
-    
+  expectResponseCb: (response) => {
+    expect(response.body).to.deep.equal({
+      authenticated: false,
+    });
     return;
   },
 };};
@@ -245,7 +249,7 @@ describe("Authentication Tests", () => {
             depth: null,
           })}`
       );
-      hats.expectedResponse.checkResponse(response.body, {data: true});
+      hats.expectedResponse.checkResponse(response.body, {authenticated: true});
       return;
     });
     it("POST login-with-secret as Customer User works", async () => {
@@ -258,7 +262,9 @@ describe("Authentication Tests", () => {
             depth: null,
           })}`
       );
-      hats.expectedResponse.checkResponse(response.body, {data: true});
+      hats.expectedResponse.checkResponse(response.body, {
+        authenticated: true,
+      });
       return;
     });
     it("POST login-with-secret as Vendor works", async () => {

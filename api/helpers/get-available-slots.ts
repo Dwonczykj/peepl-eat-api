@@ -172,24 +172,24 @@ module.exports = {
             : "no idea why")
       );
       
-      let openingHoursAll = [];
-      try {
-        openingHoursAll = await OpeningHours.find({
-          fulfilmentMethod: inputs.fulfilmentMethodId,
-        });
-      } catch (error) {
-        //ignore
-      }
-      sails.log.info(
-        `Vendors opening hours for ${
-          fulfilmentMethod.methodType
-        } fulfilmentMethod [${inputs.fulfilmentMethodId}] are: ${util.inspect(
-          openingHoursAll,
-          {
-            depth: null,
-          }
-        )}`
-      );
+      // let openingHoursAll = [];
+      // try {
+      //   openingHoursAll = await OpeningHours.find({
+      //     fulfilmentMethod: inputs.fulfilmentMethodId,
+      //   });
+      // } catch (error) {
+      //   //ignore
+      // }
+      // sails.log.info(
+      //   `Vendors opening hours for ${
+      //     fulfilmentMethod.methodType
+      //   } fulfilmentMethod [${inputs.fulfilmentMethodId}] are: ${util.inspect(
+      //     openingHoursAll,
+      //     {
+      //       depth: null,
+      //     }
+      //   )}`
+      // );
       
       availableSlots = [];
     }

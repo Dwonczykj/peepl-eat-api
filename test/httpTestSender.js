@@ -1,6 +1,6 @@
 var supertest = require("supertest");
 const util = require('util');
-const { envConfig, callAuthActionWithCookie } = require("./utils");
+const { envConfig, callAuthActionWithCookieAndUser } = require("./utils");
 const { assert, expect } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
 
 class ExpectResponse {
@@ -148,7 +148,7 @@ class HttpTestSender {
   }
 
   makeCallWith(cookie) {
-    return async (updatedPostDataWith, updatedPostDataWithOutKeys = []) => {
+    return async (updatedPostDataWith, updatedPostDataWithOutKeys = [], filesByName = {}) => {
       const _sw = this.expectedResponse.sendWith(
         updatedPostDataWith,
         updatedPostDataWithOutKeys
@@ -156,15 +156,48 @@ class HttpTestSender {
 
       // if (this.HTTP_TYPE.toUpperCase() === "GET" && _sw) {
       //   console.log(
-      //     "We are going to add query params to get: " +
+      //     "We are going to add query params to GET request: " +
       //       util.inspect(_sw, { depth: 1 })
       //   );
       // }
+      const self = this;
+      let _makeCall = () =>
+        self.HTTP_TYPE.toUpperCase() === "GET"
+          ? self.httpCall().query(_sw)
+          : Object.keys(filesByName).length > 0
+          ? self
+              .httpCall()
+              // .send(_sw)
+              .field("profileData", JSON.stringify(_sw))
+              .attach(
+                Object.keys(filesByName)[0],
+                Object.values(filesByName)[0]
+              )
+          : self.httpCall().send(_sw);
 
-      const _makeCall = () =>
-        this.HTTP_TYPE.toUpperCase() === "GET"
-          ? this.httpCall().query(_sw)
-          : this.httpCall().send(_sw);
+      if(Object.keys(filesByName).length > 0){
+        // for (const fileName of Object.keys(filesByName)){
+        //   console.log(`Adding file: '${fileName}' to supertest request...`);
+        //   _makeCall = () => _makeCall().attach(fileName, filesByName[fileName]);
+        // }
+        let _makeCallAttached = () =>
+          self
+            .httpCall();
+        for (var field of Object.keys(_sw)){
+          console.log(`Adding field: '${field}' to supertest request...`);
+          _makeCallAttached = () => _makeCallAttached().field(field, _sw[field]);
+        }
+        // for (var fileName of Object.keys(filesByName)) {
+        //   console.log(`Adding fileName: '${fileName}' to supertest request...`);
+        //   _makeCallAttached = () =>
+        //     _makeCallAttached().attach(fileName, filesByName[fileName]);
+        // }
+        _makeCallAttached = () =>
+          _makeCallAttached().attach(
+            Object.keys(filesByName)[0],
+            Object.values(filesByName)[0]
+          );
+      }
 
       const response = _makeCall()
         .set("Cookie", cookie)
@@ -216,39 +249,53 @@ class HttpAuthTestSender extends HttpTestSender {
   async makeAuthCallWith(
     updatedPostDataWith,
     updatedPostDataWithOutKeys = [],
-    otherLoginDetails = {}
+    otherLoginDetails = {},
+    filesByName = {}
   ) {
-    if (!otherLoginDetails && !!this.useAccount) {
-      const userDetails = await User.findOne({ name: this.useAccount }); //.populate('vendor&courier');
-      const bespokeUserDetails = {
-        email: userDetails.email,
-        phoneNoCountry: userDetails.phoneNoCountry,
-        phoneCountryCode: userDetails.phoneCountryCode,
-        name: userDetails.name,
-        isSuperAdmin: userDetails.isSuperAdmin,
-        role: userDetails.role,
-        // vendor: userDetails.vendor,
-        // vendorRole: userDetails.vendorRole,
-        firebaseSessionToken: userDetails.firebaseSessionToken,
-        secret: envConfig[`test_${userDetails.name}_secret`],
-      };
-      otherLoginDetails = bespokeUserDetails;
-    }
     const self = this;
-    return this.useAccount !== "TEST_UNAUTHENTICATED"
-      ? callAuthActionWithCookie(
-          async (cookie) =>
-            self.makeCallWith(cookie)(
-              updatedPostDataWith,
-              updatedPostDataWithOutKeys
-            ),
-          false,
-          otherLoginDetails || null
-      )
-      : await self.makeCallWith("")(
-          updatedPostDataWith,
-          updatedPostDataWithOutKeys
+    if (this.useAccount === "TEST_UNAUTHENTICATED") {
+      return await self.makeCallWith("")(
+        updatedPostDataWith,
+        updatedPostDataWithOutKeys,
+        filesByName
       );
+    }
+    let userDetails;
+    if (!Object.keys(otherLoginDetails).length && !!this.useAccount) {
+      userDetails = await User.findOne({ name: this.useAccount }); //.populate('vendor&courier');
+      if (!userDetails) {
+        console.warn(
+          `Failed to find user account with name ${this.useAccount} for authentication`
+        );
+      }
+    } else {
+      userDetails = await User.findOne({ name: "TEST_SERVICE" }); //.populate('vendor&courier');
+    }
+    const bespokeUserDetails = {
+      email: userDetails.email,
+      phoneNoCountry: userDetails.phoneNoCountry,
+      phoneCountryCode: userDetails.phoneCountryCode,
+      name: userDetails.name,
+      isSuperAdmin: userDetails.isSuperAdmin,
+      role: userDetails.role,
+      // vendor: userDetails.vendor,
+      // vendorRole: userDetails.vendorRole,
+      firebaseSessionToken: userDetails.firebaseSessionToken,
+      secret: envConfig[`test_${userDetails.name}_secret`],
+    };
+    otherLoginDetails = bespokeUserDetails;
+    return callAuthActionWithCookieAndUser(
+      async (cookie) =>
+        self.makeCallWith(cookie)(
+          updatedPostDataWith,
+          updatedPostDataWithOutKeys,
+          filesByName
+        ),
+      bespokeUserDetails.name,
+      bespokeUserDetails.secret,
+      false,
+      otherLoginDetails || null
+    );
   }
 }
 

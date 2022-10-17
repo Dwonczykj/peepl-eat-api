@@ -78,12 +78,17 @@ Cloud.setup({
     acceptRejectDeliveryConfirmation: {
       verb: "POST",
       url: "/api/v1/couriers/accept-reject-delivery-confirmation",
-      args: ["deliveryId", "deliveryPartnerConfirmed"],
+      args: ["deliveryId", "deliveryPartnerConfirmed", "deliveryPartnerId"],
     },
     addDeliveryAvailabilityForOrder: {
       verb: "POST",
       url: "/api/v1/couriers/add-delivery-availability-for-order",
-      args: ["vegiOrderId", "deliveryId", "deliveryPartnerAccepted"],
+      args: [
+        "vegiOrderId",
+        "deliveryId",
+        "deliveryPartnerAccepted",
+        "deliveryPartnerId",
+      ],
     },
     cancelDelivery: {
       verb: "POST",

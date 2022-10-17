@@ -23,46 +23,68 @@ module.exports = {
     deliveryPartnerAlreadyConfirmedOrder: {
       statusCode: 401,
     },
+    notFound: {
+      statusCode: 404,
+    }
   },
 
   fn: async function (inputs, exits) {
     var order = await Order.findOne({
-      deliveryId: inputs.deliveryId,
-      completedFlag: "",
+      publicId: inputs.vegiOrderId,
     }).populate("deliveryPartner");
 
     if (!order) {
       return exits.notFound();
+    } else if(order.completedFlag !== ""){
+      sails.log("order flag: " + order.completedFlag);
+      return exits.notFound();
     }
 
-    if (
-      order.deliveryPartner.id !== null &&
-      order.deliveryPartner.id !== undefined &&
-      order.deliveryPartner.id !== this.req.session.userId
-    ) {
-      return exits.otherDeliveryPartnerRegisteredToOrder();
-    } else if (
-      order.deliveryPartner.id === this.req.session.userId &&
-      order.deliveryPartnerConfirmed
-    ) {
-      // This DeliveryPartner has previously confirmed the delivery, they cannot cancel the delivery after this.
-      return exits.deliveryPartnerAlreadyConfirmedOrder(); //NOTE: cannot be cancelled after this stage
+    if (order.deliveryPartner) {
+      const isAuthorisedToCancel =
+        await sails.helpers.isAuthorisedForDeliveryPartner.with({
+          userId: this.req.session.userId,
+          deliveryPartnerId: order.deliveryPartner.id,
+        });
+      if(!isAuthorisedToCancel){
+        return exits.otherDeliveryPartnerRegisteredToOrder();
+      } else if(order.deliveryPartnerConfirmed){
+        // This DeliveryPartner has previously confirmed the delivery, they cannot cancel the delivery after this.
+        return exits.deliveryPartnerAlreadyConfirmedOrder(); //NOTE: cannot be cancelled after this stage
+      }
     }
 
-    await Order.updateOne({ deliveryId: inputs.deliveryId }).set({
-      deliveryId: null,
-      deliveryPartnerAccepted: false,
+    try {
+	    if (order.deliveryPartner){
+	      await sails.helpers.sendFirebaseNotification.with({
+	        topic: "order-" + order.publicId,
+	        title: "Rider Cancelled! 🚨",
+	        body: "Your order has been cancelled by the rider. \nWe will find a new rider and notify you again when we do. \n\nAlternatively open vegi to manage to your order.",
+	        data: {
+	          orderId: order.id,
+	        },
+	      });
+	      await sails.helpers.raiseVegiSupportIssue.with({
+	        orderId: order.publicId,
+	        title: "order_delivery_rider_cancelled",
+	        message: `Order Delivery Partner cancelled delivery for order: ${order.publicId}. Please request a new delivery partner for the order.`,
+	      });
+	    }
+    } catch (error) {
+      sails.log.error(
+        `Failed to notify user & vegi support of a delivery cancellation for order: ${order.publicId} with error: ${error}`
+      );
+    }
+
+    await Order.updateOne(order.id).set({
+      deliveryId: "",
       deliveryPartner: null,
+      deliveryPartnerAccepted: false,
       deliveryPartnerConfirmed: false,
     });
 
-    await sails.helpers.sendFirebaseNotification.with({
-      topic: "order-" + order.publicId,
-      title: "Rider Cancelled! 🚨",
-      body: "Your order has been cancelled by the rider. \nWe will find a new rider and notify you again when we do. \n\nAlternatively open vegi to manage to your order.",
-    });
 
     // All done.
-    return;
+    return exits.success();
   },
 };

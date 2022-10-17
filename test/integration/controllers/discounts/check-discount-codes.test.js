@@ -1,6 +1,4 @@
 const { expect } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
-var supertest = require("supertest");
-const { logoutCbLogin, callAuthActionWithCookie } = require("../../../utils");
 const util = require("util");
 
 const { fixtures } = require("../../../../scripts/build_db");
@@ -21,7 +19,7 @@ const CAN_GET_DISCOUNTCODES = (fixtures) => {
     ACTION_PATH: "discounts",
     ACTION_NAME: "check-discount-code/:discountCode",
     sendData: {
-      discountCode: discountCode.id,
+      discountCode: discountCode.code,
     },
     expectResponse: {},
     expectStatusCode: 200,
@@ -47,7 +45,7 @@ const CAN_NOT_VIEW_DISCOUNTCODES_WHEN_UNAUTH = (fixtures) => {
     ACTION_PATH: "discounts",
     ACTION_NAME: "check-discount-code/:discountCode",
     sendData: {
-      discountCode: discountCode.id,
+      discountCode: discountCode.code,
     },
     expectResponse: {},
     expectStatusCode: 200,

@@ -50,15 +50,18 @@ module.exports = {
         }
 
         if (inputs.image) {
-            var imageInfo = await sails.uploadOne(inputs.image, {
-                adapter: require('skipper-s3'),
+            var imageInfo = await sails
+              .uploadOne(inputs.image, {
+                adapter: require("skipper-s3"),
                 key: sails.config.custom.amazonS3AccessKey,
                 secret: sails.config.custom.amazonS3Secret,
                 bucket: sails.config.custom.amazonS3Bucket,
-                maxBytes: 30000000
-            })
-                .intercept('E_EXCEEDS_UPLOAD_LIMIT', 'tooBig')
-                .intercept((err) => new Error('The photo upload failed! ' + err.message));
+                maxBytes: sails.config.custom.amazonS3MaxUploadSizeBytes,
+              })
+              .intercept("E_EXCEEDS_UPLOAD_LIMIT", "tooBig")
+              .intercept(
+                (err) => new Error("The photo upload failed! " + err.message)
+              );
 
             if (imageInfo) {
                 inputs.imageUrl = sails.config.custom.amazonS3BucketUrl + imageInfo.fd;

@@ -2487,7 +2487,8 @@
             "name": "deliveryPartnerId",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "number",
+              "format": "double"
             }
           }
         ],
@@ -2803,6 +2804,15 @@
             "schema": {
               "type": "boolean"
             }
+          },
+          {
+            "in": "query",
+            "name": "deliveryPartnerId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
           }
         ],
         "responses": {
@@ -2810,11 +2820,15 @@
             "description": "The requested resource"
           },
           "401": {
-            "description": "Success",
+            "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {
                   "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Forbidden"
+                    },
                     {
                       "type": "string",
                       "description": "DeliveryPartner has already confirmed this order."
@@ -2873,6 +2887,15 @@
             "required": true,
             "schema": {
               "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "deliveryPartnerId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
             }
           }
         ],
@@ -2974,7 +2997,7 @@
             }
           },
           "404": {
-            "description": "Resource not found"
+            "description": "Not found"
           },
           "500": {
             "description": "Internal server error"
@@ -6101,7 +6124,23 @@
         ],
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
           },
           "404": {
             "description": "Not found"

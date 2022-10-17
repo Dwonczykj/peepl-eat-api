@@ -6,7 +6,7 @@ module.exports = [
     isEnabled: true,
     expiryDateTime: 0,
     timesUsed: 0,
-    maxUses: 0,
+    maxUses: 1000,
     vendor: null,
   },
 ];
