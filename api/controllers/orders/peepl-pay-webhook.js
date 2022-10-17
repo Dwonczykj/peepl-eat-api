@@ -37,6 +37,7 @@ module.exports = {
 
     await sails.helpers.sendSmsNotification.with({body: 'You have received a new order from Vegi for delivery between ' + order.fulfilmentSlotFrom + ' and ' + order.fulfilmentSlotTo + '. To accept or decline: ' + sails.config.custom.baseUrl + '/admin/approve-order/' + order.publicId, to: order.vendor.phoneNumber});
 
+    await sails.helpers.sendSlackNotification.with({order: order});
     // // Send order confirmation email
     // await sails.helpers.sendTemplateEmail.with({
     //   template: 'email-order-confirmation-new',
