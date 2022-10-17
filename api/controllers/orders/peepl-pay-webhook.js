@@ -35,7 +35,15 @@ module.exports = {
     var order = await Order.findOne({paymentIntentId: inputs.publicId})
     .populate('vendor');
 
-    await sails.helpers.sendSmsNotification.with({body: 'You have received a new order from Vegi for delivery between ' + order.fulfilmentSlotFrom + ' and ' + order.fulfilmentSlotTo + '. To accept or decline: ' + sails.config.custom.baseUrl + '/admin/approve-order/' + order.publicId, to: order.vendor.phoneNumber});
+    await sails.helpers.sendSmsNotification.with({
+      // body: 'You have received a new order from Vegi for delivery between ' + order.fulfilmentSlotFrom + ' and ' + order.fulfilmentSlotTo + '. To accept or decline: ' + sails.config.custom.baseUrl + '/admin/approve-order/' + order.publicId, to: order.vendor.phoneNumber
+      body: `[from vegi]
+New order alert! 🚨
+Order details ${sails.config.custom.baseUrl}/admin/approve-order/${order.publicId}
+Please accept/decline ASAP.
+Delivery/Collection on ${order.fulfilmentSlotFrom} - ${order.fulfilmentSlotTo}`,
+      to: order.vendor.phoneNumber
+    });
 
     await sails.helpers.sendSlackNotification.with({order: order});
     // // Send order confirmation email
