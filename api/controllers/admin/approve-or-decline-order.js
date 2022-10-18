@@ -102,7 +102,7 @@ module.exports = {
       return exits.orderNotPaidFor();
     }
 
-    if (inputs.orderFulfilled === "accept") {
+    if (inputs.orderFulfilled === "accept" && order.subtotal > 0) {
       await Order.updateOne(order.id).set({
         restaurantAcceptanceStatus: "accepted",
       });
@@ -111,7 +111,7 @@ module.exports = {
       let rewardsIssued = false;
       try {
         var rewardAmountResult = await sails.helpers.calculatePplReward.with({
-          amount: order.total,
+          amount: order.subtotal,
           orderType: OrderTypeEnum.vegiEats,
         });
 

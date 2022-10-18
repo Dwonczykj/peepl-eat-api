@@ -269,6 +269,7 @@ module.exports = {
           // Update with correct amount
           await wrapWithDb(db, () =>
             Order.updateOne(order.id).set({
+              subtotal: calculatedOrderTotal.withoutFees,
               total: calculatedOrderTotal.finalAmount,
             })
           );

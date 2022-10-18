@@ -54,7 +54,13 @@ module.exports = {
 	    if(order.paymentStatus === 'paid'){
 	      await sails.helpers.sendSmsNotification.with({
 	        to: order.vendor.phoneNumber,
-	        body: 'You have received a new order from vegi for delivery between ' + order.fulfilmentSlotFrom + ' and ' + order.fulfilmentSlotTo + '. To accept or decline: ' + sails.config.custom.baseUrl + '/admin/approve-order/' + order.publicId,
+	        // body: `You have received a new order from vegi for delivery between ${order.fulfilmentSlotFrom} and ${order.fulfilmentSlotTo}. ` +
+          // `To accept or decline: ' + sails.config.custom.baseUrl + '/admin/approve-order/' + order.publicId,
+	        body: `[from vegi]
+New order alert! 🚨
+Order details ${sails.config.custom.baseUrl}/admin/approve-order/${order.publicId}
+Please accept/decline ASAP.
+Delivery/Collection on ${order.fulfilmentSlotFrom} - ${order.fulfilmentSlotTo}`,
           data: {
             orderId: order.id,
           },
@@ -77,6 +83,7 @@ module.exports = {
       sails.log.error(`peepl-pay-webhook errored sending sms notification to vendor for paid order: ${error}`);
     }
 
+    await sails.helpers.sendSlackNotification.with({order: order});
     // // Send order confirmation email
     // await sails.helpers.sendTemplateEmail.with({
     //   template: 'email-order-confirmation-new',
