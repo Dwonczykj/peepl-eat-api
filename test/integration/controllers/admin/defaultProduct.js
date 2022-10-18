@@ -10,11 +10,25 @@ const DEFAULT_NEW_PRODUCT_OBJECT = (fixtures, overrides = {}) => {
     ...{
       code: "TEST20",
       percentage: 20,
+      description: "This is a test product",
+      basePrice: 100,
       expiryDateTime: 0,
       timesUsed: 0,
       maxUses: 0,
       isEnabled: true,
-      vendor: null,
+      vendor: fixtures.productCategories[0].vendor,
+      category: fixtures.productCategories[0].id,
+    },
+    ...overrides,
+  };
+};
+const DEFAULT_NEW_PRODUCT_OPTION_OBJECT = (fixtures, overrides = {}) => {
+  return {
+    ...{
+      name: "Test product option",
+      isRequired: false,
+      values: [],
+      product: fixtures.products[0].id,
     },
     ...overrides,
   };
@@ -90,6 +104,7 @@ class HttpAuthTestSenderProduct extends HttpAuthTestSender {
 
 module.exports = {
   DEFAULT_NEW_PRODUCT_OBJECT: DEFAULT_NEW_PRODUCT_OBJECT,
+  DEFAULT_NEW_PRODUCT_OPTION_OBJECT: DEFAULT_NEW_PRODUCT_OPTION_OBJECT,
   ExpectResponseProduct: ExpectResponseProduct,
   HttpAuthTestSenderProduct: HttpAuthTestSenderProduct,
 };

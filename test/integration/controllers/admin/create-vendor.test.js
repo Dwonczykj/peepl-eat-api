@@ -24,7 +24,8 @@ const CAN_CREATE_VENDORS = (fixtures) => {
     expectResponse: {},
     expectStatusCode: 200,
     expectResponseCb: async (response, requestPayload) => {
-      return;
+      expect(response.body).to.have.property("id");
+      return Promise.resolve();
     },
   };
 };
@@ -42,18 +43,23 @@ describe(`${CAN_CREATE_VENDORS(fixtures).ACTION_NAME}`, () => {
       delete vendorCall.imageUrl;
       
       const hats = new HttpAuthTestSenderVendor(CAN_CREATE_VENDORS(fixtures));
+      // const response = await hats.makeAuthCallWith(
+      //   vendorCall,
+      //   ["imageUrl"],
+      //   {},
+      //   {
+      //     [imgName]: testImage,
+      //   }
+      // );
       const response = await hats.makeAuthCallWith(
         vendorCall,
         ["imageUrl"],
-        {},
-        {
-          [imgName]: testImage,
-        }
+        // {},
+        // {
+        //   [imgName]: testImage,
+        // }
       );
       await hats.expectedResponse.checkResponse(response);
-      expect(response.body.name).to.equal(
-        "TEST CAN_CREATE_VENDORS TEST VENDOR"
-      );
     } catch (errs) {
       console.warn(errs);
       throw errs;

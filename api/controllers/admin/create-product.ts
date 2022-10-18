@@ -1,5 +1,6 @@
 declare var sails: any;
 declare var Product: any;
+import {v4 as uuidv4} from 'uuid';
 
 module.exports = {
   friendlyName: "Create product",
@@ -74,18 +75,29 @@ module.exports = {
 
     var newProduct;
 
-    // Check that the file is not too big.
-    var imageInfo = await sails
-      .uploadOne(inputs.image, {
-        adapter: require("skipper-s3"),
-        key: sails.config.custom.amazonS3AccessKey,
-        secret: sails.config.custom.amazonS3Secret,
-        bucket: sails.config.custom.amazonS3Bucket,
-        maxBytes: sails.config.custom.amazonS3MaxUploadSizeBytes,
-      })
-      .intercept("E_EXCEEDS_UPLOAD_LIMIT", "tooBig")
-      .intercept((err) => new Error("The photo upload failed! " + err.message));
-
+    var dontActuallySend =
+      sails.config.environment === "test" ||
+      process.env.FIREBASE_AUTH_EMULATOR_HOST;
+    let imageInfo;
+    if (!dontActuallySend) {
+      imageInfo = await sails
+        .uploadOne(inputs.image, {
+          adapter: require("skipper-s3"),
+          key: sails.config.custom.amazonS3AccessKey,
+          secret: sails.config.custom.amazonS3Secret,
+          bucket: sails.config.custom.amazonS3Bucket,
+          maxBytes: sails.config.custom.amazonS3MaxUploadSizeBytes,
+        })
+        .intercept("E_EXCEEDS_UPLOAD_LIMIT", "tooBig")
+        .intercept(
+          (err) => new Error("The photo upload failed! " + err.message)
+        );
+    } else {
+      imageInfo = {
+        fd: dontActuallySend ? "test-image-fd-" + uuidv4() : null,
+      };
+    }
+    
     if (!imageInfo) {
       // Create the new product
       newProduct = await Product.create({
