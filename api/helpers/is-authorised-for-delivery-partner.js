@@ -62,7 +62,9 @@ module.exports = {
       return exits.success(true);
     }
 
-    sails.log.info(`Not authorised to view deliveryPartner route`);
+    sails.log.info(
+      `User: [${user.name}] is not authorised to view deliveryPartner route for deliveryPartner: ${deliveryPartner.name}. They have access to ${user.deliveryPartner}.`
+    );
     return exits.success(false);
   },
 };

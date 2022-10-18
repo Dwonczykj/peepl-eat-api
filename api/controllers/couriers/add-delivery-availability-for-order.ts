@@ -1,5 +1,6 @@
 import moment from "moment";
 import { Slot } from "../../interfaces/vendors/slot";
+import util from 'util';
 
 module.exports = {
   friendlyName: "Add delivery availability to order",
@@ -64,6 +65,7 @@ module.exports = {
     }
 
     if (!order) {
+      sails.log(`order not found with public id: ${inputs.vegiOrderId}`);
       return exits.notFound();
     }
 
@@ -79,7 +81,7 @@ module.exports = {
       order.deliveryPartnerConfirmed ||
       order.deliveryPartner
     ) {
-      // This DeliveryPartner has previously confirmed the delivery, they cannot cancel the delivery after this.
+      sails.log(`This DeliveryPartner has previously confirmed the delivery, they cannot accept the the delivery again.`);
       return exits.orderAlreadyHasDeliveryPartner(); //NOTE: cannot be cancelled after this stage
     }
 
@@ -87,23 +89,30 @@ module.exports = {
       inputs.deliveryPartnerId
     ).populate('deliveryFulfilmentMethod');
     if(!deliveryPartner){
+      sails.log(
+        `Delivery partner with id: ${inputs.deliveryPartnerId} not found.`
+      );
       return exits.notFound();
     }
 
     try {
 	    if (deliveryPartner.deliveryFulfilmentMethod) {
 	      // Check that delivery partner can service this delivery slot
-	      const dPdeliverySlots: Slot[] = await sails.helpers
+	      const dPdeliverySlotsI = await sails.helpers
           .getAvailableSlots(
             moment
               .utc(order.fulfilmentSlotFrom, "YYYY-MM-DD HH:mm:ss")
               .format("YYYY-MM-DD"),
             deliveryPartner.deliveryFulfilmentMethod.id
-          )
-          .map((slot) => Slot.from(slot));
+          );
+        const dPdeliverySlots = dPdeliverySlotsI.map((slot) => Slot.from(slot));
+        // sails.log(
+        //   `Order between ${order.fulfilmentSlotFrom} and ${order.fulfilmentSlotTo}`
+        // );
+        // sails.log(util.inspect(dPdeliverySlots, {depth: null}));
 	      const slotOk =
 	        dPdeliverySlots.filter((slot) => {
-	          moment
+	          return moment
               .utc(order.fulfilmentSlotFrom, "YYYY-MM-DD HH:mm:ss")
               .isSameOrAfter(slot.startTime) &&
               moment

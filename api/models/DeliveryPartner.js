@@ -88,21 +88,20 @@ module.exports = {
     },
   },
 
-  beforeCreate: async function (deliveryPartnerDraft, proceed) {
-    return proceed();
-  },
+  // beforeCreate: async function (deliveryPartnerDraft, proceed) {
+  //   return proceed();
+  // },
 
   afterCreate: async function (newlyCreatedRecord, proceed) {
-    if (!sails.helpers.isSuperAdmin.with({ userId: this.req.session.userId })) {
-      await DeliveryPartner.addToCollection(
-        newlyCreatedRecord.id,
-        "users",
-        this.req.session.userId
-      );
+    if(!newlyCreatedRecord.deliveryFulfilmentMethod){
+      try {
+        await sails.helpers.initialiseDeliveryMethods.with({
+          deliveryPartner: newlyCreatedRecord.id,
+        });
+      } catch (error) {
+        sails.log.error(error);
+      }
     }
-    await sails.helpers.initialiseDeliveryMethods.with({
-      deliveryPartner: newlyCreatedRecord.id,
-    });
     return proceed();
   },
 };

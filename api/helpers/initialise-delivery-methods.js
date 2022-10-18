@@ -89,7 +89,7 @@ module.exports = {
       await FulfilmentMethod.addToCollection(col.id, 'openingHours').members(newHoursIDsCol);
     }
 
-    return;
+    return exits.success();
   }
 
 

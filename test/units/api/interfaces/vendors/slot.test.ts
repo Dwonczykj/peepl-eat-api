@@ -12,11 +12,102 @@ const expect = chai.expect;
 describe('units/api/interfaces/vendors/slot', () => {
 
   describe('Can intersect Slots', () => {
+    it('can filter a list of slots to find the matching slot', () => {
+      const slot = new Slot({
+        startTime: moment.utc("20220901 10:00:00", "YYYYMMDD HH:mm:ss"),
+        endTime: moment.utc("20220901 11:00:00", "YYYYMMDD HH:mm:ss"),
+      });
+
+      
+      const fulfilmentSlotFrom = moment.utc(
+        "20220901 10:00:00",
+        "YYYYMMDD HH:mm:ss"
+      );
+      const fulfilmentSlotTo = moment.utc(
+        "20220901 11:00:00",
+        "YYYYMMDD HH:mm:ss"
+      );
+
+      const match1 = fulfilmentSlotFrom.isSameOrAfter(slot.startTime);
+
+      const match2 = fulfilmentSlotFrom.isSameOrBefore(slot.endTime);
+
+      const match3 = fulfilmentSlotTo.isSameOrAfter(slot.startTime);
+
+      const match4 = fulfilmentSlotTo.isSameOrBefore(slot.endTime);
+
+      expect(match1).to.equal(true);
+      expect(match2).to.equal(true);
+      expect(match3).to.equal(true);
+      expect(match4).to.equal(true);
+      return;
+    });
+    it('can filter a list of slots to find the matching slot', () => {
+      const slots = [
+        new Slot({
+          startTime: moment.utc("20220901 09:00:00", "YYYYMMDD HH:mm:ss"),
+          endTime: moment.utc("20220901 10:00:00", "YYYYMMDD HH:mm:ss"),
+        }),
+        new Slot({
+          startTime: moment.utc("20220901 10:00:00", "YYYYMMDD HH:mm:ss"),
+          endTime: moment.utc("20220901 11:00:00", "YYYYMMDD HH:mm:ss"),
+        }),
+        new Slot({
+          startTime: moment.utc("20220901 11:00:00", "YYYYMMDD HH:mm:ss"),
+          endTime: moment.utc("20220901 12:00:00", "YYYYMMDD HH:mm:ss"),
+        }),
+        new Slot({
+          startTime: moment.utc("20220901 12:00:00", "YYYYMMDD HH:mm:ss"),
+          endTime: moment.utc("20220901 13:00:00", "YYYYMMDD HH:mm:ss"),
+        }),
+        new Slot({
+          startTime: moment.utc("20220901 13:00:00", "YYYYMMDD HH:mm:ss"),
+          endTime: moment.utc("20220901 14:00:00", "YYYYMMDD HH:mm:ss"),
+        }),
+      ];
+
+      const fulfilmentSlotFrom = moment.utc(
+        "20220901 10:00:00",
+        "YYYYMMDD HH:mm:ss"
+      );
+      const fulfilmentSlotTo = moment.utc(
+        "20220901 11:00:00",
+        "YYYYMMDD HH:mm:ss"
+      );
+
+      const matchingSlots = slots.filter((slot) => {
+        return fulfilmentSlotFrom.isSameOrAfter(slot.startTime) &&
+          fulfilmentSlotFrom.isSameOrBefore(slot.endTime) &&
+          fulfilmentSlotTo.isSameOrAfter(slot.startTime) &&
+          fulfilmentSlotTo.isSameOrBefore(slot.endTime);
+      });
+
+      // const fulfilmentSlotFrom = "20220901 10:00:00";
+      // const fulfilmentSlotTo = "20220901 11:00:00";
+      // const matchingSlots =
+      //   slots.filter((slot) => {
+      //     moment
+      //       .utc(fulfilmentSlotFrom, "YYYYMMDD HH:mm:ss")
+      //       .isSameOrAfter(slot.startTime) &&
+      //       moment
+      //         .utc(fulfilmentSlotFrom, "YYYYMMDD HH:mm:ss")
+      //         .isSameOrBefore(slot.endTime) &&
+      //       moment
+      //         .utc(fulfilmentSlotTo, "YYYYMMDD HH:mm:ss")
+      //         .isSameOrAfter(slot.startTime) &&
+      //       moment
+      //         .utc(fulfilmentSlotTo, "YYYYMMDD HH:mm:ss")
+      //         .isSameOrBefore(slot.endTime);
+      //   });
+
+      expect(matchingSlots).to.have.lengthOf(1);
+      return;
+    });
     it('overLap 2 overlapping slots is true', (done) => {
-      const s1 = moment('20220901 13:00:00', 'YYYYMMdd HH:mm:ss');
-      const e1 = moment('20220901 15:00:00', 'YYYYMMdd HH:mm:ss');
-      const s2 = moment('20220901 14:00:00', 'YYYYMMdd HH:mm:ss');
-      const e2 = moment('20220901 16:00:00', 'YYYYMMdd HH:mm:ss');
+      const s1 = moment.utc('20220901 13:00:00', 'YYYYMMDD HH:mm:ss');
+      const e1 = moment.utc('20220901 15:00:00', 'YYYYMMDD HH:mm:ss');
+      const s2 = moment.utc('20220901 14:00:00', 'YYYYMMDD HH:mm:ss');
+      const e2 = moment.utc('20220901 16:00:00', 'YYYYMMDD HH:mm:ss');
       const slot1: Slot = new Slot({startTime: s1, endTime: e1});
       const slot2: Slot = new Slot({startTime: s2, endTime: e2});
       const isOverlap = slot1.overlapsWith(slot2);
@@ -24,10 +115,10 @@ describe('units/api/interfaces/vendors/slot', () => {
       return done();
     });
     it('intersection of a slot and a subslot is the subslot', (done) => {
-      const s1 = moment('20220901 13:00:00', 'YYYYMMdd HH:mm:ss');
-      const e1 = moment('20220901 18:00:00', 'YYYYMMdd HH:mm:ss');
-      const s2 = moment('20220901 14:00:00', 'YYYYMMdd HH:mm:ss');
-      const e2 = moment('20220901 16:00:00', 'YYYYMMdd HH:mm:ss');
+      const s1 = moment.utc('20220901 13:00:00', 'YYYYMMDD HH:mm:ss');
+      const e1 = moment.utc('20220901 18:00:00', 'YYYYMMDD HH:mm:ss');
+      const s2 = moment.utc('20220901 14:00:00', 'YYYYMMDD HH:mm:ss');
+      const e2 = moment.utc('20220901 16:00:00', 'YYYYMMDD HH:mm:ss');
       const slot1: Slot = new Slot({startTime: s1, endTime: e1});
       const slot2: Slot = new Slot({startTime: s2, endTime: e2});
       const interSlot = slot1.intersectWith(slot2);
@@ -39,10 +130,10 @@ describe('units/api/interfaces/vendors/slot', () => {
       return done();
     });
     it('intersection of 2 partially overlapping slots is a intersecting-slot', (done) => {
-      const s1 = moment('20220901 13:00:00', 'YYYYMMdd HH:mm:ss');
-      const e1 = moment('20220901 15:00:00', 'YYYYMMdd HH:mm:ss');
-      const s2 = moment('20220901 14:00:00', 'YYYYMMdd HH:mm:ss');
-      const e2 = moment('20220901 16:00:00', 'YYYYMMdd HH:mm:ss');
+      const s1 = moment.utc('20220901 13:00:00', 'YYYYMMDD HH:mm:ss');
+      const e1 = moment.utc('20220901 15:00:00', 'YYYYMMDD HH:mm:ss');
+      const s2 = moment.utc('20220901 14:00:00', 'YYYYMMDD HH:mm:ss');
+      const e2 = moment.utc('20220901 16:00:00', 'YYYYMMDD HH:mm:ss');
       const slot1: Slot = new Slot({startTime: s1, endTime: e1});
       const slot2: Slot = new Slot({startTime: s2, endTime: e2});
       const interSlot = slot1.intersectWith(slot2);
@@ -52,10 +143,10 @@ describe('units/api/interfaces/vendors/slot', () => {
       return done();
     });
     it('intersection of 2 mutually exclusive slots is null', (done) => {
-      const s1 = moment('20220901 13:00:00', 'YYYYMMdd HH:mm:ss');
-      const e1 = moment('20220901 14:00:00', 'YYYYMMdd HH:mm:ss');
-      const s2 = moment('20220901 15:00:00', 'YYYYMMdd HH:mm:ss');
-      const e2 = moment('20220901 16:00:00', 'YYYYMMdd HH:mm:ss');
+      const s1 = moment.utc('20220901 13:00:00', 'YYYYMMDD HH:mm:ss');
+      const e1 = moment.utc('20220901 14:00:00', 'YYYYMMDD HH:mm:ss');
+      const s2 = moment.utc('20220901 15:00:00', 'YYYYMMDD HH:mm:ss');
+      const e2 = moment.utc('20220901 16:00:00', 'YYYYMMDD HH:mm:ss');
       const slot1: Slot = new Slot({startTime: s1, endTime: e1});
       const slot2: Slot = new Slot({startTime: s2, endTime: e2});
       const interSlot = slot1.intersectWith(slot2);
@@ -66,21 +157,21 @@ describe('units/api/interfaces/vendors/slot', () => {
   describe('Can intersect Arrays of Slots', () => {
     it('can merge overlapping slots within array', (done) => {
       // 9 -> 11
-      const s1 = moment('20220901 09:00:00', 'YYYYMMdd HH:mm:ss');
-      const e1 = moment('20220901 11:00:00', 'YYYYMMdd HH:mm:ss');
+      const s1 = moment.utc('20220901 09:00:00', 'YYYYMMDD HH:mm:ss');
+      const e1 = moment.utc('20220901 11:00:00', 'YYYYMMDD HH:mm:ss');
       // 10 -> 12
-      const ds1 = moment('20220901 10:00:00', 'YYYYMMdd HH:mm:ss');
-      const de1 = moment('20220901 12:00:00', 'YYYYMMdd HH:mm:ss');
+      const ds1 = moment.utc('20220901 10:00:00', 'YYYYMMDD HH:mm:ss');
+      const de1 = moment.utc('20220901 12:00:00', 'YYYYMMDD HH:mm:ss');
       // 10:30 -> 11:30
-      const ds3 = moment('20220901 10:30:00', 'YYYYMMdd HH:mm:ss');
-      const de3 = moment('20220901 11:30:00', 'YYYYMMdd HH:mm:ss');
+      const ds3 = moment.utc('20220901 10:30:00', 'YYYYMMDD HH:mm:ss');
+      const de3 = moment.utc('20220901 11:30:00', 'YYYYMMDD HH:mm:ss');
 
       // 15 -> 16
-      const ds2 = moment('20220901 15:00:00', 'YYYYMMdd HH:mm:ss');
-      const de2 = moment('20220901 16:00:00', 'YYYYMMdd HH:mm:ss');
+      const ds2 = moment.utc('20220901 15:00:00', 'YYYYMMDD HH:mm:ss');
+      const de2 = moment.utc('20220901 16:00:00', 'YYYYMMDD HH:mm:ss');
       // 15:15 -> 15:45
-      const s4 = moment('20220901 15:15:00', 'YYYYMMdd HH:mm:ss');
-      const e4 = moment('20220901 15:45:00', 'YYYYMMdd HH:mm:ss');
+      const s4 = moment.utc('20220901 15:15:00', 'YYYYMMDD HH:mm:ss');
+      const e4 = moment.utc('20220901 15:45:00', 'YYYYMMDD HH:mm:ss');
 
       const slotv1: Slot = new Slot({startTime: s1, endTime: e1});
       const slotd1: Slot = new Slot({startTime: ds1, endTime: de1});
@@ -102,24 +193,24 @@ describe('units/api/interfaces/vendors/slot', () => {
     });
     it('overLap 2 overlapping slots is true', (done) => {
       // 9 -> 11
-      const s1 = moment('20220901 09:00:00', 'YYYYMMdd HH:mm:ss');
-      const e1 = moment('20220901 11:00:00', 'YYYYMMdd HH:mm:ss');
+      const s1 = moment.utc('20220901 09:00:00', 'YYYYMMDD HH:mm:ss');
+      const e1 = moment.utc('20220901 11:00:00', 'YYYYMMDD HH:mm:ss');
       // 12 -> 14
-      const s2 = moment('20220901 12:00:00', 'YYYYMMdd HH:mm:ss');
-      const e2 = moment('20220901 14:00:00', 'YYYYMMdd HH:mm:ss');
+      const s2 = moment.utc('20220901 12:00:00', 'YYYYMMDD HH:mm:ss');
+      const e2 = moment.utc('20220901 14:00:00', 'YYYYMMDD HH:mm:ss');
       // 15:15 -> 15:45
-      const s4 = moment('20220901 15:15:00', 'YYYYMMdd HH:mm:ss');
-      const e4 = moment('20220901 15:45:00', 'YYYYMMdd HH:mm:ss');
+      const s4 = moment.utc('20220901 15:15:00', 'YYYYMMDD HH:mm:ss');
+      const e4 = moment.utc('20220901 15:45:00', 'YYYYMMDD HH:mm:ss');
       
       // 10 -> 12
-      const ds1 = moment('20220901 10:00:00', 'YYYYMMdd HH:mm:ss');
-      const de1 = moment('20220901 12:00:00', 'YYYYMMdd HH:mm:ss');
+      const ds1 = moment.utc('20220901 10:00:00', 'YYYYMMDD HH:mm:ss');
+      const de1 = moment.utc('20220901 12:00:00', 'YYYYMMDD HH:mm:ss');
       // 10:30 -> 11:30
-      const ds3 = moment('20220901 10:30:00', 'YYYYMMdd HH:mm:ss');
-      const de3 = moment('20220901 11:30:00', 'YYYYMMdd HH:mm:ss');
+      const ds3 = moment.utc('20220901 10:30:00', 'YYYYMMDD HH:mm:ss');
+      const de3 = moment.utc('20220901 11:30:00', 'YYYYMMDD HH:mm:ss');
       // 15 -> 16
-      const ds2 = moment('20220901 15:00:00', 'YYYYMMdd HH:mm:ss');
-      const de2 = moment('20220901 16:00:00', 'YYYYMMdd HH:mm:ss');
+      const ds2 = moment.utc('20220901 15:00:00', 'YYYYMMDD HH:mm:ss');
+      const de2 = moment.utc('20220901 16:00:00', 'YYYYMMDD HH:mm:ss');
 
       const slotv1: Slot = new Slot({startTime: s1, endTime: e1});
       const slotv2: Slot = new Slot({startTime: s2, endTime: e2});

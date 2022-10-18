@@ -1,11 +1,13 @@
 /* eslint-disable no-console */
+
+import { Slot } from "../../../../api/interfaces/vendors/slot";
+
 // test/integration/controllers/admin/create-product.test.js
-const { assert, expect } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
-var supertest = require("supertest");
+import { assert, expect } from "chai"; // ~ https://www.chaijs.com/api/bdd/
 const _ = require("lodash");
 // var util = require("util");
-const moment = require("moment/moment");
-var util = require("util");
+import moment from 'moment';
+import util from 'util';
 require("ts-node/register");
 const { v4: uuidv4 } = require("uuid");
 const {
@@ -13,6 +15,14 @@ const {
   ExpectResponse,
 } = require("../../../httpTestSender");
 const {fixtures} = require('../../../../scripts/build_db');
+const {getNextWeekday} = require('../../../utils');
+
+declare var Order:any;
+declare var User:any;
+declare var OpeningHours:any;
+declare var DeliveryPartner:any;
+declare var FulfilmentMethod:any;
+declare var Vendor:any;
 
 const DEFAULT_NEW_ORDER_OBJECT = (fixtures, overrides = {}) => {
   const vendor = fixtures.vendors[0];
@@ -144,7 +154,7 @@ const VIEW_DELIVERIES = (fixtures, deliveryPartner, orders) => {
     expectStatusCode: 200,
     expectResponseCb: (response) => {
       assert.isNotEmpty(orders);
-      return;
+      return Promise.resolve();
     },
   };
 };
@@ -161,7 +171,7 @@ const CANCEL_DELIVERY = (fixtures) => {
     expectResponse: {},
     expectStatusCode: 200,
     expectResponseCb: (response) => {
-      return;
+      return Promise.resolve();
     },
   };
 };
@@ -178,7 +188,7 @@ const CANCEL_DELIVERY_CONFIRMED = (fixtures) => {
     expectResponse: {},
     expectStatusCode: 401,
     expectResponseCb: (response) => {
-      return;
+      return Promise.resolve();
     },
   };
 };
@@ -194,7 +204,7 @@ const CANCEL_DELIVERY_NOT_ALLOWED_BY_USER = (fixtures) => { return {
   expectResponse: {},
   expectStatusCode: 401,
   expectResponseCb: (response) => {
-    return;
+    return Promise.resolve();
   },
 };};
 const ACCEPT_DELIVERY_CONFIRMATION_AS_ADMIN = (fixtures) => { return {
@@ -210,7 +220,7 @@ const ACCEPT_DELIVERY_CONFIRMATION_AS_ADMIN = (fixtures) => { return {
   expectResponse: {},
   expectStatusCode: 200,
   expectResponseCb: (response) => {
-    return;
+    return Promise.resolve();
   },
 };};
 const ACCEPT_DELIVERY_CONFIRMATION_AS_USER_NOT_ALLOWED = (fixtures) => { return {
@@ -225,7 +235,7 @@ const ACCEPT_DELIVERY_CONFIRMATION_AS_USER_NOT_ALLOWED = (fixtures) => { return 
   expectResponse: {},
   expectStatusCode: 401,
   expectResponseCb: (response) => {
-    return;
+    return Promise.resolve();
   },
 };};
 const ACCEPT_DELIVERY_CONFIRMATION_AS_DELIVERYPARTNER = (fixtures) => { return {
@@ -240,7 +250,7 @@ const ACCEPT_DELIVERY_CONFIRMATION_AS_DELIVERYPARTNER = (fixtures) => { return {
   expectResponse: {},
   expectStatusCode: 200,
   expectResponseCb: (response) => {
-    return;
+    return Promise.resolve();
   },
 };};
 const ACCEPT_DELIVERY_CONFIRMATION_AS_DELIVERYPARTNER_FOR_ORDER_FOR_OTHER_DP = (fixtures) => { return {
@@ -255,7 +265,7 @@ const ACCEPT_DELIVERY_CONFIRMATION_AS_DELIVERYPARTNER_FOR_ORDER_FOR_OTHER_DP = (
   expectResponse: {},
   expectStatusCode: 401,
   expectResponseCb: (response) => {
-    return;
+    return Promise.resolve();
   },
 };};
 const ACCEPT_DELIVERY_CONFIRMATION_AS_DELIVERYPARTNER_ALREADY_CONFIRMED = (
@@ -273,7 +283,7 @@ const ACCEPT_DELIVERY_CONFIRMATION_AS_DELIVERYPARTNER_ALREADY_CONFIRMED = (
     expectResponse: {},
     expectStatusCode: 401,
     expectResponseCb: (response) => {
-      return;
+      return Promise.resolve();
     },
   };
 };
@@ -290,7 +300,7 @@ const ADD_DELIVERY_DELIVERY_AVAILABILITY = (fixtures) => { return {
   expectResponse: {},
   expectStatusCode: 200,
   expectResponseCb: (response) => {
-    return;
+    return Promise.resolve();
   },
 };};
 const ADD_DELIVERY_DELIVERY_AVAILABILITY_FOR_ORDER_ALREADY_ACCEPTED = (
@@ -309,7 +319,7 @@ const ADD_DELIVERY_DELIVERY_AVAILABILITY_FOR_ORDER_ALREADY_ACCEPTED = (
     expectResponse: {},
     expectStatusCode: 401,
     expectResponseCb: (response) => {
-      return;
+      return Promise.resolve();
     },
   };
 };
@@ -326,9 +336,27 @@ const ADD_DELIVERY_DELIVERY_AVAILABILITY_FOR_ORDER_ALREADY_CONFIRMED = (fixtures
   expectResponse: {},
   expectStatusCode: 401,
   expectResponseCb: (response) => {
-    return;
+    return Promise.resolve();
   },
 };};
+const ADD_DELIVERY_DELIVERY_AVAILABILITY_NO_OVERLAPPING_SLOTS = (fixtures) => {
+  return {
+    useAccount: "TEST_DELIVERY_PARTNER",
+    HTTP_TYPE: "post",
+    ACTION_PATH: "couriers",
+    ACTION_NAME: "add-delivery-availability-for-order",
+    sendData: {
+      deliveryPartnerAccepted: true,
+      vegiOrderId: null, // populate in test
+      deliveryId: "", // populate in test
+    },
+    expectResponse: {},
+    expectStatusCode: 404,
+    expectResponseCb: (response) => {
+      return Promise.resolve();
+    },
+  };
+};
 const ADD_DELIVERY_DELIVERY_AVAILABILITY_AS_USER_NOT_ALLOWED = (fixtures) => { return {
   useAccount: "TEST_USER",
   HTTP_TYPE: "post",
@@ -342,7 +370,7 @@ const ADD_DELIVERY_DELIVERY_AVAILABILITY_AS_USER_NOT_ALLOWED = (fixtures) => { r
   expectResponse: {},
   expectStatusCode: 401,
   expectResponseCb: (response) => {
-    return;
+    return Promise.resolve();
   },
 };};
 
@@ -431,7 +459,7 @@ const CREATE_ORDER = (fixtures) => { return {
   },
   expectStatusCode: 200,
   expectResponseCb: (response) => {
-    return;
+    return Promise.resolve();
   },
 };};
 
@@ -923,40 +951,19 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
         throw errs;
       }
     });
-    it(`${ADD_DELIVERY_DELIVERY_AVAILABILITY(fixtures).ACTION_NAME} returns 404 when no overlapping fulfliment slots between Vendor and Delivery Partner`, async () => {
+    it(`${ADD_DELIVERY_DELIVERY_AVAILABILITY_NO_OVERLAPPING_SLOTS(fixtures).ACTION_NAME} returns 404 when no overlapping fulfliment slots between Vendor and Delivery Partner`, async () => {
       // This should not be possible in the UI anyway, but needs protection on the backend anyway as elgible delivery slots should be the intersection of vendor and dp slots anyway.
+      let parentOrder;
       try {
-        const deliveryStart = "11:00";
-        const deliveryEnd = "13:00";
-        // create an order with the fulfilment slot set to one that works for DeliveryPartner
-
-        const deliveryPartner = await DeliveryPartner.create({
-          name: "Test helpers getAvailableDeliveryPartnerFromPool Delivery Partner",
-          email: "getAvailableDeliveryPartnerFromPool@sailshelpers.com",
-          phoneNumber: "0123456123",
-          status: "active",
-          deliversToPostCodes: ["L1"],
-          walletAddress: "0xf039CD9391cB28a7e632D07821deeBc249a32410",
-          imageUrl:
-            "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
-          rating: 5,
-        });
-        // Generate collection/delivery blank opening hours
-        var openingHoursDel = [];
-        var openingHoursDelVen = [];
-        var weekdays = [
-          "monday",
-          "tuesday",
-          "wednesday",
-          "thursday",
-          "friday",
-          "saturday",
-          "sunday",
-        ];
-        const delvDp = await FulfilmentMethod.create({
-          deliveryPartner: deliveryPartner,
-          methodType: "delivery",
-        }).fetch();
+        const delvId =
+          "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_11" + uuidv4();
+        const currentUser = await User.findOne({
+          name: "TEST_DELIVERY_PARTNER",
+        }).populate("deliveryPartner");
+        const userDeliveryPartner = currentUser.deliveryPartner;
+        assert.isDefined(userDeliveryPartner);
+        const deliveryPartner = await DeliveryPartner.findOne(userDeliveryPartner.id).populate('deliveryFulfilmentMethod');
+        
         const vendor = await Vendor.create({
           createdAt: 1650878843365,
           updatedAt: 1651529215649,
@@ -990,16 +997,32 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
           vendor: vendor.id,
           methodType: "delivery",
         }).fetch();
+
         // Create blank opening hours for each day
+        // var openingHoursDel = [];
+        var openingHoursDelVen = [];
+        var weekdays = [
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+          "saturday",
+          "sunday",
+        ];
+        const deliveryStartDP = "11:00";
+        const deliveryEndDP = "13:00";
+        const deliveryStartVen = "17:30";
+        const deliveryEndVen = "18:30";
         weekdays.forEach((weekday) => {
           // Delivery hours
-          openingHoursDel.push({
-            dayOfWeek: weekday,
-            isOpen: true,
-            openTime: deliveryStart,
-            closeTime: deliveryEnd,
-            fulfilmentMethod: delvDp.id,
-          });
+          // openingHoursDel.push({
+          //   dayOfWeek: weekday,
+          //   isOpen: true,
+          //   openTime: deliveryStartDP,
+          //   closeTime: deliveryEndDP,
+          //   fulfilmentMethod: delvDp.id,
+          // });
           // openingHoursDel.push({
           //   dayOfWeek: weekday,
           //   isOpen: true,
@@ -1019,59 +1042,159 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
           openingHoursDelVen.push({
             dayOfWeek: weekday,
             isOpen: true,
-            openTime: "15:00",
-            closeTime: "17:00",
+            openTime: deliveryStartVen,
+            closeTime: deliveryEndVen,
             fulfilmentMethod: delvVendor.id,
           });
         });
 
         // Add the opening hours to the database
-        const newHoursDel = await OpeningHours.createEach(
-          openingHoursDel
-        ).fetch();
-        const newHoursIDsDel = newHoursDel.map(({ id }) => id);
-        const fmDp =await FulfilmentMethod.addToCollection(delvDp.id, "openingHours").members(
-          newHoursIDsDel
-        );
+        await OpeningHours.update({
+          dayOfWeek: weekdays,
+          fulfilmentMethod: deliveryPartner.deliveryFulfilmentMethod.id
+        }).set({
+          isOpen: true,
+          openTime: deliveryStartDP,
+          closeTime: deliveryEndDP,
+        });
+        const newHoursDel = await OpeningHours.find({
+          dayOfWeek: weekdays,
+          fulfilmentMethod: deliveryPartner.deliveryFulfilmentMethod.id,
+        });
+        // await FulfilmentMethod.addToCollection(delvDp.id, "openingHours").members(
+        //   newHoursDel.map(({ id }) => id)
+        // );
+
         const newHoursDelVen = await OpeningHours.createEach(
           openingHoursDelVen
         ).fetch();
-        const newHoursIDsDelVen = newHoursDelVen.map(({ id }) => id);
-        const fmVen = await FulfilmentMethod.addToCollection(
+        await FulfilmentMethod.addToCollection(
           delvVendor.id,
           "openingHours"
-        ).members(newHoursIDsDelVen);
+        ).members(newHoursDelVen.map(({ id }) => id));
+
+        parentOrder = await Order.create(
+          DEFAULT_NEW_ORDER_OBJECT(fixtures, {
+            deliveryPartnerAccepted: false,
+            deliveryPartnerConfirmed: false,
+            deliveryPartner: null,
+            deliveryId: delvId,
+            fulfilmentMethod: delvVendor.id, // mobile app only requests fulfilment methods for vendor at the moment
+            fulfilmentSlotFrom: moment
+              .utc(
+                getNextWeekday("thursday") + " " + deliveryStartVen,
+                "YYYY-MM-DD HH:mm"
+              )
+              .toDate(), //fmVen.openingHours.openTime -> closeTime
+            fulfilmentSlotTo: moment
+              .utc(
+                getNextWeekday("thursday") + " " + deliveryEndVen,
+                "YYYY-MM-DD HH:mm"
+              )
+              .toDate(),
+          })
+        ).fetch();
+
+        // const dPdeliverySlots: Slot[] = newHoursDel.map((openingHours) =>
+        //   Slot.from({
+        //     startTime: moment.utc(
+        //       getNextWeekday(openingHours.dayOfWeek) +
+        //         " " +
+        //         openingHours.openTime,
+        //       "YYYY-MM-DD HH:mm"
+        //     ),
+        //     endTime: moment.utc(
+        //       getNextWeekday(openingHours.dayOfWeek) +
+        //         " " +
+        //         openingHours.closeTime,
+        //       "YYYY-MM-DD HH:mm"
+        //     ),
+        //   })
+        // );
+        const orderDateDeliveryPartnerOpeningHourSlot = Slot.from({
+          startTime: moment.utc(
+            getNextWeekday("thursday") + " " + newHoursDel[0].openTime,
+            "YYYY-MM-DD HH:mm"
+          ),
+          endTime: moment.utc(
+            getNextWeekday("thursday") + " " + newHoursDel[0].closeTime,
+            "YYYY-MM-DD HH:mm"
+          ),
+        });
+        assert.isTrue(
+          orderDateDeliveryPartnerOpeningHourSlot.startTime.isBefore(
+            parentOrder.fulfilmentSlotFrom
+          ),
+          `expected ${orderDateDeliveryPartnerOpeningHourSlot.startTime} to be before or same as ${parentOrder.fulfilmentSlotFrom}.`
+        );
+        assert.isTrue(
+          orderDateDeliveryPartnerOpeningHourSlot.endTime.isBefore(
+            parentOrder.fulfilmentSlotTo
+          ),
+          `expected ${orderDateDeliveryPartnerOpeningHourSlot.endTime} not to be after or same as ${parentOrder.fulfilmentSlotTo}.`
+        );
         
-        const parentOrder = await new HttpAuthTestSenderDeliveryPartner(
-          CREATE_ORDER
-        ).makeAuthCallWith(
+        // const vendorDeliverySlots: Slot[] = newHoursDelVen.map((openingHours) =>
+        //   Slot.from({
+        //     startTime: moment.utc(
+        //       getNextWeekday(openingHours.dayOfWeek) +
+        //         " " +
+        //         openingHours.openTime,
+        //       "YYYY-MM-DD HH:mm"
+        //     ),
+        //     endTime: moment.utc(
+        //       getNextWeekday(openingHours.dayOfWeek) +
+        //         " " +
+        //         openingHours.closeTime,
+        //       "YYYY-MM-DD HH:mm"
+        //     ),
+        //   })
+        // );
+
+        const orderDateVendorOpeningHourSlot = Slot.from({
+          startTime: moment.utc(
+            getNextWeekday("thursday") + " " + newHoursDelVen[0].openTime,
+            "YYYY-MM-DD HH:mm"
+          ),
+          endTime: moment.utc(
+            getNextWeekday("thursday") + " " + newHoursDelVen[0].closeTime,
+            "YYYY-MM-DD HH:mm"
+          ),
+        });
+        
+
+        assert.isTrue(
+          orderDateVendorOpeningHourSlot.startTime.isSameOrBefore(
+            parentOrder.fulfilmentSlotFrom
+          ),
+          `expected ${orderDateVendorOpeningHourSlot.startTime} to be before or same as ${parentOrder.fulfilmentSlotTo}.`
+        );
+        assert.isTrue(
+          orderDateVendorOpeningHourSlot.endTime.isSameOrAfter(
+            parentOrder.fulfilmentSlotTo
+          ),
+          `expected ${orderDateVendorOpeningHourSlot.endTime} to be after or same as ${parentOrder.fulfilmentSlotTo}.`
+        );
+
+        const hats = new HttpAuthTestSenderDeliveryPartner(
+          ADD_DELIVERY_DELIVERY_AVAILABILITY_NO_OVERLAPPING_SLOTS(fixtures)
+        );
+        const response = await hats.makeAuthCallWith(
           {
-            deliveryId: "A_DELIVERY_ID_SET_BY_TEST_DELIVERY_PARTNER_14",
-            fulfilmentMethod: fmVen, // mobile app only requests fulfilment methods for vendor at the moment
-            fulfilmentSlotFrom: moment.utc("15:00", "HH:mm:ss").toDate(), //fmVen.openingHours.openTime -> closeTime
-            fulfilmentSlotTo: moment.utc("17:00", "HH:mm:ss").toDate(),
+            vegiOrderId: parentOrder.publicId,
+            deliveryId: delvId,
+            deliveryPartnerId: fixtures.deliveryPartners[0].id,
+            deliveryPartnerAccepted: true,
           },
           []
         );
-        const hats = new HttpAuthTestSenderDeliveryPartner(
-          ADD_DELIVERY_DELIVERY_AVAILABILITY
-        );
-        const response = await hats.makeAuthCallWith({}, []);
-
-        expect(response.statusCode).to.equal(404,
-          `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
-            depth: null,
-          })} with trace: ${util.inspect(response.body.traceRef, {
-            depth: null,
-          })}`
-        ); // because DeliveryPartner available slots are 11 -> 1
-        // await hats.expectedResponse.checkResponse(response);
+        await hats.expectedResponse.checkResponse(response);
         const newOrder = await Order.findOne({
           publicId: parentOrder.publicId,
         }).populate("deliveryPartner");
+        expect(newOrder.deliveryId).to.equal(delvId);
         expect(newOrder.deliveryPartnerAccepted).to.equal(false);
         expect(newOrder.deliveryPartnerConfirmed).to.equal(false);
-        expect(newOrder.deliveryId).to.equal("");
         expect(newOrder.deliveryPartner).to.equal(null);
       } catch (errs) {
         console.warn(errs);
