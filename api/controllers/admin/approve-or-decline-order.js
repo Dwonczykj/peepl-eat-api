@@ -69,6 +69,9 @@ module.exports = {
       statusCode: 500,
       data: null,
     },
+    orderHasNoItems: {
+      statusCode: 401,
+    },
   },
 
   fn: async function (inputs, exits) {
@@ -102,7 +105,11 @@ module.exports = {
       return exits.orderNotPaidFor();
     }
 
-    if (inputs.orderFulfilled === "accept" && order.subtotal > 0) {
+    if (inputs.orderFulfilled === "accept") {
+      if (order.subtotal <= 0) {
+        return exits.orderHasNoItems();
+      }
+
       await Order.updateOne(order.id).set({
         restaurantAcceptanceStatus: "accepted",
       });
@@ -214,7 +221,7 @@ module.exports = {
       // * wait for user response via /admin/customer-update-order controller action.
     } else {
       sails.log.warn(
-        "Unknown orderFulfilled status passed to approve-or-decline-order action."
+        `Unknown orderFulfilled status of '${inputs.orderFulfilled}' passed to approve-or-decline-order action.`
       );
     }
     // All done.

@@ -23,7 +23,7 @@ const VIEW_SIGNUP_PAGE = (fixtures) => {
     sendData: {},
     expectResponse: {},
     expectStatusCode: 200,
-    expectResponseCb: (response) => {
+    expectResponseCb: async (response) => {
       expect(response.text).to.have.string(
         '<div id="signup" class="admin" v-cloak>'
       );
@@ -54,7 +54,7 @@ const REGISTER_USER_PHONE = (fixtures) => {
     },
     expectResponse: {},
     expectStatusCode: 200,
-    expectResponseCb: (response) => {
+    expectResponseCb: async (response) => {
       expect(response.body).to.have.property("data");
       expect(response.body["data"]).to.deep.include({
         // firebaseSessionToken: "REGISTERING_USER", * These are hid from JSON remember
@@ -83,7 +83,7 @@ const REGISTER_USER_PHONE_THROWS_IF_USER_EXISTS = (fixtures) => {
     },
     expectResponse: {},
     expectStatusCode: 401,
-    expectResponseCb: (response) => {
+    expectResponseCb: async (response) => {
       return;
     },
   };

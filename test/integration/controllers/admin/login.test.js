@@ -93,7 +93,7 @@ const IS_LOGGED_IN = (fixtures) => { return {
     authenticated: true,
   },
   expectStatusCode: 200,
-  expectResponseCb: (response) => {
+  expectResponseCb: async (response) => {
     expect(response.body).to.deep.equal({
       authenticated: true
     });
@@ -110,7 +110,7 @@ const IS_LOGGED_IN_UNAUTHENTICATED = (fixtures) => { return {
     authenticated: false,
   },
   expectStatusCode: 200,
-  expectResponseCb: (response) => {
+  expectResponseCb: async (response) => {
     expect(response.body).to.deep.equal({
       authenticated: false,
     });
@@ -139,7 +139,7 @@ const LOGIN = (fixtures) => { return {
     data: true,
   },
   expectStatusCode: 200,
-  expectResponseCb: (responseBody) => {
+  expectResponseCb: async (responseBody) => {
     
     return;
   },
@@ -154,7 +154,7 @@ const LOGIN_AS_USER = (fixtures) => { return {
     data: true,
   },
   expectStatusCode: 200,
-  expectResponseCb: (responseBody) => {
+  expectResponseCb: async (responseBody) => {
     
     return;
   },
@@ -169,7 +169,7 @@ const LOGIN_AS_VENDOR = (fixtures) => { return {
     data: true,
   },
   expectStatusCode: 200,
-  expectResponseCb: (responseBody) => {
+  expectResponseCb: async (responseBody) => {
     
     return;
   },
@@ -184,7 +184,7 @@ const LOGIN_AS_DELIVERY_PARTNER = (fixtures) => { return {
     data: true,
   },
   expectStatusCode: 200,
-  expectResponseCb: (responseBody) => {
+  expectResponseCb: async (responseBody) => {
     
     return;
   },

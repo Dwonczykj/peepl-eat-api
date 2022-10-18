@@ -388,8 +388,10 @@
           "rating": {
             "type": "integer",
             "format": "int64",
+            "default": 5,
             "maximum": 5,
-            "minimum": 0
+            "minimum": 0,
+            "example": 5
           },
           "deliveryFulfilmentMethod": {
             "description": "JSON dictionary representing the **fulfilmentmethod** instance or FK when creating / updating / not populated",
@@ -4943,6 +4945,48 @@
               ],
               "example": "inactive"
             }
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "bike",
+              "enum": [
+                "bike",
+                "electric"
+              ],
+              "example": "bike"
+            }
+          },
+          {
+            "in": "query",
+            "name": "rating",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "default": 5,
+              "maximum": 5,
+              "minimum": 0,
+              "example": 5
+            }
+          },
+          {
+            "in": "query",
+            "name": "walletAddress",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            }
+          },
+          {
+            "in": "query",
+            "name": "image",
+            "required": false,
+            "schema": {}
           }
         ],
         "responses": {
@@ -6022,6 +6066,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Success"
           },
           "404": {
             "description": "Order not found"

@@ -19,11 +19,21 @@ const DEFAULT_NEW_ORDER_OBJECT = (fixtures, overrides = {}) => {
       openHrs.isOpen === true &&
       openHrs.fulfilmentMethod === fulfilmentMethodVendor.id
   )[0];
+  if (
+    Object.keys(overrides).includes("total") &&
+    !Object.keys(overrides).includes("subtotal")
+  ) {
+    overrides["subtotal"] = overrides.total - 125;
+    if(overrides.subtotal < 0){
+      overrides.subtotal = 0;
+    }
+  }
   return {
     ...{
       customerWalletAddress: "0xb98AEa2159e4855c8C703A19f57912ACAdCa3625",
       items: [1, 6, 7],
       total: 2800,
+      subtotal: 2800-125,
       tipAmount: 0,
       orderedDateTime: Date.now(),
       restaurantAcceptanceStatus: "accepted",

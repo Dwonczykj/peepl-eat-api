@@ -69,6 +69,7 @@ module.exports = {
       min: 0,
       max: 5,
       columnType: "INT",
+      defaultsTo: 5,
     },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗

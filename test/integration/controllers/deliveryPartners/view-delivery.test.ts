@@ -152,7 +152,7 @@ const VIEW_DELIVERIES = (fixtures, deliveryPartner, orders) => {
     },
     expectResponse: {},
     expectStatusCode: 200,
-    expectResponseCb: (response) => {
+    expectResponseCb: async (response) => {
       assert.isNotEmpty(orders);
       return Promise.resolve();
     },
@@ -170,7 +170,7 @@ const CANCEL_DELIVERY = (fixtures) => {
     },
     expectResponse: {},
     expectStatusCode: 200,
-    expectResponseCb: (response) => {
+    expectResponseCb: async (response) => {
       return Promise.resolve();
     },
   };
@@ -187,7 +187,7 @@ const CANCEL_DELIVERY_CONFIRMED = (fixtures) => {
     },
     expectResponse: {},
     expectStatusCode: 401,
-    expectResponseCb: (response) => {
+    expectResponseCb: async (response) => {
       return Promise.resolve();
     },
   };
@@ -203,7 +203,7 @@ const CANCEL_DELIVERY_NOT_ALLOWED_BY_USER = (fixtures) => { return {
   },
   expectResponse: {},
   expectStatusCode: 401,
-  expectResponseCb: (response) => {
+  expectResponseCb: async (response) => {
     return Promise.resolve();
   },
 };};
@@ -219,7 +219,7 @@ const ACCEPT_DELIVERY_CONFIRMATION_AS_ADMIN = (fixtures) => { return {
   },
   expectResponse: {},
   expectStatusCode: 200,
-  expectResponseCb: (response) => {
+  expectResponseCb: async (response) => {
     return Promise.resolve();
   },
 };};
@@ -234,7 +234,7 @@ const ACCEPT_DELIVERY_CONFIRMATION_AS_USER_NOT_ALLOWED = (fixtures) => { return 
   },
   expectResponse: {},
   expectStatusCode: 401,
-  expectResponseCb: (response) => {
+  expectResponseCb: async (response) => {
     return Promise.resolve();
   },
 };};
@@ -249,7 +249,7 @@ const ACCEPT_DELIVERY_CONFIRMATION_AS_DELIVERYPARTNER = (fixtures) => { return {
   },
   expectResponse: {},
   expectStatusCode: 200,
-  expectResponseCb: (response) => {
+  expectResponseCb: async (response) => {
     return Promise.resolve();
   },
 };};
@@ -264,7 +264,7 @@ const ACCEPT_DELIVERY_CONFIRMATION_AS_DELIVERYPARTNER_FOR_ORDER_FOR_OTHER_DP = (
   },
   expectResponse: {},
   expectStatusCode: 401,
-  expectResponseCb: (response) => {
+  expectResponseCb: async (response) => {
     return Promise.resolve();
   },
 };};
@@ -282,7 +282,7 @@ const ACCEPT_DELIVERY_CONFIRMATION_AS_DELIVERYPARTNER_ALREADY_CONFIRMED = (
     },
     expectResponse: {},
     expectStatusCode: 401,
-    expectResponseCb: (response) => {
+    expectResponseCb: async (response) => {
       return Promise.resolve();
     },
   };
@@ -299,7 +299,7 @@ const ADD_DELIVERY_DELIVERY_AVAILABILITY = (fixtures) => { return {
   },
   expectResponse: {},
   expectStatusCode: 200,
-  expectResponseCb: (response) => {
+  expectResponseCb: async (response) => {
     return Promise.resolve();
   },
 };};
@@ -318,7 +318,7 @@ const ADD_DELIVERY_DELIVERY_AVAILABILITY_FOR_ORDER_ALREADY_ACCEPTED = (
     },
     expectResponse: {},
     expectStatusCode: 401,
-    expectResponseCb: (response) => {
+    expectResponseCb: async (response) => {
       return Promise.resolve();
     },
   };
@@ -335,7 +335,7 @@ const ADD_DELIVERY_DELIVERY_AVAILABILITY_FOR_ORDER_ALREADY_CONFIRMED = (fixtures
   },
   expectResponse: {},
   expectStatusCode: 401,
-  expectResponseCb: (response) => {
+  expectResponseCb: async (response) => {
     return Promise.resolve();
   },
 };};
@@ -352,7 +352,7 @@ const ADD_DELIVERY_DELIVERY_AVAILABILITY_NO_OVERLAPPING_SLOTS = (fixtures) => {
     },
     expectResponse: {},
     expectStatusCode: 404,
-    expectResponseCb: (response) => {
+    expectResponseCb: async (response) => {
       return Promise.resolve();
     },
   };
@@ -369,7 +369,7 @@ const ADD_DELIVERY_DELIVERY_AVAILABILITY_AS_USER_NOT_ALLOWED = (fixtures) => { r
   },
   expectResponse: {},
   expectStatusCode: 401,
-  expectResponseCb: (response) => {
+  expectResponseCb: async (response) => {
     return Promise.resolve();
   },
 };};
@@ -458,7 +458,7 @@ const CREATE_ORDER = (fixtures) => { return {
     parentOrder: null,
   },
   expectStatusCode: 200,
-  expectResponseCb: (response) => {
+  expectResponseCb: async (response) => {
     return Promise.resolve();
   },
 };};
