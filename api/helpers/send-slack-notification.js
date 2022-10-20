@@ -29,6 +29,8 @@ module.exports = {
 
   fn: async function (inputs) {
     // Send a notification to Slack with the order details
+    console.log('Sending slack notification');
+    console.log(sails.config.environment);
     if(sails.config.environment === 'production') {
       const instance = axios.create({
         baseURL: sails.config.custom.slackWebhookUrl,
