@@ -40,17 +40,30 @@ const ids = {
 };
 
 const GET_ROUTE_PARAMS = {
+  // * Must do this for all paraterized GET actions that are written in .ts
   "vendors/get-fulfilment-slots": {
-    'params': {
+    params: {
       vendor: 1,
       date: getNextWeekday("thursday"),
     },
-    "statusCode": 200,
+    statusCode: 200,
+  },
+  "vendors/get-next-fulfilment-slot": {
+    params: {
+      vendor: 1,
+    },
+    statusCode: 200,
+  },
+  "vendors/get-eligible-order-dates": {
+    params: {
+      vendor: 1,
+    },
+    statusCode: 200,
   },
   "admin/logout": {
-    'params': {},
-    "statusCode": 302,
-  }
+    params: {},
+    statusCode: 302,
+  },
 };
 
 const IGNORE_ROUTES = ["admin/view-order"];

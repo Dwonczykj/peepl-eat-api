@@ -134,6 +134,7 @@ module.exports = {
       }
       delete inputs.image;
     }
+
     // else {
     //   delete inputs.image;
     //   inputs.imageUrl = vendor.imageUrl;
@@ -149,12 +150,16 @@ module.exports = {
       return exits.badPostalCode();
     }
 
-    var newVendor = await Vendor.updateOne(inputs.id).set(inputs);
-
-    // All done.
-    return {
-      id: newVendor.id
-    };
+    try {
+	    var newVendor = await Vendor.updateOne(inputs.id).set(inputs);
+      return exits.success({
+        id: newVendor.id,
+      });
+    } catch (error) {
+      sails.log.error(`Error editting vendor: ${error}`);
+      return exits.notFound();
+    }
+    
   }
 
 

@@ -72,7 +72,7 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Mocha Custom Tests (js only)",
+            "name": "Mocha All Tests",
             // "preLaunchTask": {
             //     "task": "",
             //     "type": ""

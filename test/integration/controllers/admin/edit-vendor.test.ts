@@ -36,7 +36,7 @@ describe(`${CAN_EDIT_VENDORS(fixtures).ACTION_NAME}`, () => {
     try {
       const imgName = "roast-back";
       const testImage = process.cwd() + `/test/assets/images/${imgName}.jpg`;
-      const imgStream = fs.editReadStream(testImage);
+      // const imgStream = fs.editReadStream(testImage);
 
       const existingObj = await Vendor.create(
         DEFAULT_NEW_VENDOR_OBJECT(fixtures, {
