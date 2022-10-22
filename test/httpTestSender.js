@@ -3,6 +3,9 @@ const util = require('util');
 const { envConfig, callAuthActionWithCookieAndUser } = require("./utils");
 const { assert, expect } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
 
+const cwd = process.cwd();
+const routesRead = require(cwd + "/config/routes.js")["routes"];
+
 class ExpectResponse {
   constructor({
     HTTP_TYPE = "get",
@@ -208,6 +211,12 @@ class HttpTestSender {
       if (response.statusCode === 400 || response.statusCode >= 402) {
         // we might want to expect a 401
         // eslint-disable-next-line no-console
+        if(response.statusCode === 404){
+          const route = `${this.HTTP_TYPE} ${this.baseUrl}`;
+          if (!Object.keys(routesRead).includes(route)) {
+            console.warn(`Could not locate "${route}" in config/routes.js`);
+          }
+        }
         console.warn(
           `(${this.HTTP_TYPE} ${this.baseUrl})->[${response.statusCode}]: ` +
             `body: ${util.inspect(response.body, { depth: null })}\n` +

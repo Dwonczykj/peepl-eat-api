@@ -154,7 +154,7 @@ function getNextWeekday(weekday) {
       theDay = dateOfFirstDayOfNextWeek + dayInd;
     }
   }
-  closest = new Date(today.setDate(theDay));
+  let closest = new Date(today.setDate(theDay));
   
   return (
     closest.getFullYear() +

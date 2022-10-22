@@ -101,6 +101,7 @@ module.exports = {
         });
       } catch (error) {
         sails.log.error(error);
+        return proceed(error);
       }
     }
     return proceed();

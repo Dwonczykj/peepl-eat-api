@@ -31,6 +31,9 @@ module.exports.routes = {
   "GET /api/v1/vendors/get-fulfilment-slots": {
     action: "vendors/get-fulfilment-slots",
   },
+  "GET /api/v1/vendors/get-next-fulfilment-slot": {
+    action: "vendors/get-next-fulfilment-slot",
+  },
   "GET /api/v1/vendors/get-eligible-order-dates": {
     action: "vendors/get-eligible-order-dates",
   },
@@ -185,6 +188,12 @@ module.exports.routes = {
   },
   "POST /api/v1/admin/edit-product-option": {
     action: "admin/edit-product-option",
+  },
+  "POST /api/v1/admin/create-category-group": {
+    action: "admin/create-category-group",
+  },
+  "POST /api/v1/admin/edit-category-group": {
+    action: "admin/edit-category-group",
   },
   "POST /api/v1/admin/create-product-option-value": {
     action: "admin/create-product-option-value",

@@ -1,4 +1,4 @@
-var CategoryGroup: any;
+declare var CategoryGroup: any;
 
 module.exports = {
 
@@ -57,14 +57,15 @@ module.exports = {
       return exits.notFound();
     }
 
+    inputs.imageUrl = "";
     if (inputs.image) {
       let imageInfo = await sails.helpers.uploadOneS3(inputs.image);
       if (imageInfo) {
         inputs.imageUrl = sails.config.custom.amazonS3BucketUrl + imageInfo.fd;
       }
+      delete inputs.image;    
     }
 
-    delete inputs.image;
 
     // Update the category group
     await CategoryGroup.updateOne({
@@ -77,7 +78,7 @@ module.exports = {
 
     // Return the updated category group
     // All done.
-    return categoryGroup;
+    return exits.success({categoryGroup});
 
   }
 

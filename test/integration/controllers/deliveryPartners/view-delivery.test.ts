@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-import { Slot } from "../../../../api/interfaces/vendors/slot";
+import { TimeWindow } from "../../../../api/interfaces/vendors/slot";
 
 // test/integration/controllers/admin/create-product.test.js
 import { assert, expect } from "chai"; // ~ https://www.chaijs.com/api/bdd/
@@ -1111,7 +1111,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
         //     ),
         //   })
         // );
-        const orderDateDeliveryPartnerOpeningHourSlot = Slot.from({
+        const orderDateDeliveryPartnerOpeningHourSlot = TimeWindow.from({
           startTime: moment.utc(
             getNextWeekday("thursday") + " " + newHoursDel[0].openTime,
             "YYYY-MM-DD HH:mm"
@@ -1151,7 +1151,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
         //   })
         // );
 
-        const orderDateVendorOpeningHourSlot = Slot.from({
+        const orderDateVendorOpeningHourSlot = TimeWindow.from({
           startTime: moment.utc(
             getNextWeekday("thursday") + " " + newHoursDelVen[0].openTime,
             "YYYY-MM-DD HH:mm"

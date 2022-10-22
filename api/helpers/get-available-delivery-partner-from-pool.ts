@@ -3,7 +3,7 @@ import moment from 'moment';
 import {
   DeliveryInformation, DeliveryPartnerObject, getDeliveryPartnerHelpers, IDeliveryPartner
 } from "../interfaces/orders/deliveryPartnerHelperObjects";
-import { Slot } from "../interfaces/vendors/slot";
+import { iSlot, TimeWindow } from "../interfaces/vendors/slot";
 
 declare var FulfilmentMethod: any;
 declare var sails: any;
@@ -89,7 +89,7 @@ module.exports = {
   },
 
   fn: async function (inputs, exits) {
-    var validSlotsForDeliveryPartner = [];
+    var validSlotsForDeliveryPartner:iSlot[] = [];
     var date = moment
       .utc(inputs.fulfilmentSlotFrom, "YYYY-MM-DD HH:mm:ss")
       .format("YYYY-MM-DD");
@@ -134,11 +134,11 @@ module.exports = {
       const availableSlot = validSlotsForDeliveryPartner
         .map(
           (slot) =>
-            new Slot({ startTime: slot.startTime, endTime: slot.endTime })
+            new TimeWindow({ startTime: slot.startTime, endTime: slot.endTime })
         )
         .find((slot) => {
           return slot.overlapsWith(
-            new Slot({
+            new TimeWindow({
               startTime: moment.utc(inputs.fulfilmentSlotFrom),
               endTime: moment.utc(inputs.fulfilmentSlotTo),
             })

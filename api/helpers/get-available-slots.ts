@@ -157,20 +157,22 @@ module.exports = {
             paymentStatus: "paid",
             restaurantAcceptanceStatus: { "!=": "rejected" },
           });
-          orders = orders.filter(order => {
-            return (
-              moment
-                .utc(order.fulfilmentSlotFrom)
-                .isSameOrAfter(
-                  moment.utc(openTime, `${dateStrFormat} ${timeStrFormat}`)
-                ) &&
-              moment
-                .utc(order.fulfilmentSlotTo)
-                .isSameOrBefore(
-                  moment.utc(closeTime, `${dateStrFormat} ${timeStrFormat}`)
-                )
-            );
-          });
+          if(orders.length > 0){
+            orders = orders.filter(order => {
+              return (
+                moment
+                  .utc(order.fulfilmentSlotFrom)
+                  .isSameOrAfter(
+                    moment.utc(openTime, `${dateStrFormat} ${timeStrFormat}`)
+                  ) &&
+                moment
+                  .utc(order.fulfilmentSlotTo)
+                  .isSameOrBefore(
+                    moment.utc(closeTime, `${dateStrFormat} ${timeStrFormat}`)
+                  )
+              );
+            });
+          }
         }else{
           orders = await Order.find({
             fulfilmentMethod: inputs.fulfilmentMethodId,

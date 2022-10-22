@@ -61,11 +61,18 @@ describe("Firebase Tests", () => {
   // });
   describe("Signin with Email", () => {
     it("succeeds", async () => {
-      const creds = await signInWithEmailAndPassword(
-        auth,
-        "joey@vegiapp.co.uk",
-        "DUMMY_FIREBASE_TOKEN" //"Testing123"
-      );
+      try {
+	      const creds = await signInWithEmailAndPassword(
+	        auth,
+	        "joey@vegiapp.co.uk",
+	        "DUMMY_FIREBASE_TOKEN" //"Testing123"
+	      );
+      } catch (error) {
+        if(error.code === 'auth/operation-not-supported-in-this-environment'){
+          console.warn('Check running FirebaseAuth Emulator');
+        }
+        throw error;
+      }
       console.log(creds);
       assert.containsAllKeys(creds, ["user"]);
     });

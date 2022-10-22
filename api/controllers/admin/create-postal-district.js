@@ -32,16 +32,16 @@ module.exports = {
       outcode: inputs.outcode
     });
 
-    if (existingPostalDistrict) {
+    if (existingPostalDistrict && existingPostalDistrict.length > 0) {
       exits.postalDistrictAlreadyExists();
     }
 
-    var postalDistrict = await PostalDistrict.findOrCreate({
+    var postalDistrict = await PostalDistrict.create({
       outcode: inputs.outcode
     }).fetch();
 
     // All done.
-    return exits.success({ data: postalDistrict });
+    return exits.success({postalDistrict});
 
   }
 

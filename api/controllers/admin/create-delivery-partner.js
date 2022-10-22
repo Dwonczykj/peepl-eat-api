@@ -1,3 +1,4 @@
+const util = require('util');
 module.exports = {
   friendlyName: "Create delivery partner",
 
@@ -63,26 +64,32 @@ module.exports = {
   },
 
   fn: async function (inputs, exits) {
-    var exist = await DeliveryPartner.find([
-      {
-        email: inputs.email,
-      },
-      {
-        name: inputs.name,
-      },
-    ]);
+    var exist = await DeliveryPartner.find({
+      or: [
+        {
+          email: inputs.email,
+        },
+        {
+          name: inputs.name,
+        },
+      ],
+    });
 
-    if (exist) {
+    if (exist && exist.length > 0) {
+      sails.log(
+        `DeliveryPartner: ${util.inspect(exist[0], {
+          depth: null,
+        })} already exists.`
+      );
       return exits.alreadyExists();
     }
 
-    inputs.imageUrl = '';
-    
-    if (inputs.image) {
-      let imageInfo = await sails.helpers.uploadOneS3(inputs.image);
-      if (imageInfo) {
-        inputs.imageUrl = sails.config.custom.amazonS3BucketUrl + imageInfo.fd;
-      }
+    inputs.imageUrl = "";
+
+    //Dont check for inputs.image as imageUrl is required on DeliveryPartner model
+    let imageInfo = await sails.helpers.uploadOneS3(inputs.image);
+    if (imageInfo) {
+      inputs.imageUrl = sails.config.custom.amazonS3BucketUrl + imageInfo.fd;
     }
 
     // Create a new delivery partner
@@ -94,7 +101,7 @@ module.exports = {
       walletAddress: inputs.walletAddress,
       rating: inputs.rating,
       type: inputs.type,
-      imageUrl: inputs.imageUrl
+      imageUrl: inputs.imageUrl,
     }).fetch();
 
     // Return the new delivery partner

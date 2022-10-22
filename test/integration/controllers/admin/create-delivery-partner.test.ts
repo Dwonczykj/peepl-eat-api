@@ -28,7 +28,11 @@ const CAN_CREATE_DELIVERY_PARTNER = (fixtures) => {
     expectResponse: {},
     expectStatusCode: 200,
     expectResponseCb: async (response, requestPayload) => {
-      expect(response.body).to.have.property("id");
+      expect(response.body).to.have.property("newDeliveryPartner");
+      expect(response.body.newDeliveryPartner).to.have.property("name");
+      expect(response.body.newDeliveryPartner.name).to.equal(
+        requestPayload.name
+      );
       return Promise.resolve();
     },
   };

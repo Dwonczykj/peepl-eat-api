@@ -43,6 +43,7 @@ module.exports.custom = {
   vegiGreenPointsTicker: "PPL",
   vegiDigitalStableCurrencyTicker: "GBPX",
   requestDeliveryAvailability: false, // * This if true, checks if there is a courier available before asking vendor to fulfil. Only works when vendors have automated fulfilment processes.
+  ignoreSpecialDatesMoreThanXMonthsAway: 12,
 
   /**************************************************************************
    *                                                                         *

@@ -184,6 +184,9 @@
       "name": "Edit product option"
     },
     {
+      "name": "Edit category group"
+    },
+    {
       "name": "Create product option value"
     },
     {
@@ -694,9 +697,19 @@
           },
           "openTime": {},
           "closeTime": {},
+          "timezone": {
+            "type": "integer",
+            "format": "int64",
+            "default": 0,
+            "maximum": 12,
+            "minimum": -12
+          },
           "isOpen": {
             "type": "boolean",
             "default": false
+          },
+          "logicId": {
+            "type": "string"
           },
           "fulfilmentMethod": {
             "description": "JSON dictionary representing the **fulfilmentmethod** instance or FK when creating / updating / not populated",
@@ -2726,6 +2739,36 @@
         }
       }
     },
+    "/api/v1/vendors/get-next-fulfilment-slot": {
+      "get": {
+        "summary": "Get fulfilment slots",
+        "tags": [
+          "Get fulfilment slots"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "vendor",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Success"
+          },
+          "500": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/v1/vendors/get-eligible-order-dates": {
       "get": {
         "summary": "Get eligible order dates",
@@ -2741,6 +2784,16 @@
             "schema": {
               "type": "number",
               "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "deliveryPartner",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
             }
           }
         ],
@@ -5554,6 +5607,143 @@
           },
           "404": {
             "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/create-category-group": {
+      "post": {
+        "summary": "Create delivery partner",
+        "tags": [
+          "Create delivery partner"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 50
+            },
+            "description": "The name of the delivery partner"
+          },
+          {
+            "in": "query",
+            "name": "forRestaurantItem",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Whether the category applies to product categories for restaurants or grocers"
+          },
+          {
+            "in": "query",
+            "name": "image",
+            "required": false,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "New delivery partner created."
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "delivery partner already exists"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/edit-category-group": {
+      "post": {
+        "summary": "Edit category group",
+        "tags": [
+          "Edit category group"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "The id of the category group to edit"
+          },
+          {
+            "in": "query",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 50
+            },
+            "description": "The name of the category group"
+          },
+          {
+            "in": "query",
+            "name": "forRestaurantItem",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Whether the category applies to product categories for restaurants or grocers"
+          },
+          {
+            "in": "query",
+            "name": "image",
+            "required": false,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "category group edited."
+                    },
+                    {
+                      "type": "string",
+                      "description": "You are not authorised to edit this vendor."
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "There is no category group with that ID!"
           },
           "500": {
             "description": "Internal server error"

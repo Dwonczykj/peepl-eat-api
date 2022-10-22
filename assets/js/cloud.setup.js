@@ -23,6 +23,11 @@ Cloud.setup({
       url: "/api/v1/vendors/get-fulfilment-slots",
       args: ["vendor", "date"],
     },
+    getNextFulfilmentSlot: {
+      verb: "GET",
+      url: "/api/v1/vendors/get-fulfilment-slots",
+      args: ["vendor"],
+    },
     getEligibleOrderDates: {
       verb: "GET",
       url: "/api/v1/vendors/get-eligible-order-dates",

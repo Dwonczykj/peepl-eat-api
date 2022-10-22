@@ -1,5 +1,5 @@
 import moment from "moment";
-import { Slot } from "../vendors/slot";
+import { TimeWindow } from "../vendors/slot";
 
 /* eslint-disable no-console */
 declare var sails: any;
@@ -202,12 +202,12 @@ export abstract class DeliveryPartnerObject implements IDeliveryPartner {
     const order = await Order.findOne({
       publicId: orderPublicId,
     });
-    const dPdeliverySlots: Slot[] = await sails.helpers
+    const dPdeliverySlots: TimeWindow[] = await sails.helpers
       .getAvailableSlots(
         inputs.deliverAfter,
         this.deliveryPartner.deliveryFulfilmentMethod.id
       )
-      .map((slot) => Slot.from(slot));
+      .map((slot) => TimeWindow.from(slot));
     const slotOk =
       dPdeliverySlots.filter((slot) => {
         moment.utc(order.fulfilmentSlotFrom).isSameOrAfter(slot.startTime) &&

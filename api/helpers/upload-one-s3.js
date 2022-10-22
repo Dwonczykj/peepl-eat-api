@@ -6,7 +6,6 @@ module.exports = {
   inputs: {
     image: {
       type: "ref",
-      required: true,
     },
   },
 
@@ -19,12 +18,12 @@ module.exports = {
   fn: async function (inputs, exits) {
     const { v4: uuidv4 } = require("uuid");
 
-    var dontActuallySend =
+    var inTestEnv =
       sails.config.environment === "test" ||
       process.env.FIREBASE_AUTH_EMULATOR_HOST;
 
     let imageInfo;
-    if (!dontActuallySend) {
+    if (!inTestEnv) {
       if(!inputs.image){
         return exits.success(undefined);
       }
@@ -50,7 +49,7 @@ module.exports = {
       }
     } else {
       imageInfo = {
-        fd: dontActuallySend ? "test-image-fd-" + uuidv4() : null,
+        fd: inTestEnv ? "test-image-fd-" + uuidv4() : null,
       };
     }
     return exits.success(imageInfo);

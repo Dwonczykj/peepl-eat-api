@@ -55,7 +55,7 @@ const GET_ROUTE_PARAMS = {
 
 const IGNORE_ROUTES = ["admin/view-order"];
 
-const routes_read = require(cwd + "/config/routes.js")['routes'];
+const routesRead = require(cwd + "/config/routes.js")['routes'];
 const policies = require(cwd + "/test/config/policies.js")['policies']; //!this checks that are polices were not updated incorrectly by forcing a dounle change to the test file.
 const queryParamsTestConfig = require(cwd +
   "/test/config/queryParamsTestConfig.js")["policies"];
@@ -63,18 +63,18 @@ const policyPaths = Object.keys(policies);
 const policyPathsRegx = Object.keys(policies).map(
   (pk) => new RegExp(pk.replace("*", ".*"), "g")
 );
-_.each(Object.keys(routes_read), function (route_key) {
+_.each(Object.keys(routesRead), function (route_key) {
   const theSplit = route_key.split(" ");
   const routeHttp = theSplit[0];
   const routePath = theSplit[1];
-  const actionRelPath = routes_read[route_key]["action"];
-  const actionPath = cwd + "/api/controllers/" + routes_read[route_key]["action"];
+  const actionRelPath = routesRead[route_key]["action"];
+  const actionPath = cwd + "/api/controllers/" + routesRead[route_key]["action"];
   if(!actionsToTest[routeHttp]){
     actionsToTest[routeHttp] = [];
   }
   var policyVar = true;
   for (var i = 0; i < policyPaths.length; i++){
-    if(routes_read[route_key]["action"].match(policyPathsRegx[i])){
+    if(routesRead[route_key]["action"].match(policyPathsRegx[i])){
       policyVar = policies[policyPaths[i]];
       break;
     }

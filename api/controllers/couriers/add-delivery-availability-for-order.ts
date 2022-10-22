@@ -1,5 +1,5 @@
 import moment from "moment";
-import { Slot } from "../../interfaces/vendors/slot";
+import { TimeWindow } from "../../interfaces/vendors/slot";
 import util from 'util';
 
 module.exports = {
@@ -105,7 +105,7 @@ module.exports = {
               .format("YYYY-MM-DD"),
             deliveryPartner.deliveryFulfilmentMethod.id
           );
-        const dPdeliverySlots = dPdeliverySlotsI.map((slot) => Slot.from(slot));
+        const dPdeliverySlots = dPdeliverySlotsI.map((slot) => TimeWindow.from(slot));
         // sails.log(
         //   `Order between ${order.fulfilmentSlotFrom} and ${order.fulfilmentSlotTo}`
         // );

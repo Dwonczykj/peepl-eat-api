@@ -1,6 +1,18 @@
-import { iCollectionDates, intersectSlotArrays, iSlot, mergeICollectionDates, Slot } from '../../interfaces/vendors/slot';
+/* eslint-disable no-unused-vars */
+import { iCollectionDates, intersectTimeWindowArrays, iSlot, mergeAvailableDates, mergeICollectionDates, TimeWindow } from '../../interfaces/vendors/slot';
 import util from 'util';
-import e from 'express';
+import { FulfilmentMethodType } from '../../../scripts/utils';
+import { AvailableDateOpeningHours } from '../../../api/helpers/get-available-dates';
+
+export type GetFulilmentSlotsSuccess = {
+  collectionMethod: FulfilmentMethodType;
+  deliveryMethod: FulfilmentMethodType;
+  collectionSlots: iSlot[];
+  deliverySlots: iSlot[];
+  eligibleCollectionDates: AvailableDateOpeningHours;
+  eligibleDeliveryDates: AvailableDateOpeningHours;
+};
+
 module.exports = {
   friendlyName: "Get fulfilment slots",
 
@@ -30,17 +42,23 @@ module.exports = {
     },
   },
 
-  fn: async function (inputs, exits) {
-    var deliverySlots: iSlot[] = [];
+  fn: async function (
+    inputs: {
+      vendor: number;
+      date: string;
+    },
+    exits: {
+      success: (args: GetFulilmentSlotsSuccess) => GetFulilmentSlotsSuccess;
+      vendorNotFound: () => void;
+      deliveryPartnerNotFound: () => void;
+    }
+  ) {
     var collectionSlots: iSlot[] = [];
-    var eligibleCollectionDates: iCollectionDates = {
-      availableDaysOfWeek: [],
-      availableSpecialDates: [],
-    };
-    var eligibleDeliveryDates = {
-      availableDaysOfWeek: [],
-      availableSpecialDates: [],
-    };
+    var deliveryPartnerDeliverySlots: iSlot[] = [];
+    var deliverySlots: iSlot[] = [];
+    var eligibleDeliveryDates: AvailableDateOpeningHours = {};
+    var eligibleCollectionDates: AvailableDateOpeningHours = {};
+    var eligibleDeliveryPartnerDeliveryDates: AvailableDateOpeningHours = {};
 
     var vendor = await Vendor.findOne(inputs.vendor).populate(
       "deliveryFulfilmentMethod&collectionFulfilmentMethod&deliveryPartner"
@@ -66,62 +84,62 @@ module.exports = {
         );
       }
       if (!deliveryPartner.deliveryFulfilmentMethod) {
-        sails.log.warn(`No deliveryFulfilmentMethod set on delivery partner: ${deliveryPartner.name}`);
+        sails.log.warn(
+          `No deliveryFulfilmentMethod set on delivery partner: ${deliveryPartner.name}`
+        );
       } else {
         try {
-          deliverySlots = await sails.helpers.getAvailableSlots(
+          deliveryPartnerDeliverySlots = await sails.helpers.getAvailableSlots(
             inputs.date,
             deliveryPartner.deliveryFulfilmentMethod.id
           );
-          eligibleDeliveryDates = await sails.helpers.getAvailableDates(
-            deliveryPartner.deliveryFulfilmentMethod.id
-          );
+          eligibleDeliveryPartnerDeliveryDates =
+            await sails.helpers.getAvailableDates(
+              deliveryPartner.deliveryFulfilmentMethod.id
+            );
         } catch (error) {
           sails.log.error(
             `Error fetching available slots and dates for vendor's delivery partner '${deliveryPartner.name}'. ${error}`
           );
         }
       }
-      
+
       deliveryFulfilmentMethod = deliveryPartner.deliveryFulfilmentMethod;
       if (vendor.deliveryFulfilmentMethod) {
         let vendorDeliverySlots: iSlot[] = [];
-        let vendorEligibleDeliveryDates: iCollectionDates = {
-          availableDaysOfWeek: [],
-          availableSpecialDates: [],
-        };
+        let vendorEligibleDeliveryDates: AvailableDateOpeningHours = {};
 
         try {
-	        vendorDeliverySlots =
-	          await sails.helpers.getAvailableSlots(
-	            inputs.date,
-	            vendor.deliveryFulfilmentMethod.id
-	          );
-	        vendorEligibleDeliveryDates =
-	          await sails.helpers.getAvailableDates(
-	            vendor.deliveryFulfilmentMethod.id
-	          );
+          vendorDeliverySlots = await sails.helpers.getAvailableSlots(
+            inputs.date,
+            vendor.deliveryFulfilmentMethod.id
+          );
+          vendorEligibleDeliveryDates = await sails.helpers.getAvailableDates(
+            vendor.deliveryFulfilmentMethod.id
+          );
         } catch (error) {
-          sails.log.error(`Error fetching available slots and dates for vendor. ${error}`);
+          sails.log.error(
+            `Error fetching available slots and dates for vendor. ${error}`
+          );
         }
-        deliverySlots = intersectSlotArrays(
-          deliverySlots.map((slot) => Slot.from(slot)),
-          vendorDeliverySlots.map((slot) => Slot.from(slot))
+        deliverySlots = intersectTimeWindowArrays(
+          deliveryPartnerDeliverySlots.map((slot) => TimeWindow.from(slot)),
+          vendorDeliverySlots.map((slot) => TimeWindow.from(slot))
         );
-        eligibleDeliveryDates = mergeICollectionDates(
-          eligibleDeliveryDates,
+        eligibleDeliveryDates = mergeAvailableDates(
+          eligibleDeliveryPartnerDeliveryDates,
           vendorEligibleDeliveryDates
         );
       }
     } else if (vendor.deliveryFulfilmentMethod) {
       try {
-	      deliverySlots = await sails.helpers.getAvailableSlots(
-	        inputs.date,
-	        vendor.deliveryFulfilmentMethod.id
-	      );
-	      eligibleDeliveryDates = await sails.helpers.getAvailableDates(
-	        vendor.deliveryFulfilmentMethod.id
-	      );
+        deliverySlots = await sails.helpers.getAvailableSlots(
+          inputs.date,
+          vendor.deliveryFulfilmentMethod.id
+        );
+        eligibleDeliveryDates = await sails.helpers.getAvailableDates(
+          vendor.deliveryFulfilmentMethod.id
+        );
       } catch (error) {
         sails.log.error(
           `Error fetching available slots and dates from vendor's deliveryFulfilmentMethod. ${error}`
@@ -131,13 +149,13 @@ module.exports = {
 
     if (vendor.collectionFulfilmentMethod) {
       try {
-	      collectionSlots = await sails.helpers.getAvailableSlots(
-	        inputs.date,
-	        vendor.collectionFulfilmentMethod.id
-	      );
-	      eligibleCollectionDates = await sails.helpers.getAvailableDates(
-	        vendor.collectionFulfilmentMethod.id
-	      );
+        collectionSlots = await sails.helpers.getAvailableSlots(
+          inputs.date,
+          vendor.collectionFulfilmentMethod.id
+        );
+        eligibleCollectionDates = await sails.helpers.getAvailableDates(
+          vendor.collectionFulfilmentMethod.id
+        );
       } catch (error) {
         sails.log.error(
           `Error fetching available slots and dates from vendor's collectionFulfilmentMethod. ${error}`
