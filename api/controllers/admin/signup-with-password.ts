@@ -163,8 +163,7 @@ module.exports = {
           firebaseSessionToken: sessionToken,
           fbUid: fbUser.uid,
         });
-        exits.success({ data: user });
-        return user;
+        return exits.success(user);
       })
       .catch((error) => {
         sails.log.info(error);

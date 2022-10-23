@@ -100,8 +100,7 @@ requests over WebSockets instead of HTTP).`,
         // sails.helpers.broadcastSessionChange(this.req);
       }
 
-      exits.success({ data: user });
-      return user;
+      return exits.success(user);
     } catch (err) {
       sails.log.info(err);
       if (err.code === "auth/wrong-password") {

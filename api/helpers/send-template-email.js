@@ -164,7 +164,7 @@ module.exports = {
               "(Usually, this means the provided data is invalid, or missing a piece.)\n" +
               "Details:\n" +
               err.message;
-            return err;
+            return exits.failed(err);
           });
       } catch (error) {
         sails.log.error(`Error formatting the html email contents for template email with error: ${error}`);
@@ -246,7 +246,7 @@ module.exports = {
           AWS.config.loadFromPath("config/aws.json");
         } catch (error) {
           sails.log.error("AWS email service not configured!!!!");
-          return exits.failed();
+          return exits.failed(error);
         }
 
         var deferred = new AWS.SES().sendEmail(messageData).promise();

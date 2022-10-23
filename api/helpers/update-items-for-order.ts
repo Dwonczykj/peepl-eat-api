@@ -2,6 +2,14 @@ declare var Order: any;
 declare var OrderItem: any;
 declare var Cloud: any;
 const util = require("util");
+declare var _:any;
+
+export type UpdateItemsForOrderSuccess = { data: {
+        validRequest: boolean;
+        calculatedOrderTotal: number;
+        orderId: number;
+        paymentIntentID: string;
+      } | {validRequest:false}};
 
 module.exports = {
   friendlyName: "Update items for order",
@@ -53,6 +61,11 @@ module.exports = {
         "This order has already been completed and cannot be updated",
       data: null,
     },
+    minimumOrderAmount: {
+      description:
+        "This order has already been completed and cannot be updated",
+      data: null,
+    },
     success: {
       data: null,
     },
@@ -70,7 +83,18 @@ module.exports = {
       retainItems: Array<number>;
       removeItems: Array<number>;
     },
-    exits
+    exits: {
+      success: (
+        unusedArgs: UpdateItemsForOrderSuccess
+      ) => UpdateItemsForOrderSuccess;
+      orderNotFound: (unusedArgs?: { data: any }) => void;
+      orderNotPaidFor: (unusedArgs: { data: any }) => void;
+      minimumOrderAmount: (unusedMessage: string) => void;
+      orderNotPending: () => void;
+      badPartialFulfilmentRequestItems: () => void;
+      orderAlreadyCompleted: (unusedArgs?: { data: any }) => void;
+      error: (unusedError: Error) => void;
+    }
   ) {
     const findOrderCriteria = {
       publicId: inputs.orderId,
@@ -218,7 +242,7 @@ module.exports = {
 
         var updatedItems = _.map(originalOrderItems, (originalOrderItem) => {
           originalOrderItem.order = newOrder.id;
-          if(inputs.removeItems.includes(originalOrderItem.id)){
+          if (inputs.removeItems.includes(originalOrderItem.id)) {
             originalOrderItem.unfulfilled = true;
             originalOrderItem.unfulfilledOnOrderId = originalOrder.id;
           } else {
@@ -226,7 +250,6 @@ module.exports = {
             originalOrderItem.unfulfilledOnOrderId = null;
           }
           originalOrderItem.order = newOrder.id;
-
 
           // retainItem.product = retainItem.product;
           return _.pick(originalOrderItem, [
@@ -263,9 +286,10 @@ module.exports = {
           calculatedOrderTotal.withoutFees <
           originalOrder.vendor.minimumOrderAmount
         ) {
-          return exits.minimumOrderAmount(
+          exits.minimumOrderAmount(
             "Vendor minimum order value not met on partially fulfilled updated order"
           );
+          return;
         }
 
         await wrapWithDb(db, () =>
@@ -276,7 +300,7 @@ module.exports = {
         );
         // Remove items from order that were not fulfilled by vendor
         // await wrapWithDb(db, () =>
-        //   OrderItem.update({ 
+        //   OrderItem.update({
         //     order: newOrder.id,
         //     id: [...inputs.removeItems],
         //   }).set({ unfulfilled: true, unfulfilledOnOrderId: originalOrder.id })
@@ -292,9 +316,11 @@ module.exports = {
 
       if (datastore.config.adapter === "sails-disk") {
         const result = await createOrderTransactionDB(null);
-        return exits.success({
-          data: result,
-        });
+        if (result) {
+          return exits.success({
+            data: result,
+          });
+        }
       } else {
         const result = await sails
           .getDatastore()

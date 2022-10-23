@@ -236,14 +236,14 @@ module.exports = {
           ).fetch();
         } catch (error) {
           sails.log.error(`Error on Order.create(...) -> ${error}`);
-          return exits.error(error);
+          exits.error(error);
+          return;
         }
 
         // Strip unneccesary data from order items
         var updatedItems = _.map(inputs.items, (object) => {
           object.order = order.id;
           // object.product = object.product;
-
           return _.pick(object, ["order", "product", "optionValues"]);
         });
 
@@ -278,7 +278,8 @@ module.exports = {
         // Return error if vendor minimum order value not met
         if (calculatedOrderTotal.withoutFees < vendor.minimumOrderAmount) {
           sails.log.info("Vendor minimum order value not met");
-          return exits.minimumOrderAmount("Vendor minimum order value not met");
+          exits.minimumOrderAmount("Vendor minimum order value not met");
+          return;
         }
 
         // Create PaymentIntent on Peepl Pay
@@ -289,11 +290,13 @@ module.exports = {
             vendor.name
           )
           .catch(() => {
-            return exits.error(new Error("Error creating payment intent"));
+            exits.error(new Error("Error creating payment intent"));
+            return;
           });
 
         if (!newPaymentIntent) {
-          return exits.error(new Error("Error creating payment intent"));
+          exits.error(new Error("Error creating payment intent"));
+          return;
         }
 
         // Update order with payment intent
@@ -312,7 +315,9 @@ module.exports = {
 
       if (datastore.config.adapter === "sails-disk") {
         const result = await createOrderTransactionDB(null);
-        return exits.success(result);
+        if(result){
+          return exits.success(result);
+        }
       } else {
         const result = await sails
           .getDatastore()

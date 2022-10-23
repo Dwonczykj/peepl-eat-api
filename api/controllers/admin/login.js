@@ -53,7 +53,7 @@ module.exports = {
     // // Update the session
     // this.req.session.userId = user.id;
 
-    // return user;
+    // return exits.success(user);
   }
 
 

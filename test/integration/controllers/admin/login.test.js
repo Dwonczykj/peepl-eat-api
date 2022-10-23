@@ -49,12 +49,14 @@ class ExpectResponseLogin extends ExpectResponse {
 
     // delete expectedResponse.publicId;
 
-    expect(responseBody).to.have.property("data");
-    assert.isObject(responseBody.data);
+    assert.isObject(responseBody);
+    expect(responseBody).to.have.property("name");
+    expect(responseBody).to.have.property("isSuperAdmin");
+    expect(responseBody).to.have.property("role");
     // const userFixture = fixtures.users_fixed
     //   .map(({ firebaseSessionToken, secret, ...RestUserdata }) => RestUserdata) // ~https://devenum.com/delete-property-from-objects-array-in-javascript/#:~:text=Delete%20property%20from%20objects%20Array%20in%20Javascript%20%286,to%20Delete%20property%20from%20objects%20array%20in%20Javascript
     //   .filter((user) => user.name === "TEST_SERVICE")[0];
-    // expect(responseBody.data).to.include(userFixture);
+    // expect(responseBody).to.include(userFixture);
 
     return expectedResponse;
   }
@@ -228,14 +230,14 @@ describe("Authentication Tests", () => {
           })}`
         );
 	      expect(Object.keys(response.headers)).to.deep.include("set-cookie");
-	      expect(response.body).to.have.property("data");
-	      assert.isObject(response.body.data);
+	      
+	      assert.isObject(response.body);
 	      const userFixture = fixtures.users_fixed
 	        .map(
 	          ({ firebaseSessionToken, secret, ...RestUserdata }) => RestUserdata
 	        )
 	        .filter((user) => user.name === "TEST_SERVICE")[0];
-	      expect(response.body.data)
+	      expect(response.body)
 	        .to.include(userFixture);
       } catch (error) {
         throw error;

@@ -19,19 +19,19 @@ class MockPeeplPayPricingAPI {
       if (toCurrency === "PPL") {
         return amount * (sails.config.custom.PPLTokenValueInPence / 100.0);
       } else if (toCurrency === "GBPX") {
-        return amount * 100.0;
+        return (amount * 100.0);
       }
     } else if (fromCurrency === "PPL") {
       if (toCurrency === "GBP") {
-        return amount / (sails.config.custom.PPLTokenValueInPence / 100.0);
+        return (amount / (sails.config.custom.PPLTokenValueInPence / 100.0));
       } else if (toCurrency === "GBPX") {
-        return amount / sails.config.custom.PPLTokenValueInPence;
+        return (amount / sails.config.custom.PPLTokenValueInPence);
       }
     } else if (fromCurrency === "GBPX") {
       if (toCurrency === "GBP") {
-        return amount / 100;
+        return (amount / 100);
       } else if (toCurrency === "PPL") {
-        return amount * sails.config.custom.PPLTokenValueInPence;
+        return (amount * sails.config.custom.PPLTokenValueInPence);
       }
     }
     throw new Error(

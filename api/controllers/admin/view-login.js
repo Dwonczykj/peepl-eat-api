@@ -16,14 +16,14 @@ module.exports = {
   },
 
 
-  fn: async function () {
+  fn: async function (inputs, exits) {
 
     if(this.req.session.userId){
       return this.res.redirect('/admin'); // Have to do this as view routes do not hit policies.
     }
 
     // Respond with view.
-    return {};
+    return exits.success({});
 
   }
 

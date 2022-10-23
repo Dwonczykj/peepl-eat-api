@@ -27,7 +27,7 @@ module.exports = {
     var updatedPostalDistrict = await PostalDistrict.updateOne(inputs.id).set(inputs);
 
     // All done.
-    return updatedPostalDistrict;
+    return exits.success(updatedPostalDistrict);
 
   }
 

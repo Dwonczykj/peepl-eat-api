@@ -111,6 +111,6 @@ module.exports = {
       sails.log.warn(err);
     });
 
-    return {id: response.data.id};
+    return exits.success({id: response.data.id});
   }
 };

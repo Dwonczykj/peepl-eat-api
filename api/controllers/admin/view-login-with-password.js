@@ -16,14 +16,14 @@ module.exports = {
   },
 
 
-  fn: async function () {
+  fn: async function (inputs, exits) {
 
     if (this.req.session.userId) {
       return this.res.redirect('/admin');
     }
 
     // Respond with view.
-    return {};
+    return exits.success({});
 
   }
 

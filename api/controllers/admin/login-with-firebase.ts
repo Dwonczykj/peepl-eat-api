@@ -164,8 +164,8 @@ requests over WebSockets instead of HTTP).`,
           // sails.helpers.broadcastSessionChange(this.req);
         }
 
-        exits.success({data: user});
-        return user;
+        
+        return exits.success(user);
       } catch(error){
         sails.log.info(error);
         return exits.serverError({data:{

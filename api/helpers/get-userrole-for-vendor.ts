@@ -37,7 +37,7 @@ module.exports = {
     });
 
     if (user.isSuperAdmin) {
-      return 'admin';
+      return exits.success('admin');
     }
 
     let vendor = await Vendor.findOne({
@@ -45,14 +45,14 @@ module.exports = {
     });
 
     if (!vendor) {
-      return 'none';
+      return exits.success('none');
     }
 
     // check if the user is authorised for the vendor
     if (user.vendor === inputs.vendorId) {
-      return user.vendorRole;
+      return exits.success(user.vendorRole);
     }
 
-    return 'none';
+    return exits.success('none');
   },
 };

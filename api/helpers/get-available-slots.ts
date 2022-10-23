@@ -1,5 +1,4 @@
 export {}; //SOLVED TypeScript Cannot Redeclare Block Scoped Variable Name https://backbencher.dev/articles/typescript-solved-cannot-redeclare-block-scoped-variable-name
-  import e from "express";
 import moment from "moment";
 // import util from 'util';
 import { iSlot } from "../../api/interfaces/vendors/slot";

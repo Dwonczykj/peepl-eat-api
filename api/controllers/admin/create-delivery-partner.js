@@ -105,7 +105,7 @@ module.exports = {
     }).fetch();
 
     // Return the new delivery partner
-    // return newDeliveryPartner;
+    // return exits.success(newDeliveryPartner);
     // Respond with view or JSON.
     if (this.req.wantsJSON) {
       return exits.successJSON({ newDeliveryPartner });

@@ -68,7 +68,7 @@ module.exports = {
     }).fetch();
 
     // Return the new delivery partner
-    // return newCategoryGroup;
+    // return exits.success(newCategoryGroup);
     // Respond with view or JSON.
     if (this.req.wantsJSON) {
       return exits.successJSON({ newCategoryGroup });

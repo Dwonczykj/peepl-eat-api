@@ -28,7 +28,7 @@ module.exports = {
   fn: function (inputs, exits) {
     const moment = require('moment');
 
-    if (!inputs.value) {return '';}
+    if (!inputs.value) {return exits.success('');}
     inputs.value = moment.unix(inputs.value).calendar();
     return exits.success(inputs.value);
 

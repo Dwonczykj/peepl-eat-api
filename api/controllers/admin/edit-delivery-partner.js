@@ -66,18 +66,18 @@ module.exports = {
     }
 
     // Update the delivery partner
-    await DeliveryPartner.updateOne({
-      id: inputs.id
+    deliveryPartner = await DeliveryPartner.updateOne({
+      id: inputs.id,
     }).set({
       name: inputs.name,
       email: inputs.email,
       phoneNumber: inputs.phoneNumber,
-      status: inputs.status
+      status: inputs.status,
     });
 
     // Return the updated delivery partner
     // All done.
-    return deliveryPartner;
+    return exits.success(deliveryPartner);
 
   }
 
