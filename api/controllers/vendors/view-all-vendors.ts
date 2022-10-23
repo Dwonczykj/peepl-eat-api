@@ -28,8 +28,9 @@ module.exports = {
   },
 
   fn: async function (inputs, exits) {
-    var postalDistrict = await PostalDistrict.findOne({outcode: inputs.outcode})
-    .populate('vendors');
+    var postalDistrict = await PostalDistrict.findOne({
+      outcode: inputs.outcode,
+    }).populate("vendors&vendors.fulfilmentPostalDistricts");
 
     if(postalDistrict){
       // Respond with view or JSON.

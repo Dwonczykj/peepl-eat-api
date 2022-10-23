@@ -24,8 +24,14 @@ const CAN_GET_VENDORS = (fixtures) => {
     expectResponse: {},
     expectStatusCode: 200,
     expectResponseCb: async (response, requestPayload) => {
-      
-
+      expect(response.body).to.have.property("vendors");
+      assert.isArray(response.body.vendors);
+      assert.isNotEmpty(response.body.vendors);
+      expect(response.body.vendors[0]).to.have.property("name");
+      expect(response.body.vendors[0]).to.have.property("status");
+      expect(response.body.vendors[0]).to.have.property(
+        "fulfilmentPostalDistricts"
+      );
       return;
     },
   };
