@@ -47,21 +47,23 @@ module.exports = {
       throw new Error('the order has not been paid for.');
     }
 
-    if(inputs.restaurantAccepted === true && order.subtotal > 0) {
+    if(inputs.restaurantAccepted === true) {
       await Order.updateOne({publicId: inputs.orderId})
       .set({restaurantAcceptanceStatus: 'accepted'});
 
-      // Issue Peepl rewards
-      // (5% order total in pence) / 10 pence (value of PPL token)
-      var rewardAmount = (order.subtotal * 0.05) / 10;
+      if(order.subtotal > 0) {
+        // Issue Peepl rewards
+        // (5% order total in pence) / 10 pence (value of PPL token)
+        var rewardAmount = (order.subtotal * 0.05) / 10;
 
-      await sails.helpers.issuePeeplReward.with({
-        rewardAmount: rewardAmount,
-        recipient: order.customerWalletAddress
-      });
+        await sails.helpers.issuePeeplReward.with({
+          rewardAmount: rewardAmount,
+          recipient: order.customerWalletAddress
+        });
 
-      await Order.updateOne({publicId: inputs.orderId})
-      .set({rewardsIssued: rewardAmount});
+        await Order.updateOne({publicId: inputs.orderId})
+        .set({rewardsIssued: rewardAmount});
+      }
     } else if (inputs.restaurantAccepted === false) {
       // TODO: Isssue refund to customer
       await Order.updateOne({publicId: inputs.orderId})
