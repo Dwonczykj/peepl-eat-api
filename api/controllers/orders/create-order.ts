@@ -8,60 +8,60 @@ import _ from 'lodash';
 // import util from 'util';
 
 module.exports = {
-  friendlyName: "Create order",
+  friendlyName: 'Create order',
 
-  description: "This action is responsible for the creation of new orders.",
+  description: 'This action is responsible for the creation of new orders.',
 
   inputs: {
     items: {
-      type: "ref",
+      type: 'ref',
       description:
-        "Cart items from the frontend, which include the product id and corresponding options.",
+        'Cart items from the frontend, which include the product id and corresponding options.',
       required: true,
     },
     address: {
-      type: "ref",
-      description: "The user's address.",
+      type: 'ref',
+      description: 'The user\'s address.',
       required: true,
     },
     total: {
-      type: "number",
-      description: "The total order value, including shipping.",
+      type: 'number',
+      description: 'The total order value, including shipping.',
       required: true,
     },
     marketingOptIn: {
-      type: "boolean",
+      type: 'boolean',
     },
     discountCode: {
-      type: "string",
+      type: 'string',
       required: false,
     },
     vendor: {
-      type: "number",
+      type: 'number',
       required: true,
     },
     fulfilmentMethod: {
-      type: "number",
+      type: 'number',
       required: true,
     },
     fulfilmentSlotFrom: {
-      type: "string",
+      type: 'string',
       description:
-        "Delivery after this time if delivery, collection from vendor after this time if collection",
+        'Delivery after this time if delivery, collection from vendor after this time if collection',
       required: true,
     },
     fulfilmentSlotTo: {
-      type: "string",
+      type: 'string',
       description:
-        "Delivery before this time if delivery, collection from vendor before this time if collection",
+        'Delivery before this time if delivery, collection from vendor before this time if collection',
       required: true,
     },
     tipAmount: {
-      type: "number",
+      type: 'number',
       defaultsTo: 0,
     },
     walletAddress: {
-      type: "string",
+      type: 'string',
       required: true,
     },
   },
@@ -69,34 +69,34 @@ module.exports = {
   exits: {
     invalidSlot: {
       statusCode: 422,
-      description: "The fulfilment slot is invalid.",
+      description: 'The fulfilment slot is invalid.',
     },
     deliveryPartnerUnavailable: {
       statusCode: 422,
-      description: "No deliveryPartner available.",
+      description: 'No deliveryPartner available.',
     },
     allItemsUnavailable: {
       statusCode: 422,
-      description: "All items are unavailable from merchant.",
+      description: 'All items are unavailable from merchant.',
     },
     minimumOrderAmount: {
       statusCode: 400,
-      description: "The minimum order amount was not met.",
+      description: 'The minimum order amount was not met.',
     },
     noItemsFound: {
       statusCode: 400,
-      responseType: "noItemsFound",
+      responseType: 'noItemsFound',
     },
     badItemsRequest: {
-      responseType: "badRequest",
+      responseType: 'badRequest',
       statusCode: 400,
     },
     notFound: {
       statusCode: 400,
-      responseType: "notFound",
+      responseType: 'notFound',
     },
     badRequest: {
-      responseType: "badRequest",
+      responseType: 'badRequest',
     },
   },
 
@@ -129,13 +129,13 @@ module.exports = {
 	        await sails.helpers.getAvailableDeliveryPartnerFromPool.with({
 	          fulfilmentSlotFrom: inputs.fulfilmentSlotFrom, //moment.utc("01:15:00 PM", "h:mm:ss A")
 	          fulfilmentSlotTo: inputs.fulfilmentSlotTo, //moment.utc("01:15:00 PM", "h:mm:ss A")
-	          
+
 	          pickupFromVendor: vendor.id,
-	
+
 	          deliveryContactName: inputs.address.name,
 	          deliveryPhoneNumber: inputs.address.phoneNumber,
 	          deliveryComments: inputs.address.deliveryInstructions,
-	
+
 	          deliveryAddressLineOne: inputs.address.lineOne,
 	          deliveryAddressLineTwo: inputs.address.lineTwo,
 	          deliveryAddressCity: inputs.address.city,
@@ -145,10 +145,10 @@ module.exports = {
         sails.log.error(`helpers.getAvailableDeliveryPartnerFromPool errored: ${error}`);
         availableDeliveryPartner = null;
       }
-      
+
       if (!availableDeliveryPartner) {
         return exits.invalidSlot(
-          "No deliveryPartner available for requested fulfilment"
+          'No deliveryPartner available for requested fulfilment'
         );
       }
     } else {
@@ -163,7 +163,7 @@ module.exports = {
 
     try {
       const datastore = sails.getDatastore();
-      
+
       const wrapWithDb = (db, cb) => {
         try {
           if (db) {
@@ -180,7 +180,7 @@ module.exports = {
 
       var newPaymentIntent;
       var order;
-      
+
       const createOrderTransactionDB = async (db: any) => {
         for (var item in inputs.items) {
           var orderItemOptionValues = [];
@@ -244,7 +244,7 @@ module.exports = {
         var updatedItems = _.map(inputs.items, (object) => {
           object.order = order.id;
           // object.product = object.product;
-          return _.pick(object, ["order", "product", "optionValues"]);
+          return _.pick(object, ['order', 'product', 'optionValues']);
         });
 
         // sails.log(`Update the ${updatedItems.length} order items in the db: ${util.inspect(updatedItems, {depth: null})}`);
@@ -277,8 +277,8 @@ module.exports = {
 
         // Return error if vendor minimum order value not met
         if (calculatedOrderTotal.withoutFees < vendor.minimumOrderAmount) {
-          sails.log.info("Vendor minimum order value not met");
-          exits.minimumOrderAmount("Vendor minimum order value not met");
+          sails.log.info('Vendor minimum order value not met');
+          exits.minimumOrderAmount('Vendor minimum order value not met');
           return;
         }
 
@@ -290,12 +290,12 @@ module.exports = {
             vendor.name
           )
           .catch(() => {
-            exits.error(new Error("Error creating payment intent"));
+            exits.error(new Error('Error creating payment intent'));
             return;
           });
 
         if (!newPaymentIntent) {
-          exits.error(new Error("Error creating payment intent"));
+          exits.error(new Error('Error creating payment intent'));
           return;
         }
 
@@ -313,7 +313,7 @@ module.exports = {
         };
       };
 
-      if (datastore.config.adapter === "sails-disk") {
+      if (datastore.config.adapter === 'sails-disk') {
         const result = await createOrderTransactionDB(null);
         if(result){
           return exits.success(result);
@@ -326,13 +326,13 @@ module.exports = {
           })
           .intercept((issues) => {
             sails.log(issues);
-            return exits.error(new Error("Error creating Order in DB"));
+            return exits.error(new Error('Error creating Order in DB'));
           });
         return exits.success(result);
       }
     } catch (error) {
       sails.log.error(error);
-      return exits.error(new Error("Error creating Order in DB"));
+      return exits.error(new Error('Error creating Order in DB'));
     }
   },
 };
