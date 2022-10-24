@@ -1,31 +1,31 @@
 module.exports = [
   {
-    name: "Starter",
+    name: 'Starter',
     product: 2,
     id: 1,
   },
   {
-    name: "Main",
+    name: 'Main',
     product: 2,
     id: 2,
   },
   {
-    name: "Dessert",
+    name: 'Dessert',
     product: 2,
     id: 3,
   },
   {
-    name: "Starter",
+    name: 'Starter',
     product: 1,
     id: 4,
   },
   {
-    name: "Main",
+    name: 'Main',
     product: 1,
     id: 5,
   },
   {
-    name: "Dessert",
+    name: 'Dessert',
     product: 1,
     id: 6,
   },

@@ -1,64 +1,64 @@
 const util = require('util');
 module.exports = {
-  friendlyName: "Create delivery partner",
+  friendlyName: 'Create delivery partner',
 
-  description: "",
+  description: '',
 
   inputs: {
     name: {
-      type: "string",
+      type: 'string',
       required: true,
-      description: "The name of the delivery partner",
+      description: 'The name of the delivery partner',
       maxLength: 50,
     },
     email: {
-      type: "string",
+      type: 'string',
       required: true,
-      description: "The email address of the delivery partner",
+      description: 'The email address of the delivery partner',
       maxLength: 50,
       isEmail: true,
     },
     phoneNumber: {
-      type: "string",
+      type: 'string',
       required: true,
-      description: "The phone number of the delivery partner",
+      description: 'The phone number of the delivery partner',
       maxLength: 20,
     },
     status: {
-      type: "string",
-      isIn: ["active", "inactive"],
-      defaultsTo: "inactive",
+      type: 'string',
+      isIn: ['active', 'inactive'],
+      defaultsTo: 'inactive',
     },
     type: {
-      type: "string",
-      isIn: ["bike", "electric"],
-      defaultsTo: "bike",
+      type: 'string',
+      isIn: ['bike', 'electric'],
+      defaultsTo: 'bike',
     },
     rating: {
-      type: "number",
+      type: 'number',
       min: 0,
       max: 5,
       defaultsTo: 5,
     },
     walletAddress: {
-      type: "string",
+      type: 'string',
       required: true,
       regex: /^0x[a-fA-F0-9]{40}$/,
     },
     image: {
-      type: "ref",
+      type: 'ref',
     },
   },
 
   exits: {
     success: {
-      description: "New delivery partner created.",
+      description: 'New delivery partner created.',
     },
     successJSON: {
       statusCode: 200,
     },
     alreadyExists: {
-      description: "delivery partner already exists",
+      description: 'delivery partner already exists',
       statusCode: 400,
     },
   },
@@ -84,7 +84,7 @@ module.exports = {
       return exits.alreadyExists();
     }
 
-    inputs.imageUrl = "";
+    inputs.imageUrl = '';
 
     //Dont check for inputs.image as imageUrl is required on DeliveryPartner model
     let imageInfo = await sails.helpers.uploadOneS3(inputs.image);

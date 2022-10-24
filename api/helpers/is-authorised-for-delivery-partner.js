@@ -1,25 +1,25 @@
 module.exports = {
-  friendlyName: "Is authorised for deliveryPartner",
+  friendlyName: 'Is authorised for deliveryPartner',
 
   description:
-    "Check if the user is a deliveryPartner User registered to this deliveryPartner or is a superadmin",
+    'Check if the user is a deliveryPartner User registered to this deliveryPartner or is a superadmin',
 
   inputs: {
     userId: {
-      type: "number",
+      type: 'number',
       required: true,
-      description: "The id of the user.",
+      description: 'The id of the user.',
     },
     deliveryPartnerId: {
-      type: "number",
+      type: 'number',
       required: true,
-      description: "The id of the delivery partner.",
+      description: 'The id of the delivery partner.',
     },
   },
 
   exits: {
     success: {
-      description: "All done.",
+      description: 'All done.',
       data: null,
     },
 

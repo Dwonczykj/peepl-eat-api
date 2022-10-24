@@ -5,7 +5,7 @@ import {
   RecaptchaVerifier,
   setPersistence,
   signInWithPhoneNumber
-} from "firebase/auth";
+} from 'firebase/auth';
 
 parasails.registerPage('login', {
   //  ╦╔╗╔╦╔╦╗╦╔═╗╦    ╔═╗╔╦╗╔═╗╔╦╗╔═╗
@@ -58,7 +58,7 @@ parasails.registerPage('login', {
     };
     initializeApp(config);
     const auth = getAuth();
-    connectAuthEmulator(auth, "http://localhost:9099");
+    connectAuthEmulator(auth, 'http://localhost:9099');
     // this.createRecaptcha();
 
 

@@ -1,19 +1,19 @@
 module.exports = {
-  friendlyName: "View approve order",
+  friendlyName: 'View approve order',
 
   description: 'Display "Approve order" page.',
 
   inputs: {
     orderId: {
-      type: "string",
-      description: "The public id of the order to be approved or rejected.",
+      type: 'string',
+      description: 'The public id of the order to be approved or rejected.',
       required: true,
     },
   },
 
   exits: {
     success: {
-      viewTemplatePath: "pages/admin/approve-order",
+      viewTemplatePath: 'pages/admin/approve-order',
     },
     notFound: {
       statusCode: 404,
@@ -23,9 +23,9 @@ module.exports = {
   fn: async function (inputs, exits) {
     var order = await Order.findOne({
       publicId: inputs.orderId,
-      completedFlag: "",
+      completedFlag: '',
     }).populate(
-      "fulfilmentMethod&items.product&optionValues&optionValues.option&optionValue"
+      'fulfilmentMethod&items.product&optionValues&optionValues.option&optionValue'
     );
 
     if (!order) {

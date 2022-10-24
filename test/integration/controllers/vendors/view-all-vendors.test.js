@@ -1,36 +1,36 @@
-const { expect, assert } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
+const { expect, assert } = require('chai'); // ~ https://www.chaijs.com/api/bdd/
 
 const util = require('util');
 
-const { fixtures } = require("../../../../scripts/build_db");
+const { fixtures } = require('../../../../scripts/build_db');
 
-const { v4: uuidv4 } = require("uuid");
+const { v4: uuidv4 } = require('uuid');
 
 const {
   DEFAULT_NEW_VENDOR_OBJECT,
   ExpectResponseVendor,
   HttpAuthTestSenderVendor,
-} = require("./defaultVendor");
+} = require('./defaultVendor');
 
 const CAN_GET_VENDORS = (fixtures) => {
   return {
-    useAccount: "TEST_VENDOR",
-    HTTP_TYPE: "get",
-    ACTION_PATH: "vendors",
-    ACTION_NAME: "",
+    useAccount: 'TEST_VENDOR',
+    HTTP_TYPE: 'get',
+    ACTION_PATH: 'vendors',
+    ACTION_NAME: '',
     sendData: {
       outcode: fixtures.postalDistricts[0].outcode,
     },
     expectResponse: {},
     expectStatusCode: 200,
     expectResponseCb: async (response, requestPayload) => {
-      expect(response.body).to.have.property("vendors");
+      expect(response.body).to.have.property('vendors');
       assert.isArray(response.body.vendors);
       assert.isNotEmpty(response.body.vendors);
-      expect(response.body.vendors[0]).to.have.property("name");
-      expect(response.body.vendors[0]).to.have.property("status");
+      expect(response.body.vendors[0]).to.have.property('name');
+      expect(response.body.vendors[0]).to.have.property('status');
       expect(response.body.vendors[0]).to.have.property(
-        "fulfilmentPostalDistricts"
+        'fulfilmentPostalDistricts'
       );
       return;
     },
@@ -38,10 +38,10 @@ const CAN_GET_VENDORS = (fixtures) => {
 };
 const CAN_NOT_VIEW_VENDORS_WHEN_UNAUTH = (fixtures) => {
   return {
-    useAccount: "TEST_UNAUTHENTICATED",
-    HTTP_TYPE: "get",
-    ACTION_PATH: "vendors",
-    ACTION_NAME: "",
+    useAccount: 'TEST_UNAUTHENTICATED',
+    HTTP_TYPE: 'get',
+    ACTION_PATH: 'vendors',
+    ACTION_NAME: '',
     sendData: {
       outcode: fixtures.postalDistricts[0].outcode,
     },
@@ -55,10 +55,10 @@ const CAN_NOT_VIEW_VENDORS_WHEN_UNAUTH = (fixtures) => {
 const CAN_VIEW_SINGLE_VENDOR = (fixtures) => {
   const vendor = fixtures.vendors[0];
   return {
-    useAccount: "TEST_UNAUTHENTICATED",
-    HTTP_TYPE: "get",
-    ACTION_PATH: "vendors",
-    ACTION_NAME: ":vendorId",
+    useAccount: 'TEST_UNAUTHENTICATED',
+    HTTP_TYPE: 'get',
+    ACTION_PATH: 'vendors',
+    ACTION_NAME: ':vendorId',
     sendData: {
       vendorId: vendor.id,
     },
@@ -77,10 +77,10 @@ const CAN_VIEW_SINGLE_VENDOR = (fixtures) => {
 };
 const CAN_GET_VENDORS_POSTALDISTRICTS = (fixtures) => {
   return {
-    useAccount: "TEST_VENDOR",
-    HTTP_TYPE: "get",
-    ACTION_PATH: "vendors",
-    ACTION_NAME: "get-postal-districts",
+    useAccount: 'TEST_VENDOR',
+    HTTP_TYPE: 'get',
+    ACTION_PATH: 'vendors',
+    ACTION_NAME: 'get-postal-districts',
     sendData: {
       vendor: null,
     },
@@ -93,29 +93,29 @@ const CAN_GET_VENDORS_POSTALDISTRICTS = (fixtures) => {
 };
 const CAN_GET_ALL_POSTALDISTRICTS = (fixtures) => {
   return {
-    useAccount: "TEST_USER",
-    HTTP_TYPE: "get",
-    ACTION_PATH: "postal-districts",
-    ACTION_NAME: "get-all-postal-districts",
+    useAccount: 'TEST_USER',
+    HTTP_TYPE: 'get',
+    ACTION_PATH: 'postal-districts',
+    ACTION_NAME: 'get-all-postal-districts',
     sendData: {
     },
     expectResponse: {},
     expectStatusCode: 200,
     expectResponseCb: async (response, requestPayload) => {
-      expect(response.body).to.have.property("postalDistricts");
+      expect(response.body).to.have.property('postalDistricts');
       assert.isArray(response.body.postalDistricts);
       assert.isNotEmpty(response.body.postalDistricts);
-      expect(response.body.postalDistricts[0]).to.have.property("outcode");
+      expect(response.body.postalDistricts[0]).to.have.property('outcode');
       return;
     },
   };
 };
 const CAN_EDIT_VENDORS_POSTALDISTRICTS = (fixtures) => {
   return {
-    useAccount: "TEST_VENDOR",
-    HTTP_TYPE: "post",
-    ACTION_PATH: "admin",
-    ACTION_NAME: "edit-vendor-postal-districts",
+    useAccount: 'TEST_VENDOR',
+    HTTP_TYPE: 'post',
+    ACTION_PATH: 'admin',
+    ACTION_NAME: 'edit-vendor-postal-districts',
     sendData: {
       vendorId: null,
       districts: []
@@ -129,10 +129,10 @@ const CAN_EDIT_VENDORS_POSTALDISTRICTS = (fixtures) => {
 };
 const CANNOT_EDIT_VENDORS_POSTALDISTRICTS_IF_NOT_AUTH_FOR_VENDOR = (fixtures) => {
   return {
-    useAccount: "TEST_USER",
-    HTTP_TYPE: "post",
-    ACTION_PATH: "admin",
-    ACTION_NAME: "edit-vendor-postal-districts",
+    useAccount: 'TEST_USER',
+    HTTP_TYPE: 'post',
+    ACTION_PATH: 'admin',
+    ACTION_NAME: 'edit-vendor-postal-districts',
     sendData: {
       vendorId: null,
       districts: []
@@ -145,11 +145,11 @@ const CANNOT_EDIT_VENDORS_POSTALDISTRICTS_IF_NOT_AUTH_FOR_VENDOR = (fixtures) =>
   };
 };
 
-describe("Fetch Vendors Controller Tests", () => {
+describe('Fetch Vendors Controller Tests', () => {
   describe(`${
     CAN_GET_VENDORS(fixtures).ACTION_PATH
   }/:outcode (view-all-vendors) returns a 200 with json when authenticated`, () => {
-    it("Returns All Vendors", async () => {
+    it('Returns All Vendors', async () => {
       try {
         // let vendor = await Vendor.create(
         //   DEFAULT_NEW_VENDOR_OBJECT(fixtures, {})
@@ -159,11 +159,11 @@ describe("Fetch Vendors Controller Tests", () => {
         }).populate('vendor');
         const vendor = currentUser.vendor;
         const postalDistrict = await PostalDistrict.create({
-          outcode: "L5",
+          outcode: 'L5',
         }).fetch();
         await Vendor.addToCollection(
           vendor.id,
-          "fulfilmentPostalDistricts"
+          'fulfilmentPostalDistricts'
         ).members([postalDistrict.id]);
         const hats = new HttpAuthTestSenderVendor(CAN_GET_VENDORS(fixtures));
         const response = await hats.makeAuthCallWith(
@@ -182,25 +182,25 @@ describe("Fetch Vendors Controller Tests", () => {
   describe(`${
     CAN_GET_VENDORS_POSTALDISTRICTS(fixtures).ACTION_NAME
   }`, () => {
-    it("returns a list of postal districts for a vendor", async () => {
+    it('returns a list of postal districts for a vendor', async () => {
       try {
         let vendor = await Vendor.create(
           DEFAULT_NEW_VENDOR_OBJECT(fixtures, {})
         ).fetch();
         const postalDistricts = await PostalDistrict.createEach([
           {
-            outcode: "M1",
+            outcode: 'M1',
           },
           {
-            outcode: "M2",
+            outcode: 'M2',
           },
           {
-            outcode: "M3",
+            outcode: 'M3',
           },
         ]).fetch();
         await Vendor.addToCollection(
           vendor.id,
-          "fulfilmentPostalDistricts"
+          'fulfilmentPostalDistricts'
         ).members(postalDistricts.map(pd => pd.id));
         const hats = new HttpAuthTestSenderVendor(
           CAN_GET_VENDORS_POSTALDISTRICTS(fixtures)
@@ -219,36 +219,36 @@ describe("Fetch Vendors Controller Tests", () => {
     });
   });
   describe(`${CAN_EDIT_VENDORS_POSTALDISTRICTS(fixtures).ACTION_NAME}`, () => {
-    it("returns a list of updated postal districts for a vendor", async () => {
+    it('returns a list of updated postal districts for a vendor', async () => {
       try {
         const currentUser = await User.findOne({
           name: CAN_EDIT_VENDORS_POSTALDISTRICTS(fixtures).useAccount,
-        }).populate("vendor");
+        }).populate('vendor');
         const vendor = currentUser.vendor;
         const postalDistricts = await PostalDistrict.createEach([
           {
-            outcode: "S1",
+            outcode: 'S1',
           },
           {
-            outcode: "S2",
+            outcode: 'S2',
           },
           {
-            outcode: "S3",
+            outcode: 'S3',
           },
         ]).fetch();
         await Vendor.addToCollection(
           vendor.id,
-          "fulfilmentPostalDistricts"
+          'fulfilmentPostalDistricts'
         ).members(postalDistricts.map((pd) => pd.id));
         const postalDistrictsUpdated = await PostalDistrict.createEach([
           {
-            outcode: "S4",
+            outcode: 'S4',
           },
           {
-            outcode: "S5",
+            outcode: 'S5',
           },
           {
-            outcode: "S6",
+            outcode: 'S6',
           },
         ]).fetch();
         const hats = new HttpAuthTestSenderVendor(
@@ -263,7 +263,7 @@ describe("Fetch Vendors Controller Tests", () => {
         );
         await hats.expectedResponse.checkResponse(response);
         assert.isNotEmpty(response.body);
-        expect(response.body).to.have.property("name");
+        expect(response.body).to.have.property('name');
         assert.isDefined(response.body.fulfilmentPostalDistricts);
         assert.isArray(response.body.fulfilmentPostalDistricts);
         expect(
@@ -274,18 +274,18 @@ describe("Fetch Vendors Controller Tests", () => {
         throw errs;
       }
     });
-    it("returns a 401 when user is not authorized to edit a vendor", async () => {
+    it('returns a 401 when user is not authorized to edit a vendor', async () => {
       try {
         const currentUser = await User.findOne({
-          name: "TEST_VENDOR",
-        }).populate("vendor");
+          name: 'TEST_VENDOR',
+        }).populate('vendor');
         const vendor = currentUser.vendor;
         const postalDistrictsUpdated = await PostalDistrict.createEach([
           {
-            outcode: "S7",
+            outcode: 'S7',
           },
           {
-            outcode: "S8",
+            outcode: 'S8',
           },
         ]).fetch();
         const hats = new HttpAuthTestSenderVendor(
@@ -307,7 +307,7 @@ describe("Fetch Vendors Controller Tests", () => {
     });
   });
   describe(`${CAN_GET_ALL_POSTALDISTRICTS(fixtures).ACTION_NAME}`, () => {
-    it("returns a list of all postal districts", async () => {
+    it('returns a list of all postal districts', async () => {
       try {
         const hats = new HttpAuthTestSenderVendor(
           CAN_GET_ALL_POSTALDISTRICTS(fixtures)
@@ -326,7 +326,7 @@ describe("Fetch Vendors Controller Tests", () => {
   describe(`${
     CAN_VIEW_SINGLE_VENDOR(fixtures).ACTION_PATH
   }/:vendor`, () => {
-    it("returns a single vendor", async () => {
+    it('returns a single vendor', async () => {
       try {
         const hats = new HttpAuthTestSenderVendor(
           CAN_VIEW_SINGLE_VENDOR(fixtures)

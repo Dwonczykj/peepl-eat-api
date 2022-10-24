@@ -1,11 +1,11 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp } from 'firebase/app';
 import {
   connectAuthEmulator, createUserWithEmailAndPassword,
   getAuth,
   signInWithEmailAndPassword
-} from "firebase/auth";
+} from 'firebase/auth';
 
-parasails.registerPage("login-with-password", {
+parasails.registerPage('login-with-password', {
   //  ╦╔╗╔╦╔╦╗╦╔═╗╦    ╔═╗╔╦╗╔═╗╔╦╗╔═╗
   //  ║║║║║ ║ ║╠═╣║    ╚═╗ ║ ╠═╣ ║ ║╣
   //  ╩╝╚╝╩ ╩ ╩╩ ╩╩═╝  ╚═╝ ╩ ╩ ╩ ╩ ╚═╝
@@ -14,12 +14,12 @@ parasails.registerPage("login-with-password", {
     cloudError: false,
     formErrors: {},
     formData: {
-      emailAddress: "",
-      password: "",
+      emailAddress: '',
+      password: '',
       rememberMe: false,
     },
-    emailAddress: "",
-    password: "",
+    emailAddress: '',
+    password: '',
     rememberMe: false,
   },
 
@@ -31,18 +31,18 @@ parasails.registerPage("login-with-password", {
   },
   mounted: async function () {
     const config = {
-      apiKey: "AIzaSyB9hAjm49_3linYAcDkkEYijBiCoObXYfk", //! apiKey is fine: See: https://firebase.google.com/docs/projects/api-keys
-      authDomain: "vegiliverpool.firebaseapp.com",
-      projectId: "vegiliverpool",
-      storageBucket: "vegiliverpool.appspot.com",
-      messagingSenderId: "526129377",
-      appId: "1:526129377:web:a0e4d54396cbdebe70bfa0",
-      measurementId: "G-YZCWVWRNKN",
+      apiKey: 'AIzaSyB9hAjm49_3linYAcDkkEYijBiCoObXYfk', //! apiKey is fine: See: https://firebase.google.com/docs/projects/api-keys
+      authDomain: 'vegiliverpool.firebaseapp.com',
+      projectId: 'vegiliverpool',
+      storageBucket: 'vegiliverpool.appspot.com',
+      messagingSenderId: '526129377',
+      appId: '1:526129377:web:a0e4d54396cbdebe70bfa0',
+      measurementId: 'G-YZCWVWRNKN',
     };
     initializeApp(config);
     const auth = getAuth();
-    connectAuthEmulator(auth, "http://localhost:9099");
-    this.$focus("[autofocus]");
+    connectAuthEmulator(auth, 'http://localhost:9099');
+    this.$focus('[autofocus]');
   },
 
   //  ╦╔╗╔╔╦╗╔═╗╦═╗╔═╗╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
@@ -88,7 +88,7 @@ parasails.registerPage("login-with-password", {
       const email = this.emailAddress;
       const password = this.password;
       const rememberMe = this.rememberMe;
-      
+
       const auth = getAuth();
       signInWithEmailAndPassword(auth, email, password)
         .then(async (userCredential) => {
@@ -97,25 +97,25 @@ parasails.registerPage("login-with-password", {
 
           // eslint-disable-next-line no-console
           const sessionToken = await fbUser.getIdToken(true);
-          console.log(fbUser.email + " authorised signed in to firebase with session token " + sessionToken);
+          console.log(fbUser.email + ' authorised signed in to firebase with session token ' + sessionToken);
 
           return Cloud.loginWithPassword(email, sessionToken, rememberMe);
         })
         .then((response) => {
-          location.replace("/admin");
+          location.replace('/admin');
         })
         .catch((err) => {
-          if (err.code === "auth/user-not-found") {
+          if (err.code === 'auth/user-not-found') {
             Cloud.userExistsForEmail(email).then((userExists) => {
               if (userExists && userExists.data === true) {
                 return this.registerEmailPasswordFirebaseOnly(email, password);
               }
             });
           }
-          else if (err.exit === "userExists") {
-            this.cloudError = "Unable to login. Check credentials.";
+          else if (err.exit === 'userExists') {
+            this.cloudError = 'Unable to login. Check credentials.';
           }
-          else if (err.code === "firebaseErrored") {
+          else if (err.code === 'firebaseErrored') {
             this.cloudError = `${err.message}`;
             // eslint-disable-next-line no-console
             console.warn(err.responseInfo);
@@ -135,20 +135,20 @@ parasails.registerPage("login-with-password", {
           const fbUser = userCredential.user;
 
           // eslint-disable-next-line no-console
-          console.log(fbUser.email + " authorised signed in to firebase.");
+          console.log(fbUser.email + ' authorised signed in to firebase.');
           return fbUser.getIdToken(true);
         })
-        .then(sessionToken => { 
+        .then(sessionToken => {
           return Cloud.loginWithPassword(email, sessionToken, this.rememberMe);
         })
         .then(response => {
-          location.replace("/admin");
+          location.replace('/admin');
         })
         .catch((err) => {
           this.cloudError = err.message;
           console.warn(err.responseInfo);
-          if (err.exit === "userExists") {
-            this.cloudError = "Unable to login. Check credentials.";
+          if (err.exit === 'userExists') {
+            this.cloudError = 'Unable to login. Check credentials.';
           }
           // eslint-disable-next-line no-console
           console.warn(err);
@@ -158,15 +158,15 @@ parasails.registerPage("login-with-password", {
     // *Form submitted style functions
     submittedForm: function () {
       this.syncing = true;
-      window.location = "/admin";
+      window.location = '/admin';
     },
 
     // * navigation functions
     toRegister: function () {
-      window.location.replace("/admin/signup");
+      window.location.replace('/admin/signup');
     },
     toLoginWithPassword: function () {
-      window.location.replace("/admin/login-with-password");
+      window.location.replace('/admin/login-with-password');
     },
   },
 });

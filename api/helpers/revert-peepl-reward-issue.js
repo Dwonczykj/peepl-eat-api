@@ -1,5 +1,5 @@
 const axios = require('axios').default;
-const { v4: uuidv4 } = require("uuid");
+const { v4: uuidv4 } = require('uuid');
 const OrderTypeEnum = {
   vegiEats: 'vegiEats',
   vegiPays: 'vegiPays',
@@ -55,14 +55,14 @@ module.exports = {
 
   fn: async function (inputs, exits) {
     var dontActuallySend =
-      sails.config.environment === "test" ||
+      sails.config.environment === 'test' ||
       process.env.FIREBASE_AUTH_EMULATOR_HOST;
     if (dontActuallySend) {
       sails.log
         .info(`Running sails in test mode, helpers.revertPeeplRewardIssue will not request rewards points reversions.
       Rewards points issue would have been retrieved from ${inputs.recipient} with paymentIntentId: ${inputs.paymentId}`);
       return exits.success({
-        paymentIntentId: "dummy_refund_payment_id_" + uuidv4(),
+        paymentIntentId: 'dummy_refund_payment_id_' + uuidv4(),
       });
     }
     let _instance;
@@ -106,13 +106,13 @@ module.exports = {
 
         await sails.helpers.raiseVegiSupportIssue.with({
           orderId:
-            order.id || "UNKNOWN with paymentIntentId: " + inputs.paymentId,
-          title: "order_reward_issue_failed_",
+            order.id || 'UNKNOWN with paymentIntentId: ' + inputs.paymentId,
+          title: 'order_reward_issue_failed_',
           message: `Order Reversion of Rewards Points Issue Failed: ${order.publicId} -> Failed to Revert PPL Issue from wallet '${order.customerWalletAddress}' due to mismatched rewards issued.`,
         });
       } catch (error) {
         sails.log.error(
-          "failed to raise vegi support issue to log a failed rewards points issue for an accepted order"
+          'failed to raise vegi support issue to log a failed rewards points issue for an accepted order'
         );
       }
       return exits.requestFailed(
@@ -123,7 +123,7 @@ module.exports = {
     }
 
     //request refund for full amount of order from peeplPay community manager wallet address back to the customer.
-    instance.post('/revert_reward_issue', { //Check Stripe API and aim to keep peeplPay requests inline with stripAPI 
+    instance.post('/revert_reward_issue', { //Check Stripe API and aim to keep peeplPay requests inline with stripAPI
       amount: revertRewardAmount,
       recipientWalletAddress: inputs.refundRecipientWalletAddress,
       webhookAddress: null //! no callback required for now as reward sent back to vegi. We can track this elsewhere.

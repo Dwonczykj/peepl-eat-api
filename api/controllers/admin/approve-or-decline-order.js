@@ -9,30 +9,30 @@ Object.freeze(OrderTypeEnum);
 
 
 module.exports = {
-  friendlyName: "Approve or decline order",
+  friendlyName: 'Approve or decline order',
 
-  description: "",
+  description: '',
 
   inputs: {
     orderId: {
-      type: "string",
-      description: "Public ID for the order.",
+      type: 'string',
+      description: 'Public ID for the order.',
       required: true,
     },
     orderFulfilled: {
-      type: "string",
-      isIn: ["accept", "reject", "partial"],
+      type: 'string',
+      isIn: ['accept', 'reject', 'partial'],
       required: true,
     },
     retainItems: {
-      type: "ref",
+      type: 'ref',
       required: true,
-      description: "array of publicIds for the items",
+      description: 'array of publicIds for the items',
     },
     removeItems: {
-      type: "ref",
+      type: 'ref',
       required: true,
-      description: "array of publicIds for the items",
+      description: 'array of publicIds for the items',
     },
   },
 
@@ -40,20 +40,20 @@ module.exports = {
     badPartialFulfilmentRequestItems: {
       statusCode: 400,
       description:
-        "Request failed to include retainItems or removeItems arrays",
+        'Request failed to include retainItems or removeItems arrays',
       data: null,
     },
     orderNotFound: {
       statusCode: 404,
-      description: "Order not found",
+      description: 'Order not found',
     },
     orderNotPaidFor: {
       statusCode: 400,
-      description: "the order has not been paid for.",
+      description: 'the order has not been paid for.',
     },
     orderNotPending: {
       statusCode: 400,
-      description: "Restaurant has already accepted or rejected this order.",
+      description: 'Restaurant has already accepted or rejected this order.',
     },
 
     success: {
@@ -80,38 +80,38 @@ module.exports = {
       // fulfilmentSlotFrom: {
       //   '>=': new Date()
       // },
-      completedFlag: "",
+      completedFlag: '',
     });
-    const slotTo = moment.utc(order.fulfilmentSlotTo, "YYYY-MM-DD HH:mm:ss");
+    const slotTo = moment.utc(order.fulfilmentSlotTo, 'YYYY-MM-DD HH:mm:ss');
     if (slotTo.isBefore(moment.utc())) {
-      const nowFormatted = moment.utc().format("YYYY-MM-DD HH:mm:ss");
+      const nowFormatted = moment.utc().format('YYYY-MM-DD HH:mm:ss');
       return exits.orderHasFulfilmentSlotInPast({
         data: `[${nowFormatted}] -> Order delivery slot already passed at ${order.fulfilmentSlotTo}.`,
       });
     }
 
     if (!order) {
-      sails.log("approve or decline order - order NOT found");
+      sails.log('approve or decline order - order NOT found');
       return exits.orderNotFound();
     }
 
-    if (order.restaurantAcceptanceStatus !== "pending") {
+    if (order.restaurantAcceptanceStatus !== 'pending') {
       // Restaurant has previously accepted or declined the order, they cannot modify the order acceptance after this.
       return exits.orderNotPending();
     }
 
-    if (order.paymentStatus !== "paid") {
+    if (order.paymentStatus !== 'paid') {
       // Order is not paid
       return exits.orderNotPaidFor();
     }
 
-    if (inputs.orderFulfilled === "accept") {
+    if (inputs.orderFulfilled === 'accept') {
       if (order.subtotal <= 0) {
         return exits.orderHasNoItems();
       }
 
       await Order.updateOne(order.id).set({
-        restaurantAcceptanceStatus: "accepted",
+        restaurantAcceptanceStatus: 'accepted',
       });
 
       // Issue Peepl rewards
@@ -140,7 +140,7 @@ module.exports = {
         try {
           await sails.helpers.raiseVegiSupportIssue.with({
             orderId: order.publicId,
-            title: "order_reward_issue_failed_",
+            title: 'order_reward_issue_failed_',
             message: `Order Rewards Points Issue Failed: ${order.publicId} -> Failed to send PPL to wallet '${order.customerWalletAddress}'.`,
           });
         } catch (error) {
@@ -151,15 +151,15 @@ module.exports = {
       }
       // Send notification to customer that their order has been accepted/declined.
       await sails.helpers.sendFirebaseNotification.with({
-        topic: "order-" + order.publicId,
-        title: "Order update",
-        body: "Your order has been accepted 😎.",
+        topic: 'order-' + order.publicId,
+        title: 'Order update',
+        body: 'Your order has been accepted 😎.',
       });
-    } else if (inputs.orderFulfilled === "reject") {
+    } else if (inputs.orderFulfilled === 'reject') {
       await Order.updateOne(order.id).set({
-        restaurantAcceptanceStatus: "rejected",
+        restaurantAcceptanceStatus: 'rejected',
       });
-      if (order.paymentStatus === "paid") {
+      if (order.paymentStatus === 'paid') {
         try {
           // send a refund to the user:
           //todo vegi has no idea how much of payment was funded by PPL and GBPx split?
@@ -180,11 +180,11 @@ module.exports = {
       }
 
       await sails.helpers.sendFirebaseNotification.with({
-        topic: "order-" + order.publicId,
-        title: "Order update",
-        body: "Your order has been declined 😔.",
+        topic: 'order-' + order.publicId,
+        title: 'Order update',
+        body: 'Your order has been declined 😔.',
       });
-    } else if (inputs.orderFulfilled === "partial") {
+    } else if (inputs.orderFulfilled === 'partial') {
       try {
         var response = await sails.helpers.updateItemsForOrder.with({
           orderId: inputs.orderId,
@@ -193,9 +193,9 @@ module.exports = {
           removeItems: inputs.removeItems,
         });
 
-        if (!response || !response.data["validRequest"]) {
+        if (!response || !response.data['validRequest']) {
           sails.log.warn(
-            "Bad partial fulfilment requested by vendor on approve-or-decline-order action with missing items."
+            'Bad partial fulfilment requested by vendor on approve-or-decline-order action with missing items.'
           );
           return exits.badPartialFulfilmentRequestItems();
         }

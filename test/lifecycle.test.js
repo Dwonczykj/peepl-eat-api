@@ -2,7 +2,7 @@
 /* eslint-disable no-console */
 var sails = require('sails');
 var _ = require('lodash');
-var util = require("util");
+var util = require('util');
 const dotenv = require('dotenv');//.load('./env'); // alias of .config()
 // const envConfig = dotenv.load().parsed;
 const envConfig = dotenv.config('./test/env').parsed;
@@ -120,7 +120,7 @@ async function populateDbData(done) {
     // var postalDistricts = await PostalDistrict.createEach(
     //   fixtures.postalDistricts
     // ).fetch();
-    
+
     // console.info("Finished populating Postal Districts");
 
     // await DeliveryPartner.createEach(fixtures.deliveryPartners);
@@ -150,7 +150,7 @@ async function populateDbData(done) {
     //   fulfilmentPostalDistricts: [],//postalDistricts.map(pd => pd.id),
     //   deliveryPartner: null, //deliveryPartner.id,
     // }).fetch();
-    
+
     // var delifonseca = await Vendor.create({
     //   name: "Delifonseca Alt.",
     //   type: "restaurant",
@@ -170,7 +170,7 @@ async function populateDbData(done) {
     //   ],
     //   deliveryPartner: null,
     // }).fetch();
-    
+
     // console.info("Finished creating vendor: 'Delifonseca Alt.'");
 
     // await Vendor.createEach(fixtures.vendors);
@@ -214,7 +214,7 @@ async function populateDbData(done) {
 
     // await Order.createEach(fixtures.orders); // ! Not for bootstrap.js
 
-    console.info("Finished populating DB");
+    console.info('Finished populating DB');
   } catch (error) {
     console.error(error);
     done(error);
@@ -236,7 +236,7 @@ before(function (done) {
   let app;
   try {
     var rc = require('sails/accessible/rc');
-    console.log("Call sails.lift");
+    console.log('Call sails.lift');
     sails.lift({
       ...rc('sails'), ...{
         models: {
@@ -247,9 +247,9 @@ before(function (done) {
       }
     }, async (err, sails) => {
       console.log('Lifting Sails');
-      if (err) { 
+      if (err) {
         console.warn('Sails setup blewup!');
-        return done(err); 
+        return done(err);
       }
 
       app = sails;
@@ -309,13 +309,13 @@ before(function (done) {
         .get('/csrfToken')
         .set('Accept', 'application/json')
         .then(response => {
-            console.log(response.body);
-            this._csrf = response.body._csrf;
-            console.log('Sails lifted!');
+          console.log(response.body);
+          this._csrf = response.body._csrf;
+          console.log('Sails lifted!');
         })
         .catch(done);
-        done();
-        return;
+      done();
+      return;
     });
   } catch (err) {
     done(err);

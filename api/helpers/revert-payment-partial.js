@@ -61,7 +61,7 @@ module.exports = {
       amount: inputs.refundRequestGBPx,
       recipientWalletAddress: inputs.refundRecipientWalletAddress,
       requestedAt: requestedAt,
-      refundStatus: "unpaid",
+      refundStatus: 'unpaid',
     }).fetch();
     const newRefundPPL = await Refund.create({
       paymentIntentId: inputs.paymentId,
@@ -69,7 +69,7 @@ module.exports = {
       amount: inputs.refundRequestGBPx,
       recipientWalletAddress: inputs.refundRecipientWalletAddress,
       requestedAt: requestedAt,
-      refundStatus: "unpaid",
+      refundStatus: 'unpaid',
     }).fetch();
 
     const instance = axios.create({
@@ -81,7 +81,7 @@ module.exports = {
     //TODO: request refund for partial amount of order from peeplPay community manager wallet address back to the customer.
     //TODO: Assert that the paymentAmount == the sum of value of the items (+ % of service charge?) - discount
     instance
-      .post("/payment_refunds", {
+      .post('/payment_refunds', {
         amount: inputs.paymentAmount,
         originalPaymentIntentId: inputs.paymentId,
         recipientWalletAddress: inputs.refundRecipientWalletAddress,

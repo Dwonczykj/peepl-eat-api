@@ -36,17 +36,17 @@ module.exports = {
     // Update order with payment ID and time
     var order = await Order.updateOne({
       paymentIntentId: inputs.publicId,
-      completedFlag: "",
+      completedFlag: '',
     })
       .set({
-        paymentStatus: inputs.status === "paid" ? "paid" : "failed",
+        paymentStatus: inputs.status === 'paid' ? 'paid' : 'failed',
         paidDateTime: unixtime,
       });
-    
+
     if(!order){
       return exits.orderNotFound();
     }
-    
+
     order = await Order.findOne(order.id)
       .populate('vendor');
 
@@ -69,11 +69,11 @@ Delivery/Collection on ${order.fulfilmentSlotFrom} - ${order.fulfilmentSlotTo}`,
 	      await sails.helpers.sendSmsNotification.with({
 	        to: order.deliveryPhoneNumber,
 	        body:
-	          "Your payment for a recent order failed. Details of order " +
+	          'Your payment for a recent order failed. Details of order ' +
 	          order.fulfilmentSlotFrom +
-	          " and " +
+	          ' and ' +
 	          order.fulfilmentSlotTo +
-	          ". Please review your payment method in the vegi app.",
+	          '. Please review your payment method in the vegi app.',
           data: {
             orderId: order.id
           },

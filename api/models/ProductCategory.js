@@ -11,13 +11,13 @@ module.exports = {
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
     //  ╩  ╩╚═╩╩ ╩╩ ╩ ╩ ╚╝ ╚═╝╚═╝
     name: {
-      type: "string",
-      description: "The name of the product category.",
+      type: 'string',
+      description: 'The name of the product category.',
       required: true,
     },
     imageUrl: {
-      type: "string",
-      description: "The URL of the product category image.",
+      type: 'string',
+      description: 'The URL of the product category image.',
     },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
@@ -28,18 +28,18 @@ module.exports = {
     //  ╠═╣╚═╗╚═╗║ ║║  ║╠═╣ ║ ║║ ║║║║╚═╗
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
     vendor: {
-      model: "vendor",
-      description: "The category owner.",
+      model: 'vendor',
+      description: 'The category owner.',
       required: true,
     },
     categoryGroup: {
-      model: "CategoryGroup",
-      description: "The category group shared between vendors.",
+      model: 'CategoryGroup',
+      description: 'The category group shared between vendors.',
       required: true,
     },
     products: {
-      collection: "product",
-      via: "category",
+      collection: 'product',
+      via: 'category',
     },
   },
 
@@ -47,7 +47,7 @@ module.exports = {
     if(newlyCreatedRecord.vendor){
       await Vendor.addToCollection(
         newlyCreatedRecord.vendor,
-        "productCategories",
+        'productCategories',
         [
           newlyCreatedRecord.id,
         ]

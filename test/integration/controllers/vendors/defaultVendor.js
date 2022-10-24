@@ -1,15 +1,15 @@
 const {
   HttpAuthTestSender,
   ExpectResponse,
-} = require("../../../httpTestSender");
-const { assert, expect } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
+} = require('../../../httpTestSender');
+const { assert, expect } = require('chai'); // ~ https://www.chaijs.com/api/bdd/
 
 const DEFAULT_NEW_VENDOR_OBJECT = (fixtures, overrides = {}) => {
   const vendor = fixtures.vendors[0];
   const fulfilmentMethodVendor = fixtures.fulfilmentMethods.filter(
     (fm) =>
       fm.vendor === vendor.id &&
-      fm.methodType === "delivery" &&
+      fm.methodType === 'delivery' &&
       fixtures.openingHours.filter(
         (oh) => oh.fulfilmentMethod === fm.id && oh.isOpen === true
       )
@@ -21,23 +21,23 @@ const DEFAULT_NEW_VENDOR_OBJECT = (fixtures, overrides = {}) => {
   )[0];
   return {
     ...{
-      name: "Purple Carrot Test Vendor",
-      description: "This is a test.",
-      type: "restaurant",
-      walletAddress: "0x6ad1D130d8B4F6f2D133E172799484B653c9fb40",
-      phoneNumber: "+447123456789",
+      name: 'Purple Carrot Test Vendor',
+      description: 'This is a test.',
+      type: 'restaurant',
+      walletAddress: '0x6ad1D130d8B4F6f2D133E172799484B653c9fb40',
+      phoneNumber: '+447123456789',
       imageUrl:
-        "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
-      status: "active",
+        'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
+      status: 'active',
       vendorCategories: fixtures.vendorCategories[0].id,
       productCategories: [],
       fulfilmentPostalDistricts: fixtures.postalDistricts.map(pd => pd.id),
       fulfilmentMethod: fulfilmentMethodVendor.id,
       deliveryPartner: fixtures.deliveryPartners[0].id,
       pickupAddressLineOne: 'Random Street',
-      pickupAddressLineTwo: "Baltic",
-      pickupAddressCity: "Liverpool",
-      pickupAddressPostCode: "L1 0FT",
+      pickupAddressLineTwo: 'Baltic',
+      pickupAddressCity: 'Liverpool',
+      pickupAddressPostCode: 'L1 0FT',
     },
     ...overrides,
   };
@@ -55,9 +55,9 @@ function checkIfValidUUID(str) {
 
 class ExpectResponseVendor extends ExpectResponse {
   constructor({
-    HTTP_TYPE = "get",
-    ACTION_PATH = "",
-    ACTION_NAME = "",
+    HTTP_TYPE = 'get',
+    ACTION_PATH = '',
+    ACTION_NAME = '',
     sendData = {},
     expectResponse = {},
   }) {
@@ -74,7 +74,7 @@ class ExpectResponseVendor extends ExpectResponse {
     expect(responseBody.orderedDateTime).closeTo(
       expectedResponse.orderedDateTime,
       100,
-      "OrderedDateTime should be within 100s of test."
+      'OrderedDateTime should be within 100s of test.'
     );
     // ~ https://devenum.com/delete-property-from-objects-array-in-javascript/#:~:text=Delete%20property%20from%20objects%20Array%20in%20Javascript%20%286,to%20Delete%20property%20from%20objects%20array%20in%20Javascript
     delete expectedResponse.orderedDateTime;
@@ -86,11 +86,11 @@ class ExpectResponseVendor extends ExpectResponse {
 
 class HttpAuthTestSenderVendor extends HttpAuthTestSender {
   constructor({
-    HTTP_TYPE = "get",
-    ACTION_PREFIX = "/api/v1",
-    ACTION_PATH = "",
-    ACTION_NAME = "",
-    useAccount = "TEST_SERVICE",
+    HTTP_TYPE = 'get',
+    ACTION_PREFIX = '/api/v1',
+    ACTION_PATH = '',
+    ACTION_NAME = '',
+    useAccount = 'TEST_SERVICE',
     sendData = {},
     expectResponse = {},
     expectResponseCb = async (response, requestPayload) => {},

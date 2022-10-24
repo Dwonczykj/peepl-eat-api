@@ -1,4 +1,4 @@
-parasails.registerPage("account", {
+parasails.registerPage('account', {
   //  ╦╔╗╔╦╔╦╗╦╔═╗╦    ╔═╗╔╦╗╔═╗╔╦╗╔═╗
   //  ║║║║║ ║ ║╠═╣║    ╚═╗ ║ ╠═╣ ║ ║╣
   //  ╩╝╚╝╩ ╩ ╩╩ ╩╩═╝  ╚═╝ ╩ ╩ ╩ ╩ ╚═╝
@@ -7,8 +7,8 @@ parasails.registerPage("account", {
     cloudError: false,
     formErrors: {},
     user: {},
-    email: "",
-    name: "",
+    email: '',
+    name: '',
   },
 
   //  ╦  ╦╔═╗╔═╗╔═╗╦ ╦╔═╗╦  ╔═╗

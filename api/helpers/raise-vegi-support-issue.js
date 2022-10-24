@@ -59,7 +59,7 @@ module.exports = {
     } catch (error) {
       orderInternalId = null;
     }
-    
+
     try {
 	    await sails.helpers.sendSmsNotification.with({
         to: sails.config.custom.internalPhoneNumber,

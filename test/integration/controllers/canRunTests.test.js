@@ -13,7 +13,7 @@ describe('Is Logged In', () => {
 	        .expect(200);
       } catch (errs) {
         throw errs;
-      } 
+      }
     });
   });
   // describe('Test login-with-password Action()', () => {

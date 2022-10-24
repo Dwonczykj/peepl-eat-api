@@ -3,37 +3,37 @@ const vendorCategories = require('./vendorCategories');
 module.exports = [
   {
     id: 1, //TODO: See if this is allowed?
-    name: "Lunch",
+    name: 'Lunch',
     vendor: 1,
     categoryGroup: 11, // vendorCategories[10].id,
   },
   {
     id: 2,
-    name: "Coffee",
+    name: 'Coffee',
     vendor: 1,
     categoryGroup: 23, // vendorCategories[22].id,
   },
   {
     id: 3,
-    name: "Desert",
+    name: 'Desert',
     vendor: 1,
     categoryGroup: 11, // vendorCategories[10].id,
   },
   {
     id: 4,
-    name: "Dinner",
+    name: 'Dinner',
     vendor: 1,
     categoryGroup: 11, // vendorCategories[10].id,
   },
   {
     id: 5,
-    name: "Bakery",
+    name: 'Bakery',
     vendor: 1,
     categoryGroup: 11, // vendorCategories[10].id,
   },
   {
     id: 6,
-    name: "Free-from",
+    name: 'Free-from',
     vendor: 1,
     categoryGroup: 11, // vendorCategories[10].id,
   },

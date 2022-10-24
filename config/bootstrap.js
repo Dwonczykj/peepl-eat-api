@@ -30,11 +30,11 @@ module.exports.bootstrap = async function () {
 
   //Pull in Fixtures
   var fixtures = {};
-  const fs = require("fs");
+  const fs = require('fs');
 
-  _.each(fs.readdirSync(process.cwd() + "/test/fixtures/"), function (file) {
-    fixtures[file.replace(/\.js$/, "")] = require(process.cwd() +
-      "/test/fixtures/" +
+  _.each(fs.readdirSync(process.cwd() + '/test/fixtures/'), (file) => {
+    fixtures[file.replace(/\.js$/, '')] = require(process.cwd() +
+      '/test/fixtures/' +
       file);
   });
 
@@ -60,7 +60,7 @@ module.exports.bootstrap = async function () {
 
   try {
     var isMochaTestEnv =
-      sails.config.environment === "test" ||
+      sails.config.environment === 'test' ||
       process.env.FIREBASE_AUTH_EMULATOR_HOST;
     if (!isMochaTestEnv) {
       await buildDb(sails, false);

@@ -56,18 +56,18 @@ module.exports = {
       amount: inputs.refundAmount,
       recipientWalletAddress: inputs.refundRecipientWalletAddress,
       requestedAt: Date.now(),
-      refundStatus: "unpaid",
+      refundStatus: 'unpaid',
     }).fetch();
 
     var dontActuallySend =
-      sails.config.environment === "test" ||
+      sails.config.environment === 'test' ||
       process.env.FIREBASE_AUTH_EMULATOR_HOST;
     if (dontActuallySend) {
       sails.log
         .info(`Running sails in test mode, helpers.revertPaymentFull will not request payment reversions.
       Payment Refund would have been issued to ${inputs.refundFromName} for amount: ${inputs.refundAmount}`);
       return exits.success({
-        paymentIntentId: "dummy_refund_payment_id_" + uuidv4(),
+        paymentIntentId: 'dummy_refund_payment_id_' + uuidv4(),
       });
     }
 

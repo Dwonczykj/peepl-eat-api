@@ -1,25 +1,25 @@
 module.exports = {
-  friendlyName: "Is authorised for vendor",
+  friendlyName: 'Is authorised for vendor',
 
   description:
-    "Check if the user is a vendor User registered to this vendor or is a superadmin",
+    'Check if the user is a vendor User registered to this vendor or is a superadmin',
 
   inputs: {
     userId: {
-      type: "number",
+      type: 'number',
       required: true,
-      description: "The id of the user.",
+      description: 'The id of the user.',
     },
     vendorId: {
-      type: "number",
+      type: 'number',
       required: true,
-      description: "The id of the vendor.",
+      description: 'The id of the vendor.',
     },
   },
 
   exits: {
     success: {
-      description: "All done.",
+      description: 'All done.',
       data: null,
     },
 

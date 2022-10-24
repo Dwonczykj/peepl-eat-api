@@ -54,17 +54,17 @@ module.exports = {
       metadata:
         inputs.data && inputs.data.orderId
           ? {
-            model: "order",
+            model: 'order',
             id: inputs.data.orderId,
           }
           : {
-            model: "",
+            model: '',
             id: null,
           },
     }).fetch();
 
     var dontActuallySend =
-      sails.config.environment === "test" ||
+      sails.config.environment === 'test' ||
       process.env.FIREBASE_AUTH_EMULATOR_HOST;
     if (dontActuallySend) {
       sails.log

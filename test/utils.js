@@ -1,21 +1,21 @@
 /* eslint-disable no-console */
 /* eslint-disable no-undef */
-const { expect, assert } = require("chai");
+const { expect, assert } = require('chai');
 const request = require('supertest');
 const dotenv = require('dotenv');
-const util = require("util");
-const envConfig = dotenv.config({path: process.cwd() + "/test/.env"}).parsed;
+const util = require('util');
+const envConfig = dotenv.config({path: process.cwd() + '/test/.env'}).parsed;
 
 assert.containsAllKeys(
   envConfig,
   [
-    "test_TEST_SERVICE_secret",
-    "test_TEST_USER_secret",
-    "test_TEST_VENDOR_secret",
-    "test_TEST_DELIVERY_PARTNER_secret",
-    "FIREBASE_AUTH_EMULATOR_HOST",
+    'test_TEST_SERVICE_secret',
+    'test_TEST_USER_secret',
+    'test_TEST_VENDOR_secret',
+    'test_TEST_DELIVERY_PARTNER_secret',
+    'FIREBASE_AUTH_EMULATOR_HOST',
   ],
-  ".env config does not contain secrets for testing: " +
+  '.env config does not contain secrets for testing: ' +
     util.inspect(envConfig, { depth: 1 })
 );
 
@@ -26,7 +26,7 @@ const loginAsUser = async function (name, secret, verbose=false) {
     }
 
     return request(sails.hooks.http.app)
-      .post("/api/v1/admin/login-with-secret")
+      .post('/api/v1/admin/login-with-secret')
       .send({
         name: name,
         secret: secret,
@@ -47,8 +47,8 @@ const loginAsUser = async function (name, secret, verbose=false) {
 
 const login = async function (verbose = false) {
   return await loginAsUser(
-    "TEST_SERVICE",
-    envConfig["test_TEST_SERVICE_secret"],
+    'TEST_SERVICE',
+    envConfig['test_TEST_SERVICE_secret'],
     verbose
   );
 };
@@ -62,7 +62,7 @@ const logout = async function (verbose=false) {
 
 
     return request(sails.hooks.http.app)
-      .get("/api/v1/admin/logout")
+      .get('/api/v1/admin/logout')
       .expect(200)
       .then((response) => {
         // must be then, not a callback
@@ -88,8 +88,8 @@ const callAuthActionWithCookie = async (cb, verbose=false, data={}) =>
   login(verbose)
     .then((response) => {
       expect(response.statusCode).to.equal(200, 'Login-with-secret wrapper failed to login: ' + util.inspect(response, {depth: null}));
-      expect(Object.keys(response.headers)).to.deep.include("set-cookie");
-      const sessionCookie = response.headers["set-cookie"];
+      expect(Object.keys(response.headers)).to.deep.include('set-cookie');
+      const sessionCookie = response.headers['set-cookie'];
       if(verbose){
         console.log('SESSION COOKIE: "' + sessionCookie + '"');
       }
@@ -105,11 +105,11 @@ const callAuthActionWithCookieAndUser = async (
   loginAsUser(name, secret, verbose).then((response) => {
     expect(response.statusCode).to.equal(
       200,
-      "Login-with-secret wrapper failed to login: " +
+      'Login-with-secret wrapper failed to login: ' +
         util.inspect(response, { depth: null })
     );
-    expect(Object.keys(response.headers)).to.deep.include("set-cookie");
-    const sessionCookie = response.headers["set-cookie"];
+    expect(Object.keys(response.headers)).to.deep.include('set-cookie');
+    const sessionCookie = response.headers['set-cookie'];
     if (verbose) {
       console.log('SESSION COOKIE: "' + sessionCookie + '"');
     }
@@ -119,22 +119,22 @@ const callAuthActionWithCookieAndUser = async (
 function getNextWeekday(weekday) {
   // ~ https://stackoverflow.com/a/25493271
   assert.include([
-    "monday",
-    "tuesday",
-    "wednesday",
-    "thursday",
-    "friday",
-    "saturday",
-    "sunday",
+    'monday',
+    'tuesday',
+    'wednesday',
+    'thursday',
+    'friday',
+    'saturday',
+    'sunday',
   ],weekday);
   const weekdays = [
-    "sunday",
-    "monday",
-    "tuesday",
-    "wednesday",
-    "thursday",
-    "friday",
-    "saturday",
+    'sunday',
+    'monday',
+    'tuesday',
+    'wednesday',
+    'thursday',
+    'friday',
+    'saturday',
   ];
   const dayInd = weekdays.indexOf(weekday.toLowerCase());
   var today = new Date();
@@ -142,7 +142,7 @@ function getNextWeekday(weekday) {
   var day = today.getDay();
   if (day === dayInd) {
     return (
-      today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate()
+      today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate()
     );
   } else {
     day = today.getDay();
@@ -155,12 +155,12 @@ function getNextWeekday(weekday) {
     }
   }
   let closest = new Date(today.setDate(theDay));
-  
+
   return (
     closest.getFullYear() +
-    "-" +
+    '-' +
     (closest.getMonth() + 1) +
-    "-" +
+    '-' +
     closest.getDate()
   );
 }

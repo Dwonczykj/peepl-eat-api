@@ -1,16 +1,16 @@
-var supertest = require("supertest");
+var supertest = require('supertest');
 const util = require('util');
-const { envConfig, callAuthActionWithCookieAndUser } = require("./utils");
-const { assert, expect } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
+const { envConfig, callAuthActionWithCookieAndUser } = require('./utils');
+const { assert, expect } = require('chai'); // ~ https://www.chaijs.com/api/bdd/
 
 const cwd = process.cwd();
-const routesRead = require(cwd + "/config/routes.js")["routes"];
+const routesRead = require(cwd + '/config/routes.js')['routes'];
 
 class ExpectResponse {
   constructor({
-    HTTP_TYPE = "get",
-    ACTION_PATH = "",
-    ACTION_NAME = "",
+    HTTP_TYPE = 'get',
+    ACTION_PATH = '',
+    ACTION_NAME = '',
     sendData = {},
     expectResponse = {},
     expectResponseCb = async (response, requestPayload) => {},
@@ -38,12 +38,12 @@ class ExpectResponse {
   // ~ https://masteringjs.io/tutorials/fundamentals/parameters#:~:text=JavaScript%2C%20by%20default%2C%20does%20not%20support%20named%20parameters.,even%20if%20you%20have%20default%20values%20set%20up.
   // sendWith({ updatedPostDataWith = {}, updatedPostDataWithOutKeys = [] } = {}) {
   sendWith(updatedPostDataWith, updatedPostDataWithOutKeys = []) {
-    assert.isObject(updatedPostDataWith, "updatedPostDataWith is an object");
+    assert.isObject(updatedPostDataWith, 'updatedPostDataWith is an object');
     assert.isArray(
       updatedPostDataWithOutKeys,
-      "updatedPostDataWithOutKeys is an array"
+      'updatedPostDataWithOutKeys is an array'
     );
-    
+
     let send = this.send;
     for (let k of updatedPostDataWithOutKeys) {
       delete send[k];
@@ -94,10 +94,10 @@ class ExpectResponse {
 
 class HttpTestSender {
   constructor({
-    HTTP_TYPE = "get",
-    ACTION_PREFIX = "/api/v1",
-    ACTION_PATH = "",
-    ACTION_NAME = "",
+    HTTP_TYPE = 'get',
+    ACTION_PREFIX = '/api/v1',
+    ACTION_PATH = '',
+    ACTION_NAME = '',
     sendData = {},
     expectResponse = {},
     expectResponseChecker = ExpectResponse,
@@ -110,7 +110,7 @@ class HttpTestSender {
     this.HTTP_TYPE = HTTP_TYPE;
     const relUrl = `${this.ACTION_PATH}/${this.ACTION_NAME}`;
     let baseUrl = !relUrl
-      ? this.ACTION_NAME === ""
+      ? this.ACTION_NAME === ''
         ? `${this.ACTION_PREFIX}/${this.ACTION_PATH}`
         : `${this.ACTION_PREFIX}/${this.ACTION_PATH}/${this.ACTION_NAME}`
       : `${this.ACTION_PREFIX}/${relUrl}`;
@@ -122,11 +122,11 @@ class HttpTestSender {
       }
     }
     this.baseUrl = baseUrl;
-    if (HTTP_TYPE.toLowerCase() === "get") {
+    if (HTTP_TYPE.toLowerCase() === 'get') {
       this.httpCall = () => supertest(sails.hooks.http.app).get(baseUrl);
-    } else if (HTTP_TYPE.toLowerCase() === "post") {
+    } else if (HTTP_TYPE.toLowerCase() === 'post') {
       this.httpCall = () => supertest(sails.hooks.http.app).post(baseUrl);
-    } else if (HTTP_TYPE.toLowerCase() === "all") {
+    } else if (HTTP_TYPE.toLowerCase() === 'all') {
       this.httpCall = () => supertest(sails.hooks.http.app).get(baseUrl);
     } else {
       throw new Error(`httpType of ${HTTP_TYPE} not implemented for tests.`);
@@ -165,13 +165,13 @@ class HttpTestSender {
       // }
       const self = this;
       let _makeCall = () =>
-        self.HTTP_TYPE.toUpperCase() === "GET"
+        self.HTTP_TYPE.toUpperCase() === 'GET'
           ? self.httpCall().query(_sw)
           : Object.keys(filesByName).length > 0
           ? self
               .httpCall()
               // .send(_sw)
-              .field("profileData", JSON.stringify(_sw))
+              .field('profileData', JSON.stringify(_sw))
               .attach(
                 Object.keys(filesByName)[0],
                 Object.values(filesByName)[0]
@@ -203,8 +203,8 @@ class HttpTestSender {
       }
 
       const response = _makeCall()
-        .set("Cookie", cookie)
-        .set("Accept", "application/json");
+        .set('Cookie', cookie)
+        .set('Accept', 'application/json');
 
       console.log(`Supertest: -> ${response.method} ${response.url}`);
 
@@ -230,11 +230,11 @@ class HttpTestSender {
 
 class HttpAuthTestSender extends HttpTestSender {
   constructor({
-    HTTP_TYPE = "get",
-    ACTION_PREFIX = "/api/v1",
-    ACTION_PATH = "",
-    ACTION_NAME = "",
-    useAccount = "TEST_SERVICE",
+    HTTP_TYPE = 'get',
+    ACTION_PREFIX = '/api/v1',
+    ACTION_PATH = '',
+    ACTION_NAME = '',
+    useAccount = 'TEST_SERVICE',
     sendData = {},
     expectResponse = {},
     expectResponseChecker = ExpectResponse,
@@ -262,8 +262,8 @@ class HttpAuthTestSender extends HttpTestSender {
     filesByName = {}
   ) {
     const self = this;
-    if (this.useAccount === "TEST_UNAUTHENTICATED") {
-      return await self.makeCallWith("")(
+    if (this.useAccount === 'TEST_UNAUTHENTICATED') {
+      return await self.makeCallWith('')(
         updatedPostDataWith,
         updatedPostDataWithOutKeys,
         filesByName
@@ -278,7 +278,7 @@ class HttpAuthTestSender extends HttpTestSender {
         );
       }
     } else {
-      userDetails = await User.findOne({ name: "TEST_SERVICE" }); //.populate('vendor&courier');
+      userDetails = await User.findOne({ name: 'TEST_SERVICE' }); //.populate('vendor&courier');
     }
     const bespokeUserDetails = {
       email: userDetails.email,

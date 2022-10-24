@@ -1,11 +1,11 @@
 module.exports = {
-  friendlyName: "View signup",
+  friendlyName: 'View signup',
 
   description: 'Display "Signup" page.',
 
   exits: {
     success: {
-      viewTemplatePath: "pages/admin/signup",
+      viewTemplatePath: 'pages/admin/signup',
       data: null,
     },
     successJSON: {
@@ -14,7 +14,7 @@ module.exports = {
   },
 
   fn: async function (inputs, exits) {
-    const vendors = await Vendor.find({ status: ["active", "draft"] });
+    const vendors = await Vendor.find({ status: ['active', 'draft'] });
 
     if (this.req.wantsJSON) {
       return exits.successJSON({

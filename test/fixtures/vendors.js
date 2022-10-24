@@ -12,36 +12,36 @@ module.exports = [
     productCategories: [],
     fulfilmentPostalDistricts: [1,2,3],
     deliveryPartner: 1,
-    "pickupAddressLineOne": null,
-    "pickupAddressLineTwo": null,
-    "pickupAddressCity": null,
-    "pickupAddressPostCode": null,
+    'pickupAddressLineOne': null,
+    'pickupAddressLineTwo': null,
+    'pickupAddressCity': null,
+    'pickupAddressPostCode': null,
   },
   // {
-    // "name": 'Delifonseca',
-    // "type": 'restaurant',
-    // "description": 'Life\'s too short to have a bad meal. Delifonseca is here to help you enjoy the finer tastes in life.',
-    // "walletAddress": '0xf039CD9391cB28a7e632D07821deeBc249a32410',
-    // "imageUrl": 'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
-    // "status": 'active',
-    // "phoneNumber": '+447495995614',
-    // "pickupAddressLineOne": null,
-    // "pickupAddressLineTwo": null,
-    // "pickupAddressCity": null,
-    // "pickupAddressPostCode": null,
-    // "costLevel": null,
-    // "rating": 0,
-    // "isVegan": false,
-    // "minimumOrderAmount": 0,
-    // "platformFee": 0,
-    // // "collectionFulfilmentMethod": 8,
-    // // "deliveryFulfilmentMethod": 7,
-    // "deliveryPartner": 1, // Agile
-    // "products": [],
-    // "vendorCategories": [], // Cafes
-    // "productCategories": [],
-    // "fulfilmentPostalDistricts": [1,2], // L1, L2
-    // "users": [],
+  // "name": 'Delifonseca',
+  // "type": 'restaurant',
+  // "description": 'Life\'s too short to have a bad meal. Delifonseca is here to help you enjoy the finer tastes in life.',
+  // "walletAddress": '0xf039CD9391cB28a7e632D07821deeBc249a32410',
+  // "imageUrl": 'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
+  // "status": 'active',
+  // "phoneNumber": '+447495995614',
+  // "pickupAddressLineOne": null,
+  // "pickupAddressLineTwo": null,
+  // "pickupAddressCity": null,
+  // "pickupAddressPostCode": null,
+  // "costLevel": null,
+  // "rating": 0,
+  // "isVegan": false,
+  // "minimumOrderAmount": 0,
+  // "platformFee": 0,
+  // // "collectionFulfilmentMethod": 8,
+  // // "deliveryFulfilmentMethod": 7,
+  // "deliveryPartner": 1, // Agile
+  // "products": [],
+  // "vendorCategories": [], // Cafes
+  // "productCategories": [],
+  // "fulfilmentPostalDistricts": [1,2], // L1, L2
+  // "users": [],
   // },
   // {
   //   "createdAt": 1650878843365,
@@ -102,7 +102,7 @@ module.exports = [
   // {
   //   "createdAt": 1650877872328,
   //   "updatedAt": 1653299196098,
-    
+
   //   "name": "The Wise Root",
   //   "type": "restaurant",
   //   "description": "Organic fruit, vegetables and groceries",
@@ -131,7 +131,7 @@ module.exports = [
   // {
   //   "createdAt": 1652295973495,
   //   "updatedAt": 1653298931542,
-    
+
   //   "name": "Purple Carrot 1",
   //   "type": "restaurant",
   //   "description": "Vegan supermarket and organic green grocer. Est. 2014\r\n",
@@ -160,7 +160,7 @@ module.exports = [
   // {
   //   "createdAt": 1650891599758,
   //   "updatedAt": 1655392783846,
-    
+
   //   "name": "Greens for Good",
   //   "type": "restaurant",
   //   "description": "From Farm Urban vertical farm ",
@@ -189,7 +189,7 @@ module.exports = [
   // {
   //   "createdAt": 1653580819424,
   //   "updatedAt": 1656321612630,
-    
+
   //   "name": "The Fruit Bowl",
   //   "type": "restaurant",
   //   "description": "Organic fruit and vegetables exclusively U.K. grown",
@@ -218,7 +218,7 @@ module.exports = [
   // {
   //   "createdAt": 1653577881317,
   //   "updatedAt": 1655392611515,
-    
+
   //   "name": "Meatless",
   //   "type": "restaurant",
   //   "description": "Healthy & fresh vegan meal prep",
@@ -247,7 +247,7 @@ module.exports = [
   // {
   //   "createdAt": 1656679822507,
   //   "updatedAt": 1662832555069,
-    
+
   //   "name": "Frost Burgers",
   //   "type": "restaurant",
   //   "description": "Badass streetfood by Monami Frost\n58 Wood Street L1 4AQ",
@@ -276,7 +276,7 @@ module.exports = [
   // {
   //   "createdAt": 1650891018718,
   //   "updatedAt": 1662987165540,
-    
+
   //   "name": "Purple Carrot test",
   //   "type": "restaurant",
   //   "description": "Est 2014, vegan wholefoods, healthfoods and treats\n286 Smithdown Road L15 5AJ",
@@ -305,7 +305,7 @@ module.exports = [
   // {
   //   "createdAt": 1649681733026,
   //   "updatedAt": 1661173658318,
-    
+
   //   "name": "The Nakery",
   //   "type": "restaurant",
   //   "description": "Raw vegan treats!",
@@ -334,7 +334,7 @@ module.exports = [
   // {
   //   "createdAt": 1660841980166,
   //   "updatedAt": 1660844811845,
-    
+
   //   "name": "PC From Script",
   //   "type": "restaurant",
   //   "description": "PC But from Script",
@@ -363,7 +363,7 @@ module.exports = [
   // {
   //   "createdAt": 1660842972746,
   //   "updatedAt": 1660844841018,
-    
+
   //   "name": "PC From Script 2",
   //   "type": "restaurant",
   //   "description": "This is the final one hopefully. Praying.",
@@ -392,7 +392,7 @@ module.exports = [
   // {
   //   "createdAt": 1660844888129,
   //   "updatedAt": 1661251657380,
-    
+
   //   "name": "PC From Script FINAL ",
   //   "type": "restaurant",
   //   "description": "This is the final version.",
@@ -421,7 +421,7 @@ module.exports = [
   // {
   //   "createdAt": 1661248477732,
   //   "updatedAt": 1664273100932,
-    
+
   //   "name": "Purple Carrot",
   //   "type": "restaurant",
   //   "description": "Est 2014, vegan wholefoods, healthfoods and treats\r\n286 Smithdown Road L15 5AJ",

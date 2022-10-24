@@ -10,7 +10,7 @@
 module.exports = async function (req, res, proceed) {
   if (!req.session.userId) {
     sails.log(
-      "Policy:<is-delivery-partner> -> redirect to admin as not logged in"
+      'Policy:<is-delivery-partner> -> redirect to admin as not logged in'
     );
     if (req.wantsJSON) {
       return res.forbidden();
@@ -28,7 +28,7 @@ module.exports = async function (req, res, proceed) {
   }
 
   sails.log(
-    "Policy:<is-delivery-partner> -> redirect to admin as not a deliveryPartner"
+    'Policy:<is-delivery-partner> -> redirect to admin as not a deliveryPartner'
   );
   if (req.wantsJSON) {
     return res.forbidden();

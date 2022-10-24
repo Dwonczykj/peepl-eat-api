@@ -1,24 +1,24 @@
 /* eslint-disable no-console */
 // test/integration/controllers/Vendors/view-all-vendors.test.js
-const { expect, assert } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
-var supertest = require("supertest");
-const { login } = require("../../../utils");
-const {fixtures} = require("../../../../scripts/build_db");
+const { expect, assert } = require('chai'); // ~ https://www.chaijs.com/api/bdd/
+var supertest = require('supertest');
+const { login } = require('../../../utils');
+const {fixtures} = require('../../../../scripts/build_db');
 const {
   HttpAuthTestSender,
   ExpectResponse,
-} = require("../../../httpTestSender");
-var util = require("util");
+} = require('../../../httpTestSender');
+var util = require('util');
 
 // require("ts-node/register");
 
 class ExpectResponseLogin extends ExpectResponse {
   constructor({
-    HTTP_TYPE = "get",
-    ACTION_PREFIX = "/api/v1",
-    ACTION_PATH = "",
-    ACTION_NAME = "",
-    useAccount = "TEST_SERVICE",
+    HTTP_TYPE = 'get',
+    ACTION_PREFIX = '/api/v1',
+    ACTION_PATH = '',
+    ACTION_NAME = '',
+    useAccount = 'TEST_SERVICE',
     sendData = {},
     expectResponse = {},
     expectResponseCb = async (response, requestPayload) => {},
@@ -50,9 +50,9 @@ class ExpectResponseLogin extends ExpectResponse {
     // delete expectedResponse.publicId;
 
     assert.isObject(responseBody);
-    expect(responseBody).to.have.property("name");
-    expect(responseBody).to.have.property("isSuperAdmin");
-    expect(responseBody).to.have.property("role");
+    expect(responseBody).to.have.property('name');
+    expect(responseBody).to.have.property('isSuperAdmin');
+    expect(responseBody).to.have.property('role');
     // const userFixture = fixtures.users_fixed
     //   .map(({ firebaseSessionToken, secret, ...RestUserdata }) => RestUserdata) // ~https://devenum.com/delete-property-from-objects-array-in-javascript/#:~:text=Delete%20property%20from%20objects%20Array%20in%20Javascript%20%286,to%20Delete%20property%20from%20objects%20array%20in%20Javascript
     //   .filter((user) => user.name === "TEST_SERVICE")[0];
@@ -64,10 +64,10 @@ class ExpectResponseLogin extends ExpectResponse {
 
 class HttpAuthTestSenderLogin extends HttpAuthTestSender {
   constructor({
-    HTTP_TYPE = "get",
-    ACTION_PATH = "",
-    ACTION_NAME = "",
-    useAccount = "TEST_SERVICE",
+    HTTP_TYPE = 'get',
+    ACTION_PATH = '',
+    ACTION_NAME = '',
+    useAccount = 'TEST_SERVICE',
     sendData = {},
     expectResponse = {},
   }) {
@@ -84,12 +84,12 @@ class HttpAuthTestSenderLogin extends HttpAuthTestSender {
 }
 
 const IS_LOGGED_IN = (fixtures) => { return {
-  useAccount: "TEST_SERVICE",
-  HTTP_TYPE: "get",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "logged-in",
+  useAccount: 'TEST_SERVICE',
+  HTTP_TYPE: 'get',
+  ACTION_PATH: 'admin',
+  ACTION_NAME: 'logged-in',
   sendData: {
-    
+
   },
   expectResponse: {
     authenticated: true,
@@ -103,10 +103,10 @@ const IS_LOGGED_IN = (fixtures) => { return {
   },
 };};
 const IS_LOGGED_IN_UNAUTHENTICATED = (fixtures) => { return {
-  useAccount: "TEST_UNAUTHENTICATED",
-  HTTP_TYPE: "get",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "logged-in",
+  useAccount: 'TEST_UNAUTHENTICATED',
+  HTTP_TYPE: 'get',
+  ACTION_PATH: 'admin',
+  ACTION_NAME: 'logged-in',
   sendData: {},
   expectResponse: {
     authenticated: false,
@@ -126,79 +126,79 @@ const IS_LOGGED_IN_UNAUTHENTICATED = (fixtures) => { return {
 //   ACTION_NAME: "login",
 //   sendData: {},
 //   expectResponse: {
-    
+
 //   },
 // };
 const LOGIN = (fixtures) => { return {
-  useAccount: "TEST_SERVICE",
-  HTTP_TYPE: "get",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "logged-in", //handler will log us in with useAccount
+  useAccount: 'TEST_SERVICE',
+  HTTP_TYPE: 'get',
+  ACTION_PATH: 'admin',
+  ACTION_NAME: 'logged-in', //handler will log us in with useAccount
   sendData: {
-    
+
   },
   expectResponse: {
     data: true,
   },
   expectStatusCode: 200,
   expectResponseCb: async (responseBody) => {
-    
+
     return;
   },
 };};
 const LOGIN_AS_USER = (fixtures) => { return {
-  useAccount: "TEST_USER",
-  HTTP_TYPE: "get",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "logged-in", //handler will log us in with useAccount
+  useAccount: 'TEST_USER',
+  HTTP_TYPE: 'get',
+  ACTION_PATH: 'admin',
+  ACTION_NAME: 'logged-in', //handler will log us in with useAccount
   sendData: {},
   expectResponse: {
     data: true,
   },
   expectStatusCode: 200,
   expectResponseCb: async (responseBody) => {
-    
+
     return;
   },
 };};
 const LOGIN_AS_VENDOR = (fixtures) => { return {
-  useAccount: "TEST_VENDOR",
-  HTTP_TYPE: "get",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "logged-in", //handler will log us in with useAccount
+  useAccount: 'TEST_VENDOR',
+  HTTP_TYPE: 'get',
+  ACTION_PATH: 'admin',
+  ACTION_NAME: 'logged-in', //handler will log us in with useAccount
   sendData: {},
   expectResponse: {
     data: true,
   },
   expectStatusCode: 200,
   expectResponseCb: async (responseBody) => {
-    
+
     return;
   },
 };};
 const LOGIN_AS_DELIVERY_PARTNER = (fixtures) => { return {
-  useAccount: "TEST_DELIVERY_PARTNER",
-  HTTP_TYPE: "get",
-  ACTION_PATH: "admin",
-  ACTION_NAME: "logged-in", //handler will log us in with useAccount
+  useAccount: 'TEST_DELIVERY_PARTNER',
+  HTTP_TYPE: 'get',
+  ACTION_PATH: 'admin',
+  ACTION_NAME: 'logged-in', //handler will log us in with useAccount
   sendData: {},
   expectResponse: {
     data: true,
   },
   expectStatusCode: 200,
   expectResponseCb: async (responseBody) => {
-    
+
     return;
   },
 };};
 
 
-describe("Authentication Tests", () => {
-  describe("Login Tests", () => {
-    it("GET view-login", (done) => {
+describe('Authentication Tests', () => {
+  describe('Login Tests', () => {
+    it('GET view-login', (done) => {
       supertest(sails.hooks.http.app)
-        .get("/admin/login")
-        .set("Cookie", "")
+        .get('/admin/login')
+        .set('Cookie', '')
         .expect(200)
         .then((response) => {
           expect(response.statusCode).to.equal(200,
@@ -218,10 +218,10 @@ describe("Authentication Tests", () => {
           return done(errs);
         });
     });
-    it("POST login-with-secret works", async () => {
+    it('POST login-with-secret works', async () => {
       try {
 	      const response = await login();
-	        
+
 	      expect(response.statusCode).to.equal(200,
           `[${response.body.code}] -> response.body: ${util.inspect(response.body, {
             depth: null,
@@ -229,14 +229,14 @@ describe("Authentication Tests", () => {
             depth: null,
           })}`
         );
-	      expect(Object.keys(response.headers)).to.deep.include("set-cookie");
-	      
+	      expect(Object.keys(response.headers)).to.deep.include('set-cookie');
+
 	      assert.isObject(response.body);
 	      const userFixture = fixtures.users_fixed
 	        .map(
 	          ({ firebaseSessionToken, secret, ...RestUserdata }) => RestUserdata
 	        )
-	        .filter((user) => user.name === "TEST_SERVICE")[0];
+	        .filter((user) => user.name === 'TEST_SERVICE')[0];
 	      expect(response.body)
 	        .to.include(userFixture);
       } catch (error) {
@@ -254,7 +254,7 @@ describe("Authentication Tests", () => {
       hats.expectedResponse.checkResponse(response.body, {authenticated: true});
       return;
     });
-    it("POST login-with-secret as Customer User works", async () => {
+    it('POST login-with-secret as Customer User works', async () => {
       const hats = new HttpAuthTestSenderLogin(LOGIN_AS_USER(fixtures));
       const response = await hats.makeAuthCallWith({}, []);
       expect(response.statusCode).to.equal(200,
@@ -269,7 +269,7 @@ describe("Authentication Tests", () => {
       });
       return;
     });
-    it("POST login-with-secret as Vendor works", async () => {
+    it('POST login-with-secret as Vendor works', async () => {
       const hats = new HttpAuthTestSenderLogin(LOGIN_AS_VENDOR(fixtures));
       const response = await hats.makeAuthCallWith({}, []);
       expect(response.statusCode).to.equal(200,
@@ -282,7 +282,7 @@ describe("Authentication Tests", () => {
       hats.expectedResponse.checkResponse(response.body, {data: true});
       return;
     });
-    it("POST login-with-secret as Delivery Partner works", async () => {
+    it('POST login-with-secret as Delivery Partner works', async () => {
       const hats = new HttpAuthTestSenderLogin(LOGIN_AS_DELIVERY_PARTNER(fixtures));
       const response = await hats.makeAuthCallWith({}, []);
       expect(response.statusCode).to.equal(200,
@@ -295,7 +295,7 @@ describe("Authentication Tests", () => {
       hats.expectedResponse.checkResponse(response.body, {data: true});
       return;
     });
-    it("GET logged-in returns true when authenticated", async () => {
+    it('GET logged-in returns true when authenticated', async () => {
       const hats = new HttpAuthTestSenderLogin(IS_LOGGED_IN(fixtures));
       const response = await hats.makeAuthCallWith({}, []);
       expect(response.statusCode).to.equal(200,
@@ -307,7 +307,7 @@ describe("Authentication Tests", () => {
       );
       await hats.expectedResponse.checkResponse(response);
     });
-    it("GET logged-in returns false when not signed in", async () => {
+    it('GET logged-in returns false when not signed in', async () => {
       // supertest(sails.hooks.http.app)
       //   .get("/api/v1/admin/logged-in")
       //   .set("Cookie", "")
@@ -339,10 +339,10 @@ describe("Authentication Tests", () => {
       await hats.expectedResponse.checkResponse(response);
     });
   });
-  describe("Login-with-password email & password firebase Tests", () => {
-    it("Successfully created the dummy user in firebase emulator", async () => {
-      const DUMMY_API_KEY = "dummy_firebase_key";
-      const postUrlRegisterDummyUser = 
+  describe('Login-with-password email & password firebase Tests', () => {
+    it('Successfully created the dummy user in firebase emulator', async () => {
+      const DUMMY_API_KEY = 'dummy_firebase_key';
+      const postUrlRegisterDummyUser =
         `http://localhost:9099/identitytoolkit.googleapis.com/v1/accounts:signUp?key=${DUMMY_API_KEY}`;
       // supertest(sails.hooks.http.app)
       //   .get("/api/v1/admin/logged-in")
@@ -363,9 +363,9 @@ describe("Authentication Tests", () => {
       //     return;
       //   });
       //TODO: Ensure the emulator has started in headless mode and get the token from it when trying to auth with phone.
-      
+
     });
-    it("Successfully logged in to vegi with dummy user", async () => {
+    it('Successfully logged in to vegi with dummy user', async () => {
       // supertest(sails.hooks.http.app)
       //   .get("/api/v1/admin/logged-in")
       //   .set("Cookie", "")
@@ -384,7 +384,7 @@ describe("Authentication Tests", () => {
       //     expect(response._body).to.deep.equal({ data: false });
       //     return;
       //   });
-      
+
       //TODO: Ensure the emulator has started in headless mode and get the token from it when trying to auth with phone.
       const hats = new HttpAuthTestSenderLogin(IS_LOGGED_IN_UNAUTHENTICATED(fixtures));
       const response = await hats.makeAuthCallWith({}, []);

@@ -64,7 +64,6 @@ module.exports = {
     });
 
 
-
     if (found) {
       return exits.success(true);
     } else {

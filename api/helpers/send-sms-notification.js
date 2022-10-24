@@ -1,54 +1,54 @@
 const twilio = require('twilio');
 
 module.exports = {
-  friendlyName: "Send sms notification",
+  friendlyName: 'Send sms notification',
 
-  description: "",
+  description: '',
 
   inputs: {
     body: {
-      type: "string",
-      description: "The body of the SMS to be sent.",
+      type: 'string',
+      description: 'The body of the SMS to be sent.',
       required: true,
     },
     to: {
-      type: "string",
-      description: "The phone number to send the SMS to.",
+      type: 'string',
+      description: 'The phone number to send the SMS to.',
       required: true,
     },
     data: {
-      type: "ref",
+      type: 'ref',
       defaultsTo: {},
     },
   },
 
   exits: {
     success: {
-      description: "All done.",
+      description: 'All done.',
     },
   },
 
   fn: async function (inputs, exits) {
     const newNotification = await Notification.create({
       recipient: inputs.to,
-      type: "sms",
+      type: 'sms',
       sentAt: Date.now(),
       title: inputs.body,
       order: (inputs.data && inputs.data.orderId) || null,
       metadata:
         inputs.data && inputs.data.orderId
           ? {
-            model: "order",
+            model: 'order',
             id: inputs.data.orderId,
           }
           : {
-            model: "",
+            model: '',
             id: null,
           },
     }).fetch();
 
     var dontActuallySend =
-      sails.config.environment === "test" ||
+      sails.config.environment === 'test' ||
       process.env.FIREBASE_AUTH_EMULATOR_HOST;
     if (dontActuallySend) {
       sails.log
@@ -65,7 +65,7 @@ module.exports = {
       .create({
         body: inputs.body,
         to: inputs.to,
-        from: "VegiApp",
+        from: 'VegiApp',
       })
       .then((message) => {
         return message.sid;

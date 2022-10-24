@@ -1,25 +1,25 @@
 /* eslint-disable no-console */
 /* eslint-disable no-undef */
 // test/integration/controllers/Vendors/view-all-vendors.test.js
-const { expect, assert } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
-var supertest = require("supertest");
-var util = require("util");
+const { expect, assert } = require('chai'); // ~ https://www.chaijs.com/api/bdd/
+var supertest = require('supertest');
+var util = require('util');
 const {
   HttpAuthTestSenderAdmin
 } = require('./defaultAdmin');
-const { fixtures } = require("../../../../scripts/build_db");
+const { fixtures } = require('../../../../scripts/build_db');
 
 
 const genUserName = (id, busType) => `Can Signup Password ${busType} User${id}`;
 const genUserEmail = (id, busType) => `User${id}@example.com`;
 const genUserPhoneNoCountry = (id, busType) => Number.parseInt(`${id}790553251200000`.substring(0, 11));
 
-const VIEW_SIGNUP_PAGE = (fixtures) => { 
+const VIEW_SIGNUP_PAGE = (fixtures) => {
   return {
-    useAccount: "TEST_UNAUTHENTICATED",
-    HTTP_TYPE: "get",
-    ACTION_PATH: "admin",
-    ACTION_NAME: "signup",
+    useAccount: 'TEST_UNAUTHENTICATED',
+    HTTP_TYPE: 'get',
+    ACTION_PATH: 'admin',
+    ACTION_NAME: 'signup',
     sendData: {},
     expectResponse: {},
     expectStatusCode: 200,
@@ -31,16 +31,16 @@ const VIEW_SIGNUP_PAGE = (fixtures) => {
     },
   };
 };
-const REGISTER_USER_PHONE = (fixtures) => { 
+const REGISTER_USER_PHONE = (fixtures) => {
   const vendor = fixtures.vendors[0];
-  const userName = genUserName(1, "vendor");
-  const userEmail = genUserEmail(1, "vendor");
-  const userPhone = genUserPhoneNoCountry(1, "vendor");
+  const userName = genUserName(1, 'vendor');
+  const userEmail = genUserEmail(1, 'vendor');
+  const userPhone = genUserPhoneNoCountry(1, 'vendor');
   return {
-    useAccount: "TEST_UNAUTHENTICATED",
-    HTTP_TYPE: "post",
-    ACTION_PATH: "admin",
-    ACTION_NAME: "signup",
+    useAccount: 'TEST_UNAUTHENTICATED',
+    HTTP_TYPE: 'post',
+    ACTION_PATH: 'admin',
+    ACTION_NAME: 'signup',
     sendData: {
       phoneNoCountry: userPhone,
       phoneCountryCode: 1,
@@ -48,15 +48,15 @@ const REGISTER_USER_PHONE = (fixtures) => {
       name: userName,
       vendor: vendor.id,
       deliveryPartner: null,
-      role: "vendor",
-      vendorRole: "inventoryManager",
-      deliveryPartnerRole: "none",
+      role: 'vendor',
+      vendorRole: 'inventoryManager',
+      deliveryPartnerRole: 'none',
     },
     expectResponse: {},
     expectStatusCode: 200,
     expectResponseCb: async (response) => {
-      expect(response.body).to.have.property("data");
-      expect(response.body["data"]).to.deep.include({
+      expect(response.body).to.have.property('data');
+      expect(response.body['data']).to.deep.include({
         // firebaseSessionToken: "REGISTERING_USER", * These are hid from JSON remember
         name: userName,
       });
@@ -64,22 +64,22 @@ const REGISTER_USER_PHONE = (fixtures) => {
     },
   };
 };
-const REGISTER_USER_PHONE_THROWS_IF_USER_EXISTS = (fixtures) => { 
+const REGISTER_USER_PHONE_THROWS_IF_USER_EXISTS = (fixtures) => {
   return {
-    useAccount: "TEST_UNAUTHENTICATED",
-    HTTP_TYPE: "post",
-    ACTION_PATH: "admin",
-    ACTION_NAME: "signup",
+    useAccount: 'TEST_UNAUTHENTICATED',
+    HTTP_TYPE: 'post',
+    ACTION_PATH: 'admin',
+    ACTION_NAME: 'signup',
     sendData: {
-      phoneNoCountry: "",
+      phoneNoCountry: '',
       phoneCountryCode: 1,
-      email: "userEmail",
-      name: "userName",
+      email: 'userEmail',
+      name: 'userName',
       vendor: 1,
       deliveryPartner: null,
-      role: "vendor",
-      vendorRole: "inventoryManager",
-      deliveryPartnerRole: "none",
+      role: 'vendor',
+      vendorRole: 'inventoryManager',
+      deliveryPartnerRole: 'none',
     },
     expectResponse: {},
     expectStatusCode: 401,
@@ -89,13 +89,13 @@ const REGISTER_USER_PHONE_THROWS_IF_USER_EXISTS = (fixtures) => {
   };
 };
 
-describe("Signup Tests", () => {
-  describe("Can get signup view", () => {
-    it("returns 200", async () => {
+describe('Signup Tests', () => {
+  describe('Can get signup view', () => {
+    it('returns 200', async () => {
       supertest(sails.hooks.http.app)
-        .get("/admin/signup")
-        .set("Cookie", "")
-        .set("Accept", "text/html")
+        .get('/admin/signup')
+        .set('Cookie', '')
+        .set('Accept', 'text/html')
         .expect(200)
         .then((response) => {
           expect(response.statusCode).to.equal(200,
@@ -112,11 +112,11 @@ describe("Signup Tests", () => {
         })
         .catch((errs) => {
           console.warn(errs);
-          throw errs
+          throw errs;
         });
     });
   });
-  describe("Can Register User", () => {
+  describe('Can Register User', () => {
     // it("Can Register Vendor User using Email & Password", (done) => {
     //   supertest(sails.hooks.http.app) //TODO: Convert the mock firebase using the Firebase Emulator Sweet for Web Apps
     //     .post("/api/v1/admin/signup-with-password")
@@ -157,7 +157,7 @@ describe("Signup Tests", () => {
     //       return errs;
     //     });
     // });
-    it("Can Register Vendor User using Phone (no firebase)", async () => {
+    it('Can Register Vendor User using Phone (no firebase)', async () => {
       try {
         const hats = new HttpAuthTestSenderAdmin(
           REGISTER_USER_PHONE(fixtures)
@@ -172,13 +172,13 @@ describe("Signup Tests", () => {
         throw error;
       }
     });
-    it("Registration using Phone throws userExists if user already exists", async () => {
+    it('Registration using Phone throws userExists if user already exists', async () => {
       try {
 	      const user = await User.findOne({
 	        phoneNoCountry: 7905532512,
 	        phoneCountryCode: 44,
 	      }).populate('deliveryPartner&vendor');
-	        
+
 	      const hats = new HttpAuthTestSenderAdmin(REGISTER_USER_PHONE_THROWS_IF_USER_EXISTS(fixtures));
 	      const response = await hats.makeAuthCallWith(
           {
@@ -200,7 +200,7 @@ describe("Signup Tests", () => {
         throw error;
       }
     });
-    it("Registration using Email and Password throws userExists if user already exists", async () => {
+    it('Registration using Email and Password throws userExists if user already exists', async () => {
       console.warn('BLANK TEST!!!!!!!!! PLEASE IMPLEMENT.');
     });
   });

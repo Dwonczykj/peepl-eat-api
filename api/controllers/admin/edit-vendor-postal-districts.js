@@ -55,7 +55,7 @@ module.exports = {
     .members(inputs.districts);
 
     vendor = await Vendor.findOne(vendor.id).populate(
-      "fulfilmentPostalDistricts"
+      'fulfilmentPostalDistricts'
     );
 
     return exits.success(vendor);

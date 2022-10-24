@@ -1,163 +1,163 @@
 module.exports = [
   {
     id: 1,
-    name: "Sweets",
+    name: 'Sweets',
     imageUrl:
-      "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
+      'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
     forRestaurantItem: false,
   },
   {
     id: 2,
-    name: "Snacks",
+    name: 'Snacks',
     imageUrl:
-      "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
+      'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
     forRestaurantItem: false,
   },
   {
     id: 3,
-    name: "Drinks",
+    name: 'Drinks',
     imageUrl:
-      "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
+      'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
     forRestaurantItem: false,
   },
   {
     id: 4,
-    name: "Alcohol",
+    name: 'Alcohol',
     imageUrl:
-      "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
+      'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
     forRestaurantItem: false,
   },
   {
     id: 5,
-    name: "Fruit & Veg",
+    name: 'Fruit & Veg',
     imageUrl:
-      "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
+      'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
     forRestaurantItem: false,
   },
   {
     id: 6,
-    name: "Protein",
+    name: 'Protein',
     imageUrl:
-      "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
+      'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
     forRestaurantItem: false,
   },
   {
     id: 7,
-    name: "Dairy substitutes",
+    name: 'Dairy substitutes',
     imageUrl:
-      "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
+      'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
     forRestaurantItem: false,
   },
   {
     id: 8,
-    name: "Bakery",
+    name: 'Bakery',
     imageUrl:
-      "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
+      'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
     forRestaurantItem: false,
   },
   {
     id: 9,
-    name: "Cupboard",
+    name: 'Cupboard',
     imageUrl:
-      "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
+      'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
     forRestaurantItem: false,
   },
   {
     id: 10,
-    name: "Pharmacy",
+    name: 'Pharmacy',
     imageUrl:
-      "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
+      'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
     forRestaurantItem: false,
   },
   {
     id: 11,
-    name: "Ready Meals",
+    name: 'Ready Meals',
     imageUrl:
-      "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
+      'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
     forRestaurantItem: false,
   },
   {
     id: 12,
-    name: "Pantry",
+    name: 'Pantry',
     imageUrl:
-      "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
+      'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
     forRestaurantItem: false,
   },
   {
     id: 13,
-    name: "Personal Care",
+    name: 'Personal Care',
     imageUrl:
-      "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
+      'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
     forRestaurantItem: false,
   },
   {
     id: 14,
-    name: "Baby",
+    name: 'Baby',
     imageUrl:
-      "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
+      'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
     forRestaurantItem: false,
   },
   {
     id: 15,
-    name: "Pet",
+    name: 'Pet',
     imageUrl:
-      "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
+      'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
     forRestaurantItem: false,
   },
   {
     id: 16,
-    name: "World Cuisine",
+    name: 'World Cuisine',
     imageUrl:
-      "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
+      'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
     forRestaurantItem: false,
   },
   {
     id: 17,
-    name: "Frozen",
+    name: 'Frozen',
     imageUrl:
-      "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
+      'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
     forRestaurantItem: false,
   },
   {
     id: 18,
-    name: "Curry",
+    name: 'Curry',
     imageUrl:
-      "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
+      'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
     forRestaurantItem: true,
   },
   {
     id: 19,
-    name: "Italian",
+    name: 'Italian',
     imageUrl:
-      "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
+      'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
     forRestaurantItem: true,
   },
   {
     id: 20,
-    name: "Greek",
+    name: 'Greek',
     imageUrl:
-      "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
+      'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
     forRestaurantItem: true,
   },
   {
     id: 21,
-    name: "French",
+    name: 'French',
     imageUrl:
-      "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
+      'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
     forRestaurantItem: true,
   },
   {
     id: 22,
-    name: "Cafe",
+    name: 'Cafe',
     imageUrl:
-      "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
+      'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
     forRestaurantItem: true,
   },
   {
     id: 23,
-    name: "Coffee",
+    name: 'Coffee',
     imageUrl:
-      "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
+      'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
     forRestaurantItem: false,
   },
 ];

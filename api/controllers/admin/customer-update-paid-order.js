@@ -1,36 +1,36 @@
-const util = require("util");
+const util = require('util');
 
 // const peeplPay = require('../../interfaces/peeplPay');
 
 const OrderTypeEnum = {
-  vegiEats: "vegiEats",
-  vegiPays: "vegiPays",
+  vegiEats: 'vegiEats',
+  vegiPays: 'vegiPays',
 };
 
 class MockPeeplPayPricingAPI {
   async getAmountInCurrency({
     amount = 0,
-    fromCurrency = "",
-    toCurrency = "",
+    fromCurrency = '',
+    toCurrency = '',
   }) {
     fromCurrency = fromCurrency.toUpperCase();
     toCurrency = toCurrency.toUpperCase();
-    if (fromCurrency === "GBP") {
-      if (toCurrency === "PPL") {
+    if (fromCurrency === 'GBP') {
+      if (toCurrency === 'PPL') {
         return amount * (sails.config.custom.PPLTokenValueInPence / 100.0);
-      } else if (toCurrency === "GBPX") {
+      } else if (toCurrency === 'GBPX') {
         return (amount * 100.0);
       }
-    } else if (fromCurrency === "PPL") {
-      if (toCurrency === "GBP") {
+    } else if (fromCurrency === 'PPL') {
+      if (toCurrency === 'GBP') {
         return (amount / (sails.config.custom.PPLTokenValueInPence / 100.0));
-      } else if (toCurrency === "GBPX") {
+      } else if (toCurrency === 'GBPX') {
         return (amount / sails.config.custom.PPLTokenValueInPence);
       }
-    } else if (fromCurrency === "GBPX") {
-      if (toCurrency === "GBP") {
+    } else if (fromCurrency === 'GBPX') {
+      if (toCurrency === 'GBP') {
         return (amount / 100);
-      } else if (toCurrency === "PPL") {
+      } else if (toCurrency === 'PPL') {
         return (amount * sails.config.custom.PPLTokenValueInPence);
       }
     }
@@ -45,68 +45,68 @@ const peeplPay = new MockPeeplPayPricingAPI();
 Object.freeze(OrderTypeEnum);
 
 module.exports = {
-  friendlyName: "Customer update paid order",
+  friendlyName: 'Customer update paid order',
 
   description:
-    "A handle for customers to repond to requests to update their order when a vendor was unable to service an entire order.",
+    'A handle for customers to repond to requests to update their order when a vendor was unable to service an entire order.',
 
   inputs: {
     orderId: {
-      type: "string",
-      description: "Public ID for the order.",
+      type: 'string',
+      description: 'Public ID for the order.',
       required: true,
     },
     customerWalletAddress: {
-      type: "string",
+      type: 'string',
       required: true,
     },
     retainItems: {
-      type: "ref",
+      type: 'ref',
       required: true,
-      description: "array of internal ids for the items",
+      description: 'array of internal ids for the items',
     },
     removeItems: {
-      type: "ref",
+      type: 'ref',
       required: true,
-      description: "array of internal ids for the items",
+      description: 'array of internal ids for the items',
     },
     refundRequestGBPx: {
-      type: "ref",
+      type: 'ref',
       required: true,
       description:
-        "specification of how refund recipient would like their refund to be made from GBPx (GBP*100)",
+        'specification of how refund recipient would like their refund to be made from GBPx (GBP*100)',
     },
     refundRequestPPL: {
-      type: "ref",
+      type: 'ref',
       required: true,
       description:
-        "specification of how refund recipient would like their refund to be made from PPL",
+        'specification of how refund recipient would like their refund to be made from PPL',
     },
   },
 
   exits: {
     badRequest: {
       statusCode: 400,
-      description: "likely caused by no items retained in the request",
+      description: 'likely caused by no items retained in the request',
     },
     orderNotAuthorised: {
       description:
-        "thrown when the updated order has a larger total than the new order.",
+        'thrown when the updated order has a larger total than the new order.',
       statusCode: 401,
     },
     orderNotFound: {
       statusCode: 404,
       description:
-        "Order not found either because publicId does not exist or because the customerWalletAddress does not agree or because the order has already been flagged as completed.",
+        'Order not found either because publicId does not exist or because the customerWalletAddress does not agree or because the order has already been flagged as completed.',
     },
     orderAlreadyCompleted: {
       statusCode: 401,
-      description: "Order has already been flagged as completed.",
+      description: 'Order has already been flagged as completed.',
     },
     orderNotPaid: {
       statusCode: 401,
       description:
-        "order has not yet been paid for so no refund needs to be processed",
+        'order has not yet been paid for so no refund needs to be processed',
     },
     noPaidOrderFound: {
       statusCode: 404,
@@ -117,7 +117,7 @@ module.exports = {
     },
     incompleteOrderInformationStoredDB: {
       statusCode: 501,
-      description: "the stored order doesnt have the paymentIntentId set",
+      description: 'the stored order doesnt have the paymentIntentId set',
     },
     success: {
       statusCode: 200,
@@ -138,11 +138,11 @@ module.exports = {
       return exits.orderNotFound();
     }
 
-    if (order.completedFlag !== "") {
+    if (order.completedFlag !== '') {
       return exits.orderAlreadyCompleted();
     }
 
-    if (order.paymentStatus !== "paid") {
+    if (order.paymentStatus !== 'paid') {
       return exits.orderNotPaid();
     }
 
@@ -159,11 +159,11 @@ module.exports = {
 
     if (
       !response ||
-      !response.data["validRequest"] ||
-      !response.data["orderId"]
+      !response.data['validRequest'] ||
+      !response.data['orderId']
     ) {
       sails.log.warn(
-        "Bad partial fulfilment requested by consumer app on customer-update-order action"
+        'Bad partial fulfilment requested by consumer app on customer-update-order action'
       );
       return exits.badRequest();
     }
@@ -173,7 +173,7 @@ module.exports = {
       parentOrder: order.id,
       paymentIntentID: response.data.paymentIntentId,
       customerWalletAddress: inputs.customerWalletAddress,
-    }).populate("vendor");
+    }).populate('vendor');
 
     if (!newOrder || !newOrder.vendor) {
       return exits.orderNotFound();
@@ -183,7 +183,7 @@ module.exports = {
     if (!oldOrder) {
       return exits.orderNotFound();
     }
-    if (oldOrder.completedFlag !== "void") {
+    if (oldOrder.completedFlag !== 'void') {
       return exits.error(
         new Error(
           `helpers.updateItemsForOrder failed to update the original order's completed flag to void`
@@ -219,13 +219,13 @@ module.exports = {
       );
       _gbpxPortion = await peeplPay.getAmountInCurrency({
         amount: inputs.refundRequestGBPx,
-        fromCurrency: "GBPx",
-        toCurrency: "GBP",
+        fromCurrency: 'GBPx',
+        toCurrency: 'GBP',
       });
       _pplPortion = await peeplPay.getAmountInCurrency({
         amount: inputs.refundRequestPPL,
-        fromCurrency: "PPL",
-        toCurrency: "GBP",
+        fromCurrency: 'PPL',
+        toCurrency: 'GBP',
       });
       sails.log(`gbpx -> ${_gbpxPortion}; ppl -> ${_pplPortion}`);
       if (
@@ -273,7 +273,7 @@ module.exports = {
         `The updated order is scheduled for delivery between ${newOrder.fulfilmentSlotFrom} and ${newOrder.fulfilmentSlotTo}. ` +
         `Please accept or decline the update: ` +
         sails.config.custom.baseUrl +
-        "/admin/approve-order/" +
+        '/admin/approve-order/' +
         newOrder.publicId,
       data: {
         orderId: newOrder.id

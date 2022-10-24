@@ -1,20 +1,20 @@
 // const util = require("util");
 module.exports = {
-  friendlyName: "Peepl pay Update Paid Order webhook", //peeplWebhookAddressCustomerUpdatePaidOrder
+  friendlyName: 'Peepl pay Update Paid Order webhook', //peeplWebhookAddressCustomerUpdatePaidOrder
 
-  description: "",
+  description: '',
 
   inputs: {
     publicId: {
-      type: "string",
+      type: 'string',
       description:
-        "the paymentIntentId as this is the publicId that the peeplPay api keeps",
+        'the paymentIntentId as this is the publicId that the peeplPay api keeps',
     },
     metadata: {
-      type: "ref",
+      type: 'ref',
     },
     status: {
-      type: "string",
+      type: 'string',
     },
   },
 
@@ -31,7 +31,7 @@ module.exports = {
   },
 
   fn: async function (inputs, exits) {
-    var refundSucceeded = inputs.status === "success";
+    var refundSucceeded = inputs.status === 'success';
 
     var unixtime = Date.now();
     // var paidOrder = await Order.findOne({
@@ -41,7 +41,7 @@ module.exports = {
     // });
     var paidOrder = await Order.findOne({
       paymentIntentId: inputs.publicId,
-      parentOrder: {"!=": null},
+      parentOrder: {'!=': null},
     }).populate('vendor');
 
     if (!paidOrder) {
@@ -50,9 +50,9 @@ module.exports = {
 
     if (
       inputs.metadata &&
-      Object.keys(inputs.metadata).includes("orderId") &&
-      Object.keys(inputs.metadata).includes("paymentIntentId") &&
-      Object.keys(inputs.metadata).includes("customerWalletAddress") &&
+      Object.keys(inputs.metadata).includes('orderId') &&
+      Object.keys(inputs.metadata).includes('paymentIntentId') &&
+      Object.keys(inputs.metadata).includes('customerWalletAddress') &&
       (inputs.metadata.orderId !== paidOrder.publicId ||
         inputs.metadata.paymentIntentId !== paidOrder.paymentIntentId ||
         inputs.metadata.customerWalletAddress !==
@@ -70,7 +70,7 @@ module.exports = {
       return exits.orderMetadataDoesntMatch();
     }
 
-    const formulateMoney = (amount) => "£" + (amount / 100.0).toFixed(2);
+    const formulateMoney = (amount) => '£' + (amount / 100.0).toFixed(2);
 
     const refundGBPx = await Refund.findOne({
       paymentIntentId: inputs.publicId,
@@ -82,39 +82,39 @@ module.exports = {
     });
     if (refundGBPx) {
       await Refund.updateOne(refundGBPx.id).set({
-        refundStatus: refundSucceeded ? "paid" : "failed",
+        refundStatus: refundSucceeded ? 'paid' : 'failed',
       });
     }
     if (refundPPL) {
       await Refund.updateOne(refundPPL.id).set({
-        refundStatus: refundSucceeded ? "paid" : "failed",
+        refundStatus: refundSucceeded ? 'paid' : 'failed',
       });
     }
 
     // Update order with payment ID and time
     if (refundSucceeded) {
       const order = await Order.updateOne(paidOrder.id).set({
-        completedFlag: "partially refunded",
+        completedFlag: 'partially refunded',
         refundDateTime: unixtime,
       });
       if (!order) {
         return exits.orderNotFound();
       }
     }
-    
-    var refundStr = refundSucceeded ? "success" : "failure";
+
+    var refundStr = refundSucceeded ? 'success' : 'failure';
     var refundWorked = refundSucceeded
-      ? "has been partially refunded"
-      : "failed to be partially refunded";
+      ? 'has been partially refunded'
+      : 'failed to be partially refunded';
     var moneyFormatted = `with funds transferred back to`;
     if(refundGBPx && refundPPL){
       moneyFormatted = `with: ${formulateMoney(refundGBPx.amount)} and ${
         refundPPL.amount
       } vegi rewards points transferred back to`;
     }
-    
+
     const msgBody = `vegi order [${paidOrder.publicId}] ${refundWorked} ${moneyFormatted}`;
-    sails.log("built message");
+    sails.log('built message');
     const msgBodyCustomer = `Your ${msgBody} your wallet 😎.`;
     const msgBodyVendor = `Your customer's ${msgBody} their wallet 😎.`;
     const msgBodySupport = `Your customer's ${msgBody} the customer's wallet: '${paidOrder.customerWalletAddress}'.`;
@@ -124,8 +124,8 @@ module.exports = {
     sails.log('notify users');
     try {
       await sails.helpers.sendFirebaseNotification.with({
-        topic: "order-" + paidOrder.publicId,
-        title: "Order Partially Refunded",
+        topic: 'order-' + paidOrder.publicId,
+        title: 'Order Partially Refunded',
         body: msgBodyCustomer,
         data: {
           orderId: paidOrder.id,
@@ -150,7 +150,7 @@ module.exports = {
       vendorNotified = true;
       await sails.helpers.raiseVegiSupportIssue.with({
         orderId: paidOrder.publicId,
-        title: "order_refund_" + refundStr,
+        title: 'order_refund_' + refundStr,
         message: msgBodySupport,
       });
     } catch (error) {

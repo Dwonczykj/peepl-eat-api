@@ -1,32 +1,32 @@
-const { expect, assert } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
-const { fixtures } = require("../../../../scripts/build_db");
+const { expect, assert } = require('chai'); // ~ https://www.chaijs.com/api/bdd/
+const { fixtures } = require('../../../../scripts/build_db');
 
-const { v4: uuidv4 } = require("uuid");
+const { v4: uuidv4 } = require('uuid');
 
 const {
   DEFAULT_NEW_PRODUCT_OBJECT,
   ExpectResponseProduct,
   HttpAuthTestSenderProduct,
-} = require("./defaultProduct");
+} = require('./defaultProduct');
 
 const CAN_CREATE_PRODUCTS = (fixtures) => {
   return {
-    useAccount: "TEST_SERVICE",
-    HTTP_TYPE: "post",
-    ACTION_PATH: "admin",
-    ACTION_NAME: "create-product",
+    useAccount: 'TEST_SERVICE',
+    HTTP_TYPE: 'post',
+    ACTION_PATH: 'admin',
+    ACTION_NAME: 'create-product',
     sendData: {},
     expectResponse: {},
     expectStatusCode: 200,
     expectResponseCb: async (response, requestPayload) => {
-      expect(response.body).to.have.property("id");
+      expect(response.body).to.have.property('id');
       return Promise.resolve();
     },
   };
 };
 
 describe(`${CAN_CREATE_PRODUCTS(fixtures).ACTION_NAME}`, () => {
-  it("Returns a newly created product", async () => {
+  it('Returns a newly created product', async () => {
     try {
       // const imgName = "roast-back";
       // const testImage = process.cwd() + `/test/assets/images/${imgName}.jpg`;
@@ -48,7 +48,7 @@ describe(`${CAN_CREATE_PRODUCTS(fixtures).ACTION_NAME}`, () => {
       // );
       const response = await hats.makeAuthCallWith(
         vendorCall,
-        ["imageUrl"]
+        ['imageUrl']
         // {},
         // {
         //   [imgName]: testImage,

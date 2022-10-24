@@ -4,7 +4,7 @@ var fixtures = {};
 const fs = require(`fs`);
 const _ = require(`lodash`);
 
-_.each(fs.readdirSync(process.cwd() + `/test/fixtures/`), function (file) {
+_.each(fs.readdirSync(process.cwd() + `/test/fixtures/`), (file) => {
   fixtures[file.replace(/\.js$/, ``)] = require(process.cwd() +
     `/test/fixtures/` +
     file);

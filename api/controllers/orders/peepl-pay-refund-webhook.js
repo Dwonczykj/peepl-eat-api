@@ -1,23 +1,23 @@
 module.exports = {
-  friendlyName: "Peepl pay refunds webhook",
+  friendlyName: 'Peepl pay refunds webhook',
 
-  description: "",
+  description: '',
 
   inputs: {
     publicId: {
-      type: "string",
+      type: 'string',
       description:
-        "the paymentIntentId as this is the publicId that the peeplPay api keeps",
+        'the paymentIntentId as this is the publicId that the peeplPay api keeps',
     },
     status: {
-      type: "string",
+      type: 'string',
     },
   },
 
   exits: {
     orderNotFound: {
       statusCode: 404,
-      responseType: "notFound",
+      responseType: 'notFound',
     },
     success: {
       statusCode: 200,
@@ -26,7 +26,7 @@ module.exports = {
   },
 
   fn: async function (inputs, exits) {
-    var refundSucceeded = inputs.status === "success";
+    var refundSucceeded = inputs.status === 'success';
 
     var unixtime = Date.now();
 
@@ -40,12 +40,12 @@ module.exports = {
     });
     if (refundGBPx) {
       await Refund.updateOne(refundGBPx.id).set({
-        refundStatus: refundSucceeded ? "paid" : "failed",
+        refundStatus: refundSucceeded ? 'paid' : 'failed',
       });
     }
     if (refundPPL) {
       await Refund.updateOne(refundPPL.id).set({
-        refundStatus: refundSucceeded ? "paid" : "failed",
+        refundStatus: refundSucceeded ? 'paid' : 'failed',
       });
     }
 
@@ -54,7 +54,7 @@ module.exports = {
       const order = await Order.updateOne({
         paymentIntentId: inputs.publicId,
       }).set({
-        completedFlag: "refunded",
+        completedFlag: 'refunded',
         refundDateTime: unixtime,
       });
       if (!order) {
@@ -64,23 +64,23 @@ module.exports = {
 
     var order = await Order.findOne({
       paymentIntentId: inputs.publicId,
-    }).populate("vendor");
+    }).populate('vendor');
 
     if (!order) {
       return exits.orderNotFound();
     }
 
-    const formulateMoney = (amount) => "£" + (amount / 100.0).toFixed(2);
+    const formulateMoney = (amount) => '£' + (amount / 100.0).toFixed(2);
 
-    var refundStr = refundSucceeded ? "success" : "failure";
+    var refundStr = refundSucceeded ? 'success' : 'failure';
     var refundWorked = refundSucceeded
-      ? "has been successfully refunded"
-      : "failed to be refunded";
+      ? 'has been successfully refunded'
+      : 'failed to be refunded';
     try {
       await sails.helpers.sendSmsNotification.with({
         to: order.deliveryPhoneNumber,
         body:
-          "Your vegi order: " +
+          'Your vegi order: ' +
           order.publicId +
           ` ${refundWorked} for ` +
           formulateMoney(order.total),
@@ -91,11 +91,11 @@ module.exports = {
       await sails.helpers.sendSmsNotification.with({
         to: order.vendor.phoneNumber,
         body:
-          "Refund complete for vegi order: " +
+          'Refund complete for vegi order: ' +
           order.publicId +
-          ". Order " +
+          '. Order ' +
           refundWorked +
-          " to customer for " +
+          ' to customer for ' +
           formulateMoney(order.total),
         data: {
           orderId: order.id,
@@ -104,11 +104,11 @@ module.exports = {
 
       await sails.helpers.raiseVegiSupportIssue.with({
         orderId: order.publicId,
-        title: "order_refund_" + refundStr,
+        title: 'order_refund_' + refundStr,
         message:
           `Order Refund ${refundStr}: ${order.publicId} ${refundWorked} to wallet '${order.customerWalletAddress}' for ` +
           formulateMoney(order.total) +
-          ".",
+          '.',
       });
     } catch (error) {
       sails.log.error(`failed to contact vegi support with error: ${error}`);

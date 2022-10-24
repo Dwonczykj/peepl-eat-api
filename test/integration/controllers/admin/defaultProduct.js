@@ -1,16 +1,16 @@
 const {
   HttpAuthTestSender,
   ExpectResponse,
-} = require("../../../httpTestSender");
-const { assert, expect } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
+} = require('../../../httpTestSender');
+const { assert, expect } = require('chai'); // ~ https://www.chaijs.com/api/bdd/
 
 const DEFAULT_NEW_PRODUCT_OBJECT = (fixtures, overrides = {}) => {
   // const product = fixtures.products[0];
   return {
     ...{
-      code: "TEST20",
+      code: 'TEST20',
       percentage: 20,
-      description: "This is a test product",
+      description: 'This is a test product',
       basePrice: 100,
       expiryDateTime: 0,
       timesUsed: 0,
@@ -25,7 +25,7 @@ const DEFAULT_NEW_PRODUCT_OBJECT = (fixtures, overrides = {}) => {
 const DEFAULT_NEW_PRODUCT_OPTION_OBJECT = (fixtures, overrides = {}) => {
   return {
     ...{
-      name: "Test product option",
+      name: 'Test product option',
       isRequired: false,
       values: [],
       product: fixtures.products[0].id,
@@ -46,9 +46,9 @@ function checkIfValidUUID(str) {
 
 class ExpectResponseProduct extends ExpectResponse {
   constructor({
-    HTTP_TYPE = "get",
-    ACTION_PATH = "",
-    ACTION_NAME = "",
+    HTTP_TYPE = 'get',
+    ACTION_PATH = '',
+    ACTION_NAME = '',
     sendData = {},
     expectResponse = {},
   }) {
@@ -65,7 +65,7 @@ class ExpectResponseProduct extends ExpectResponse {
     expect(responseBody.orderedDateTime).closeTo(
       expectedResponse.orderedDateTime,
       100,
-      "OrderedDateTime should be within 100s of test."
+      'OrderedDateTime should be within 100s of test.'
     );
     // ~ https://devenum.com/delete-property-from-objects-array-in-javascript/#:~:text=Delete%20property%20from%20objects%20Array%20in%20Javascript%20%286,to%20Delete%20property%20from%20objects%20array%20in%20Javascript
     delete expectedResponse.orderedDateTime;
@@ -77,11 +77,11 @@ class ExpectResponseProduct extends ExpectResponse {
 
 class HttpAuthTestSenderProduct extends HttpAuthTestSender {
   constructor({
-    HTTP_TYPE = "get",
-    ACTION_PREFIX = "/api/v1",
-    ACTION_PATH = "",
-    ACTION_NAME = "",
-    useAccount = "TEST_SERVICE",
+    HTTP_TYPE = 'get',
+    ACTION_PREFIX = '/api/v1',
+    ACTION_PATH = '',
+    ACTION_NAME = '',
+    useAccount = 'TEST_SERVICE',
     sendData = {},
     expectResponse = {},
     expectResponseCb = async (response, requestPayload) => {},

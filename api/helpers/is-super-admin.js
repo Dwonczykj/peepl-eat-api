@@ -1,23 +1,23 @@
 module.exports = {
-  friendlyName: "Is Super Admin",
+  friendlyName: 'Is Super Admin',
 
-  description: "Check if the user is a superadmin",
+  description: 'Check if the user is a superadmin',
 
   inputs: {
     userId: {
-      type: "number",
+      type: 'number',
       required: true,
-      description: "The id of the user.",
+      description: 'The id of the user.',
     },
   },
 
   exits: {
     success: {
-      description: "All done.",
+      description: 'All done.',
       data: null,
     },
     catastrophicFailure: {
-      description: "Requesting User uid is not the id of a registered user",
+      description: 'Requesting User uid is not the id of a registered user',
     },
   },
 
@@ -28,9 +28,9 @@ module.exports = {
     });
 
     if (!user) {
-      sails.log.error("Requesting User uid is not the id of a registered user");
+      sails.log.error('Requesting User uid is not the id of a registered user');
       exits.catastrophicFailure();
-      this.res.redirect("/admin/logout");
+      this.res.redirect('/admin/logout');
     }
 
     if (user.isSuperAdmin) {
