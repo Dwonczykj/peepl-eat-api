@@ -124,7 +124,7 @@ module.exports = {
   },
 
   beforeCreate: async function (userDraft, proceed) {
-    // const saltRounds = sails.config.custom.passwordSaltRounds;
+    // const saltRounds = sails.config.custom.saltRounds;
 
     // try {
     //   user.firebaseSessionToken = await bcrypt.hash(user.firebaseSessionToken, saltRounds);

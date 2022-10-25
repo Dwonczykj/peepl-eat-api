@@ -1,6 +1,5 @@
 // test/integration/controllers/UserController.test.js
 var request = require('supertest');
-const { envConfig } = require('../../utils');
 // var util = require("util");
 
 describe('Login Controllers', () => {
@@ -21,7 +20,7 @@ describe('Login Controllers', () => {
       //                     // .set('X-CSRF-Token', response.body._csrf)
       //                     .send({
       //                       name: 'TEST_SERVICE',
-      //                       secret: envConfig['test_secret'],
+      //                       secret: sails.config.custom.test_secret,
       //                       _csrf: response.body._csrf
       //                     })
       //                     .expect(302, done);
@@ -31,7 +30,7 @@ describe('Login Controllers', () => {
                 .post('/api/v1/admin/login-with-secret')
                 .send({
                   name: 'TEST_SERVICE',
-                  secret: envConfig['test_secret'],
+                  secret: sails.config.custom.test_secret,
                 })
                 .expect(200, (response) => {
                   return done();

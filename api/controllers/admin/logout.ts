@@ -38,7 +38,7 @@ module.exports = {
     
     // All done.
 
-    return this.res.redirect('/admin/login');
+    return this.res.redirect('/admin/login-with-password');
   }
 
 

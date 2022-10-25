@@ -1,7 +1,3 @@
-const dotenv = require('dotenv');//.load('./env'); // alias of .config()
-// const envConfig = dotenv.load().parsed;
-const envConfig = dotenv.config('./env').parsed;
-
 /**
  * Custom configuration
  * (sails.config.custom)
@@ -20,7 +16,7 @@ module.exports.custom = {
    ***************************************************************************/
   baseUrl: 'https://vegi.itsaboutpeepl.com',
   internalEmailAddress: 'support@itsaboutpeepl.com',
-  internalPhoneNumber: envConfig['internalPhone'], // For support requests
+  internalPhoneNumber: '+1 000 0000000', // For support requests
   buildNumber: 1,
   peeplWebhookAddress:
     'https://vegi.itsaboutpeepl.com/api/v1/orders/peepl-pay-webhook',
@@ -36,7 +32,6 @@ module.exports.custom = {
   amazonS3BucketUrl: 'https://vegiapp-1.s3.us-east-1.amazonaws.com/',
   amazonS3Bucket: 'vegiapp-1',
   amazonS3MaxUploadSizeBytes: 30000000,
-  passwordSaltRounds: envConfig['saltRounds'],
   vegiEatsRewardPcnt: 0.05,
   vegiPayRewardPcnt: 0.005, // TODO v2.0: To be 0 <= x <= 0.01 based on ESC measure value
   PPLTokenValueInPence: 10, // TODO: GET this value from the PeeplPay API @TheAdamGalloway

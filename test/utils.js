@@ -4,24 +4,10 @@ const { expect, assert } = require('chai');
 const request = require('supertest');
 const dotenv = require('dotenv');
 const util = require('util');
-const envConfig = dotenv.config({path: process.cwd() + '/test/.env'}).parsed;
 
-assert.containsAllKeys(
-  envConfig,
-  [
-    'test_TEST_SERVICE_secret',
-    'test_TEST_USER_secret',
-    'test_TEST_VENDOR_secret',
-    'test_TEST_DELIVERY_PARTNER_secret',
-    'FIREBASE_AUTH_EMULATOR_HOST',
-  ],
-  '.env config does not contain secrets for testing: ' +
-    util.inspect(envConfig, { depth: 1 })
-);
-
-const loginAsUser = async function (name, secret, verbose=false) {
+const loginAsUser = async function (name, secret, verbose = false) {
   try {
-    if(verbose){
+    if (verbose) {
       console.log(`Login with ${name}'s Account`);
     }
 
@@ -40,26 +26,39 @@ const loginAsUser = async function (name, secret, verbose=false) {
         throw errs;
       });
   } catch (loginErr) {
-    console.warn('test/utils.js: Lifecycle.test failed to login with test service account: ' + loginErr);
+    console.warn(
+      'test/utils.js: Lifecycle.test failed to login with test service account: ' +
+        loginErr
+    );
     return loginErr;
   }
 };
 
 const login = async function (verbose = false) {
+  assert.containsAllKeys(
+    sails.config.custom,
+    [
+      'test_TEST_SERVICE_secret',
+      'test_TEST_USER_secret',
+      'test_TEST_VENDOR_secret',
+      'test_TEST_DELIVERY_PARTNER_secret',
+      'FIREBASE_AUTH_EMULATOR_HOST',
+    ],
+    '.env config does not contain secrets for testing: ' +
+      util.inspect(sails.config.custom, { depth: 1 })
+  );
   return await loginAsUser(
     'TEST_SERVICE',
-    envConfig['test_TEST_SERVICE_secret'],
+    sails.config.custom.test_TEST_SERVICE_secret,
     verbose
   );
 };
 
-const logout = async function (verbose=false) {
+const logout = async function (verbose = false) {
   try {
-
-    if(verbose){
+    if (verbose) {
       console.log('Logout with Test Account');
     }
-
 
     return request(sails.hooks.http.app)
       .get('/api/v1/admin/logout')
@@ -74,7 +73,10 @@ const logout = async function (verbose=false) {
         throw err;
       });
   } catch (logoutErr) {
-    console.warn('test/utils.js: Lifecycle.test failed to logout with test service account: ' + logoutErr);
+    console.warn(
+      'test/utils.js: Lifecycle.test failed to logout with test service account: ' +
+        logoutErr
+    );
     throw logoutErr;
   }
 };
@@ -84,21 +86,25 @@ const logoutCbLogin = async (cb, verbose = false) =>
     .then(() => cb())
     .then((unused) => login(verbose));
 
-const callAuthActionWithCookie = async (cb, verbose=false, data={}) =>
-  login(verbose)
-    .then((response) => {
-      expect(response.statusCode).to.equal(200, 'Login-with-secret wrapper failed to login: ' + util.inspect(response, {depth: null}));
-      expect(Object.keys(response.headers)).to.deep.include('set-cookie');
-      const sessionCookie = response.headers['set-cookie'];
-      if(verbose){
-        console.log('SESSION COOKIE: "' + sessionCookie + '"');
-      }
-      return cb(sessionCookie);
-    });
+const callAuthActionWithCookie = async (cb, verbose = false, data = {}) =>
+  login(verbose).then((response) => {
+    expect(response.statusCode).to.equal(
+      200,
+      'Login-with-secret wrapper failed to login: ' +
+        util.inspect(response, { depth: null })
+    );
+    expect(Object.keys(response.headers)).to.deep.include('set-cookie');
+    const sessionCookie = response.headers['set-cookie'];
+    if (verbose) {
+      console.log('SESSION COOKIE: "' + sessionCookie + '"');
+    }
+    return cb(sessionCookie);
+  });
 
 const callAuthActionWithCookieAndUser = async (
   cb,
-  name, secret,
+  name,
+  secret,
   verbose = false,
   data = {}
 ) =>
@@ -118,15 +124,18 @@ const callAuthActionWithCookieAndUser = async (
 
 function getNextWeekday(weekday) {
   // ~ https://stackoverflow.com/a/25493271
-  assert.include([
-    'monday',
-    'tuesday',
-    'wednesday',
-    'thursday',
-    'friday',
-    'saturday',
-    'sunday',
-  ],weekday);
+  assert.include(
+    [
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+      'sunday',
+    ],
+    weekday
+  );
   const weekdays = [
     'sunday',
     'monday',
@@ -148,7 +157,7 @@ function getNextWeekday(weekday) {
     day = today.getDay();
     var dateOfFirstDayOfThisWeek = today.getDate() - day;
     var dateOfFirstDayOfNextWeek = dateOfFirstDayOfThisWeek + 7;
-    if (today.getDay() < dayInd){
+    if (today.getDay() < dayInd) {
       theDay = dateOfFirstDayOfThisWeek + dayInd;
     } else {
       theDay = dateOfFirstDayOfNextWeek + dayInd;
@@ -174,6 +183,5 @@ module.exports = {
   logoutCbLogin,
   callAuthActionWithCookie,
   callAuthActionWithCookieAndUser,
-  envConfig,
   getNextWeekday,
 };

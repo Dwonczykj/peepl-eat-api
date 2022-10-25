@@ -126,6 +126,9 @@ module.exports = {
                 .isSameOrBefore(slot.endTime);
 	        }).length > 0;
 	      if (!slotOk) {
+          sails.log.info(
+            `DeliveryPartner: ${deliveryPartner.name} unable to service delivery for order with publicId: ${order.publicId}`
+          );
 	        return exits.deliveryPartnerUnableToServiceSlot();
 	      }
 	    }

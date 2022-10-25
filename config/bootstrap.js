@@ -13,31 +13,10 @@
 
 // Don't include as hides the sails hooks added below needed to create models, include types implicity using .d.ts files so don't need import statements as they are global to transpiler.
 
-const dotenv = require('dotenv');//.load('./env'); // alias of .config()
-// const envConfig = dotenv.load().parsed;
-const envConfig = dotenv.config('./env').parsed;
-const util = require('util');
 const { buildDb } = require('../scripts/build_db');
-
-async function asyncForEach(array, callback) {
-  for (let index = 0; index < array.length; index++) {
-    return callback(array[index], index, array);
-  }
-}
 
 module.exports.bootstrap = async function () {
   _.extend(sails.hooks.http.app.locals, sails.config.http.locals);
-
-  //Pull in Fixtures
-  var fixtures = {};
-  const fs = require('fs');
-
-  _.each(fs.readdirSync(process.cwd() + '/test/fixtures/'), (file) => {
-    fixtures[file.replace(/\.js$/, '')] = require(process.cwd() +
-      '/test/fixtures/' +
-      file);
-  });
-
 
   // Import dependencies
   var path = require('path');
@@ -61,9 +40,9 @@ module.exports.bootstrap = async function () {
   try {
     var isMochaTestEnv =
       sails.config.environment === 'test' ||
-      process.env.FIREBASE_AUTH_EMULATOR_HOST;
+      sails.config.custom.FIREBASE_AUTH_EMULATOR_HOST;
     if (!isMochaTestEnv) {
-      await buildDb(sails, false);
+      fixtures = await buildDb(sails, false);
     }
 
   } catch (error) {

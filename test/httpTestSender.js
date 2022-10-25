@@ -1,6 +1,6 @@
 var supertest = require('supertest');
 const util = require('util');
-const { envConfig, callAuthActionWithCookieAndUser } = require('./utils');
+const { callAuthActionWithCookieAndUser } = require('./utils');
 const { assert, expect } = require('chai'); // ~ https://www.chaijs.com/api/bdd/
 
 const cwd = process.cwd();
@@ -290,7 +290,7 @@ class HttpAuthTestSender extends HttpTestSender {
       // vendor: userDetails.vendor,
       // vendorRole: userDetails.vendorRole,
       firebaseSessionToken: userDetails.firebaseSessionToken,
-      secret: envConfig[`test_${userDetails.name}_secret`],
+      secret: sails.config.custom[`test_${userDetails.name}_secret`],
     };
     otherLoginDetails = bespokeUserDetails;
     return callAuthActionWithCookieAndUser(

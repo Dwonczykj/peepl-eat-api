@@ -1,21 +1,19 @@
 /* eslint-disable no-console */
 //Pull in Fixtures
-var fixtures = {};
 const fs = require(`fs`);
 const _ = require(`lodash`);
+
+var fixtures = {};
 
 _.each(fs.readdirSync(process.cwd() + `/test/fixtures/`), (file) => {
   fixtures[file.replace(/\.js$/, ``)] = require(process.cwd() +
     `/test/fixtures/` +
-    file);
+    file)();
   fixtures[file.replace(/\.js$/, ``) + `_fixed`] = _.cloneDeep(fixtures[file.replace(/\.js$/, ``)]);
 });
 
 async function buildDb(sails, test) {
-  const dotenv = require(`dotenv`); //.load('./env'); // alias of .config()
-  // const envConfig = dotenv.load().parsed;
-  const envConfig = dotenv.config(`./env`).parsed;
-  const util = require(`util`);
+  // const util = require(`util`);
 
   _.extend(sails.hooks.http.app.locals, sails.config.http.locals);
 
@@ -37,14 +35,56 @@ async function buildDb(sails, test) {
   ).fetch();
   console.info(`Finished populating Postal Districts for ${_envRT}`);
 
-  await Vendor.createEach(fixtures.vendors);
+  const vendors = await Vendor.createEach(fixtures.vendors).fetch();
   console.info(`Finished populating Vendors for ${_envRT}`);
 
-  await DeliveryPartner.createEach(fixtures.deliveryPartners);
+  const deliveryPartners = await DeliveryPartner.createEach(fixtures.deliveryPartners).fetch();
   console.info(`Finished populating Delivery Partners for ${_envRT}`);
-  await FulfilmentMethod.createEach(fixtures.fulfilmentMethods);
+
+  // await FulfilmentMethod.createEach(fixtures.fulfilmentMethods);
+
+  const fms1 = await FulfilmentMethod.find({
+    'or': [
+      {
+        vendor: vendors.map(v => v.id)
+      },
+      {
+        deliveryPartner: deliveryPartners.map(v => v.id)
+      },
+    ]
+  });
+
+  fixtures.fulfilmentMethods = fms1;
   console.info(`Finished populating fulfilment methods for ${_envRT}`);
-  await OpeningHours.createEach(fixtures.openingHours);
+
+  await OpeningHours.update({
+    fulfilmentMethod: fms1.map(fm => fm.id)
+  }).set({
+    isOpen: true
+  });
+
+  await OpeningHours.update({
+    or: fixtures.openingHours.map((oh) => ({
+      dayOfWeek: oh.dayOfWeek,
+      fulfilmentMethod: oh.fulfilmentMethod,
+    })),
+  }).set({
+    isOpen: true,
+    openTime: "09:00",
+    closeTime: "17:00",
+  });
+
+  const openingHours = await OpeningHours.find({
+    fulfilmentMethod: fms1.map((fm) => fm.id),
+  });
+  fixtures.openingHours = openingHours;
+
+  // const fms = await FulfilmentMethod.find({
+  //   deliveryPartner: 1
+  // }).populate('deliveryPartner');
+  // const debugAgileOpeningHours = await OpeningHours.find({
+  //   fulfilmentMethod: fms.filter(fm => fm.deliveryPartner.id === 1).map(fm => fm.id)
+  // });
   console.info(`Finished populating opening hours for ${_envRT}`);
 
   await CategoryGroup.createEach(fixtures.categoryGroups);
@@ -62,9 +102,9 @@ async function buildDb(sails, test) {
   console.info(`Finished populating Discounts for ${_envRT}`);
 
   //TODO: Populate test notifications & refunds ?
-
+  let users = [];
   if(test){
-    await User.createEach(fixtures.users);
+    users = await User.createEach(fixtures.users).fetch();
     await Order.createEach(fixtures.orders);
     await OrderItem.createEach(fixtures.orderItems);
     // for(const item of fixtures.orderItems){
@@ -72,11 +112,10 @@ async function buildDb(sails, test) {
     //   await Order.addToCollection(item.order, `items`, [item.id]);
     // }
   } else {
-    await User.createEach([
+    users = await User.createEach([
       {
-        email: `adam@itsaboutpeepl.co.uk`,
-        // password: 'Testing123!',
-        phoneNoCountry: 7905532512,
+        email: `adam@itsaboutpeepl.com`,
+        phoneNoCountry: 7917787967,
         phoneCountryCode: 44,
         name: `Adam`,
         vendor: 1,
@@ -86,9 +125,22 @@ async function buildDb(sails, test) {
         role: `admin`,
         firebaseSessionToken: `DUMMY_FIREBASE_TOKEN`,
       },
-    ]);
+      {
+        email: `joey@vegiapp.co.uk`,
+        phoneNoCountry: 7905532512,
+        phoneCountryCode: 44,
+        name: `Joey D`,
+        vendor: 1,
+        vendorConfirmed: true,
+        isSuperAdmin: true,
+        vendorRole: `none`,
+        role: `admin`,
+        firebaseSessionToken: `DUMMY_FIREBASE_TOKEN`,
+      },
+    ]).fetch();
   }
-  console.info(`Finished Bootstapping DB for ${_envRT}!`);
+  console.info(`Finished Bootstapping DB for ${_envRT} with ${users.length} users added!`);
+  return fixtures;
 }
 
 module.exports = {

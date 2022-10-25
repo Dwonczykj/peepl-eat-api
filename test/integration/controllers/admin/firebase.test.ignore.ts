@@ -3,7 +3,6 @@
 const { expect, assert } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
 // var supertest = require("supertest");
 const axios = require("axios").default;
-import { envConfig } from "../../../utils";
 // var util = require("util");
 
 import { initializeApp } from "firebase/app";
@@ -25,7 +24,7 @@ const config = {
 };
 initializeApp(config);
 const auth = getAuth();
-// connectAuthEmulator(auth, "http://localhost:9099");
+// connectAuthEmulator(auth, "http://127.0.0.1:9099");
 
 describe("Firebase Tests", () => {
   // describe("Signin with Credential", () => {
@@ -111,7 +110,7 @@ describe("Firebase Tests", () => {
   describe("Firebase can register user to emulator", () => {
     it("Posts to Register", async () => {
       const postBaseUrl = `http://localhost:9099/identitytoolkit.googleapis.com/v1`;
-      const postUrlRegisterDummyUser = `/accounts:signUp?key=${envConfig["firebaseAPIKey"]}`;
+      const postUrlRegisterDummyUser = `/accounts:signUp?key=${sails.config.custom.firebaseAPIKey}`;
       const instance = axios.create({
         baseURL: postBaseUrl,
         timeout: 2000,

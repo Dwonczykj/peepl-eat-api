@@ -20,7 +20,7 @@ module.exports = {
 
     var inTestEnv =
       sails.config.environment === 'test' ||
-      process.env.FIREBASE_AUTH_EMULATOR_HOST;
+      sails.config.custom.FIREBASE_AUTH_EMULATOR_HOST;
 
     let imageInfo;
     if (!inTestEnv) {

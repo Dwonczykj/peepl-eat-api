@@ -56,7 +56,7 @@ module.exports = {
   fn: async function (inputs, exits) {
     var dontActuallySend =
       sails.config.environment === 'test' ||
-      process.env.FIREBASE_AUTH_EMULATOR_HOST;
+      sails.config.custom.FIREBASE_AUTH_EMULATOR_HOST;
     if (dontActuallySend) {
       sails.log
         .info(`Running sails in test mode, helpers.revertPeeplRewardIssue will not request rewards points reversions.

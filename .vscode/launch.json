@@ -19,6 +19,9 @@
                 // "assets/**"
             ],
             "program": "${workspaceFolder}/app.js",
+            "env": {
+                "NODE_ENV": "development",
+            },
             "args": [
                 "--verbose",
                 "--hookTimeout=160000"
@@ -78,6 +81,10 @@
             //     "type": ""
             // },
             "program": "${workspaceFolder}/node_modules/mocha/bin/mocha",
+            "env": {
+                "NODE_ENV": "test",
+                "test": "true",
+            },
             "args": [
                 "--exit",
                 "-t",
@@ -110,6 +117,10 @@
             "request": "launch",
             "name": "Mocha Test Current .test.(js|ts) File",
             "program": "${workspaceFolder}/node_modules/mocha/bin/mocha",
+            "env": {
+                "NODE_ENV": "test",
+                "test": "true",
+            },
             "args": [
                 "--exit",
                 "-t",
@@ -138,12 +149,17 @@
             "request": "launch",
             "name": "Mocha Test TS Interfaces (TS only)",
             "program": "${workspaceFolder}/node_modules/mocha/bin/mocha",
+            "env": {
+                "NODE_ENV": "test",
+                "test": "true",
+            },
             "args": [
                 "--exit",
                 // "--require",
                 // "esm",
                 "--require",
                 "ts-node/register",
+                "NODE_ENV=test",
                 // "--require",
                 "${workspaceFolder}/test/lifecycle.test.js",
                 // "--require",

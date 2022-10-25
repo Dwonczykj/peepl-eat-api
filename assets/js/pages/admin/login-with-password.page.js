@@ -41,7 +41,7 @@ parasails.registerPage('login-with-password', {
     };
     initializeApp(config);
     const auth = getAuth();
-    connectAuthEmulator(auth, 'http://localhost:9099');
+    connectAuthEmulator(auth, 'http://127.0.0.1:9099');
     this.$focus('[autofocus]');
   },
 

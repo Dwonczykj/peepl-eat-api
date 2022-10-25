@@ -1,20 +1,20 @@
-import { DaysOfWeek } from "api/interfaces/vendors/slot";
-import moment from "moment";
+import { DaysOfWeek } from 'api/interfaces/vendors/slot';
+import moment from 'moment';
 declare var sails: any;
 
-export function getTodayDayName(offset:number=0):DaysOfWeek {
+export function getTodayDayName(offset: number = 0): DaysOfWeek {
   // const weekday:any = moment().format("dddd");
   const today = new Date();
   const day = today.getDay();
-  
-  const weekdays:Array<DaysOfWeek> = [
-    "sunday",
-    "monday",
-    "tuesday",
-    "wednesday",
-    "thursday",
-    "friday",
-    "saturday",
+
+  const weekdays: Array<DaysOfWeek> = [
+    'sunday',
+    'monday',
+    'tuesday',
+    'wednesday',
+    'thursday',
+    'friday',
+    'saturday',
   ];
   const outDayInd = (day + offset) % weekdays.length;
   return weekdays[outDayInd];
@@ -22,45 +22,48 @@ export function getTodayDayName(offset:number=0):DaysOfWeek {
   //   throw new Error(`Bad weekday found for getTodayDayName`);
   // }
   // const dayInd = weekdays.indexOf(weekday);
-  
+
   // return weekdays[outDayInd];
 }
 
-export function getNextWeekday(weekday: DaysOfWeek, todayInWeek:boolean=false) {
+export function getNextWeekday(
+  weekday: DaysOfWeek,
+  todayInWeek: boolean = false
+) {
   // ~ https://stackoverflow.com/a/25493271
   weekday = weekday.toLowerCase() as DaysOfWeek;
   if (
     ![
-      "monday",
-      "tuesday",
-      "wednesday",
-      "thursday",
-      "friday",
-      "saturday",
-      "sunday",
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+      'sunday',
     ].includes(weekday)
   ) {
     throw new Error(`Bad weekday passed to getNextWeekday`);
   }
   const weekdays = [
-    "sunday",
-    "monday",
-    "tuesday",
-    "wednesday",
-    "thursday",
-    "friday",
-    "saturday",
+    'sunday',
+    'monday',
+    'tuesday',
+    'wednesday',
+    'thursday',
+    'friday',
+    'saturday',
   ];
   const dayInd = weekdays.indexOf(weekday.toLowerCase());
   var today = new Date();
   var theDay;
   var day = today.getDay();
   if (day === dayInd) {
-    if(todayInWeek){
+    if (todayInWeek) {
       today = new Date(today.setDate(today.getDate() + 7));
     }
     return (
-      today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate()
+      today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate()
     );
   } else {
     day = today.getDay();
@@ -76,18 +79,18 @@ export function getNextWeekday(weekday: DaysOfWeek, todayInWeek:boolean=false) {
 
   return (
     closest.getFullYear() +
-    "-" +
+    '-' +
     (closest.getMonth() + 1) +
-    "-" +
+    '-' +
     closest.getDate()
   );
 }
 
-export const dateStrFormat = "YYYY-MM-DD";
-export const timeStrFormat = "HH:mm";
-export const datetimeStrFormat = "YYYY-MM-DD HH:mm";
-export const datetimeStrTzFormat = "YYYY-MM-DD HH:mm Z";
-export const timeStrTzFormat = "HH:mm Z";
+export const dateStrFormat = 'YYYY-MM-DD';
+export const timeStrFormat = 'HH:mm';
+export const datetimeStrFormat = 'YYYY-MM-DD HH:mm';
+export const datetimeStrTzFormat = 'YYYY-MM-DD HH:mm Z';
+export const timeStrTzFormat = 'HH:mm Z';
 
 type _VendorTypeHidden = {
   id: number;
@@ -99,15 +102,15 @@ type _VendorTypeHidden = {
   // collectionFulfilmentMethod?: FulfilmentMethodType;
 };
 
-export type StatusLiteral = "active" | "inactive";
+export type StatusLiteral = 'active' | 'inactive';
 export type RatingType = 0 | 1 | 2 | 3 | 4 | 5;
 export type CompletedFlagType =
-  | ""
-  | "completed"
-  | "cancelled"
-  | "refunded"
-  | "partially refunded"
-  | "void";
+  | ''
+  | 'completed'
+  | 'cancelled'
+  | 'refunded'
+  | 'partially refunded'
+  | 'void';
 
 type _DeliveryPartnerTypeHidden = {
   id: number;
@@ -118,7 +121,7 @@ type _DeliveryPartnerTypeHidden = {
 
 type _FulfilmentMethodTypeHidden = {
   id: number;
-  methodType: "delivery" | "collection";
+  methodType: 'delivery' | 'collection';
   slotLength: number;
   bufferLength: number;
   orderCutoff: string;
@@ -143,8 +146,8 @@ export type OpeningHoursType = {
 };
 
 export type DeliveryPartnerType = _DeliveryPartnerTypeHidden & {
-  deliveryFulfilmentMethod?: _FulfilmentMethodTypeHidden,
-}
+  deliveryFulfilmentMethod?: _FulfilmentMethodTypeHidden;
+};
 
 export type VendorType = _VendorTypeHidden & {
   deliveryPartner?: _DeliveryPartnerTypeHidden;
@@ -155,7 +158,7 @@ export type VendorType = _VendorTypeHidden & {
 export type DiscountType = {
   id: number;
   outcode: string;
-}
+};
 export type _ProductTypeHidden = {
   id: number;
 };
@@ -163,7 +166,7 @@ export type _ProductOptionValueTypeHidden = {
   id: number;
   name: string;
   description: string;
-  priceModifier:number;
+  priceModifier: number;
   isAvailable: boolean;
 };
 export type _ProductOptionTypeHidden = {
@@ -174,7 +177,7 @@ export type _ProductOptionTypeHidden = {
 };
 export type ProductOptionValueType = {
   option: _ProductOptionTypeHidden;
-}
+};
 export type ProductOptionType = {
   id: number;
   name: string;
@@ -188,25 +191,24 @@ export type _OrderItemTypeHidden = {
   unfulfilledOnOrderId: number;
 };
 
-
 export type OrderItemOptionValueType = {
   id: number;
-  option: ProductOptionType,
-  optionValue: ProductOptionValueType,
-  orderItem: _OrderItemTypeHidden,
+  option: ProductOptionType;
+  optionValue: ProductOptionValueType;
+  orderItem: _OrderItemTypeHidden;
 };
 export type CategoryGroupType = {
   id: number;
   name: string;
   imageUrl: string;
-  forRestaurantItem:boolean;
+  forRestaurantItem: boolean;
 };
 export type ProductCategoryType = {
   id: number;
   name: string;
   vendor: VendorType;
   categoryGroup: CategoryGroupType;
-  products: Array<_ProductTypeHidden>
+  products: Array<_ProductTypeHidden>;
 };
 export type ProductType = _ProductTypeHidden & {
   id: number;
@@ -220,17 +222,17 @@ export type ProductType = _ProductTypeHidden & {
   isFeatured: boolean;
   status: StatusLiteral;
   vendor: VendorType;
-  options: Array<ProductOptionType>
+  options: Array<ProductOptionType>;
   category: ProductCategoryType;
 };
 
 export type RestaurantAcceptedStatusType =
-  | "rejected"
-  | "accepted"
-  | "pending"
-  | "partially fulfilled";
+  | 'rejected'
+  | 'accepted'
+  | 'pending'
+  | 'partially fulfilled';
 
-export type PaymentStatusType = "paid" | "unpaid" | "failed";
+export type PaymentStatusType = 'paid' | 'unpaid' | 'failed';
 
 export type _OrderTypeHidden = {
   id: number;
@@ -285,11 +287,14 @@ export type OrderType = _OrderTypeHidden & {
   unfulfilledItems: Array<OrderItemType>;
 };
 
-export const openingHoursToMoments = (openingHours:OpeningHoursType, withDate: moment.Moment) => {
+export const openingHoursToMoments = (
+  openingHours: OpeningHoursType,
+  withDate: moment.Moment
+) => {
   let openTime: moment.Moment;
   let closeTime: moment.Moment;
-  const sign = openingHours.timezone < 0 ? "-" : "+";
-  const leadingZero = Math.abs(openingHours.timezone) >= 10 ? "0" : "";
+  const sign = openingHours.timezone < 0 ? '-' : '+';
+  const leadingZero = Math.abs(openingHours.timezone) >= 10 ? '0' : '';
 
   const dateStr = withDate.format(dateStrFormat);
   try {

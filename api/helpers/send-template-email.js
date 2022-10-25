@@ -193,7 +193,7 @@ module.exports = {
       dontActuallySend =
         sails.config.environment === 'test' ||
         isToAddressConsideredFake ||
-        process.env.FIREBASE_AUTH_EMULATOR_HOST;
+        sails.config.custom.FIREBASE_AUTH_EMULATOR_HOST;
 
       result.loggedInsteadOfSending = dontActuallySend;
       if (dontActuallySend) {

@@ -1,6 +1,25 @@
 import { getAuth } from 'firebase-admin/auth';
 //TODO: Consider connecting Passport to Google Auth Flow: https://stackoverflow.com/q/34069046
 
+export const splitPhoneNumber = (formattedFirebaseNumber:string) => {
+  try {
+    const countryCode = Number.parseInt(
+      formattedFirebaseNumber.match(/^\+(\d{1,2})/g)[0]
+    );
+    const phoneNoCountry = Number.parseInt(
+      formattedFirebaseNumber.replace(/-/g, "").match(/(\d{1,10})$/g)[0]
+    ); // min of 1 digits as number might be 000-000-0001
+    return {
+      countryCode,
+      phoneNoCountry,
+    };
+  } catch (unused) {
+    return {
+      countryCode: -1,
+      phoneNoCountry: 9999999999,
+    };
+  }
+};
 
 // const bcrypt = require('bcrypt');
 module.exports = {
@@ -66,25 +85,11 @@ requests over WebSockets instead of HTTP).`,
 
     sails.log.info('Entered login-with-firebase controller method');
     
-    const splitPhoneNumber = (formattedFirebaseNumber) => {
-      try {
-        const countryCode = Number.parseInt(formattedFirebaseNumber.match(/^\+(\d{1,2})/g)[0]);
-        const phoneNoCountry = Number.parseInt(formattedFirebaseNumber.replace(/-/g, '').match(/(\d{1,10})$/g)[0]); // min of 1 digits as number might be 000-000-0001
-        return {
-          countryCode,
-          phoneNoCountry
-        };
-      } catch (unused) {
-        return {
-          countryCode: -1,
-          phoneNoCountry: 9999999999
-        };
-      }
-    };
+    
 
     try {
       const inputPhoneDetails = splitPhoneNumber(inputs.phoneNumber);
-      var decodedToken;
+      // var decodedToken;
       const auth = getAuth();
       // if (inputs.firebaseSessionToken === 'DUMMY'){
       //   decodedToken = {
@@ -95,7 +100,7 @@ requests over WebSockets instead of HTTP).`,
       // } else {
       //   decodedToken = await auth.verifyIdToken(inputs.firebaseSessionToken);
       // }
-      decodedToken = await auth.verifyIdToken(inputs.firebaseSessionToken);
+      const decodedToken = await auth.verifyIdToken(inputs.firebaseSessionToken);
 
       const formattedFirebaseNumber = decodedToken.phone_number;
       if (!formattedFirebaseNumber){
@@ -116,18 +121,18 @@ requests over WebSockets instead of HTTP).`,
       if(!user){
         //create one as using valid firebase token:
         user = await User.create({
-          email: "",
+          email: decodedToken.email || "",
           // password: 'Testing123!',
           phoneNoCountry: inputPhoneDetails["phoneNoCountry"],
           phoneCountryCode: inputPhoneDetails["countryCode"],
-          name: "",
+          name: decodedToken.email || "",
           vendor: null,
           vendorConfirmed: false,
           isSuperAdmin: false,
           vendorRole: "none",
           deliveryPartnerRole: "none",
-          role: "none",
-          firebaseSessionToken: decodedToken,
+          role: "consumer",
+          firebaseSessionToken: inputs.firebaseSessionToken,
         });
       }
       try {
