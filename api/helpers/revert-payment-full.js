@@ -81,10 +81,10 @@ module.exports = {
     //TODO: Assert that the refundAmount == the sum of value of the items (+ % of service charge?) - discount
     instance.post('/payment_refunds', {
       amount: inputs.refundAmount,
-      originalPaymentIntentId: inputs.paymentId,
-      recipientWalletAddress: inputs.refundRecipientWalletAddress,
-      vendorDisplayName: inputs.refundFromName,
-      webhookAddress: sails.config.custom.peeplPayRefundWebhookAddress
+      paymentIntentId: inputs.paymentId,
+      // recipientWalletAddress: inputs.refundRecipientWalletAddress,
+      // vendorDisplayName: inputs.refundFromName,
+      // webhookAddress: sails.config.custom.peeplPayRefundWebhookAddress
     })
       .then(async (response) => {
         // TODO: Check whether request for refund was accepted and can be fulfilled by the peeplPay service.
