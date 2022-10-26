@@ -23,7 +23,10 @@ module.exports = {
     }
 
     // Respond with view.
-    return exits.success({});
+    return exits.success({
+      useEmulator: sails.config.custom.FIREBASE_AUTH_EMULATOR_HOST,
+      firebaseAPIKey: sails.config.custom.firebaseAPIKey,
+    });
 
   }
 

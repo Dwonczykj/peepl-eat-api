@@ -7,26 +7,35 @@ const axios = require("axios").default;
 
 import { initializeApp } from "firebase/app";
 import {
-  // connectAuthEmulator,
+  connectAuthEmulator,
   // createUserWithEmailAndPassword,
-  getAuth, RecaptchaVerifier, signInWithEmailAndPassword,
+  getAuth, Auth, RecaptchaVerifier,
+  signInWithEmailAndPassword, UserCredential,
   signInWithPhoneNumber
 } from "firebase/auth";
+declare var sails:any;
 
-const config = {
-  apiKey: "AIzaSyB9hAjm49_3linYAcDkkEYijBiCoObXYfk", //! apiKey is fine: See: https://firebase.google.com/docs/projects/api-keys
-  authDomain: "vegiliverpool.firebaseapp.com",
-  projectId: "vegiliverpool",
-  storageBucket: "vegiliverpool.appspot.com",
-  messagingSenderId: "526129377",
-  appId: "1:526129377:web:a0e4d54396cbdebe70bfa0",
-  measurementId: "G-YZCWVWRNKN",
-};
-initializeApp(config);
-const auth = getAuth();
-// connectAuthEmulator(auth, "http://127.0.0.1:9099");
-
+let auth: Auth;
 describe("Firebase Tests", () => {
+  before(() => {
+    const config = {
+      apiKey: sails.config.custom.firebaseAPIKey, // apiKey is fine: See: https://firebase.google.com/docs/projects/api-keys
+      authDomain: 'vegiliverpool.firebaseapp.com',
+      projectId: 'vegiliverpool',
+      storageBucket: 'vegiliverpool.appspot.com',
+      messagingSenderId: '526129377',
+      appId: '1:526129377:web:a0e4d54396cbdebe70bfa0',
+      measurementId: 'G-YZCWVWRNKN',
+    };
+    initializeApp(config);
+    auth = getAuth();
+    if (sails.config.custom.FIREBASE_AUTH_EMULATOR_HOST) {
+      connectAuthEmulator(
+        auth,
+        sails.config.custom.FIREBASE_AUTH_EMULATOR_HOST
+      );
+    }
+  });
   // describe("Signin with Credential", () => {
   //   it("succeeds", async () => {
   //     const creds = await signInWithCredential(auth,
@@ -60,8 +69,9 @@ describe("Firebase Tests", () => {
   // });
   describe("Signin with Email", () => {
     it("succeeds", async () => {
+      let _creds: UserCredential;
       try {
-	      const creds = await signInWithEmailAndPassword(
+	      _creds = await signInWithEmailAndPassword(
 	        auth,
 	        "joey@vegiapp.co.uk",
 	        "DUMMY_FIREBASE_TOKEN" //"Testing123"
@@ -72,6 +82,7 @@ describe("Firebase Tests", () => {
         }
         throw error;
       }
+      const creds = _creds;
       console.log(creds);
       assert.containsAllKeys(creds, ["user"]);
     });
@@ -79,7 +90,7 @@ describe("Firebase Tests", () => {
   describe("Signin with Phone", () => {
     it("succeeds", async () => {
       // Turn off phone auth app verification.
-      
+
       const recaptcha = new RecaptchaVerifier('recaptcha-container', {
       }, auth);
       const verificationCode = "133337";
@@ -88,10 +99,10 @@ describe("Firebase Tests", () => {
         "+1 234-566-9420",
         recaptcha
       )
-        .then(function (confirmationResult) {
+        .then((confirmationResult) => {
           return confirmationResult.confirm(verificationCode);
         })
-        .catch(function (error) {
+        .catch((error) => {
           // Error; SMS not sent
           // ...
           throw error;
@@ -103,13 +114,13 @@ describe("Firebase Tests", () => {
   });
   // describe("Signin with Phone", () => {
   //   it("succeeds", async () => {
-      
+
   //     signInWithPhoneNumber(auth,"+447905532512",);
   //   });
   // });
   describe("Firebase can register user to emulator", () => {
     it("Posts to Register", async () => {
-      const postBaseUrl = `http://localhost:9099/identitytoolkit.googleapis.com/v1`;
+      const postBaseUrl = `${sails.config.custom.FIREBASE_AUTH_EMULATOR_HOST}/identitytoolkit.googleapis.com/v1`;
       const postUrlRegisterDummyUser = `/accounts:signUp?key=${sails.config.custom.firebaseAPIKey}`;
       const instance = axios.create({
         baseURL: postBaseUrl,
@@ -135,6 +146,6 @@ describe("Firebase Tests", () => {
         });
     });
   });
-  
+
 
 });

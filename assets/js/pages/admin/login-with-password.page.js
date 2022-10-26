@@ -31,7 +31,7 @@ parasails.registerPage('login-with-password', {
   },
   mounted: async function () {
     const config = {
-      apiKey: 'AIzaSyB9hAjm49_3linYAcDkkEYijBiCoObXYfk', //! apiKey is fine: See: https://firebase.google.com/docs/projects/api-keys
+      apiKey: window.SAILS_LOCALS.firebaseAPIKey, //! apiKey is fine: See: https://firebase.google.com/docs/projects/api-keys
       authDomain: 'vegiliverpool.firebaseapp.com',
       projectId: 'vegiliverpool',
       storageBucket: 'vegiliverpool.appspot.com',
@@ -41,7 +41,9 @@ parasails.registerPage('login-with-password', {
     };
     initializeApp(config);
     const auth = getAuth();
-    connectAuthEmulator(auth, 'http://127.0.0.1:9099');
+    if(window.SAILS_LOCALS.useEmulator){
+      connectAuthEmulator(auth, 'http://127.0.0.1:9099');
+    }
     this.$focus('[autofocus]');
   },
 
@@ -97,7 +99,12 @@ parasails.registerPage('login-with-password', {
 
           // eslint-disable-next-line no-console
           const sessionToken = await fbUser.getIdToken(true);
-          console.log(fbUser.email + ' authorised signed in to firebase with session token ' + sessionToken);
+          console.log(
+            fbUser.email +
+              ' authorised sign in to firebase with session token:\n---------' +
+              sessionToken +
+              '---------'
+          );
 
           return Cloud.loginWithPassword(email, sessionToken, rememberMe);
         })

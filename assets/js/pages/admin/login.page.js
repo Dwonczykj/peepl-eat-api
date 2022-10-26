@@ -48,17 +48,19 @@ parasails.registerPage('login', {
   mounted: async function () {
 
     const config = {
-      apiKey: 'AIzaSyB9hAjm49_3linYAcDkkEYijBiCoObXYfk', //! apiKey is fine: See: https://firebase.google.com/docs/projects/api-keys
+      apiKey: window.SAILS_LOCALS.firebaseAPIKey, //! apiKey is fine: See: https://firebase.google.com/docs/projects/api-keys
       authDomain: 'vegiliverpool.firebaseapp.com',
       projectId: 'vegiliverpool',
       storageBucket: 'vegiliverpool.appspot.com',
       messagingSenderId: '526129377',
       appId: '1:526129377:web:a0e4d54396cbdebe70bfa0',
-      measurementId: 'G-YZCWVWRNKN'
+      measurementId: 'G-YZCWVWRNKN',
     };
     initializeApp(config);
     const auth = getAuth();
-    connectAuthEmulator(auth, 'http://127.0.0.1:9099');
+    if (window.SAILS_LOCALS.useEmulator) {
+      connectAuthEmulator(auth, 'http://127.0.0.1:9099');
+    }
     // this.createRecaptcha();
 
 
