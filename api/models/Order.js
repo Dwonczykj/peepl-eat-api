@@ -27,14 +27,14 @@ module.exports = {
     paidDateTime: {
       type: 'number',
       description:
-        'The unixtime when the order payment was confirmed (if at all).',
+        'The unixtime when the order payment was paid (if at all).',
       required: false,
       allowNull: true,
     },
     refundDateTime: {
       type: 'number',
       description:
-        'The unixtime when the order payment was confirmed (if at all).',
+        'The unixtime when the order payment was refunded (if at all).',
       required: false,
       allowNull: true,
     },

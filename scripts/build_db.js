@@ -19,7 +19,7 @@ async function buildDb(sails, test) {
 
 
   const _envRT = test ? 'testing' : 'dev server';
-  console.info(`Bootstapping DB for ${_envRT}`);
+  console.info(`Bootstrapping DB for ${_envRT}`);
 
   var vendorCategory = await VendorCategory.createEach(
     fixtures.vendorCategories
