@@ -201,15 +201,15 @@ module.exports.routes = {
   'POST /api/v1/admin/edit-product-option-value': {
     action: 'admin/edit-product-option-value',
   },
-  'POST /api/v1/admin/archive-order': { action: 'admin/archive-order' },
+  // 'POST /api/v1/admin/archive-order': { action: 'admin/archive-order' },
   'POST /api/v1/admin/update-product-status': {
     action: 'admin/update-product-status',
   },
   'POST /api/v1/admin/create-discount': { action: 'admin/create-discount' },
   'POST /api/v1/admin/edit-discount': { action: 'admin/edit-discount' },
-  'POST /api/v1/admin/create-update-openinghours': {
-    action: 'admin/create-update-openinghours',
-  },
+  // 'POST /api/v1/admin/create-update-openinghours': {
+  //   action: 'admin/create-update-openinghours',
+  // },
   'POST /api/v1/admin/update-fulfilment-method': {
     action: 'admin/update-fulfilment-method',
   },
