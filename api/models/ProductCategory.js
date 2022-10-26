@@ -33,7 +33,7 @@ module.exports = {
       required: true,
     },
     categoryGroup: {
-      model: 'CategoryGroup',
+      model: 'categorygroup',
       description: 'The category group shared between vendors.',
       required: true,
     },

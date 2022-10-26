@@ -5,7 +5,13 @@ declare var OrderItem: any;
 declare var Order: any;
 // declare var _: any;
 import _ from 'lodash';
+import { OrderType } from 'scripts/utils';
 // import util from 'util';
+
+export type CreateOrderSuccess = {
+  orderId: number;
+  paymentIntentID: string;
+}
 
 module.exports = {
   friendlyName: 'Create order',
@@ -92,15 +98,49 @@ module.exports = {
       statusCode: 400,
     },
     notFound: {
-      statusCode: 400,
+      statusCode: 404,
       responseType: 'notFound',
     },
     badRequest: {
       responseType: 'badRequest',
     },
+    error: {
+      statusCode: 400,
+    },
   },
 
-  fn: async function (inputs, exits) {
+  fn: async function (
+    inputs: {
+      items: Array<{
+        id: number;
+        options: Array<{ [k: number]: number }>;
+        optionValues?: Array<any>;
+        order: any;
+      }>;
+      address: any;
+      total: number;
+      marketingOptIn: boolean;
+      discountCode: string;
+      vendor: number;
+      fulfilmentMethod: number;
+      fulfilmentSlotFrom: string;
+      fulfilmentSlotTo: string;
+      tipAmount: number;
+      walletAddress: string;
+    },
+    exits: {
+      success: (unusedResult: CreateOrderSuccess) => CreateOrderSuccess;
+      invalidSlot: (unusedArg?: string | Error) => void;
+      deliveryPartnerUnavailable: (unusedErr: Error) => void;
+      allItemsUnavailable: (unusedArg?: string | Error) => void;
+      minimumOrderAmount: (unusedArg?: string | Error) => void;
+      noItemsFound: (unusedArg?: string | Error) => void;
+      badItemsRequest: (unusedArg?: string | Error) => void;
+      notFound: (unusedArg?: string | Error) => void;
+      badRequest: (unusedArg?: string | Error) => void;
+      error: (unusedArg?: string | Error) => void;
+    }
+  ) {
     try {
       await sails.helpers.validateOrder.with(inputs);
     } catch (err) {
@@ -114,13 +154,17 @@ module.exports = {
       discount = await Discount.findOne({ code: inputs.discountCode });
     }
 
-    const vendorFulfilmentMethod = await FulfilmentMethod.findOne(inputs.fulfilmentMethod).populate('vendor');
+    const vendorFulfilmentMethod = await FulfilmentMethod.findOne(
+      inputs.fulfilmentMethod
+    ).populate("vendor");
 
-    if (vendorFulfilmentMethod.vendor.id !== inputs.vendor){
-      return exits.badRequest('Vendor did not match the vendor on the requested fulfilment method');
+    if (vendorFulfilmentMethod.vendor.id !== inputs.vendor) {
+      return exits.badRequest(
+        "Vendor did not match the vendor on the requested fulfilment method"
+      );
     }
 
-    const isDelivery = vendorFulfilmentMethod.methodType === 'delivery';
+    const isDelivery = vendorFulfilmentMethod.methodType === "delivery";
 
     let availableDeliveryPartner;
     if (isDelivery) {
@@ -129,23 +173,25 @@ module.exports = {
 	        await sails.helpers.getAvailableDeliveryPartnerFromPool.with({
 	          fulfilmentSlotFrom: inputs.fulfilmentSlotFrom, //moment.utc("01:15:00 PM", "h:mm:ss A")
 	          fulfilmentSlotTo: inputs.fulfilmentSlotTo, //moment.utc("01:15:00 PM", "h:mm:ss A")
-
+	          
 	          pickupFromVendor: vendor.id,
-
+	
 	          deliveryContactName: inputs.address.name,
 	          deliveryPhoneNumber: inputs.address.phoneNumber,
 	          deliveryComments: inputs.address.deliveryInstructions,
-
+	
 	          deliveryAddressLineOne: inputs.address.lineOne,
 	          deliveryAddressLineTwo: inputs.address.lineTwo,
 	          deliveryAddressCity: inputs.address.city,
 	          deliveryAddressPostCode: inputs.address.postCode,
 	        });
       } catch (error) {
-        sails.log.error(`helpers.getAvailableDeliveryPartnerFromPool errored: ${error}`);
+        sails.log.error(
+          `helpers.getAvailableDeliveryPartnerFromPool errored: ${error}`
+        );
         availableDeliveryPartner = null;
       }
-
+      
       if (!availableDeliveryPartner) {
         return exits.invalidSlot(
           'No deliveryPartner available for requested fulfilment'
@@ -163,7 +209,7 @@ module.exports = {
 
     try {
       const datastore = sails.getDatastore();
-
+      
       const wrapWithDb = (db, cb) => {
         try {
           if (db) {
@@ -180,7 +226,7 @@ module.exports = {
 
       var newPaymentIntent;
       var order;
-
+      
       const createOrderTransactionDB = async (db: any) => {
         for (var item in inputs.items) {
           var orderItemOptionValues = [];
@@ -315,7 +361,7 @@ module.exports = {
 
       if (datastore.config.adapter === 'sails-disk') {
         const result = await createOrderTransactionDB(null);
-        if(result){
+        if (result) {
           return exits.success(result);
         }
       } else {

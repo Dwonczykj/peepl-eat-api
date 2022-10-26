@@ -3192,11 +3192,11 @@
                     },
                     {
                       "type": "string",
-                      "description": "Not found"
+                      "description": "Bad request"
                     },
                     {
                       "type": "string",
-                      "description": "Bad request"
+                      "description": "Server error"
                     }
                   ]
                 }
@@ -3204,7 +3204,7 @@
             }
           },
           "404": {
-            "description": "Resource not found"
+            "description": "Not found"
           },
           "422": {
             "description": "Success",

@@ -25,8 +25,9 @@ module.exports = {
 
 
   fn: async function (inputs, exits) {
-    var vendor = await Vendor.findOne(inputs.vendorid)
-    .populate('products');
+    var vendor = await Vendor.findOne(inputs.vendorid).populate(
+      "products&fulfilmentPostalDistricts"
+    );
 
     if(!vendor){
       return exits.notFound();

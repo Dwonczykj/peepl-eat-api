@@ -1,4 +1,7 @@
 // declare var Order: any;
+
+import { OrderType } from "scripts/utils";
+
 // declare var User: any;
 module.exports = {
   friendlyName: "View order",
@@ -30,7 +33,17 @@ module.exports = {
     },
   },
 
-  fn: async function (inputs, exits) {
+  fn: async function (
+    inputs: {
+      orderId: string;
+    },
+    exits: {
+      success: (unusedArg: { order: OrderType }) => OrderType;
+      successJSON: (unusedArg: { order: OrderType }) => OrderType;
+      notFound: (unusedArg?: Error | string) => void;
+      badRequest: (unusedArg?: Error | string) => void;
+    }
+  ) {
     var order = await Order.findOne({
       publicId: inputs.orderId,
       completedFlag: "",

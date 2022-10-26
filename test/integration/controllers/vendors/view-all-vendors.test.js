@@ -66,6 +66,11 @@ const CAN_VIEW_SINGLE_VENDOR = (fixtures) => {
     expectStatusCode: 200,
     expectResponseCb: async (response, requestPayload) => {
       expect(response.body).to.have.property('vendor');
+      expect(response.body.vendor).to.have.property("name");
+      expect(response.body.vendor).to.have.property("status");
+      expect(response.body.vendor).to.have.property(
+        "fulfilmentPostalDistricts"
+      );
       expect(response.body.vendor).to.include({
         name: vendor.name,
         type: vendor.type,

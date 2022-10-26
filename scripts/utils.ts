@@ -99,22 +99,30 @@ type _VendorTypeHidden = {
   // collectionFulfilmentMethod?: FulfilmentMethodType;
 };
 
+export type StatusLiteral = "active" | "inactive";
+export type RatingType = 0 | 1 | 2 | 3 | 4 | 5;
+export type CompletedFlagType =
+  | ""
+  | "completed"
+  | "cancelled"
+  | "refunded"
+  | "partially refunded"
+  | "void";
+
 type _DeliveryPartnerTypeHidden = {
   id: number;
   name: string;
-  status: "active" | "inactive";
+  status: StatusLiteral;
   // deliveryFulfilmentMethod?: FulfilmentMethodType,
 };
 
 type _FulfilmentMethodTypeHidden = {
   id: number;
-  methodType: string;
+  methodType: "delivery" | "collection";
   slotLength: number;
   bufferLength: number;
   orderCutoff: string;
   maxOrders: number;
-  // vendor?: VendorType;
-  // deliveryPartner?: DeliveryPartnerType;
 };
 
 export type FulfilmentMethodType = _FulfilmentMethodTypeHidden & {
@@ -148,36 +156,104 @@ export type DiscountType = {
   id: number;
   outcode: string;
 }
-
-export type OrderType = {
+export type _ProductTypeHidden = {
   id: number;
-  items: Array<any>;
-  unfulfilledItems: Array<any>;
+};
+export type _ProductOptionValueTypeHidden = {
+  id: number;
+  name: string;
+  description: string;
+  priceModifier:number;
+  isAvailable: boolean;
+};
+export type _ProductOptionTypeHidden = {
+  id: number;
+  name: string;
+  isRequired: boolean;
+  product: _ProductTypeHidden;
+};
+export type ProductOptionValueType = {
+  option: _ProductOptionTypeHidden;
+}
+export type ProductOptionType = {
+  id: number;
+  name: string;
+  isRequired: boolean;
+  product: _ProductTypeHidden;
+  values: Array<ProductOptionValueType>;
+};
+export type _OrderItemTypeHidden = {
+  id: number;
+  unfulfilled: boolean;
+  unfulfilledOnOrderId: number;
+};
+
+
+export type OrderItemOptionValueType = {
+  id: number;
+  option: ProductOptionType,
+  optionValue: ProductOptionValueType,
+  orderItem: _OrderItemTypeHidden,
+};
+export type CategoryGroupType = {
+  id: number;
+  name: string;
+  imageUrl: string;
+  forRestaurantItem:boolean;
+};
+export type ProductCategoryType = {
+  id: number;
+  name: string;
+  vendor: VendorType;
+  categoryGroup: CategoryGroupType;
+  products: Array<_ProductTypeHidden>
+};
+export type ProductType = _ProductTypeHidden & {
+  id: number;
+  name: string;
+  description: string;
+  shortDescription: string;
+  basePrice: number;
+  imageUrl: string;
+  isAvailable: boolean;
+  priority: number;
+  isFeatured: boolean;
+  status: StatusLiteral;
+  vendor: VendorType;
+  options: Array<ProductOptionType>
+  category: ProductCategoryType;
+};
+
+export type RestaurantAcceptedStatusType =
+  | "rejected"
+  | "accepted"
+  | "pending"
+  | "partially fulfilled";
+
+export type PaymentStatusType = "paid" | "unpaid" | "failed";
+
+export type _OrderTypeHidden = {
+  id: number;
   vendor: VendorType;
   deliveryPartner?: DeliveryPartnerType;
-  parentOrder?: OrderType;
   subtotal: number;
   total: number;
   orderedDateTime: number;
   paidDateTime: number;
   refundDateTime: number;
-  paymentStatus: "paid" | "unpaid" | "failed";
+  paymentStatus: PaymentStatusType;
   paymentIntentId: string;
   fulfilmentMethod: FulfilmentMethodType;
   fulfilmentSlotFrom: Date;
   fulfilmentSlotTo: Date;
-  restaurantAcceptanceStatus:
-    | "rejected"
-    | "accepted"
-    | "pending"
-    | "partially fulfilled";
+  restaurantAcceptanceStatus: RestaurantAcceptedStatusType;
   deliveryName: string;
   deliveryEmail: string;
   deliveryPhoneNumber: string;
   deliveryAddressLineOne: string;
   deliveryAddressLineTwo: string;
-  deliveryAddressLineCity: string;
-  deliveryAddressLinePostCode: string;
+  deliveryAddressCity: string;
+  deliveryAddressPostCode: string;
   deliveryAddressInstructions: string;
   customerWalletAddress: string;
   deliveryId?: string;
@@ -187,17 +263,26 @@ export type OrderType = {
   tipAmount: number;
   rewardsIssued: number;
   sentToDeliveryPartner: boolean;
-  completedFlag:
-    | ""
-    | "completed"
-    | "cancelled"
-    | "refunded"
-    | "partially refunded"
-    | "void";
+  completedFlag: CompletedFlagType;
   completedOrderFeedback: string;
-  deliveryPunctuality: 0 | 1 | 2 | 3 | 4 | 5;
-  orderCondition: 0 | 1 | 2 | 3 | 4 | 5;
+  deliveryPunctuality: RatingType;
+  orderCondition: RatingType;
   discount: DiscountType;
+};
+
+export type OrderItemType = _OrderItemTypeHidden & {
+  id: number;
+  unfulfilled: boolean;
+  unfulfilledOnOrderId: number;
+  order: _OrderTypeHidden;
+  product: ProductType;
+  optionValues: OrderItemOptionValueType;
+};
+
+export type OrderType = _OrderTypeHidden & {
+  parentOrder?: OrderType;
+  items: Array<OrderItemType>;
+  unfulfilledItems: Array<OrderItemType>;
 };
 
 export const openingHoursToMoments = (openingHours:OpeningHoursType, withDate: moment.Moment) => {
