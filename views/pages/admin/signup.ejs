@@ -4,7 +4,7 @@
     <div class="container">
       <div class="row">
         <div class="col-md-6 mx-auto">
-          <div id="registrationPhoneContainer" class="login-panel panel panel-default">
+          <div id="registrationPhoneContainer" class="hidden login-panel panel panel-default">
             <div class="panel-heading">
               <h2 class="panel-title">Register with Phone</h2>
             </div>
@@ -267,12 +267,13 @@
                     <!-- <option value="admin">Vegi Admin</option> -->
                     <option value="vendor">Merchant</option>
                     <option value="deliveryPartner">DeliveryPartner</option>
+                    <option value="consumer">Consumer</option>
                   </select>
                 </div>
                 <div class="form-group">
                   <label for="business">Business</label>
                   <select class="form-control" id="business" v-model="businessId">
-                    <option v-if="role !== 'deliveryPartner'" v-for="vendor in vendors" :value="vendor.id">{{vendor.name}} -
+                    <option v-if="role === 'vendor'" v-for="vendor in vendors" :value="vendor.id">{{vendor.name}} -
                       {{vendor.type}}</option>
                     <option v-if="role === 'deliveryPartner'" v-for="vendor in deliveryPartners" :value="vendor.id">{{vendor.name}} -
                       {{vendor.type}}</option>
@@ -309,10 +310,10 @@
                     :options="filteredDeliveryPartnerRoles">
                   </b-form-select>
                 </div>
-                <ajax-button 
-                  class="btn btn-peepl mt-6" 
+                <ajax-button
+                  class="btn btn-peepl mt-6"
                   id="registerUserSubmitButton"
-                  type="submit" 
+                  type="submit"
                   @click="clickRegisterUserWithPhone()"
                   :syncing="syncing"
                   :class="{ 'is-loading': syncing }">
@@ -323,7 +324,7 @@
               </ajax-form>
             </div>
           </div>
-          <div id="registrationEmailPasswordContainer" class="hidden login-panel panel panel-default">
+          <div id="registrationEmailPasswordContainer" class="login-panel panel panel-default">
             <div class="panel-heading">
               <h2 class="panel-title">Register with Email & Password</h2>
             </div>
@@ -591,12 +592,13 @@
                     <!-- <option value="admin">Vegi Admin</option> -->
                     <option value="vendor">Merchant</option>
                     <option value="deliveryPartner">DeliveryPartner</option>
+                    <option value="consumer">Consumer</option>
                   </select>
                 </div>
-                <div class="form-group">
+                <div class="form-group" :class="isConsumer ? 'hidden' : ''">
                   <label for="businessEP">Business</label>
                   <select class="form-control" id="businessEP" v-model="businessId">
-                    <option v-if="role !== 'deliveryPartner'" v-for="vendor in vendors" :value="vendor.id">{{vendor.name}} -
+                    <option v-if="role === 'vendor'" v-for="vendor in vendors" :value="vendor.id">{{vendor.name}} -
                       {{vendor.type}}</option>
                     <option v-if="role === 'deliveryPartner'" v-for="vendor in deliveryPartners" :value="vendor.id">{{vendor.name}} -
                       {{vendor.type}}</option>
@@ -634,10 +636,10 @@
                   </b-form-select>
                 </div>
 
-                <ajax-button 
-                  class="btn btn-peepl mt-6" 
+                <ajax-button
+                  class="btn btn-peepl mt-6"
                   id="registerUserSubmitButtonEP"
-                  type="submit" 
+                  type="submit"
                   @click="clickRegisterUserWithEmailPassword()"
                   :syncing="syncing"
                   :class="{ 'is-loading': syncing }">
@@ -648,10 +650,10 @@
               </ajax-form>
             </div>
           </div>
-          <div id="signupWithPhoneButton" style="width: 50%; padding: 0.25em;" class="hidden">
+          <div id="signupWithPhoneButton" style="width: 50%; padding: 0.25em;">
             <button @click="hideSignupWithPassword" id="register" class="btn-sm">Register with Phone</button>
           </div>
-          <div id="signupWithPasswordButton" style="width: 50%; padding: 0.25em;">
+          <div id="signupWithPasswordButton" style="width: 50%; padding: 0.25em;" class="hidden">
             <button @click="hideSignupWithPhone" id="register" class="btn-sm">Register with Email & Password</button>
           </div>
         </div>

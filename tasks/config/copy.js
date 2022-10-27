@@ -13,12 +13,20 @@ module.exports = function(grunt) {
 
   grunt.config.set('copy', {
     dev: {
-      files: [{
-        expand: true,
-        cwd: './assets/dependencies',
-        src: ['**/*.!(coffee|less|scss|sass)'],
-        dest: '.tmp/public/dependencies'
-      }]
+      files: [
+        {
+          expand: true,
+          cwd: './assets/dependencies',
+          src: ['**/*.!(coffee|less|scss|sass)'],
+          dest: '.tmp/public/dependencies'
+        },
+        {
+          expand: true,
+          cwd: './assets/images',
+          src: ['**/*.!(coffee|less|scss|sass)'],
+          dest: '.tmp/public/images'
+        },
+      ]
     },
     devbabel: {
       files: [{

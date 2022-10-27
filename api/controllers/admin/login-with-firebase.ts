@@ -1,4 +1,5 @@
-import { getAuth } from 'firebase-admin/auth';
+import { DecodedIdToken } from 'firebase-admin/auth';
+import * as firebase from '../../../config/firebaseAdmin';
 //TODO: Consider connecting Passport to Google Auth Flow: https://stackoverflow.com/q/34069046
 
 export const splitPhoneNumber = (formattedFirebaseNumber:string) => {
@@ -74,7 +75,7 @@ requests over WebSockets instead of HTTP).`,
     serverError: {
       statusCode: 500,
       data: null,
-    }
+    },
   },
 
 
@@ -83,24 +84,25 @@ requests over WebSockets instead of HTTP).`,
     // TODO: First authenticate backend service account: https://firebase.google.com/docs/auth/admin/verify-id-tokens#verify_id_tokens_using_the_firebase_admin_sdk
     // TODO: Second use this idToken from the user with the Firebase Admin SDK: getAuth().verifyIdToken(idToken)
 
-    sails.log.info('Entered login-with-firebase controller method');
-    
-    
+    var _decodedToken: DecodedIdToken;
+
+    try {
+      _decodedToken = await firebase.verifyIdToken(inputs.firebaseSessionToken);
+    } catch (err) {
+      sails.log.error(err);
+
+      return exits.firebaseErrored({
+        code: err.code,
+        message: err.message,
+        error: err,
+      }); //https://firebase.google.com/docs/reference/js/auth#autherrorcodes
+    }
+
+    // Signed in
+    const decodedToken = _decodedToken;
 
     try {
       const inputPhoneDetails = splitPhoneNumber(inputs.phoneNumber);
-      // var decodedToken;
-      const auth = getAuth();
-      // if (inputs.firebaseSessionToken === 'DUMMY'){
-      //   decodedToken = {
-      //     // eslint-disable-next-line camelcase
-      //     phone_number: inputs.phoneNumber,
-      //     uid: 'testing_DUMMY',
-      //   };
-      // } else {
-      //   decodedToken = await auth.verifyIdToken(inputs.firebaseSessionToken);
-      // }
-      const decodedToken = await auth.verifyIdToken(inputs.firebaseSessionToken);
 
       const formattedFirebaseNumber = decodedToken.phone_number;
       if (!formattedFirebaseNumber){
@@ -169,7 +171,7 @@ requests over WebSockets instead of HTTP).`,
           // sails.helpers.broadcastSessionChange(this.req);
         }
 
-        
+
         return exits.success(user);
       } catch(error){
         sails.log.info(error);

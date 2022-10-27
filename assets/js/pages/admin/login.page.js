@@ -96,7 +96,7 @@ parasails.registerPage('login', {
       // }, auth);
       const auth = getAuth();
       window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
-        'size': 'invisible',
+        'size': 'normal',
         'callback': (response) => {
           // window.alert('repatcha  callback called -> call the getVerificationCode flow' + response.toString());
 

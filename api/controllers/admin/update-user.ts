@@ -1,12 +1,22 @@
-declare var DeliveryPartner: any;
+import { UserRecord } from 'firebase-admin/auth';
+import * as firebase from '../../../config/firebaseAdmin';
+import {
+  UserDeliveryPartnerRoleLiteral,
+  UserRoleLiteral,
+  UserVendorRoleLiteral,
+  UserType,
+  DeliveryPartnerType,
+} from '../../../scripts/utils';
+import { sailsVegi, SailsModelType } from '../../interfaces/iSails';
+declare var sails: sailsVegi;
+declare var DeliveryPartner: SailsModelType<DeliveryPartnerType>;
+declare var User: SailsModelType<UserType>;
+
 module.exports = {
-
-
   friendlyName: 'Update User Vendor Role',
 
-
-  description: 'Update the role of the user at the vendor they are registered to',
-
+  description:
+    'Update the role of the user at the vendor they are registered to',
 
   inputs: {
     email: {
@@ -14,39 +24,63 @@ module.exports = {
       isEmail: true,
       required: true,
     },
-    vendorId: {
-      type: 'number',
-      required: true,
-    },
-    vendorRole: {
-      type: 'string',
-      isIn: ['owner', 'inventoryManager', 'salesManager', 'deliveryPartner', 'none'],
-    },
-    vendorConfirmed: {
-      type: 'boolean',
-    },
-    deliveryPartnerId: {
-      type: 'number',
-      required: true,
-    },
-    deliveryPartnerRole: {
-      type: 'string',
-      isIn: ['owner', 'deliveryManager', 'rider', 'none'],
-    },
     name: {
       type: 'string',
     },
     role: {
       type: 'string',
-      isIn: ['admin', 'vendor', 'deliveryPartner'],
+      isIn: [
+        'admin',
+        'vendor',
+        'deliveryPartner',
+        'consumer',
+      ] as Array<UserRoleLiteral>,
+    },
+    password: {
+      type: 'string',
+      required: false,
+      defaultsTo: ''
+    },
+    vendorId: {
+      type: 'number',
+      required: false,
+    },
+    vendorRole: {
+      type: 'string',
+      isIn: [
+        'owner',
+        'inventoryManager',
+        'salesManager',
+        'deliveryPartner',
+        'none',
+      ] as Array<UserVendorRoleLiteral>,
+    },
+    vendorConfirmed: {
+      type: 'boolean',
+    },
+    roleConfirmedWithOwner: {
+      type: 'boolean',
+      defaultsTo: false,
+    },
+    deliveryPartnerId: {
+      type: 'number',
+      required: false,
+    },
+    deliveryPartnerRole: {
+      type: 'string',
+      isIn: [
+        'owner',
+        'deliveryManager',
+        'rider',
+        'none',
+      ] as Array<UserDeliveryPartnerRoleLiteral>,
     },
   },
-
 
   exits: {
     success: {
       outputDescription: '`User`s vendor role has been successfully updated.',
-      outputExample: {}
+      outputExample: {},
     },
     badRequest: {
       description: 'VendorRole passed does not exist.',
@@ -54,30 +88,81 @@ module.exports = {
     },
     notFound: {
       description: 'There is no vendor with that ID!',
-      responseType: 'notFound'
+      responseType: 'notFound',
     },
     unauthorised: {
       description: 'You are not authorised to have a role with this vendor.',
-      responseType: 'unauthorised'
+      responseType: 'unauthorised',
+    },
+    firebaseErrored: {
+      responseType: 'firebaseError',
+      statusCode: 401,
+      description: 'firebase errored on verifying the user token',
+      code: null,
+      message: 'error',
+      error: null,
     },
   },
 
+  fn: async function (
+    inputs: {
+      name: string;
+      role: UserRoleLiteral;
+      email: string;
+      password?: string;
+      vendorId?: number;
+      vendorRole?: UserVendorRoleLiteral;
+      vendorConfirmed?: boolean;
+      roleConfirmedWithOwner?: boolean;
+      deliveryPartnerId?: number;
+      deliveryPartnerRole?: UserDeliveryPartnerRoleLiteral;
+    },
+    exits: {
+      success: (unusedArg?: { updatedUserId: number }) => void;
+      badRequest: (unusedArg?: any) => void;
+      notFound: () => void;
+      unauthorised: () => void;
+      firebaseErrored: (unusedArg?: any) => void;
+    }
+  ) {
+    // TODO: Integration Test this
+    const myUser: UserType = await User.findOne({
+      id: this.req.session.userId,
+    });
+    if (!myUser) {
+      this.res.redirect('/');
+      return exits.notFound();
+    }
 
-  fn: async function (inputs, exits) {
-    // TODO: Test this
-    let myUser = await User.findOne({ id: this.req.session.userId });
+    const userToUpdate: UserType = await User.findOne({ email: inputs.email });
 
-    let userToUpdate = await User.findOne({ email: inputs.email });
+    if (!userToUpdate){
+      return exits.notFound();
+    }else if (!userToUpdate.fbUid) {
+      sails.log.warn(
+        `User with email: ${userToUpdate.email} not linked to firebase account`
+      );
+      // return exits.notFound();
+    }
 
-    let updateUserObj = {
+    if(userToUpdate.id !== myUser.id){
+      const isSuperAdmin = await sails.helpers.isSuperAdmin.with({
+        userId: myUser.id
+      });
+      if(!isSuperAdmin.data){
+        return exits.unauthorised();
+      }
+    }
 
-    };
-    if (Object.keys(inputs).includes('name'))
+    let updateUserObj: {[key in keyof UserType]?: UserType[key]} = {};
+    if (Object.keys(inputs).includes('name')) {
       updateUserObj['name'] = inputs.name;
-    if (Object.keys(inputs).includes('role'))
-      updateUserObj['role'] = inputs.name;
+    }
+    if (Object.keys(inputs).includes('role')) {
+      updateUserObj['role'] = inputs.role;
+    }
 
-
+    // Set user.vendor
     if (Object.keys(inputs).includes('vendorId')) {
       //TODO: Check that the user is registered to a vendor and that it matches the vendor in the inputs (request)
       let vendor = await Vendor.findOne({ id: inputs.vendorId });
@@ -86,56 +171,100 @@ module.exports = {
         return exits.notFound();
       }
       // Check if admin user is authorised to edit vendor.
-      var isAuthorisedForVendor = await sails.helpers.isAuthorisedForVendor.with({
-        userId: this.req.session.userId,
-        vendorId: vendor.id
-      });
+      const isAuthorisedForVendor =
+        await sails.helpers.isAuthorisedForVendor.with({
+          userId: this.req.session.userId,
+          vendorId: vendor.id,
+        });
 
       if (!isAuthorisedForVendor) {
         return exits.unauthorised();
       }
 
-      if (!['owner', 'inventoryManager', 'salesManager', 'none'].includes(inputs.vendorRole)) {
+      if (
+        !['owner', 'inventoryManager', 'salesManager', 'none'].includes(
+          inputs.vendorRole
+        )
+      ) {
         return exits.badRequest();
       }
 
       updateUserObj['vendorRole'] = inputs.vendorRole;
       updateUserObj['vendor'] = vendor;
-
     }
 
+    // Set user.deliveryPartner
     if (Object.keys(inputs).includes('deliveryPartnerId')) {
       //TODO: Check that the user is registered to a deliveryPartner and that it matches the deliveryPartner in the inputs (request)
-      let deliveryPartner = await DeliveryPartner.findOne({ id: inputs.deliveryPartnerId });
+      let deliveryPartner = await DeliveryPartner.findOne({
+        id: inputs.deliveryPartnerId,
+      });
 
       if (!deliveryPartner) {
         return exits.notFound();
       }
       // Check if admin user is authorised to edit deliveryPartner.
-      var isAuthorisedForDeliveryPartner = await sails.helpers.isAuthorisedForDeliveryPartner.with({
-        userId: this.req.session.userId,
-        deliveryPartnerId: deliveryPartner.id
-      });
+      const isAuthorisedForDeliveryPartner =
+        await sails.helpers.isAuthorisedForDeliveryPartner.with({
+          userId: this.req.session.userId,
+          deliveryPartnerId: deliveryPartner.id,
+        });
 
       if (!isAuthorisedForDeliveryPartner) {
         return exits.unauthorised();
       }
 
-      if (!['owner', 'deliveryManager', 'rider', 'none'].includes(inputs.deliveryPartnerRole)) {
+      if (
+        !['owner', 'deliveryManager', 'rider', 'none'].includes(
+          inputs.deliveryPartnerRole
+        )
+      ) {
         return exits.badRequest();
       }
 
       updateUserObj['deliveryPartnerRole'] = inputs.deliveryPartnerRole;
       updateUserObj['deliveryPartner'] = deliveryPartner;
-
     }
 
-    var updatedUser = await User.updateOne(inputs.id).set(updateUserObj);
+    await User.updateOne(userToUpdate.id).set(updateUserObj);
+    //TODO: Update the user in admin
+    var _userRecord: UserRecord;
+    if (userToUpdate.fbUid){
+      try {
+        _userRecord = await firebase.updateUser(
+          userToUpdate.fbUid,
+          inputs.password
+            ? {
+              email: userToUpdate.email,
+              password: inputs.password,
+              name: inputs.name,
+            }
+            : {
+              email: userToUpdate.email,
+              name: inputs.name,
+            }
+        );
+      } catch (err) {
+        sails.log.error(err);
+
+        return exits.firebaseErrored({
+          code: err.code,
+          message: err.message,
+          error: err,
+        }); //https://firebase.google.com/docs/reference/js/auth#autherrorcodes
+      }
+
+      // Signed in
+      const userRecord = _userRecord;
+
+      await User.updateOne(userToUpdate.id).set({
+        fbUid: userRecord.uid
+      });
+    }
 
     // All done.
-    return exits.success();
-
-  }
-
-
+    return exits.success({
+      updatedUserId: userToUpdate.id,
+    });
+  },
 };

@@ -9,11 +9,11 @@
  */
 module.exports = async function (req, res, proceed) {
   if (!req.session.userId) {
-    sails.log('Policy:<is-super-admin> -> redirect to login as no active session');
+    sails.log('Policy:<is-super-admin> -> redirect to default root as no active session');
     if (req.wantsJSON) {
       return res.forbidden();
     } else {
-      return res.redirect('/admin/login-with-password');
+      return res.redirect('/home');
     }
   }
 
@@ -29,6 +29,6 @@ module.exports = async function (req, res, proceed) {
   if (req.wantsJSON) {
     return res.forbidden();
   } else {
-    return res.redirect('/admin/login');
+    return res.redirect('/home');
   }
 };

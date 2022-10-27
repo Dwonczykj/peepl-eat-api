@@ -92,6 +92,40 @@ export const datetimeStrFormat = 'YYYY-MM-DD HH:mm';
 export const datetimeStrTzFormat = 'YYYY-MM-DD HH:mm Z';
 export const timeStrTzFormat = 'HH:mm Z';
 
+export type UserRoleLiteral =
+  | 'consumer'
+  | 'admin'
+  | 'vendor'
+  | 'deliveryPartner';
+export type UserVendorRoleLiteral =
+  | 'admin'
+  | 'owner'
+  | 'inventoryManager'
+  | 'salesManager'
+  | 'none';
+export type UserDeliveryPartnerRoleLiteral =
+  | 'admin'
+  | 'owner'
+  | 'deliveryManager'
+  | 'rider'
+  | 'none';
+
+type _UserTypeHidden = {
+  id: number;
+  email: string;
+  phoneNoCountry: number;
+  phoneCountryCode: number;
+  name: string;
+  isSuperAdmin: boolean;
+  role: UserRoleLiteral;
+  vendorRole?: UserVendorRoleLiteral;
+  deliveryPartnerRole?: UserDeliveryPartnerRoleLiteral;
+  roleConfirmedWithOwner: boolean;
+  vendorConfirmed: boolean;
+  fbUid?: string;
+  firebaseSessionToken?: string;
+};
+
 type _VendorTypeHidden = {
   id: number;
   name: string;
@@ -117,6 +151,11 @@ type _DeliveryPartnerTypeHidden = {
   name: string;
   status: StatusLiteral;
   // deliveryFulfilmentMethod?: FulfilmentMethodType,
+};
+
+export type UserType = _UserTypeHidden & {
+  vendor: _VendorTypeHidden;
+  deliveryPartner: _DeliveryPartnerTypeHidden;
 };
 
 type _FulfilmentMethodTypeHidden = {

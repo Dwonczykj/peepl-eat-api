@@ -1,5 +1,4 @@
-// * Moved to api/policies/firebase.js
-// var admin = require('firebase-admin');
+var admin = require('firebase-admin');
 // var serviceAccount = require('../../config/vegiliverpool-firebase-adminsdk-4dfpz-8f01f888b3.json');
 // admin.initializeApp({
 //   credential: admin.credential.cert(serviceAccount)
@@ -80,7 +79,7 @@ module.exports = {
         body: inputs.body
       }
     };
-    const admin = this.req.firebase;
+    // const admin = this.req.firebase;
     admin.messaging()
       .sendToTopic(inputs.topic, message)
       .then((res) => {

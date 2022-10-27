@@ -71,9 +71,12 @@ module.exports = {
     // firebaseUser: { // https://sailsjs.com/documentation/concepts/models-and-orm/attributes#:~:text=%23-,Type,-%23
     //   type: 'json', // https://sailsjs.com/documentation/concepts/models-and-orm/associations
     // }
+    fbUid: {
+      type: "string",
+    },
     firebaseSessionToken: {
       type: "string",
-      required: true,
+      required: false,
     },
     secret: {
       type: "string",
@@ -82,9 +85,6 @@ module.exports = {
         "Securely hashed representation of the service account's secret.",
       protect: true,
       example: "2$28a8eabna301089103-13948134nad",
-    },
-    fbUid: {
-      type: "string",
     },
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗

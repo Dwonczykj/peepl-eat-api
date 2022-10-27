@@ -18,6 +18,9 @@ const { buildDb } = require('../scripts/build_db');
 module.exports.bootstrap = async function () {
   _.extend(sails.hooks.http.app.locals, sails.config.http.locals);
 
+  // const { initFirebase } = require(`${process.cwd()}/config/firebase`);
+  // initFirebase(sails);
+
   // Import dependencies
   var path = require('path');
 
@@ -26,14 +29,29 @@ module.exports.bootstrap = async function () {
 
   // This path indicates where to store/look for the JSON file that tracks the "last run bootstrap info"
   // locally on this development computer (if we happen to be on a development computer).
-  var bootstrapLastRunInfoPath = path.resolve(sails.config.appPath, '.tmp/bootstrap-version.json');
+  var bootstrapLastRunInfoPath = path.resolve(
+    sails.config.appPath,
+    '.tmp/bootstrap-version.json'
+  );
   // Compare bootstrap version from code base to the version that was last run
-  var lastRunBootstrapInfo = await sails.helpers.fs.readJson(bootstrapLastRunInfoPath)
+  var lastRunBootstrapInfo = await sails.helpers.fs
+    .readJson(bootstrapLastRunInfoPath)
     .tolerate('doesNotExist'); // (it's ok if the file doesn't exist yet-- just keep going.)
 
-  if (lastRunBootstrapInfo && lastRunBootstrapInfo.lastRunVersion === HARD_CODED_DATA_VERSION) {
-    sails.log('Skipping v' + HARD_CODED_DATA_VERSION + ' bootstrap script...  (because it\'s already been run)');
-    sails.log('(last run on this computer: @ ' + (new Date(lastRunBootstrapInfo.lastRunAt)) + ')');
+  if (
+    lastRunBootstrapInfo &&
+    lastRunBootstrapInfo.lastRunVersion === HARD_CODED_DATA_VERSION
+  ) {
+    sails.log(
+      'Skipping v' +
+        HARD_CODED_DATA_VERSION +
+        " bootstrap script...  (because it's already been run)"
+    );
+    sails.log(
+      '(last run on this computer: @ ' +
+        new Date(lastRunBootstrapInfo.lastRunAt) +
+        ')'
+    );
     return;
   } //•
 
@@ -44,19 +62,28 @@ module.exports.bootstrap = async function () {
     if (!isMochaTestEnv) {
       fixtures = await buildDb(sails, false);
     }
-
   } catch (error) {
-    sails.log.warn('Bootstrapping db failed. Delete the db and start again... Error -> ' + error);
+    sails.log.warn(
+      'Bootstrapping db failed. Delete the db and start again... Error -> ' +
+        error
+    );
   }
-  await sails.helpers.fs.writeJson.with({
-    destination: bootstrapLastRunInfoPath,
-    json: {
-      lastRunVersion: HARD_CODED_DATA_VERSION,
-      lastRunAt: Date.now()
-    },
-    force: true
-  })
+  await sails.helpers.fs.writeJson
+    .with({
+      destination: bootstrapLastRunInfoPath,
+      json: {
+        lastRunVersion: HARD_CODED_DATA_VERSION,
+        lastRunAt: Date.now(),
+      },
+      force: true,
+    })
     .tolerate((err) => {
-      sails.log.warn('For some reason, could not write bootstrap version .json file.  This could be a result of a problem with your configured paths, or, if you are in production, a limitation of your hosting provider related to `pwd`.  As a workaround, try updating app.js to explicitly pass in `appPath: __dirname` instead of relying on `chdir`.  Current sails.config.appPath: `' + sails.config.appPath + '`.  Full error details: ' + err.stack + '\n\n(Proceeding anyway this time...)');
+      sails.log.warn(
+        'For some reason, could not write bootstrap version .json file.  This could be a result of a problem with your configured paths, or, if you are in production, a limitation of your hosting provider related to `pwd`.  As a workaround, try updating app.js to explicitly pass in `appPath: __dirname` instead of relying on `chdir`.  Current sails.config.appPath: `' +
+          sails.config.appPath +
+          '`.  Full error details: ' +
+          err.stack +
+          '\n\n(Proceeding anyway this time...)'
+      );
     });
 };

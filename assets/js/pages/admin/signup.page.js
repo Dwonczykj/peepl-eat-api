@@ -36,7 +36,7 @@ parasails.registerPage('signup', {
     vendorRole: 'salesManager',
     deliveryPartnerRole: 'none',
     options: {
-      role: ['admin', 'vendor', 'deliveryPartner'],
+      role: ['admin', 'vendor', 'deliveryPartner', 'consumer'],
       vendorRole: ['owner', 'inventoryManager', 'salesManager', 'none'],
       deliveryPartnerRole: ['owner', 'deliveryManager', 'rider', 'none'],
     },
@@ -76,6 +76,9 @@ parasails.registerPage('signup', {
     },
     isVendor() {
       return this.role === 'vendor';
+    },
+    isConsumer() {
+      return this.role === 'consumer';
     },
     phoneNumber() {
       return `+${this.countryCode} ${this.phoneNoCountry}`;

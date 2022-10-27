@@ -122,6 +122,8 @@ module.exports.routes = {
   'ALL /api/v1/admin/logout': { action: 'admin/logout' },
   'POST /api/v1/admin/deregister-user': { action: 'admin/deregister-user' },
 
+  'ALL /': { action: 'home/view-dashboard' },
+  'GET /home': { action: 'home/view-dashboard' },
   'GET /admin': { action: 'admin/view-vendors' },
   'GET /admin/vendors': { action: 'admin/view-vendors' },
   'GET /admin/vendors/new': { action: 'admin/view-create-vendor' },

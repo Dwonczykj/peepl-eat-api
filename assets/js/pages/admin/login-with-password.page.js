@@ -66,7 +66,7 @@ parasails.registerPage('login-with-password', {
       };
 
       // Validate email:
-      if (!argins.emailAddress) {
+      if (!argins.email) {
         this.formErrors.emailAddress = true;
       }
 
@@ -92,47 +92,58 @@ parasails.registerPage('login-with-password', {
       const rememberMe = this.rememberMe;
 
       const auth = getAuth();
-      signInWithEmailAndPassword(auth, email, password)
-        .then(async (userCredential) => {
-          // Signed in
-          const fbUser = userCredential.user;
+      var _userCreds;
+      try {
+        _userCreds = await signInWithEmailAndPassword(auth, email, password)
 
+      } catch (err) {
+        console.error(`Unable to signin using firebase API: ${err}`);
+        this.cloudError = `Unable to signin using firebase API: ${err}`;
+        if (err.code === 'auth/user-not-found') {
+          Cloud.userExistsForEmail(email).then((userExists) => {
+            if (userExists && userExists.data === true) {
+              return this.registerEmailPasswordFirebaseOnly(email, password);
+            }
+          });
+        } else {
+          //ignore
+        }
+      }
+      const userCredential = _userCreds;
+
+      // Signed in
+      const fbUser = userCredential.user;
+
+      // eslint-disable-next-line no-console
+      const sessionToken = await fbUser.getIdToken(true);
+      console.log(
+        fbUser.email +
+          ' authorised sign in to firebase with session token:\n---------' +
+          sessionToken +
+          '---------'
+      );
+      var _vegiSigninResponse;
+      try {
+	      _vegiSigninResponse = await Cloud.loginWithPassword(email, sessionToken, rememberMe);
+      } catch (err) {
+        console.error(`Unable to signin to vegi server using firebase session token: ${err}`);
+        if (err.exit === 'userExists') {
+          this.cloudError = 'Unable to login. Check credentials.';
+        } else if (err.code === 'firebaseErrored') {
+          this.cloudError = `${err.message}`;
           // eslint-disable-next-line no-console
-          const sessionToken = await fbUser.getIdToken(true);
-          console.log(
-            fbUser.email +
-              ' authorised sign in to firebase with session token:\n---------' +
-              sessionToken +
-              '---------'
-          );
+          console.warn(err.responseInfo);
+        } else {
+          this.cloudError = `[${err.code}]: ${err.message}`;
+          // eslint-disable-next-line no-console
+          console.warn(err.responseInfo);
+        }
+      }
+      // const vegiSigninResponse = _vegiSigninResponse;
 
-          return Cloud.loginWithPassword(email, sessionToken, rememberMe);
-        })
-        .then((response) => {
-          location.replace('/admin');
-        })
-        .catch((err) => {
-          if (err.code === 'auth/user-not-found') {
-            Cloud.userExistsForEmail(email).then((userExists) => {
-              if (userExists && userExists.data === true) {
-                return this.registerEmailPasswordFirebaseOnly(email, password);
-              }
-            });
-          }
-          else if (err.exit === 'userExists') {
-            this.cloudError = 'Unable to login. Check credentials.';
-          }
-          else if (err.code === 'firebaseErrored') {
-            this.cloudError = `${err.message}`;
-            // eslint-disable-next-line no-console
-            console.warn(err.responseInfo);
-          }
-          else {
-            this.cloudError = `[${err.code}]: ${err.message}`;
-            // eslint-disable-next-line no-console
-            console.warn(err.responseInfo);
-          }
-        });
+      if(!this.cloudError){
+        location.replace('/admin');
+      }
     },
     registerEmailPasswordFirebaseOnly: function(email, password) {
       const auth = getAuth();

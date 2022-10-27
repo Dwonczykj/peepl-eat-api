@@ -25,6 +25,9 @@
   },
   "tags": [
     {
+      "name": "View dashboard"
+    },
+    {
       "name": "View vendors"
     },
     {
@@ -1517,8 +1520,7 @@
               "phoneNoCountry",
               "phoneCountryCode",
               "name",
-              "role",
-              "firebaseSessionToken"
+              "role"
             ]
           }
         ]
@@ -1601,6 +1603,9 @@
             "type": "boolean",
             "default": false
           },
+          "fbUid": {
+            "type": "string"
+          },
           "firebaseSessionToken": {
             "type": "string"
           },
@@ -1608,9 +1613,6 @@
             "type": "string",
             "description": "Securely hashed representation of the service account's secret.",
             "example": "2$28a8eabna301089103-13948134nad"
-          },
-          "fbUid": {
-            "type": "string"
           },
           "vendor": {
             "description": "JSON dictionary representing the **vendor** instance or FK when creating / updating / not populated",
@@ -1924,6 +1926,27 @@
     }
   },
   "paths": {
+    "/home": {
+      "get": {
+        "summary": "View dashboard",
+        "description": "Display Dashboard page.",
+        "tags": [
+          "View dashboard"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/admin": {
       "get": {
         "summary": "View vendors",
@@ -3791,6 +3814,12 @@
               }
             }
           },
+          "400": {
+            "description": "Server error"
+          },
+          "401": {
+            "description": "firebase errored on verifying the user token"
+          },
           "403": {
             "description": "Register request passed with string roles that do not exist on the roles/vendorRoles/deliveryPartnerRoles of a User"
           },
@@ -4101,8 +4130,39 @@
           },
           {
             "in": "query",
+            "name": "name",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "role",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "admin",
+                "vendor",
+                "deliveryPartner",
+                "consumer"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "password",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          },
+          {
+            "in": "query",
             "name": "vendorId",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "number",
               "format": "double"
@@ -4133,8 +4193,17 @@
           },
           {
             "in": "query",
+            "name": "roleConfirmedWithOwner",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "in": "query",
             "name": "deliveryPartnerId",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "number",
               "format": "double"
@@ -4151,27 +4220,6 @@
                 "deliveryManager",
                 "rider",
                 "none"
-              ]
-            }
-          },
-          {
-            "in": "query",
-            "name": "name",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "role",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "admin",
-                "vendor",
-                "deliveryPartner"
               ]
             }
           }
@@ -4200,6 +4248,9 @@
           },
           "400": {
             "description": "VendorRole passed does not exist."
+          },
+          "401": {
+            "description": "firebase errored on verifying the user token"
           },
           "404": {
             "description": "There is no vendor with that ID!"
@@ -4251,6 +4302,9 @@
           },
           "400": {
             "description": "User id passed does not exist."
+          },
+          "401": {
+            "description": "firebase errored on verifying the user token"
           },
           "404": {
             "description": "There is no user with that ID!"
@@ -6995,6 +7049,27 @@
           },
           "404": {
             "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/": {
+      "all": {
+        "summary": "View dashboard",
+        "description": "Display Dashboard page.",
+        "tags": [
+          "View dashboard"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
           },
           "500": {
             "description": "Internal server error"

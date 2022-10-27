@@ -32,7 +32,7 @@ module.exports.policies = {
   'admin/user-exists-for-email': true,
   'admin/user-exists-for-phone': true,
   'admin/signup': true,
-  'admin/signup-with-password': true,
+  'admin/signup-with-password': ['firebase'],
   'admin/view-signup': true,
   'admin/view-create-vendor': 'is-super-admin',
   'admin/view-vendors': 'is-super-admin',
@@ -50,6 +50,7 @@ module.exports.policies = {
   'admin/customer-cancel-order': true, //TODO: add 'is-logged-in' and 'is-vendor' poligices to this
   'admin/customer-received-order': true, //TODO: add 'is-logged-in' and 'is-vendor' poligices to this
   'admin/*': 'is-logged-in',
+  'home/*': 'is-logged-in',
   'discounts/*': true, // ['localize', 'firebase', 'firebase-auth', 'is-logged-in'],
   'orders/*': true, // ["localize", "firebase", "firebase-auth", "is-logged-in"],
   'products/*': true, // ["localize", "firebase", "firebase-auth", "is-logged-in"],

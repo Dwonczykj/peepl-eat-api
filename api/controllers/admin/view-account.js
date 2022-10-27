@@ -22,19 +22,19 @@ module.exports = {
   fn: async function (inputs, exits) {
 
     if (!this.req.session.userId) {
-      return this.res.redirect('/admin');
+      return this.res.redirect('/');
     }
 
 
-    let myUser = await User.findOne({ id: this.req.session.userId });
+    let user = await User.findOne({ id: this.req.session.userId });
 
     // Respond with view or JSON.
     if (this.req.wantsJSON) {
       return exits.successJSON(
-        { user: myUser }
+        { user }
       );
     } else {
-      return exits.success({ user: myUser });
+      return exits.success({ user });
     }
 
   }

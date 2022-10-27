@@ -1,26 +1,27 @@
-import { getAuth } from "firebase-admin/auth";
+import { Auth, DecodedIdToken, getAuth } from "firebase-admin/auth";
 import { splitPhoneNumber } from "./login-with-firebase";
+import * as firebase from '../../../config/firebaseAdmin';
 
 module.exports = {
-  friendlyName: "Login with Password",
+  friendlyName: 'Login with Password',
 
-  description: "Login admin.",
+  description: 'Login admin.',
 
   inputs: {
     emailAddress: {
-      type: "string",
+      type: 'string',
       required: true,
       isEmail: true,
     },
     firebaseSessionToken: {
-      type: "string",
+      type: 'string',
       required: true,
     },
     rememberMe: {
       description: "Whether to extend the lifetime of the user's session.",
       extendedDescription: `Note that this is NOT SUPPORTED when using virtual requests (e.g. sending
 requests over WebSockets instead of HTTP).`,
-      type: "boolean",
+      type: 'boolean',
       defaultsTo: false,
     },
   },
@@ -29,38 +30,47 @@ requests over WebSockets instead of HTTP).`,
     success: {
       statusCode: 200,
       data: null,
-      message: "success",
+      message: 'success',
     },
     firebaseUserNoEmail: {
       statusCode: 404,
-      responseType: 'notFound'
+      responseType: 'notFound',
     },
     firebaseErrored: {
-      responseType: "firebaseError",
+      responseType: 'firebaseError',
       statusCode: 401,
-      description: "firebase errored on verifying the user token",
+      description: 'firebase errored on verifying the user token',
       code: null,
-      message: "error",
+      message: 'error',
       error: null,
     },
     badCombo: {
       statusCode: 401,
-      responseType: "unauthorised",
+      responseType: 'unauthorised',
     },
   },
 
   fn: async function (inputs, exits) {
-    sails.log.info("Entered login-with-password controller method");
     const rememberMe = inputs.rememberMe;
+    var _decodedToken: DecodedIdToken;
+
     try {
+      _decodedToken = await firebase.verifyIdToken(inputs.firebaseSessionToken);
+    } catch (err) {
+      sails.log.error(err);
 
-      const auth = getAuth();
-      const decodedToken = await auth.verifyIdToken(
-        inputs.firebaseSessionToken
-      );
+      return exits.firebaseErrored({
+        code: err.code,
+        message: err.message,
+        error: err,
+      }); //https://firebase.google.com/docs/reference/js/auth#autherrorcodes
+    }
 
+    // Signed in
+    const decodedToken = _decodedToken;
+
+    try {
       const email = inputs.emailAddress;
-      
 
       const firebaseEmail = decodedToken.email;
       if (!firebaseEmail) {
@@ -74,7 +84,7 @@ requests over WebSockets instead of HTTP).`,
       let _user = await User.findOne({
         email: inputs.emailAddress,
       });
-      
+
       if (!_user) {
         const inputPhoneDetails = splitPhoneNumber(decodedToken.phone_number);
         _user = await User.create({
@@ -92,9 +102,9 @@ requests over WebSockets instead of HTTP).`,
       if (rememberMe) {
         if (this.req.isSocket) {
           sails.log.warn(
-            "Received `rememberMe: true` from a virtual request, but it was ignored\n" +
+            'Received `rememberMe: true` from a virtual request, but it was ignored\n' +
               "because a browser's session cookie cannot be reset over sockets.\n" +
-              "Please use a traditional HTTP request instead."
+              'Please use a traditional HTTP request instead.'
           );
         } else {
           this.req.session.cookie.maxAge =
@@ -115,7 +125,7 @@ requests over WebSockets instead of HTTP).`,
       return exits.success(user);
     } catch (err) {
       sails.log.info(err);
-      if (err.code === "auth/wrong-password") {
+      if (err.code === 'auth/wrong-password') {
         return exits.badCombo();
       }
       // return exits.firebaseErrored({
@@ -129,7 +139,7 @@ requests over WebSockets instead of HTTP).`,
         email: inputs.emailAddress,
       });
 
-      if(!_user){
+      if (!_user) {
         return exits.badCombo();
       }
       const user = _user;
@@ -137,9 +147,9 @@ requests over WebSockets instead of HTTP).`,
       if (rememberMe) {
         if (this.req.isSocket) {
           sails.log.warn(
-            "Received `rememberMe: true` from a virtual request, but it was ignored\n" +
+            'Received `rememberMe: true` from a virtual request, but it was ignored\n' +
               "because a browser's session cookie cannot be reset over sockets.\n" +
-              "Please use a traditional HTTP request instead."
+              'Please use a traditional HTTP request instead.'
           );
         } else {
           this.req.session.cookie.maxAge =
@@ -155,8 +165,8 @@ requests over WebSockets instead of HTTP).`,
       // when they're already logged in), broadcast a message that we can display in other open tabs.
       if (sails.hooks.sockets) {
         // sails.helpers.broadcastSessionChange(this.req);
-      } 
-      
+      }
+
       if (inputs.firebaseSessionToken) {
         return exits.success(user);
       } else {
