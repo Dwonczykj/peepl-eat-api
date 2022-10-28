@@ -2,7 +2,6 @@
 /* eslint-disable no-undef */
 const { expect, assert } = require('chai');
 const request = require('supertest');
-const dotenv = require('dotenv');
 const util = require('util');
 
 const loginAsUser = async function (name, secret, verbose = false) {

@@ -14,22 +14,33 @@ module.exports = function(grunt) {
   grunt.config.set('babel', {
     dist: {
       options: {
-        presets: [require('sails-hook-grunt/accessible/babel-preset-env')]
+        // presets: [require('sails-hook-grunt/accessible/babel-preset-env')], // only need this preset as already transpiled for dev
+        compact: false,
+        plugins: [
+          '@babel/plugin-proposal-object-rest-spread',
+          '@babel/plugin-transform-classes',
+        ],
       },
       files: [
         {
           expand: true,
           cwd: '.tmp/public',
-          src: [
-            'js/**/*.js'
-          ],
-          dest: '.tmp/public'
-        }
-      ]
+          src: ['**/*.page.js', '!dependencies/**/*.js'],
+          dest: '.tmp/public',
+          ext: '.page.js',
+        },
+        {
+          expand: true,
+          cwd: '.tmp/public',
+          src: ['**/*.component.js', '!dependencies/**/*.js'],
+          dest: '.tmp/public',
+          ext: '.component.js',
+        },
+      ],
     },
     dev: {
       options: {
-        presets: ['@babel/preset-env']
+        presets: ['@babel/preset-env'],
         // presets: [require('sails-hook-grunt/accessible/babel-preset-env')]
       },
       files: [
@@ -47,7 +58,7 @@ module.exports = function(grunt) {
           src: ['**/*.page.js', '!dependencies/**/*.js'],
           dest: '.assets_babel/js/',
           // dest: '.tmp/public/js/',
-          ext: '.page.js'
+          ext: '.page.js',
         },
         {
           expand: true,
@@ -55,9 +66,9 @@ module.exports = function(grunt) {
           src: ['**/*.component.js', '!dependencies/**/*.js'],
           dest: '.assets_babel/js/',
           // dest: '.tmp/public/js/',
-          ext: '.component.js'
+          ext: '.component.js',
         },
-      ]
+      ],
     },
     // paradev: {
     //   options: {
