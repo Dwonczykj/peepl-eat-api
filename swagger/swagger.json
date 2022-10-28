@@ -783,13 +783,13 @@
             "type": "number",
             "format": "double",
             "nullable": true,
-            "description": "The unixtime when the order payment was confirmed (if at all)."
+            "description": "The unixtime when the order payment was paid (if at all)."
           },
           "refundDateTime": {
             "type": "number",
             "format": "double",
             "nullable": true,
-            "description": "The unixtime when the order payment was confirmed (if at all)."
+            "description": "The unixtime when the order payment was refunded (if at all)."
           },
           "deliveryName": {
             "type": "string",

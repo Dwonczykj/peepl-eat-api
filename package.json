@@ -71,14 +71,15 @@
     "typescript": "^4.7.4"
   },
   "scripts": {
+    "dev": "NODE_ENV=development useFirebaseEmulator=false node app.js --hookTimeout=160000",
     "start": "NODE_ENV=production node app.js",
     "tsc": "tsc ./assets/js",
     "sails": "$(npm bin)/sails",
     "lift": "$(npm bin)/sails lift",
     "lint": "./node_modules/eslint/bin/eslint.js . --max-warnings=0 --report-unused-disable-directives && echo '✔  Your .js files look good.'",
     "test": "clear && npm run lint && npm run custom-tests && echo 'Done.'",
+    "custom-tests": "clear && node ./node_modules/mocha/bin/mocha --exit -t 20000 --bail --require ts-node/register --colors test/lifecycle.test.js test/integration/**/*.test.js test/integration/**/*.test.ts",
     "test-interfaces": "clear && node ./node_modules/mocha/bin/mocha --exit --require ts-node/register test/units/**/*.test.ts",
-    "custom-tests": "clear && node ./node_modules/mocha/bin/mocha --exit test/lifecycle.test.js test/integration/**/*.test.js",
     "clean": "rm -rf .tmp/bootstrap-version.json && node app.js --drop"
   },
   "main": "app.js",

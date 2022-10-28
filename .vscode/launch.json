@@ -29,58 +29,12 @@
             ],
             "outFiles": [
                 "${workspaceFolder}/out/**/*.js"
-            ]
-            // "preLaunchTask": "ngrok",
-            // "serverReadyAction": {
-            //     "pattern": "debug: Port        : ([0-9]+)",
-            //     "uriFormat": "http://localhost:%s/vendors?wallet=test",
-            //     "action": "openExternally"
-            // }
+            ],
         },
-        // {
-        //     "type": "node",
-        //     "request": "launch",
-        //     "name": "Launch Program (2)",
-        //     "skipFiles": [
-        //         "<node_internals>/**/*.js",
-        //         "assets/**"
-        //     ],
-        //     "program": "${workspaceFolder}/app.js",
-        //     // "preLaunchTask": "ngrok",
-        //     // "serverReadyAction": {
-        //     //     "pattern": "debug: Port        : ([0-9]+)",
-        //     //     "uriFormat": "http://localhost:%s/vendors?wallet=test",
-        //     //     "action": "openExternally"
-        //     // }
-        // },
-        // {
-        //     "type": "node",
-        //     "request": "launch",
-        //     "name": "Mocha Tests",
-        //     "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-        //     "args": [
-        //         "-u",
-        //         "bdd",
-        //         "--timeout",
-        //         "999999",
-        //         "--colors",
-        //         "${workspaceRoot}/test/integration/controllers/**/*.test.js"
-        //     ],
-        //     // "outFiles": [
-        //     //     "${workspaceFolder}/test/integration/controllers/**/*.js"
-        //     // ],
-        //     // "sourceMaps": true,
-        //     "protocol": "inspector",
-        //     "internalConsoleOptions": "openOnSessionStart"
-        // },
         {
             "type": "node",
             "request": "launch",
             "name": "Mocha All Tests",
-            // "preLaunchTask": {
-            //     "task": "",
-            //     "type": ""
-            // },
             "program": "${workspaceFolder}/node_modules/mocha/bin/mocha",
             "env": {
                 "NODE_ENV": "test",
@@ -97,7 +51,6 @@
                 "--require",
                 "ts-node/register",
                 // "--require",
-                "${workspaceFolder}/test/lifecycle.test.js",
                 // "--reporter",
                 // "dot",
                 // "--slow",
@@ -105,6 +58,7 @@
                 // "--timeout",
                 // "999999",
                 "--colors",
+                "${workspaceFolder}/test/lifecycle.test.js",
                 // "${workspaceFolder}/test/integration/**/*.test.js",
                 "${workspaceFolder}/test/integration/controllers/**/*.test.ts",
                 "${workspaceFolder}/test/integration/controllers/**/*.test.js",
@@ -134,12 +88,12 @@
                 "--require",
                 "ts-node/register",
                 // "--require",
-                "${workspaceFolder}/test/lifecycle.test.js",
                 // "--reporter",
                 // "dot",
                 // "--slow",
                 // "5000",
                 "--colors",
+                "${workspaceFolder}/test/lifecycle.test.js",
                 "${file}",
             ],
             "internalConsoleOptions": "openOnSessionStart",
