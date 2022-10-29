@@ -12,29 +12,58 @@
 module.exports = function(grunt) {
 
   grunt.config.set('babel', {
+    // dist: {
+    //   options: {
+    //     // presets: [require('sails-hook-grunt/accessible/babel-preset-env')], // only need this preset as already transpiled for dev
+    //     presets: ['@babel/preset-env'],
+    //     compact: false,
+    //     plugins: [
+    //       '@babel/plugin-proposal-object-rest-spread',
+    //       '@babel/plugin-transform-classes',
+    //     ],
+    //   },
+    //   files: [
+    //     {
+    //       expand: true,
+    //       cwd: '.tmp/public',
+    //       src: ['**/*.page.js', '!dependencies/**/*.js'],
+    //       dest: '.tmp/public',
+    //       ext: '.page.js',
+    //     },
+    //     {
+    //       expand: true,
+    //       cwd: '.tmp/public',
+    //       src: ['**/*.component.js', '!dependencies/**/*.js'],
+    //       dest: '.tmp/public',
+    //       ext: '.component.js',
+    //     },
+    //   ],
+    // },
     dist: {
+      // * should for now do the same as dev
       options: {
-        // presets: [require('sails-hook-grunt/accessible/babel-preset-env')], // only need this preset as already transpiled for dev
-        compact: false,
-        plugins: [
-          '@babel/plugin-proposal-object-rest-spread',
-          '@babel/plugin-transform-classes',
+        presets: [
+          '@babel/preset-env',
+          'minify'
         ],
+        // presets: [require('sails-hook-grunt/accessible/babel-preset-env')] // ! Do not use for now
       },
       files: [
         {
           expand: true,
-          cwd: '.tmp/public',
+          cwd: 'assets/js/',
           src: ['**/*.page.js', '!dependencies/**/*.js'],
-          dest: '.tmp/public',
-          ext: '.page.js',
+          dest: '.tmp/public/js/',
+          // dest: '.tmp/public/js/',
+          ext: '.page.min.js',
         },
         {
           expand: true,
-          cwd: '.tmp/public',
+          cwd: 'assets/js/',
           src: ['**/*.component.js', '!dependencies/**/*.js'],
-          dest: '.tmp/public',
-          ext: '.component.js',
+          dest: '.tmp/public/js/',
+          // dest: '.tmp/public/js/',
+          ext: '.component.min.js',
         },
       ],
     },
@@ -70,44 +99,7 @@ module.exports = function(grunt) {
         },
       ],
     },
-    // paradev: {
-    //   options: {
-    //     presets: ['@babel/preset-env']
-    //   },
-    //   files: [{
-    //     expand: true,
-    //     cwd: 'assets/js/',
-    //     src: ['**/*.page.js', '!dependencies/**/*.js'],
-    //     // dest: '.tmp/public/js/',
-    //     dest: 'test_babel_grunt_lib',
-    //     ext: '.page.js'
-    //   }]
-    // },
   });
 
   grunt.loadNpmTasks('grunt-babel');
-  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  // This Grunt plugin is part of the default asset pipeline in Sails,
-  // so it's already been automatically loaded for you at this point.
-  //
-  // Of course, you can always remove this Grunt plugin altogether by
-  // deleting this file.  But check this out: you can also use your
-  // _own_ custom version of this Grunt plugin.
-  //
-  // Here's how:
-  //
-  // 1. Install it as a local dependency of your Sails app:
-  //    ```
-  //    $ npm install grunt-babel --save-dev --save-exact
-  //    ```
-  //
-  //
-  // 2. Then uncomment the following code:
-  //
-  // ```
-  // // Load Grunt plugin from the node_modules/ folder.
-  // grunt.loadNpmTasks('grunt-babel');
-  // ```
-  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 };

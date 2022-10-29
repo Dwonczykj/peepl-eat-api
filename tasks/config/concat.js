@@ -13,14 +13,20 @@
 module.exports = function(grunt) {
 
   grunt.config.set('concat', {
+    options: {
+      separator: ';\n',
+      stripBanners: true,
+      line: true,
+      // footer: 'require=', // ~ https://stackoverflow.com/a/21978144
+    },
     js: {
       src: require('../pipeline').jsFilesToInject,
-      dest: '.tmp/public/min/production.min.js'
+      dest: '.tmp/public/concat/production.js',
     },
     css: {
       src: require('../pipeline').cssFilesToInject,
-      dest: '.tmp/public/concat/production.css'
-    }
+      dest: '.tmp/public/concat/production.css',
+    },
   });
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

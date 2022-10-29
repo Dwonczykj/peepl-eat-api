@@ -17,11 +17,10 @@ module.exports = function (grunt) {
 
   grunt.registerTask('default', [
     // 'polyfill:dev', //« uncomment to ALSO transpile during development (for broader browser compat.)
-    'runTsc',
+    // 'runTsc',
     'compileAssets',
-    // 'babel',        //« uncomment to ALSO transpile during development (for broader browser compat.) or add to compile assets
     'linkAssets',
-    'watch'
+    'watch',
   ]);
 
 

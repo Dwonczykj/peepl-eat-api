@@ -36,14 +36,6 @@ module.exports = function(grunt) {
         dest: '.tmp/public/js'
       }]
     },
-    // devbabelTest: {
-    //   files: [{
-    //     expand: true,
-    //     cwd: './assets/js',
-    //     src: ['**/*.!(coffee|less|scss|sass|page.js|js|js.map|ts)'],
-    //     dest: 'test_babel_grunt_lib'
-    //   }]
-    // },
     build: {
       files: [{
         expand: true,

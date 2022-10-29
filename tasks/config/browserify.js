@@ -1,30 +1,51 @@
 module.exports = function (grunt) {
 
-  // grunt.initConfig({
-  //     browserify: {
-  //         dev: {
-  //             src: [
-  //                 '**/*.page.js', '!dependencies/**/*.js',
-  //             ],
-  //             dest: '.tmp/public/js/',
-  //             options: {
-  //                 browserifyOptions: { debug: true },
-  //                 transform: [["babelify", { "presets": ['@babel/preset-env'] }]],
-  //                 // plugin: [
-  //                 //     ["factor-bundle", {
-  //                 //         outputs: [
-  //                 //             "./dist/js/main-home.js",
-  //                 //             "./dist/js/main-products.js"
-  //                 //         ]
-  //                 //     }]
-  //                 // ]
-  //             }
-  //         }
-  //     }
-  // });
-  // grunt.loadNpmTasks('grunt-browserify');
-
   grunt.config.set('browserify', {
+    // dist: {
+    //   files: [
+    //     {
+    //       expand: true,
+    //       cwd: '.tmp/public',
+    //       src: ['**/*.page.js', '!dependencies/**/*.js'],
+    //       dest: '.tmp/public/js/',
+    //     },
+    //   ],
+    // },
+    dist: {
+      files: [
+        {
+          expand: true,
+          cwd: '.assets_babel/js/',
+          src: ['**/*.page.js', '!dependencies/**/*.js'],
+          dest: '.tmp/public/js/',
+          // ext: '.page.js'
+        },
+      ],
+      options: {
+        // browserifyOptions: { debug: false }, // ~ https://stackoverflow.com/a/36098565
+        // transform: [[
+        //     'babelify', {
+        //         presets: [['@babel/preset-env', { modules: 'auto' }]],
+        //         sourceMaps: true,
+        //         ignore: ['node_modules']
+        //     }
+        // ]],
+        plugin: [
+          [
+            require('esmify'),
+            {
+              /* ... options ... */
+            },
+          ],
+          //   ['factor-bundle', {
+          //     outputs: [
+          //       './dist/js/main-home.js',
+          //       './dist/js/main-products.js'
+          //     ]
+          //   }]
+        ],
+      },
+    },
     dev: {
       files: [
         {
@@ -33,7 +54,7 @@ module.exports = function (grunt) {
           src: ['**/*.page.js', '!dependencies/**/*.js'],
           dest: '.tmp/public/js/',
           // ext: '.page.js'
-        }
+        },
       ],
       options: {
         browserifyOptions: { debug: true },
@@ -45,39 +66,21 @@ module.exports = function (grunt) {
         //     }
         // ]],
         plugin: [
-          [require('esmify'), { /* ... options ... */ }],
+          [
+            require('esmify'),
+            {
+              /* ... options ... */
+            },
+          ],
           //   ['factor-bundle', {
           //     outputs: [
           //       './dist/js/main-home.js',
           //       './dist/js/main-products.js'
           //     ]
           //   }]
-        ]
-      }
+        ],
+      },
     },
-    // dev: {
-    //   files: [
-    //     {
-    //       expand: true,
-    //       cwd: 'test_babel_grunt_lib',
-    //       src: ['**/*.page.js', '!dependencies/**/*.js'],
-    //       dest: '.tmp/public/js/',
-    //       ext: '.page.js'
-    //     }
-    //   ],
-    //   options: {
-    //     browserifyOptions: { debug: true },
-    //     transform: [['babelify', { 'presets': ['preset-env'] }]],
-    //     // plugin: [
-    //     //   ['factor-bundle', {
-    //     //     outputs: [
-    //     //       './dist/js/main-home.js',
-    //     //       './dist/js/main-products.js'
-    //     //     ]
-    //     //   }]
-    //     // ]
-    //   }
-    // },
     devTest: {
       files: [
         {
@@ -85,19 +88,9 @@ module.exports = function (grunt) {
           cwd: 'test_babel_grunt_lib',
           src: ['**/*.page.js', '!dependencies/**/*.js'],
           dest: 'test_browserify_grunt_lib',
-          ext: '.page.js'
-        }
-      ]
-    },
-    dist: {
-      files: [
-        {
-          expand: true,
-          cwd: '.tmp/public',
-          src: ['js/**/*.js'],
-          dest: '.tmp/public'
-        }
-      ]
+          ext: '.page.js',
+        },
+      ],
     },
   });
 

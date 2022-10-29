@@ -17,19 +17,20 @@ module.exports = function(grunt) {
       dest: '.tmp/public/min/production.min.js'
     },
     options: {
-      mangle: {
-        reserved: [
-          'AsyncFunction',
-          'SailsSocket',
-          'Promise',
-          'File',
-          'FileList',
-          'FormData',
-          'Location',
-          'RttcRefPlaceholder',
-        ],
-        keep_fnames: true//eslint-disable-line
-      },
+      // mangle: {
+      //   reserved: [
+      //     'AsyncFunction',
+      //     'SailsSocket',
+      //     'Promise',
+      //     'File',
+      //     'FileList',
+      //     'FormData',
+      //     'Location',
+      //     'RttcRefPlaceholder',
+      //   ],
+      //   keep_fnames: true//eslint-disable-line
+      // },
+      mangle: false,
       compress: {
         keep_fnames: true//eslint-disable-line
       }

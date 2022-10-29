@@ -9,9 +9,11 @@
  */
 module.exports = function(grunt) {
   var compileAssets = [
+    'clean:dist',
     'runTsc',
-    'clean:dev',
+    // 'babel:dist',
     'babel:dev',
+    // 'browserify:dist',
     'browserify:dev',
     // 'browserify:devTest',
     'less:dev',
@@ -20,6 +22,6 @@ module.exports = function(grunt) {
     'copy:devbabel',
     // 'copy:devbabelTest',
   ];
-  grunt.log.writeln(['running compileAssets: ' + compileAssets.join(', ')]);
-  grunt.registerTask('compileAssets', compileAssets);
+  grunt.log.writeln(['running compileAssetsProd: ' + compileAssets.join(', ')]);
+  grunt.registerTask('compileAssetsProd', compileAssets);
 };
