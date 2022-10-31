@@ -84,7 +84,7 @@ module.exports = {
       max: 3,
       allowNull: true
     },
-    rating: {
+    rating: { //TODO: Add ratings tables for users to add their ratings so that we can calculate the vendors rating and periodically update this rounded value
       type: 'number',
       min: 0,
       max: 5,

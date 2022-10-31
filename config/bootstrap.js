@@ -58,7 +58,7 @@ module.exports.bootstrap = async function () {
   try {
     var isMochaTestEnv =
       sails.config.environment === 'test' ||
-      sails.config.custom.FIREBASE_AUTH_EMULATOR_HOST;
+      process.env.NODE_ENV === 'test';
     if (!isMochaTestEnv) {
       fixtures = await buildDb(sails, false);
     }

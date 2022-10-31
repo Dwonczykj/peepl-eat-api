@@ -50,7 +50,7 @@ module.exports = {
     ***************************************************************************/
     default: {
       adapter: 'sails-mysql',
-      url: 'mysql://vegi:vegi2022!@localhost:3306/vegi',
+      url: 'mysql://vegi:vegi2022!@localhost:3306/vegiprod',
       charset: 'utf8mb4',
       collation: 'utf8mb4_unicode_ci',
       //--------------------------------------------------------------------------
