@@ -11,6 +11,10 @@ ADD UNIQUE INDEX `name_UNIQUE` (`name` ASC) VISIBLE,
 ADD UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE;
 ;
 
+ALTER TABLE `vegitemp`.`postaldistrict` 
+ADD UNIQUE INDEX `outcode_UNIQUE` (`outcode` ASC) VISIBLE;
+;
+
 ALTER TABLE `vegitemp`.`openinghours` 
 ADD COLUMN `logicId` VARCHAR(255) NULL DEFAULT NULL AFTER `fulfilmentMethod`,
 ADD COLUMN `timezone` INT NULL DEFAULT 0 AFTER `logicId`;
@@ -39,16 +43,17 @@ ALTER TABLE `vegitemp`.`productcategory`
 ADD COLUMN `categoryGroup` INT NULL DEFAULT NULL AFTER `vendor`;
 
 ALTER TABLE `vegitemp`.`user` 
-ADD COLUMN `phoneNoCountry` DOUBLE NULL DEFAULT NULL AFTER `email`,
-ADD COLUMN `phoneCountryCode` DOUBLE NULL DEFAULT NULL AFTER `phoneNoCountry`,
+ADD COLUMN `phoneNoCountry` DOUBLE NULL DEFAULT 0 AFTER `email`,
+ADD COLUMN `phoneCountryCode` DOUBLE NULL DEFAULT 0 AFTER `phoneNoCountry`,
 ADD COLUMN `vendorRole` VARCHAR(255) NULL DEFAULT NULL AFTER `role`,
-ADD COLUMN `deliveryPartnerRole` VARCHAR(255) NULL DEFAULT NULL AFTER `vendorRole`,
-ADD COLUMN `roleConfirmedWithOwner` TINYINT(1) NULL DEFAULT NULL AFTER `deliveryPartnerRole`,
+ADD COLUMN `deliveryPartnerRole` VARCHAR(255) NULL DEFAULT '' AFTER `vendorRole`,
+ADD COLUMN `roleConfirmedWithOwner` TINYINT(1) NULL DEFAULT 0 AFTER `deliveryPartnerRole`,
 ADD COLUMN `vendorConfirmed` TINYINT(1) NULL DEFAULT NULL AFTER `roleConfirmedWithOwner`,
 ADD COLUMN `fbUid` VARCHAR(255) NULL DEFAULT NULL AFTER `vendorConfirmed`,
-ADD COLUMN `firebaseSessionToken` VARCHAR(255) NULL DEFAULT NULL AFTER `fbUid`,
+ADD COLUMN `firebaseSessionToken` VARCHAR(1020) NULL DEFAULT NULL AFTER `fbUid`,
 ADD COLUMN `secret` VARCHAR(255) NULL DEFAULT NULL AFTER `firebaseSessionToken`,
 ADD COLUMN `deliveryPartner` INT NULL DEFAULT NULL AFTER `vendor`;
+;
 
 ALTER TABLE `vegitemp`.`vendor` 
 ADD COLUMN `pickupAddressLatitude` DOUBLE NULL DEFAULT NULL AFTER `pickupAddressPostCode`,

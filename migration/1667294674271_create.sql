@@ -1,3 +1,17 @@
+USE vegitemp;
+
+CREATE TABLE `categorygroup` (
+  `createdAt` bigint DEFAULT NULL,
+  `updatedAt` bigint DEFAULT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `imageUrl` varchar(255) DEFAULT NULL,
+  `forRestaurantItem` tinyint(1) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id` (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 CREATE TABLE `notification` (
   `createdAt` bigint DEFAULT NULL,
   `updatedAt` bigint DEFAULT NULL,

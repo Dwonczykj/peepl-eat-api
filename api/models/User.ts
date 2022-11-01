@@ -14,18 +14,18 @@ module.exports = {
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
     //  ╩  ╩╚═╩╩ ╩╩ ╩ ╩ ╚╝ ╚═╝╚═╝
     email: {
-      type: "string",
+      type: 'string',
       isEmail: true,
-      // unique: true,
-      required: false,
-    }, //TODO: Run a clean on the db to make this
+      unique: true,
+      required: true,
+    },
     phoneNoCountry: {
-      type: "number",
+      type: 'number',
       // unique: true,
       required: true,
     },
     phoneCountryCode: {
-      type: "number",
+      type: 'number',
       // unique: true,
       required: true,
     },
@@ -38,53 +38,56 @@ module.exports = {
     //   example: "2$28a8eabna301089103-13948134nad",
     // },
     name: {
-      type: "string",
+      type: 'string',
       required: true,
     },
     isSuperAdmin: {
-      type: "boolean",
+      type: 'boolean',
       defaultsTo: false,
     },
     role: {
-      type: "string",
-      isIn: ["admin", "vendor", "deliveryPartner", "consumer"],
+      type: 'string',
+      isIn: ['admin', 'vendor', 'deliveryPartner', 'consumer'],
       required: true,
     },
     vendorRole: {
-      type: "string",
-      isIn: ["admin", "owner", "inventoryManager", "salesManager", "none"],
-      defaultsTo: "none",
+      type: 'string',
+      isIn: ['admin', 'owner', 'inventoryManager', 'salesManager', 'none'],
+      defaultsTo: 'none',
     },
     deliveryPartnerRole: {
-      type: "string",
-      isIn: ["admin", "owner", "deliveryManager", "rider", "none"],
-      defaultsTo: "none",
+      type: 'string',
+      isIn: ['admin', 'owner', 'deliveryManager', 'rider', 'none'],
+      defaultsTo: 'none',
     },
     roleConfirmedWithOwner: {
-      type: "boolean",
+      type: 'boolean',
       defaultsTo: false, //TODO: Add API Endpoint to toggle this to true for admins and owners registered to that business.
     },
     vendorConfirmed: {
-      type: "boolean",
+      type: 'boolean',
       defaultsTo: false,
     },
     // firebaseUser: { // https://sailsjs.com/documentation/concepts/models-and-orm/attributes#:~:text=%23-,Type,-%23
     //   type: 'json', // https://sailsjs.com/documentation/concepts/models-and-orm/associations
     // }
     fbUid: {
-      type: "string",
+      type: 'string',
     },
     firebaseSessionToken: {
-      type: "string",
+      type: 'string',
       required: false,
+      defaultsTo: '',
+      allowNull: true,
     },
     secret: {
-      type: "string",
+      type: 'string',
       required: false,
+      allowNull: true,
       description:
         "Securely hashed representation of the service account's secret.",
       protect: true,
-      example: "2$28a8eabna301089103-13948134nad",
+      example: '2$28a8eabna301089103-13948134nad',
     },
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
@@ -94,32 +97,34 @@ module.exports = {
     //  ╠═╣╚═╗╚═╗║ ║║  ║╠═╣ ║ ║║ ║║║║╚═╗
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
     vendor: {
-      model: "vendor",
+      model: 'vendor',
     },
     deliveryPartner: {
-      model: "deliverypartner",
+      model: 'deliverypartner',
     },
   },
   //} /*as { [K in keyof userModel]: any },
 
   customToJSON: function () {
-    sails.log.info("firebaseSessionToken, secret & password token removed from user JSON");
-    return _.omit(this, ["firebaseSessionToken", "secret", "password"]);
+    sails.log.info(
+      'firebaseSessionToken, secret & password token removed from user JSON'
+    );
+    return _.omit(this, ['firebaseSessionToken', 'secret', 'password']);
   },
 
   formatPhoneNumber: async function (opts) {
     const user = await User.findOne({ id: opts.id });
 
     if (!user) {
-      throw require("flaverr")({
+      throw require('flaverr')({
         message: `Cannot find user with id=${opts.id}.`,
-        code: "E_UNKNOWN_USER",
+        code: 'E_UNKNOWN_USER',
       });
     }
 
     var x = user.phoneNoCountry.toString();
-    x = x.replace(/-/g, "").match(/(\d{1,10})/g)[0];
-    x = x.replace(/(\d{1,3})(\d{1,3})(\d{1,4})/g, "$1-$2-$3");
+    x = x.replace(/-/g, '').match(/(\d{1,10})/g)[0];
+    x = x.replace(/(\d{1,3})(\d{1,3})(\d{1,4})/g, '$1-$2-$3');
     return `+${user.phoneCountryCode} ${x}`;
   },
 
@@ -151,7 +156,7 @@ module.exports = {
       } else if (
         nonNull(userDraft.vendor) &&
         (isNull(userDraft.vendorRole) ||
-          !["owner", "salesManager", "inventoryManager"].includes(
+          !['owner', 'salesManager', 'inventoryManager'].includes(
             userDraft.vendorRole
           ))
       ) {
@@ -160,24 +165,26 @@ module.exports = {
       } else if (
         nonNull(userDraft.deliveryPartner) &&
         (isNull(userDraft.deliveryPartnerRole) ||
-          !["owner", "deliveryManager", "rider"].includes(userDraft.deliveryPartnerRole))
+          !['owner', 'deliveryManager', 'rider'].includes(
+            userDraft.deliveryPartnerRole
+          ))
       ) {
         userDraft.deliveryPartner = null;
         return undefined; //todo throw
       }
 
       if (nonNull(userDraft.vendor)) {
-        userDraft.role = "vendor";
-        userDraft.deliveryPartnerRole = "none";
+        userDraft.role = 'vendor';
+        userDraft.deliveryPartnerRole = 'none';
         userDraft.deliveryPartner = null;
       } else if (nonNull(userDraft.deliveryPartner)) {
-        userDraft.role = "deliveryPartner";
-        userDraft.vendorRole = "none";
+        userDraft.role = 'deliveryPartner';
+        userDraft.vendorRole = 'none';
         userDraft.vendor = null;
       } else if (!userDraft.isSuperAdmin) {
-        userDraft.role = "consumer";
-        userDraft.vendorRole = "none";
-        userDraft.deliveryPartnerRole = "none";
+        userDraft.role = 'consumer';
+        userDraft.vendorRole = 'none';
+        userDraft.deliveryPartnerRole = 'none';
         userDraft.vendor = null;
         userDraft.deliveryPartner = null;
       }
@@ -185,19 +192,19 @@ module.exports = {
     };
 
     if (userDraft.isSuperAdmin) {
-      userDraft.role = "admin";
-      userDraft.vendorRole = "admin";
-      userDraft.deliveryPartnerRole = "admin";
-    } else if (userDraft.role === "admin" && !userDraft.isSuperAdmin) {
+      userDraft.role = 'admin';
+      userDraft.vendorRole = 'admin';
+      userDraft.deliveryPartnerRole = 'admin';
+    } else if (userDraft.role === 'admin' && !userDraft.isSuperAdmin) {
       userDraft = setRoles();
     }
 
-    if (userDraft.role !== "vendor") {
-      userDraft.vendorRole = "none";
+    if (userDraft.role !== 'vendor') {
+      userDraft.vendorRole = 'none';
       userDraft.vendor = null;
     }
-    if (userDraft.role !== "deliveryPartner") {
-      userDraft.deliveryPartnerRole = "none";
+    if (userDraft.role !== 'deliveryPartner') {
+      userDraft.deliveryPartnerRole = 'none';
       userDraft.deliveryPartner = null;
     }
 
