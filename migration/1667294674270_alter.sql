@@ -43,6 +43,7 @@ ALTER TABLE `vegitemp`.`productcategory`
 ADD COLUMN `categoryGroup` INT NULL DEFAULT NULL AFTER `vendor`;
 
 ALTER TABLE `vegitemp`.`user` 
+DROP COLUMN `password`,
 ADD COLUMN `phoneNoCountry` DOUBLE NULL DEFAULT 0 AFTER `email`,
 ADD COLUMN `phoneCountryCode` DOUBLE NULL DEFAULT 0 AFTER `phoneNoCountry`,
 ADD COLUMN `vendorRole` VARCHAR(255) NULL DEFAULT NULL AFTER `role`,
