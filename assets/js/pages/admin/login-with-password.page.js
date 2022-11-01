@@ -1,7 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import {
-  connectAuthEmulator, createUserWithEmailAndPassword,
-  getAuth,
+  connectAuthEmulator, getAuth,
   signInWithEmailAndPassword
 } from 'firebase/auth';
 
@@ -12,6 +11,7 @@ parasails.registerPage('login-with-password', {
   data: {
     syncing: false,
     cloudError: false,
+    cloudCode: false,
     formErrors: {},
     formData: {
       emailAddress: '',
@@ -87,57 +87,74 @@ parasails.registerPage('login-with-password', {
 
     // * Submission Functions
     loginWithPassword: async function () {
+      const validForm = this.handleParsingForm();
+      if (!validForm) {
+        return;
+      }
       const email = this.emailAddress;
       const password = this.password;
       const rememberMe = this.rememberMe;
 
       const auth = getAuth();
-      var _userCreds;
+      this.cloudCode = false;
+      let _userExists = { data: false };
       try {
-        _userCreds = await signInWithEmailAndPassword(auth, email, password)
+	      _userExists = await Cloud.userExistsForEmail(email);
+      } catch (unusedError) {
+        _userExists = {data: false};
+      }
+      const userExists = _userExists;
 
+      let _userCreds;
+      try {
+        _userCreds = await signInWithEmailAndPassword(auth, email, password);
       } catch (err) {
-        console.error(`Unable to signin using firebase API: ${err}`);
-        this.cloudError = `Unable to signin using firebase API: ${err}`;
+        this.cloudCode = err.code;
         if (err.code === 'auth/user-not-found') {
-          Cloud.userExistsForEmail(email).then((userExists) => {
-            if (userExists && userExists.data === true) {
-              return this.registerEmailPasswordFirebaseOnly(email, password);
-            }
-          });
+          this.cloudError = 'Invalid credentials!';
+          if (userExists.data === true) {
+            this.cloudCode = 'LegacyUser';
+            // return this.registerEmailPasswordFirebaseOnly(email, password);
+          }
+          return;
+        }
+        else if (err.code === 'auth/wrong-password') {
+          this.cloudError = `Invalid Credentials!`;
+          return;
         } else {
-          //ignore
+          this.cloudError = `Unable to Authenticate User`;
+          console.warn(`Unable to signin using firebase API: ${err}`);
+          return;
         }
       }
       const userCredential = _userCreds;
-
-      // Signed in
       const fbUser = userCredential.user;
-
-      // eslint-disable-next-line no-console
       const sessionToken = await fbUser.getIdToken(true);
-      console.log(
-        fbUser.email +
-          ' authorised sign in to firebase with session token:\n---------' +
-          sessionToken +
-          '---------'
-      );
+
       var _vegiSigninResponse;
       try {
+        this.cloudCode = false;
 	      _vegiSigninResponse = await Cloud.loginWithPassword(email, sessionToken, rememberMe);
       } catch (err) {
-        console.error(`Unable to signin to vegi server using firebase session token: ${err}`);
-        if (err.exit === 'userExists') {
-          this.cloudError = 'Unable to login. Check credentials.';
-        } else if (err.code === 'firebaseErrored') {
-          this.cloudError = `${err.message}`;
-          // eslint-disable-next-line no-console
-          console.warn(err.responseInfo);
-        } else {
-          this.cloudError = `[${err.code}]: ${err.message}`;
-          // eslint-disable-next-line no-console
-          console.warn(err.responseInfo);
-        }
+        this.cloudCode = err.exit;
+        this.cloudError = err.exit;
+        // if (err.exit === 'userExists') {
+        //   this.cloudError = 'Unable to login. Check credentials.';
+        // } else if (err.exit === 'badCombo') {
+        //   this.cloudError = `badCombo`;
+        // } else if (err.exit === 'badCredentials') {
+        //   this.cloudError = `badCredentials`;
+        // } else if (err.exit === 'firebaseUserNoEmail') {
+        //   this.cloudError = `Invalid Credentials`;
+        // } else if (err.exit === 'firebaseIncorrectEmail') {
+        //   this.cloudError = `Invalid Credentials`;
+        // } else if (err.exit === 'userNeedsToLinkFirebaseAtSignUp') {
+        //   this.cloudError = `userNeedsToLinkFirebaseAtSignUp`;
+        // } else {
+        //   this.cloudError = err.exit;
+        //   // eslint-disable-next-line no-console
+        //   console.warn(`[${err.code}]: ${err.message}`);
+        // }
       }
       // const vegiSigninResponse = _vegiSigninResponse;
 
@@ -145,38 +162,41 @@ parasails.registerPage('login-with-password', {
         location.replace('/admin');
       }
     },
-    registerEmailPasswordFirebaseOnly: function(email, password) {
-      const auth = getAuth();
-      return createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          // Signed in
-          const fbUser = userCredential.user;
+    // registerEmailPasswordFirebaseOnly: function(email, password) {
+    //   const auth = getAuth();
+    //   return createUserWithEmailAndPassword(auth, email, password)
+    //     .then((userCredential) => {
+    //       // Signed in
+    //       const fbUser = userCredential.user;
 
-          // eslint-disable-next-line no-console
-          console.log(fbUser.email + ' authorised signed in to firebase.');
-          return fbUser.getIdToken(true);
-        })
-        .then(sessionToken => {
-          return Cloud.loginWithPassword(email, sessionToken, this.rememberMe);
-        })
-        .then(response => {
-          location.replace('/admin');
-        })
-        .catch((err) => {
-          this.cloudError = err.message;
-          console.warn(err.responseInfo);
-          if (err.exit === 'userExists') {
-            this.cloudError = 'Unable to login. Check credentials.';
-          }
-          // eslint-disable-next-line no-console
-          console.warn(err);
-        });
-    },
+    //       // eslint-disable-next-line no-console
+    //       console.log(fbUser.email + ' authorised signed in to firebase.');
+    //       return fbUser.getIdToken(true);
+    //     })
+    //     .then(sessionToken => {
+    //       return Cloud.loginWithPassword(email, sessionToken, this.rememberMe);
+    //     })
+    //     .then(response => {
+    //       location.replace('/admin');
+    //     })
+    //     .catch((err) => {
+    //       this.cloudError = err.message;
+    //       console.warn(err.responseInfo);
+    //       if (err.exit === 'userExists') {
+    //         this.cloudError = 'Unable to login. Check credentials.';
+    //       }
+    //       // eslint-disable-next-line no-console
+    //       console.warn(err);
+    //     });
+    // },
 
     // *Form submitted style functions
     submittedForm: function () {
       this.syncing = true;
-      window.location = '/admin';
+      if (!this.cloudError) {
+        window.location = '/admin';
+      }
+      this.syncing = false;
     },
 
     // * navigation functions

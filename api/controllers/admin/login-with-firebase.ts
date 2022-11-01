@@ -2,7 +2,7 @@ import { DecodedIdToken } from 'firebase-admin/auth';
 import * as firebase from '../../../config/firebaseAdmin';
 //TODO: Consider connecting Passport to Google Auth Flow: https://stackoverflow.com/q/34069046
 
-export const splitPhoneNumber = (formattedFirebaseNumber:string) => {
+const splitPhoneNumber = (formattedFirebaseNumber:string) => {
   try {
     const countryCode = Number.parseInt(
       formattedFirebaseNumber.match(/^\+(\d{1,2})/g)[0]

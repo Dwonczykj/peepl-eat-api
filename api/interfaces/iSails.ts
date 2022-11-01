@@ -4,6 +4,11 @@ import { AvailableDateOpeningHours } from "../../api/helpers/get-available-dates
 import { NextAvailableDateHelperReturnType } from "api/helpers/next-available-date";
 import { bool } from "aws-sdk/clients/signer";
 
+type WaterlineQueryKeys<T> = {
+  or: Array<{ [key in keyof T]?: T[key] }>;
+  and: Array<{ [key in keyof T]?: T[key] }>;
+};
+
 export type sailsVegi = {
   helpers: {
     isSuperAdmin: {
@@ -62,18 +67,24 @@ type SailsUpdateSetType<T> = {
 };
 
 export type SailsModelType<T> = {
-  find: (unusedArg: number | { [key in keyof T]?: T[key] }) => Promise<Array<T>>;
+  find: (
+    unusedArg: number | { [key in keyof T]?: T[key] } | WaterlineQueryKeys<T>
+  ) => Promise<Array<T>>;
   findOne: (
-    unusedArg: number | { [key in keyof T]?: T[key] }
+    unusedArg: number | { [key in keyof T]?: T[key] } | WaterlineQueryKeys<T>
   ) => Promise<T | null>;
   update: (
-    unusedArg: number | { [key in keyof T]?: T[key] }
+    unusedArg: number | { [key in keyof T]?: T[key] } | WaterlineQueryKeys<T>
   ) => SailsUpdateSetType<T>;
-  updateOne: (unusedArg: number) => SailsUpdateSetType<T>;
+  updateOne: (
+    unusedArg: number | { [key in keyof T]?: T[key] } | WaterlineQueryKeys<T>
+  ) => SailsUpdateSetType<T>;
   create: (unusedArg: { [key in keyof T]: T[key] }) =>
     | Promise<null>
-    | SailsFetchType<T>;
+    | SailsFetchType<T | null>;
   createEach: (
     unusedArg: Array<{ [key in keyof T]: T[key] }>
-  ) => Promise<null> | SailsFetchType<Array<T>>; // ~ https://bobbyhadz.com/blog/typescript-index-signature-parameter-cannot-be-union-type#:~:text=The%20error%20%22An%20index%20signature%20parameter%20type%20cannot,type%20MyType%20%3D%20%7B%20%5Bkey%20in%20MyUnion%5D%3A%20string%3B%7D.
+  ) => SailsFetchType<Array<T> | null>; // ~ https://bobbyhadz.com/blog/typescript-index-signature-parameter-cannot-be-union-type#:~:text=The%20error%20%22An%20index%20signature%20parameter%20type%20cannot,type%20MyType%20%3D%20%7B%20%5Bkey%20in%20MyUnion%5D%3A%20string%3B%7D.
 };
+
+

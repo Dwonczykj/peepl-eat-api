@@ -64,7 +64,7 @@ export const updateUser = (userFbUid:string, args:{email:string, password?:strin
   });
 };
 
-export const getUser = (phoneNumber:string): Promise<UserRecord> => {
+export const getUserByPhone = (phoneNumber:string): Promise<UserRecord> => {
   // ! phone nuber must be in format: https://www.twilio.com/docs/glossary/what-e164
   return new Promise(async (resolve, reject) => {
     try {
@@ -73,6 +73,43 @@ export const getUser = (phoneNumber:string): Promise<UserRecord> => {
     } catch (err) {
       reject(err);
     }
+  });
+};
+
+export const getUserByEmail = (email:string): Promise<UserRecord> => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const userRecord = await getAuth().getUserByEmail(email);
+      resolve(userRecord);
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
+
+export const tryGetUser = (args = {
+  tryEmail: '',
+  tryPhone: '',
+}): Promise<UserRecord> => {
+  return new Promise(async (resolve, unusedReject) => {
+    let userRecord: UserRecord;
+    if(args.tryPhone){
+      try {
+        userRecord = await getAuth().getUserByPhoneNumber(args.tryPhone);
+        return resolve(userRecord);
+      } catch (unusedErr) {
+        // reject(err);
+      }
+    }
+    if(!userRecord && args.tryEmail){
+      try {
+        userRecord = await getAuth().getUserByEmail(args.tryEmail);
+        return resolve(userRecord);
+      } catch (unusedErr) {
+        // reject(err);
+      }
+    }
+    resolve(userRecord);
   });
 };
 

@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { initializeApp } from 'firebase/app';
 import {
   browserSessionPersistence, connectAuthEmulator, getAuth,
@@ -18,7 +17,7 @@ parasails.registerPage('login', {
 
     },
     countryCode: '44',
-    phoneNoCountry: '', //TODO: remove this from commit APIKEY
+    phoneNoCountry: '',
     preventNextIteration: false,
     verificationCode: '',
     viewVerifyCodeForm: false,
@@ -81,19 +80,6 @@ parasails.registerPage('login', {
   //  ╩╝╚╝ ╩ ╚═╝╩╚═╩ ╩╚═╝ ╩ ╩╚═╝╝╚╝╚═╝
   methods: {
     createRecaptcha: function () {
-      //TODO: Switch to invisible?
-      // window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
-      //   'size': 'invisible',
-      //   'callback': (response) => {
-      //     window.alert('repatcha  callback called -> call the getVerificationCode flow' + response.toString());
-      //     //unhide phone number form
-      //     document.getElementById('numberForm').removeAttribute('hidden');
-      //     return this.clickVerifyPhoneNumber(widgetId);
-      //   },
-      //   'expired-callback': () => {
-      //     window.alert('repatcha expired callback called');
-      //   }
-      // }, auth);
       const auth = getAuth();
       window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
         'size': 'normal',
@@ -111,23 +97,6 @@ parasails.registerPage('login', {
           window.alert('recatcha expired!');
         }
       }, auth);
-      // window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
-      //   'size': 'normal',
-      //   'callback': (response) => {
-      //     // Note: Called when the recaptcha is verified
-      //     // window.alert('repatcha  callback called -> call the getVerificationCode flow' + response.toString());
-      //     //unhide phone number form
-      //     document.getElementById('start-recaptcha').classList.remove('hidden');
-
-      //     this.viewForm = 'numberForm';
-      //     document.getElementById('numberForm').classList.remove('hidden');
-
-      //     return this.clickVerifyPhoneNumber();
-      //   },
-      //   'expired-callback': () => {
-      //     window.alert('recatcha expired!');
-      //   }
-      // }, auth);
 
       var elements = document.querySelectorAll('[role="alert"]');
       for (var el in elements) {
@@ -137,8 +106,6 @@ parasails.registerPage('login', {
       }
     },
     clickVerifyPhoneNumber: async function () {
-      // const phoneNumber = document.getElementById('phoneNumber').value;
-      console.log('clickVerifyPhoneNumber');
       const phoneNumber = this.phoneNumber;
       const appVerifier = window.recaptchaVerifier;
 

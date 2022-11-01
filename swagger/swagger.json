@@ -1517,6 +1517,7 @@
           },
           {
             "required": [
+              "email",
               "phoneNoCountry",
               "phoneCountryCode",
               "name",
@@ -1545,7 +1546,8 @@
           },
           "email": {
             "type": "string",
-            "format": "email"
+            "format": "email",
+            "uniqueItems": true
           },
           "phoneNoCountry": {
             "type": "number",
@@ -1607,10 +1609,13 @@
             "type": "string"
           },
           "firebaseSessionToken": {
-            "type": "string"
+            "type": "string",
+            "nullable": true,
+            "default": ""
           },
           "secret": {
             "type": "string",
+            "nullable": true,
             "description": "Securely hashed representation of the service account's secret.",
             "example": "2$28a8eabna301089103-13948134nad"
           },
@@ -2072,7 +2077,7 @@
           {
             "in": "query",
             "name": "emailAddress",
-            "required": false,
+            "required": true,
             "schema": {
               "type": "string",
               "format": "email"
@@ -3562,7 +3567,7 @@
           {
             "in": "query",
             "name": "emailAddress",
-            "required": false,
+            "required": true,
             "schema": {
               "type": "string",
               "format": "email"
@@ -3804,6 +3809,14 @@
                       "description": "A user is already registered to the details requested"
                     },
                     {
+                      "type": "string",
+                      "description": "A firebase user is already registered to the phonenumber requested and should be signed in"
+                    },
+                    {
+                      "type": "string",
+                      "description": "A firebase user is already registered to the email requested and should be signed in"
+                    },
+                    {
                       "example": {},
                       "type": "object",
                       "properties": {},
@@ -3979,6 +3992,9 @@
           "200": {
             "description": "Success"
           },
+          "400": {
+            "description": "sails backend errored"
+          },
           "401": {
             "description": "Success",
             "content": {
@@ -3988,6 +4004,18 @@
                     {
                       "type": "string",
                       "description": "firebase errored on verifying the user token"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
                     },
                     {
                       "type": "string",

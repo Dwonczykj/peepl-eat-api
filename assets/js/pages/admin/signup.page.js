@@ -32,8 +32,8 @@ parasails.registerPage('signup', {
     name: '',
     business: '',
     businessId: -1,
-    role: 'vendor',
-    vendorRole: 'salesManager',
+    role: 'consumer',
+    vendorRole: 'none',
     deliveryPartnerRole: 'none',
     options: {
       role: ['admin', 'vendor', 'deliveryPartner', 'consumer'],
@@ -142,15 +142,17 @@ parasails.registerPage('signup', {
         this.preventNextIteration = false;
         return;
       }
-      this.phoneNoCountryNoFormat = this.phoneNoCountry
-        .replace(/-/g, '')
-        .match(/(\d{1,10})/g)[0];
+      this.phoneNoCountryNoFormat = this.phoneNoCountry.match(/\d/g)
+        ? this.phoneNoCountry.replace(/-/g, '').match(/(\d{1,10})/g)[0]
+        : '';
 
       // Format display value based on calculated currencyValue
-      this.phoneNoCountry = this.phoneNoCountryNoFormat.replace(
-        /(\d{1,3})(\d{1,3})(\d{1,4})/g,
-        '$1-$2-$3'
-      );
+      this.phoneNoCountry = this.phoneNoCountryNoFormat
+        ? this.phoneNoCountryNoFormat.replace(
+            /(\d{1,3})(\d{1,3})(\d{1,4})/g,
+            '$1-$2-$3'
+          )
+        : '';
     },
     // countryCodeChange: function (event) {
     //   // const newVal = event.srcElement.value;
@@ -191,20 +193,12 @@ parasails.registerPage('signup', {
 
       const firebasePhoneRegex = /^\+\d{1,2} \d{3}-\d{3}-\d{4}$/;
 
-      if (argins['phoneNumber'].match(firebasePhoneRegex)) {
-        // this.phoneNumber = argins['phoneNumber'];
-      } else {
+      if (!argins.phoneNumber.match(firebasePhoneRegex)) {
         this.formErrors.phoneNumber = true;
-        // throw new Error('badPhoneNumberFormat');
       }
 
       // Validate email:
-      if (
-        !(
-          argins.emailAddress &&
-          parasails.util.isValidEmailAddress(argins['email'])
-        )
-      ) {
+      if (!(argins.email && parasails.util.isValidEmailAddress(argins.email))) {
         this.formErrors.emailAddress = true;
       }
 
@@ -221,12 +215,16 @@ parasails.registerPage('signup', {
       }
     },
     clickRegisterUserWithEmailPassword: async function () {
+      const validForm = this.parseRegistrationForm();
+      if(!validForm){
+        return;
+      }
       var argins = {
         phoneNoCountry: Number.parseInt(
-          this.phoneNoCountry.trim().replace(/[^0-9]/g, '')
+          this.phoneNoCountry.trim().replace(/[^0-9]/g, '') || 0
         ),
         phoneCountryCode: Number.parseInt(
-          this.countryCode.trim().replace(/[^0-9]/g, '')
+          this.countryCode.trim().replace(/[^0-9]/g, '') || 0
         ),
         email: this.email.toString().trim(),
         password: this.password.toString().trim(),
@@ -240,27 +238,51 @@ parasails.registerPage('signup', {
 
       try {
         this.syncing = true;
-        const response = await Cloud.signupWithPassword(
-          argins['email'],
-          argins['password'],
-          argins['phoneNoCountry'],
-          argins['phoneCountryCode'],
-          argins['name'],
-          argins['vendor'],
-          argins['deliveryPartner'],
-          argins['role'],
-          argins['vendorRole'],
-          argins['deliveryPartnerRole']
-        );
+        var _vegiSignUpResponse;
+        try {
+          const _vegiSignUpResponse = await Cloud.signupWithPassword(
+            argins['email'],
+            argins['password'],
+            argins['phoneNoCountry'],
+            argins['phoneCountryCode'],
+            argins['name'],
+            argins['vendor'],
+            argins['deliveryPartner'],
+            argins['role'],
+            argins['vendorRole'],
+            argins['deliveryPartnerRole']
+          );
+        } catch (err) {
+          if (err.exit === 'firebaseUserExistsForPhone') {
+            this.cloudError =
+              'User exists for this phone number. Please login.';
+          } else if (err.exit === 'firebaseUserExistsForEmail') {
+            this.cloudError = 'User exists for this email. Please login.';
+          } else if (err.code === 'firebaseErrored') {
+            this.cloudError = `${err.message}`;
+            // eslint-disable-next-line no-console
+            console.warn(err.responseInfo);
+          } else {
+            console.error(
+              `Unable to signup to vegi server using firebase session token: ${err}`
+            );
+            this.cloudError = `[${err.code}]: ${err.message}`;
+            // eslint-disable-next-line no-console
+            console.warn(err.responseInfo);
+          }
+          this.syncing = false;
+          return;
+        }
+
         this.syncing = false;
 
-        if (response.status) {
+        if (_vegiSignUpResponse.status) {
           this.formErrors.email = true;
           this.formErrors.password = true;
           this.formErrors.business = true;
         }
-
-        return this.submittedEmailPasswordRegistrationForm();
+        return;
+        // return this.submittedEmailPasswordRegistrationForm();
       } catch (err) {
         this.cloudError = err.message;
         this.syncing = false;
@@ -270,6 +292,10 @@ parasails.registerPage('signup', {
       }
     },
     clickRegisterUserWithPhone: async function () {
+      const validForm = this.parseRegistrationForm();
+      if (!validForm) {
+        return;
+      }
       // argins = {
       //   'phoneNumber': document.getElementById('phoneNumber').value.toString().trim(),
       //   'email': document.getElementById('email').value.toString().trim(),
@@ -283,10 +309,10 @@ parasails.registerPage('signup', {
 
       var argins = {
         phoneNoCountry: Number.parseInt(
-          this.phoneNoCountry.trim().replace(/[^0-9]/g, '')
+          this.phoneNoCountry.trim().replace(/[^0-9]/g, '') || 0
         ),
         phoneCountryCode: Number.parseInt(
-          this.countryCode.trim().replace(/[^0-9]/g, '')
+          this.countryCode.trim().replace(/[^0-9]/g, '') || 0
         ),
         email: this.email.toString().trim(),
         name: this.name.toString().trim(),
@@ -294,42 +320,63 @@ parasails.registerPage('signup', {
         deliveryPartner: this.isDeliveryPartner ? this.businessId : null,
         role: this.role,
         vendorRole: this.vendorRole ? 'none' : this.vendorRole,
-        deliveryPartnerRole: this.deliveryPartnerRole ? 'none' : this.deliveryPartnerRole,
+        deliveryPartnerRole: this.deliveryPartnerRole
+          ? 'none'
+          : this.deliveryPartnerRole,
       };
 
       try {
         this.syncing = true;
-        const response = await Cloud.signup(
-          argins['email'],
-          argins['phoneNoCountry'],
-          argins['phoneCountryCode'],
-          argins['name'],
-          argins['vendor'],
-          argins['deliveryPartner'],
-          argins['role'],
-          argins['vendorRole'],
-          argins['deliveryPartnerRole']
-        );
+        var _vegiSignUpResponse;
+        try {
+          _vegiSignUpResponse = await Cloud.signup(
+            argins['email'],
+            argins['phoneNoCountry'],
+            argins['phoneCountryCode'],
+            argins['name'],
+            argins['vendor'],
+            argins['deliveryPartner'],
+            argins['role'],
+            argins['vendorRole'],
+            argins['deliveryPartnerRole']
+          );
+        } catch (err) {
+          if (err.exit === 'firebaseUserExistsForPhone') {
+            this.cloudError =
+              'User exists for this phone number. Please login.';
+          } else if (err.exit === 'firebaseUserExistsForEmail') {
+            this.cloudError = 'User exists for this email. Please login.';
+          } else if (err.code === 'firebaseErrored') {
+            this.cloudError = `${err.message}`;
+            // eslint-disable-next-line no-console
+            console.warn(err.responseInfo);
+          } else {
+            console.error(
+              `Unable to signup to vegi server using firebase session token: ${err}`
+            );
+            this.cloudError = `[${err.code}]: ${err.message}`;
+            // eslint-disable-next-line no-console
+            console.warn(err.responseInfo);
+          }
+          this.syncing = false;
+          return;
+        }
 
-        // eslint-disable-next-line no-console
-        // eslint-disable-next-line no-console
-        // console.log(response.headers["x-exit"]);
-        // // eslint-disable-next-line no-console
-        // console.log(response.message);
-        if (response.status || !response.data) {
+        if (_vegiSignUpResponse.status || !_vegiSignUpResponse.data) {
           this.formErrors.phoneNumber = true;
           this.formErrors.countryCode = true;
           this.formErrors.business = true;
         }
 
-        return this.submittedRegistrationForm();
+        return;
       } catch (err) {
         // err has ['name', 'responseInfo', 'exit', 'code']
         // err.responseInfo contains the body, headers, code etc
         this.cloudError = err.message;
 
         if (err.exit === 'userExists') {
-          this.cloudError = 'Unable to register. A user already exists for these credentials.';
+          this.cloudError =
+            'Unable to register. A user already exists for these credentials.';
         }
       }
     },
@@ -366,6 +413,14 @@ parasails.registerPage('signup', {
       document
         .getElementById('registrationEmailPasswordContainer')
         .classList.remove('hidden');
+    },
+
+    // * Navigation functions
+    toLoginWithEmail: function () {
+      window.location.replace('/admin/login-with-password');
+    },
+    toLoginWithPhone: function () {
+      window.location.replace('/admin/login');
     },
   },
 });

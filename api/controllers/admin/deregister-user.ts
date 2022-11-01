@@ -76,7 +76,7 @@ module.exports = {
     const userRecord = _userRecord;
 
     try {
-      _userRecord = await firebase.getUser(_phoneNumber);
+      _userRecord = await firebase.getUserByPhone(_phoneNumber);
     } catch (err) {
       sails.log.error(err);
 

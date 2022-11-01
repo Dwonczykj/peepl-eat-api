@@ -1,5 +1,6 @@
 import { UserRecord } from 'firebase-admin/auth';
-import { createUserWithEmailAndPassword, Auth, UserCredential } from 'firebase/auth';
+import { UserType } from '../../../scripts/utils';
+import { SailsModelType } from '../../../api/interfaces/iSails';
 import * as firebase from '../../../config/firebaseAdmin';
 declare var User: any;
 // const bcrypt = require('bcrypt');
@@ -58,6 +59,16 @@ module.exports = {
       responseType: 'unauthorised',
       description: 'A user is already registered to the details requested',
     },
+    firebaseUserExistsForPhone: {
+      responseType: 'unauthorised',
+      description:
+        'A firebase user is already registered to the phonenumber requested and should be signed in',
+    },
+    firebaseUserExistsForEmail: {
+      responseType: 'unauthorised',
+      description:
+        'A firebase user is already registered to the email requested and should be signed in',
+    },
     badRolesRequest: {
       responseType: 'badRequest',
       statusCode: 403,
@@ -83,24 +94,29 @@ module.exports = {
     },
   },
 
-  fn: async function (inputs: {
-    emailAddress: string,
-    password: string,
-    phoneNoCountry: number,
-    phoneCountryCode: number,
-    name?:string,
-    vendorId?: number,
-    deliveryPartnerId?: number,
-    role: string,
-    vendorRole?: string,
-    deliveryPartnerRole?: string,
-  }, exits: {
-    firebaseErrored,
-    success,
-    badRolesRequest,
-    userExists,
-    error,
-  }) {
+  fn: async function (
+    inputs: {
+      emailAddress: string;
+      password: string;
+      phoneNoCountry: number;
+      phoneCountryCode: number;
+      name?: string;
+      vendorId?: number;
+      deliveryPartnerId?: number;
+      role: string;
+      vendorRole?: string;
+      deliveryPartnerRole?: string;
+    },
+    exits: {
+      firebaseErrored;
+      firebaseUserExistsForPhone;
+      firebaseUserExistsForEmail;
+      success;
+      badRolesRequest;
+      userExists;
+      error;
+    }
+  ) {
     if (
       !['admin', 'owner', 'inventoryManager', 'salesManager', 'none'].includes(
         inputs.vendorRole
@@ -127,7 +143,12 @@ module.exports = {
       });
     }
 
-    const existingUser = await User.findOne({
+    const existingFirebaseUser = await firebase.tryGetUser({
+      tryEmail: inputs.emailAddress,
+      tryPhone: `+${inputs.phoneCountryCode}${inputs.phoneNoCountry}`,
+    });
+
+    const existingSailsUser: UserType = await User.findOne({
       or: [
         {
           phoneNoCountry: inputs.phoneNoCountry,
@@ -139,58 +160,111 @@ module.exports = {
       ],
     });
 
-    if (existingUser) {
+    var _userRecord: UserRecord;
+
+    if (existingFirebaseUser && existingSailsUser) {
+      if (existingFirebaseUser.email === inputs.emailAddress) {
+        return exits.firebaseUserExistsForEmail();
+      } else if (
+        existingFirebaseUser.phoneNumber ===
+        `+${inputs.phoneCountryCode}${inputs.phoneNoCountry}`
+      ) {
+        return exits.firebaseUserExistsForPhone();
+      }
       return exits.userExists();
     }
 
-    var _userRecord: UserRecord;
+    if (!existingFirebaseUser) {
+      try {
+        _userRecord = await firebase.createUser({
+          email: inputs.emailAddress,
+          password: inputs.password,
+          name: inputs.name,
+          phoneNumber: `+${inputs.phoneCountryCode}${inputs.phoneNoCountry}`,
+        });
+      } catch (err) {
+        sails.log.error(err);
 
-    try {
-      _userRecord = await firebase.createUser({
-        email: inputs.emailAddress,
-        password: inputs.password,
-        name: inputs.name,
-        phoneNumber: `+${inputs.phoneCountryCode}${inputs.phoneNoCountry}`
-      });
-
-    } catch (err) {
-      sails.log.error(err);
-
-      return exits.firebaseErrored({
-        code: err.code,
-        message: err.message,
-        error: err,
-      }); //https://firebase.google.com/docs/reference/js/auth#autherrorcodes
+        return exits.firebaseErrored({
+          code: err.code,
+          message: err.message,
+          error: err,
+        }); //https://firebase.google.com/docs/reference/js/auth#autherrorcodes
+      }
+      // Signed in
+      const fbUser = _userRecord;
+      if (!existingSailsUser) {
+        try {
+          // * Create User Wrapper
+          const user = await User.create({
+            phoneNoCountry: inputs.phoneNoCountry,
+            phoneCountryCode: inputs.phoneCountryCode,
+            email: inputs.emailAddress,
+            name: inputs.name,
+            vendor: inputs.vendorId,
+            deliveryPartner: inputs.deliveryPartnerId,
+            vendorConfirmed: false,
+            isSuperAdmin: false,
+            vendorRole: inputs.vendorRole ?? 'none',
+            deliveryPartnerRole: inputs.deliveryPartnerRole ?? 'none',
+            role: inputs.role,
+            firebaseSessionToken: `DUMMY_SIGNUP_${fbUser.uid}`, //! Set when they log in not here!
+            fbUid: fbUser.uid,
+          });
+          return exits.success(user);
+        } catch (error) {
+          sails.log.error(
+            `Error creating user in signup-with-password action: ${error}`
+          );
+          return exits.error(
+            new Error(
+              `Error creating user in signup-with-password action: ${error}`
+            )
+          );
+        }
+      } else {
+        await User.updateOne(existingSailsUser.id).set({
+          fbUid: fbUser.uid,
+        });
+        const user = await User.findOne(existingSailsUser.id);
+        return exits.success(user);
+      }
+    } else {
+      // If User has account (in firebase) then that is a vegi account and they should use it to login:
+      if(!existingSailsUser){
+        try {
+          const user: UserType = await User.create({
+            phoneNoCountry: inputs.phoneNoCountry,
+            phoneCountryCode: inputs.phoneCountryCode,
+            email: inputs.emailAddress,
+            name: inputs.name,
+            vendor: inputs.vendorId,
+            deliveryPartner: inputs.deliveryPartnerId,
+            vendorConfirmed: false,
+            isSuperAdmin: false,
+            vendorRole: inputs.vendorRole ?? 'none',
+            deliveryPartnerRole: inputs.deliveryPartnerRole ?? 'none',
+            role: inputs.role,
+          }).fetch();
+          return exits.success(user);
+        } catch (error) {
+          sails.log.error(
+            `Error creating user in signup-with-password action: ${error}`
+          );
+          // return exits.error(
+          //   new Error(
+          //     `Error creating user in signup-with-password action: ${error}`
+          //   )
+          // );
+        }
+      }
+      if(existingFirebaseUser.email === inputs.emailAddress){
+        return exits.firebaseUserExistsForEmail();
+      } else {
+        return exits.firebaseUserExistsForPhone();
+      }
     }
 
-    // Signed in
-    const fbUser = _userRecord;
-
-    try {
-	    // * Create User Wrapper
-	    const user = await User.create({
-        phoneNoCountry: inputs.phoneNoCountry,
-        phoneCountryCode: inputs.phoneCountryCode,
-        email: inputs.emailAddress,
-        name: inputs.name,
-        vendor: inputs.vendorId,
-        deliveryPartner: inputs.deliveryPartnerId,
-        vendorConfirmed: false,
-        isSuperAdmin: false,
-        vendorRole: inputs.vendorRole ?? 'none',
-        deliveryPartnerRole: inputs.deliveryPartnerRole ?? 'none',
-        role: inputs.role,
-        firebaseSessionToken: `DUMMY_SIGNUP_${fbUser.uid}`, //! Set when they log in not here!
-        fbUid: fbUser.uid,
-      });
-      return exits.success(user);
-    } catch (error) {
-      sails.log.error(`Error creating user in signup-with-password action: ${error}`);
-      return exits.error(
-        new Error(
-          `Error creating user in signup-with-password action: ${error}`
-        )
-      );
-    }
+    
   },
 };

@@ -8,7 +8,7 @@ module.exports = {
   inputs: {
     emailAddress: {
       type: "string",
-      required: false,
+      required: true,
       isEmail: true,
     },
     phoneNoCountry: {
@@ -93,32 +93,23 @@ module.exports = {
         message: "Bad role Supplied to request",
       });
     }
-    if (inputs.emailAddress) {
-      const existingUser = await User.findOne({
-        or: [
-          {
-            phoneNoCountry: inputs.phoneNoCountry,
-            phoneCountryCode: inputs.phoneCountryCode,
-          },
-          {
-            email: inputs.emailAddress,
-          },
-        ],
-      });
+    
+    const existingUser = await User.findOne({
+      or: [
+        {
+          phoneNoCountry: inputs.phoneNoCountry,
+          phoneCountryCode: inputs.phoneCountryCode,
+        },
+        {
+          email: inputs.emailAddress,
+        },
+      ],
+    });
 
-      if (existingUser) {
-        return exits.userExists();
-      }
-    } else {
-      const existingUser = await User.findOne({
-        phoneNoCountry: inputs.phoneNoCountry,
-        phoneCountryCode: inputs.phoneCountryCode,
-      });
-
-      if (existingUser) {
-        return exits.userExists();
-      }
+    if (existingUser) {
+      return exits.userExists();
     }
+    
 
     // * Create User Wrapper
     const user = await User.create({
@@ -134,7 +125,6 @@ module.exports = {
       vendorRole: inputs.vendorRole ?? "none",
       deliveryPartnerRole: inputs.deliveryPartnerRole ?? "none",
       role: inputs.role,
-      firebaseSessionToken: "REGISTERING_USER",
     }).fetch();
 
     return exits.success({ data: user });

@@ -265,9 +265,9 @@
                   <label for="role">Role</label>
                   <select class="form-control" id="role" @change="roleOnChange($event)" v-model="role">
                     <!-- <option value="admin">Vegi Admin</option> -->
+                    <option value="consumer">Consumer</option>
                     <option value="vendor">Merchant</option>
                     <option value="deliveryPartner">DeliveryPartner</option>
-                    <option value="consumer">Consumer</option>
                   </select>
                 </div>
                 <div class="form-group">
@@ -319,9 +319,16 @@
                   :class="{ 'is-loading': syncing }">
                   Register</ajax-button>
                 <div v-if="cloudError" class="alert alert-danger mt-4" role="alert">
-                  There has been an error submitting your registration. Please try again.
+                  {{this.cloudError}}
+                  <a href="/admin/login-with-password">Login</a>
                 </div>
               </ajax-form>
+              <div id="signupWithPasswordButton" style="width: 50%; padding: 0.25em;" class="hidden">
+                <button @click="hideSignupWithPhone" id="register" class="btn-sm">Register with Email & Password</button>
+              </div>
+              <div style="width: 50%; padding: 0.25em;">
+                <button @click="toLoginWithPhone" id="loginWithPhoneButton" class="btn-sm btn-block btn-peepl">Login</button>
+              </div>
             </div>
           </div>
           <div id="registrationEmailPasswordContainer" class="login-panel panel panel-default">
@@ -590,9 +597,9 @@
                   <label for="roleEP">Role</label>
                   <select class="form-control" id="roleEP" @change="roleOnChange($event)" v-model="role">
                     <!-- <option value="admin">Vegi Admin</option> -->
+                    <option value="consumer">Consumer</option>
                     <option value="vendor">Merchant</option>
                     <option value="deliveryPartner">DeliveryPartner</option>
-                    <option value="consumer">Consumer</option>
                   </select>
                 </div>
                 <div class="form-group" :class="isConsumer ? 'hidden' : ''">
@@ -645,16 +652,17 @@
                   :class="{ 'is-loading': syncing }">
                   Register</ajax-button>
                 <div v-if="cloudError" class="alert alert-danger mt-4" role="alert">
-                  There has been an error submitting your registration. Please try again.
+                  {{this.cloudError}}
+                  <a href="/admin/login-with-password">Login</a>
                 </div>
               </ajax-form>
+              <div id="signupWithPhoneButton" style="width: 50%; padding: 0.25em;">
+                <button @click="hideSignupWithPassword" id="register" class="btn-sm">Register with Phone</button>
+              </div>
+              <div style="width: 50%; padding: 0.25em;">
+                <button @click="toLoginWithEmail" id="loginWithEmailButton" class="btn-sm btn-block btn-peepl">Login</button>
+              </div>
             </div>
-          </div>
-          <div id="signupWithPhoneButton" style="width: 50%; padding: 0.25em;">
-            <button @click="hideSignupWithPassword" id="register" class="btn-sm">Register with Phone</button>
-          </div>
-          <div id="signupWithPasswordButton" style="width: 50%; padding: 0.25em;" class="hidden">
-            <button @click="hideSignupWithPhone" id="register" class="btn-sm">Register with Email & Password</button>
           </div>
         </div>
       </div>
