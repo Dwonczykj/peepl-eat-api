@@ -183,7 +183,7 @@ module.exports = {
           phoneNumber: `+${inputs.phoneCountryCode}${inputs.phoneNoCountry}`,
         });
       } catch (err) {
-        sails.log.error(err);
+        sails.log.error(`Firebase Errored on User_Creation with code: ${err.code} because: "${err.message}"`);
 
         return exits.firebaseErrored({
           code: err.code,
@@ -208,9 +208,9 @@ module.exports = {
             vendorRole: inputs.vendorRole ?? 'none',
             deliveryPartnerRole: inputs.deliveryPartnerRole ?? 'none',
             role: inputs.role,
-            firebaseSessionToken: `DUMMY_SIGNUP_${fbUser.uid}`, //! Set when they log in not here!
+            // firebaseSessionToken: `DUMMY_SIGNUP_${fbUser.uid}`, //! Set when they log in not here!
             fbUid: fbUser.uid,
-          });
+          }).fetch();
           return exits.success(user);
         } catch (error) {
           sails.log.error(

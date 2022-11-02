@@ -241,6 +241,7 @@
                       :class="{ 'is-invalid': formErrors.phoneNumber }" class="form-control"
                       @keyup="phoneNumberFocusOut" @blur="phoneNumberFocusOut">
                   </div>
+                  <div class="invalid-feedback" v-if="formErrors.phoneNumber">Please enter your phone number.</div>
                 </div>
                 <div v-if="cloudError === 'badPhoneNumberFormat'" class="alert alert-danger mt-4" role="alert">
                   Please ensure number is of format: '+1 234-567-8910'
@@ -252,6 +253,7 @@
                   <label for="email">Email</label>
                   <input type="email" id="email" v-model="email" value="" placeholder="email"
                     :class="{ 'is-invalid': formErrors.email }" class="form-control">
+                  <div class="invalid-feedback" v-if="formErrors.email">Please enter your name.</div>
                 </div>
                 <div v-if="cloudError === 'badEmailFormat'" class="alert alert-danger mt-4" role="alert">
                   Please ensure email is correctly formatted: 'example@email.com'
@@ -260,6 +262,7 @@
                   <label for="name">Name</label>
                   <input type="text" id="name" v-model="name" value="" :class="{ 'is-invalid': formErrors.name }"
                     class="form-control">
+                  <div class="invalid-feedback" v-if="formErrors.name">Please enter your name.</div>
                 </div>
                 <div class="form-group">
                   <label for="role">Role</label>
@@ -314,13 +317,12 @@
                   class="btn btn-peepl mt-6"
                   id="registerUserSubmitButton"
                   type="submit"
-                  @click="clickRegisterUserWithPhone()"
                   :syncing="syncing"
                   :class="{ 'is-loading': syncing }">
                   Register</ajax-button>
                 <div v-if="cloudError" class="alert alert-danger mt-4" role="alert">
                   {{this.cloudError}}
-                  <a href="/admin/login-with-password">Login</a>
+                  <a href="/admin/login">Login</a>
                 </div>
               </ajax-form>
               <div id="signupWithPasswordButton" style="width: 50%; padding: 0.25em;" class="hidden">
@@ -337,7 +339,7 @@
             </div>
             <div class="panel-body">
               <ajax-form id="registrationEmailPasswordForm" :handle-parsing="parseRegistrationForm" :syncing.sync="syncing"
-                :cloud-error.sync="cloudError" @submitted="submittedRegistrationForm()"
+                :cloud-error.sync="cloudError" @submitted="submittedEmailPasswordRegistrationForm()"
                 :handle-submitting="clickRegisterUserWithEmailPassword">
                 <div class="form-group">
                   <label for="phoneNumberEP">Phone Number</label>
@@ -568,6 +570,7 @@
                       :class="{ 'is-invalid': formErrors.phoneNumber }" class="form-control"
                       @keyup="phoneNumberFocusOut" @blur="phoneNumberFocusOut">
                   </div>
+                  <div class="invalid-feedback" v-if="formErrors.phoneNumber">Please enter your phone number.</div>
                 </div>
                 <div v-if="cloudError === 'badPhoneNumberFormat'" class="alert alert-danger mt-4" role="alert">
                   Please ensure number is of format: '+1 234-567-8910'
@@ -579,6 +582,7 @@
                   <label for="emailEP">Email</label>
                   <input type="email" id="emailEP" v-model="email" value="" placeholder="email"
                     :class="{ 'is-invalid': formErrors.email }" class="form-control">
+                  <div class="invalid-feedback" v-if="formErrors.email">Please enter your name.</div>
                 </div>
                 <div v-if="cloudError === 'badEmailFormat'" class="alert alert-danger mt-4" role="alert">
                   Please ensure email is correctly formatted: 'example@email.com'
@@ -592,6 +596,7 @@
                   <label for="nameEP">Name</label>
                   <input type="text" id="nameEP" v-model="name" value="" :class="{ 'is-invalid': formErrors.name }"
                     class="form-control">
+                  <div class="invalid-feedback" v-if="formErrors.name">Please enter your name.</div>
                 </div>
                 <div class="form-group">
                   <label for="roleEP">Role</label>
@@ -647,7 +652,6 @@
                   class="btn btn-peepl mt-6"
                   id="registerUserSubmitButtonEP"
                   type="submit"
-                  @click="clickRegisterUserWithEmailPassword()"
                   :syncing="syncing"
                   :class="{ 'is-loading': syncing }">
                   Register</ajax-button>
@@ -656,9 +660,9 @@
                   <a href="/admin/login-with-password">Login</a>
                 </div>
               </ajax-form>
-              <div id="signupWithPhoneButton" style="width: 50%; padding: 0.25em;">
+              <!-- <div id="signupWithPhoneButton" style="width: 50%; padding: 0.25em;">
                 <button @click="hideSignupWithPassword" id="register" class="btn-sm">Register with Phone</button>
-              </div>
+              </div> -->
               <div style="width: 50%; padding: 0.25em;">
                 <button @click="toLoginWithEmail" id="loginWithEmailButton" class="btn-sm btn-block btn-peepl">Login</button>
               </div>

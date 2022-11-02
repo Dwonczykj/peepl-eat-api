@@ -34,6 +34,27 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Launch Program (Production)",
+            "skipFiles": [
+                "<node_internals>/**/*.js",
+                // "assets/**"
+            ],
+            "program": "${workspaceFolder}/app.js",
+            "env": {
+                "NODE_ENV": "production",
+                "useFirebaseEmulator": "false",
+            },
+            "args": [
+                "--verbose",
+                "--hookTimeout=160000"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/out/**/*.js"
+            ],
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Mocha All Tests",
             "program": "${workspaceFolder}/node_modules/mocha/bin/mocha",
             "env": {

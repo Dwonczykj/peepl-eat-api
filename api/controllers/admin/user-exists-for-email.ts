@@ -36,9 +36,9 @@ module.exports = {
 
     if (!user) {
       // return exits.badCombo();
-      exits.success({ data: false });
+      return exits.success({ data: false });
     }
 
-    exits.success({ message: 'success', data: true });
+    return exits.success({ message: 'success', data: true });
   }
 };

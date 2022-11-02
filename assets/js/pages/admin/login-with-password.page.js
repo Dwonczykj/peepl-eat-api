@@ -14,11 +14,11 @@ parasails.registerPage('login-with-password', {
     cloudCode: false,
     formErrors: {},
     formData: {
-      emailAddress: '',
+      email: '',
       password: '',
       rememberMe: false,
     },
-    emailAddress: '',
+    email: '',
     password: '',
     rememberMe: false,
   },
@@ -41,7 +41,7 @@ parasails.registerPage('login-with-password', {
     };
     initializeApp(config);
     const auth = getAuth();
-    if(window.SAILS_LOCALS.useEmulator){
+    if (window.SAILS_LOCALS.useEmulator) {
       connectAuthEmulator(auth, 'http://127.0.0.1:9099');
     }
     this.$focus('[autofocus]');
@@ -54,44 +54,67 @@ parasails.registerPage('login-with-password', {
     handleParsingForm: function () {
       // Clear out any pre-existing error messages.
       this.formErrors = {};
+      const setFormErrors = {};
 
-      const email = this.emailAddress;
+      const email = this.email;
       const password = this.password;
       const rememberMe = this.rememberMe;
 
       var argins = {
         email,
         password,
-        rememberMe
+        rememberMe,
       };
 
       // Validate email:
       if (!argins.email) {
-        this.formErrors.emailAddress = true;
+        setFormErrors.email = true;
       }
 
       // Validate password:
       if (!argins.password) {
-        this.formErrors.password = true;
+        setFormErrors.password = true;
       }
 
       // If there were any issues, they've already now been communicated to the user,
       // so simply return undefined.  (This signifies that the submission should be
       // cancelled.)
-      if (Object.keys(this.formErrors).length > 0) {
-        return;
+      this.formErrors = {
+        ...this.formErrors,
+        ...setFormErrors,
+      };
+      if (!this.formErrorsExist()) {
+        return this.getSubmissionArgs();
       }
-
-      return argins;
+      return; // ! The result of this function is called from ajax-form._submit if handle-parsing prop set on the form in the ejs
+    },
+    getSubmissionArgs: function () {
+      return {
+        email: this.email.toString().trim(),
+        password: this.password.toString().trim(),
+        rememberMe: this.rememberMe,
+      };
+    },
+    cloudErrorsExist: function () {
+      return this.cloudError || this.cloudCode;
+    },
+    formErrorsExist: function () {
+      return (
+        Object.values(this.formErrors).reduce(
+          (prev, cur) => prev + Number(cur),
+          0
+        ) > 0 || this.cloudErrorsExist()
+      );
     },
 
     // * Submission Functions
     loginWithPassword: async function () {
-      const validForm = this.handleParsingForm();
-      if (!validForm) {
+      this.handleParsingForm();
+      if (this.formErrorsExist()) {
         return;
       }
-      const email = this.emailAddress;
+      // var argins = this.getSubmissionArgs();
+      const email = this.email;
       const password = this.password;
       const rememberMe = this.rememberMe;
 
@@ -99,9 +122,9 @@ parasails.registerPage('login-with-password', {
       this.cloudCode = false;
       let _userExists = { data: false };
       try {
-	      _userExists = await Cloud.userExistsForEmail(email);
+        _userExists = await Cloud.userExistsForEmail(email);
       } catch (unusedError) {
-        _userExists = {data: false};
+        _userExists = { data: false };
       }
       const userExists = _userExists;
 
@@ -117,8 +140,7 @@ parasails.registerPage('login-with-password', {
             // return this.registerEmailPasswordFirebaseOnly(email, password);
           }
           return;
-        }
-        else if (err.code === 'auth/wrong-password') {
+        } else if (err.code === 'auth/wrong-password') {
           this.cloudError = `Invalid Credentials!`;
           return;
         } else {
@@ -134,7 +156,11 @@ parasails.registerPage('login-with-password', {
       var _vegiSigninResponse;
       try {
         this.cloudCode = false;
-	      _vegiSigninResponse = await Cloud.loginWithPassword(email, sessionToken, rememberMe);
+        _vegiSigninResponse = await Cloud.loginWithPassword(
+          email,
+          sessionToken,
+          rememberMe
+        );
       } catch (err) {
         this.cloudCode = err.exit;
         this.cloudError = err.exit;
@@ -158,9 +184,7 @@ parasails.registerPage('login-with-password', {
       }
       // const vegiSigninResponse = _vegiSigninResponse;
 
-      if(!this.cloudError){
-        location.replace('/admin');
-      }
+      this.submittedForm();
     },
     // registerEmailPasswordFirebaseOnly: function(email, password) {
     //   const auth = getAuth();
@@ -193,13 +217,16 @@ parasails.registerPage('login-with-password', {
     // *Form submitted style functions
     submittedForm: function () {
       this.syncing = true;
-      if (!this.cloudError) {
-        window.location = '/admin';
+      if (!this.formErrorsExist()) {
+        return this.toHome();
       }
       this.syncing = false;
     },
 
     // * navigation functions
+    toHome: function () {
+      window.location.replace('/admin');
+    },
     toRegister: function () {
       window.location.replace('/admin/signup');
     },

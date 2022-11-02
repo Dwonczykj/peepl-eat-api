@@ -154,18 +154,16 @@ parasails.registerComponent('ajaxForm', {
     //  ╠═╝╠╦╝║╚╗╔╝╠═╣ ║ ║╣   ║║║║╣  ║ ╠═╣║ ║ ║║╚═╗
     //  ╩  ╩╚═╩ ╚╝ ╩ ╩ ╩ ╚═╝  ╩ ╩╚═╝ ╩ ╩ ╩╚═╝═╩╝╚═╝
     _submit: async function () {
-
       // Prevent double-posting.
       if (this.syncing) {
         return;
-      }//•
+      } //•
 
       // Clear the userland "cloudError" prop.
       this.$emit('update:cloudError', '');
 
       // Determine the argins that will be sent to the server in our request.
       var argins;
-
       if (this.handleParsing) {
         // Run the provided "handle-parsing" logic.
         // > This should clear out any pre-existing error messages, perform any additional
@@ -176,9 +174,15 @@ parasails.registerComponent('ajaxForm', {
           // If argins came back undefined, then avast.
           // (This means that parsing the form failed.  Submission will not be attempted.)
           return;
-        } else if (!_.isObject(argins) || _.isArray(argins) || _.isFunction(argins)) {
-          throw new Error('Invalid data returned from custom form parsing logic.  (Should return a dictionary of argins, like `{}`.)');
-        }//•
+        } else if (
+          !_.isObject(argins) ||
+          _.isArray(argins) ||
+          _.isFunction(argins)
+        ) {
+          throw new Error(
+            'Invalid data returned from custom form parsing logic.  (Should return a dictionary of argins, like `{}`.)'
+          );
+        } //•
       } else if (this.formData) {
         // Or use the simpler, built-in absorbtion strategy.
         // > This uses the provided form data as our argins, verbatim.  Then it runs
@@ -195,20 +199,20 @@ parasails.registerComponent('ajaxForm', {
             let ruleRhs = this.formRules[fieldName][ruleName];
             let violation;
 
-            let isFieldValuePresent = (
+            let isFieldValuePresent =
               fieldValue !== undefined &&
               fieldValue !== '' &&
-              !_.isNull(fieldValue)
-            );
+              !_.isNull(fieldValue);
 
-            if (ruleName === 'required' && (ruleRhs === true || ruleRhs === false)) {
+            if (
+              ruleName === 'required' &&
+              (ruleRhs === true || ruleRhs === false)
+            ) {
               // ® Must be defined, non-null, and not the empty string
               if (ruleRhs === false) {
                 violation = false;
               } else {
-                violation = (
-                  !isFieldValuePresent
-                );
+                violation = !isFieldValuePresent;
               }
             } else if (!isFieldValuePresent) {
               // Do nothing.
@@ -225,45 +229,43 @@ parasails.registerComponent('ajaxForm', {
               // > Just make `required` validation rule dynamic, and everything
               // > else will work as expected.
               // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-            } else if (ruleName === 'isEmail' && (ruleRhs === true || ruleRhs === false)) {
+            } else if (
+              ruleName === 'isEmail' &&
+              (ruleRhs === true || ruleRhs === false)
+            ) {
               // ® Must be an email address (unless falsy)
               if (ruleRhs === false) {
                 violation = false;
               } else {
-                violation = (
-                  !parasails.util.isValidEmailAddress(fieldValue)
-                );
+                violation = !parasails.util.isValidEmailAddress(fieldValue);
               }
             } else if (ruleName === 'isIn' && _.isArray(ruleRhs)) {
               // ® Must be one of these things
-              violation = (
-                !_.contains(ruleRhs, fieldValue)
-              );
+              violation = !_.contains(ruleRhs, fieldValue);
             } else if (ruleName === 'is') {
               // ® Must be exactly this thing (useful for required checkboxes)
-              violation = (
-                ruleRhs !== fieldValue
-              );
+              violation = ruleRhs !== fieldValue;
             } else if (ruleName === 'minLength' && _.isNumber(ruleRhs)) {
               // ® Must consist of at least this many characters
-              violation = (
-                !_.isString(fieldValue) ||
-                fieldValue.length < ruleRhs
-              );
+              violation =
+                !_.isString(fieldValue) || fieldValue.length < ruleRhs;
             } else if (ruleName === 'maxLength' && _.isNumber(ruleRhs)) {
               // ® Must consist of no more than this many characters
-              violation = (
-                !_.isString(fieldValue) ||
-                fieldValue.length > ruleRhs
-              );
-            } else if (ruleName === 'sameAs' && ruleRhs !== '' && _.isString(ruleRhs)) {
+              violation =
+                !_.isString(fieldValue) || fieldValue.length > ruleRhs;
+            } else if (
+              ruleName === 'sameAs' &&
+              ruleRhs !== '' &&
+              _.isString(ruleRhs)
+            ) {
               // ® Must match the value in another field
               let otherFieldName = ruleRhs;
               let otherFieldValue = formData[otherFieldName];
-              violation = (
-                otherFieldValue !== fieldValue
-              );
-            } else if (ruleName === 'isHalfwayDecentPassword' && (ruleRhs === true || ruleRhs === false)) {
+              violation = otherFieldValue !== fieldValue;
+            } else if (
+              ruleName === 'isHalfwayDecentPassword' &&
+              (ruleRhs === true || ruleRhs === false)
+            ) {
               // ® Must be a halfway-decent password
               // > This is an arbitrary distinction, so change it if you want.
               // > Just... please use common sense.  And try to avoid engaging
@@ -271,29 +273,28 @@ parasails.registerComponent('ajaxForm', {
               if (ruleRhs === false) {
                 violation = false;
               } else {
-                violation = (
+                violation =
                   (!_.isString(fieldValue) && !_.isNumber(fieldValue)) ||
-                  fieldValue.length < 6
-                );
+                  fieldValue.length < 6;
               }
             } else if (ruleName === 'regex') {
               // ® Must match the regex specified
-              violation = (
-                !ruleRhs.test(fieldValue)
-              );
+              violation = !ruleRhs.test(fieldValue);
             } else if (ruleName === 'custom' && _.isFunction(ruleRhs)) {
               // ® Provided function must return truthy when invoked with the value.
               try {
-                violation = (
-                  !ruleRhs(fieldValue)
-                );
+                violation = !ruleRhs(fieldValue);
               } catch (err) {
                 // eslint-disable-next-line no-console
                 console.warn(err);
                 violation = true;
               }
             } else {
-              throw new Error('Cannot interpret client-side validation rule (`'+ruleName+'`) because the configuration provided for it is not recognized by <ajax-form>.\n [?] If you\'re unsure, visit https://sailsjs.com/support');
+              throw new Error(
+                'Cannot interpret client-side validation rule (`' +
+                  ruleName +
+                  "`) because the configuration provided for it is not recognized by <ajax-form>.\n [?] If you're unsure, visit https://sailsjs.com/support"
+              );
             }
 
             // If a rule violation was detected, then set it as a form error
@@ -302,10 +303,9 @@ parasails.registerComponent('ajaxForm', {
             if (violation) {
               formErrors[fieldName] = ruleName;
               break;
-            }//˚
-
-          }//∞
-        }//∞
+            } //˚
+          } //∞
+        } //∞
 
         // Whether there are any errors or not, update userland "formErrors" prop
         // so that the markup reflects the new reality (i.e. inline validation errors
@@ -319,15 +319,21 @@ parasails.registerComponent('ajaxForm', {
           // states/messages are not hooked up in the HTML template)
           if (this._environment !== 'production') {
             // eslint-disable-next-line no-console
-            console.warn(`<ajax-form> encountered ${Object.keys(formErrors).length} form error${Object.keys(formErrors).length !== 1 ? 's' : ''} when performing client-side validation of "form-data" versus "form-rules".  (Note: This warning is only here to assist with debugging-- it will not be displayed in production.  If you're unsure, check out https://sailsjs.com/support for more resources.)`, _.cloneDeep(formErrors));
-          }//ﬁ
+            console.warn(
+              `<ajax-form> encountered ${
+                Object.keys(formErrors).length
+              } form error${
+                Object.keys(formErrors).length !== 1 ? 's' : ''
+              } when performing client-side validation of "form-data" versus "form-rules".  (Note: This warning is only here to assist with debugging-- it will not be displayed in production.  If you're unsure, check out https://sailsjs.com/support for more resources.)`,
+              _.cloneDeep(formErrors)
+            );
+          } //ﬁ
           return;
-        }//•
-      }//ﬁ  (determining argins)
+        } //•
+      } //ﬁ  (determining argins)
 
       // Set syncing state to `true` on userland "syncing" prop.
       this.$emit('update:syncing', true);
-
 
       // Submit the form
       var failedWithCloudExit;
@@ -339,8 +345,6 @@ parasails.registerComponent('ajaxForm', {
           // FUTURE: Consider cloning the argins ahead of time to prevent accidental mutation of form data.
           // (but remember argins could contain File instances that might not be clone-able)
           // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-          // eslint-disable-next-line no-console
-          console.log('handleSubmitting handle called on form');
           result = await this.handleSubmitting(argins);
         } catch (err) {
           rawErrorFromCloudSDK = err;
@@ -348,7 +352,14 @@ parasails.registerComponent('ajaxForm', {
             failedWithCloudExit = err;
           } else if (_.isError(err) && err.exit) {
             failedWithCloudExit = err.exit;
-          } else if (_.isObject(err) && !_.isError(err) && !_.isArray(err) && !_.isFunction(err) && Object.keys(err)[0] && _.isString(Object.keys(err)[0])) {
+          } else if (
+            _.isObject(err) &&
+            !_.isError(err) &&
+            !_.isArray(err) &&
+            !_.isFunction(err) &&
+            Object.keys(err)[0] &&
+            _.isString(Object.keys(err)[0])
+          ) {
             failedWithCloudExit = Object.keys(err)[0];
           } else {
             throw err;
@@ -362,14 +373,14 @@ parasails.registerComponent('ajaxForm', {
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         var protocol = this.protocol || 'jQuery';
 
-        result = await Cloud[this.action].with(argins)
-        .protocol(protocol)
-        .tolerate((err)=>{
-          rawErrorFromCloudSDK = err;
-          failedWithCloudExit = err.exit || 'error';
-        });
+        result = await Cloud[this.action]
+          .with(argins)
+          .protocol(protocol)
+          .tolerate((err) => {
+            rawErrorFromCloudSDK = err;
+            failedWithCloudExit = err.exit || 'error';
+          });
       }
-
 
       // When a cloud error occurs, tolerate it, but set the userland "cloudError"
       // prop accordingly.
@@ -386,7 +397,6 @@ parasails.registerComponent('ajaxForm', {
       } else {
         this.$emit('rejected', rawErrorFromCloudSDK);
       }
-
     },
 
   }
