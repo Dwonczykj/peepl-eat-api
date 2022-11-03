@@ -113,6 +113,49 @@ describe("helpers.getAvailableDates", async () => {
 
     expect(availableDates).to.deep.equal(expectAvailDateStrs);
   });
+  it("eligible dates includes a week today in returned dates when past cutoff for todays delivery date", async () => {
+    const { vendorsDelvFulfMethod, vendorsDeliveryOpeningHours, usedWeekdays } =
+      await createVendorWithOpeningHours(
+        fixtures,
+        [
+          new TimeWindow({
+            startTime: "15:30",
+            endTime: "17:30",
+            date: moment.utc(),
+          }),
+        ],
+        [todayName, tomorrowName, dayAfterTomorrowName]
+      );
+    const MAX_ORDERS = 2;
+    await FulfilmentMethod.update(vendorsDelvFulfMethod.id).set({
+      orderCutoff: moment.utc().add(-2, "hours").format(timeStrFormat),
+      slotLength: 60,
+      bufferLength: 30,
+      maxOrders: MAX_ORDERS,
+    });
+    
+    const nextAvail: AvailableDateOpeningHours =
+      await sails.helpers.getAvailableDates.with({
+        fulfilmentMethodIds: [vendorsDelvFulfMethod.id],
+      });
+
+    assert.isObject(nextAvail);
+
+    const availableDates = Object.keys(nextAvail);
+
+    const removeToday = moment.utc().format(dateStrFormat);
+    const includeNextWeekToday = moment
+      .utc()
+      .add(7, 'days')
+      .format(dateStrFormat);
+    const removeTomorrow = moment.utc().add(1, "days").format(dateStrFormat);
+    const expectAvailDateStrs = usedWeekdays
+      .map((wd) => getNextWeekday(wd as DaysOfWeek))
+      .filter((dt) => dt !== removeToday && dt !== removeTomorrow);
+    expectAvailDateStrs.push(includeNextWeekToday);
+
+    expect(availableDates).to.deep.members(expectAvailDateStrs);
+  });
   it("returns no dates when no fulfilmentIds passed", async () => {
     const nextAvail = await sails.helpers.getAvailableDates.with({
       fulfilmentMethodIds: [],

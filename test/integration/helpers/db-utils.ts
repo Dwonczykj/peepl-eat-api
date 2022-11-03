@@ -42,8 +42,8 @@ export const createOpeningHoursForFulfilmentMethod = async (
     );
   }
 
-  if (!days || days.length < 1 || !dayOffsets || dayOffsets.length < 1) {
-    days = "all";
+  if ((!days || days.length < 1) && (!dayOffsets || dayOffsets.length < 1)) {
+    days = 'all';
   }
   const usedWeekdays =
     days === "all"
