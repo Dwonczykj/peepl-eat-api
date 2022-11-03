@@ -144,6 +144,21 @@ module.exports = {
             // If dt is today
             if (dt.isSame(moment.utc(), "day")) {
               isAfterCutoff = true;
+              const dtStrNextWeek = dt
+                .clone()
+                .add(1, 'weeks')
+                .format(dateStrFormat);
+              if (
+                !Object.keys(
+                  availableNextDatesOfWeek[fulfilmentMethod.id]
+                ).includes(dtStrNextWeek)
+              ) {
+                availableNextDatesOfWeek[fulfilmentMethod.id][dtStrNextWeek] =
+                  [];
+              }
+              availableNextDatesOfWeek[fulfilmentMethod.id][dtStrNextWeek].push(
+                openingHours
+              );
             } else if (dt.isSameOrBefore(tomorrow) && cutoffTime) {
               const cutoff = moment.utc(cutoffTime, timeStrFormat); // Moment version of cutoff time
               // If the current time is after the cutoff time, set isAfterCutoff to true
