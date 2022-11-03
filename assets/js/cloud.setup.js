@@ -241,12 +241,22 @@ Cloud.setup({
     createCategoryGroup: {
       verb: 'POST',
       url: '/api/v1/admin/create-category-group',
-      args: ['name', 'imageUrl', 'forRestaurantItem'],
+      args: ['name', 'image', 'forRestaurantItem'],
     },
     editCategoryGroup: {
       verb: 'POST',
       url: '/api/v1/admin/edit-category-group',
-      args: ['id', 'name', 'imageUrl', 'forRestaurantItem'],
+      args: ['id', 'name', 'image', 'forRestaurantItem'],
+    },
+    createProductCategory: {
+      verb: 'POST',
+      url: '/api/v1/admin/create-product-category',
+      args: ['name', 'categoryGroup', 'vendor', 'image'],
+    },
+    editProductCategory: {
+      verb: 'POST',
+      url: '/api/v1/admin/edit-product-category',
+      args: ['id', 'name', 'categoryGroup', 'vendor', 'image'],
     },
     editProduct: {
       verb: 'POST',

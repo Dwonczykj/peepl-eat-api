@@ -191,6 +191,12 @@ module.exports.routes = {
   'POST /api/v1/admin/edit-product-option': {
     action: 'admin/edit-product-option',
   },
+  'POST /api/v1/admin/create-product-category': {
+    action: 'admin/create-product-category',
+  },
+  'POST /api/v1/admin/edit-product-category': {
+    action: 'admin/edit-product-category',
+  },
   'POST /api/v1/admin/create-category-group': {
     action: 'admin/create-category-group',
   },

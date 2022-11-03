@@ -1,7 +1,7 @@
 declare var CategoryGroup: any;
 import util from 'util';
 module.exports = {
-  friendlyName: "Create delivery partner",
+  friendlyName: "Create category group",
 
   description: "",
 
@@ -9,7 +9,7 @@ module.exports = {
     name: {
       type: "string",
       required: true,
-      description: "The name of the delivery partner",
+      description: "The name of the group of product categories",
       maxLength: 50,
     },
     forRestaurantItem: {
@@ -25,14 +25,14 @@ module.exports = {
 
   exits: {
     success: {
-      description: "New delivery partner created.",
+      description: "New category group created.",
       statusCode: 200,
     },
     successJSON: {
       statusCode: 200,
     },
     alreadyExists: {
-      description: "delivery partner already exists",
+      description: "category group already exists",
       statusCode: 400,
     },
   },
@@ -60,14 +60,14 @@ module.exports = {
 
     // delete inputs.image;
 
-    // Create a new delivery partner
+    // Create a new category group
     var newCategoryGroup = await CategoryGroup.create({
       name: inputs.name,
       forRestaurantItem: inputs.forRestaurantItem,
       imageUrl: inputs.imageUrl,
     }).fetch();
 
-    // Return the new delivery partner
+    // Return the new category group
     // return exits.success(newCategoryGroup);
     // Respond with view or JSON.
     if (this.req.wantsJSON) {
