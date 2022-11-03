@@ -1,37 +1,37 @@
 {
-"compilerOptions": {
-    "target": "es6",
-    "allowJs": false,
-    "checkJs": false,
-    "skipLibCheck": true,
-    "strict": false,
-    "strictNullChecks": false,
-    "experimentalDecorators": true,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "noImplicitAny": false,
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": false,
-    "lib": [
-        "es6",
-        "es2018",
-        "DOM",
-        "ESNext"
+    "compilerOptions": {
+        "target": "es6",
+        "allowJs": false,
+        "checkJs": false,
+        "skipLibCheck": true,
+        "strict": false,
+        "strictNullChecks": false,
+        "experimentalDecorators": true,
+        "forceConsistentCasingInFileNames": true,
+        "noEmit": true,
+        "esModuleInterop": true,
+        "noImplicitAny": false,
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "isolatedModules": false,
+        "lib": [
+            "es6",
+            "es2018",
+            "DOM",
+            "ESNext"
+        ],
+        "sourceMap": true,
+        "outDir": "./build",
+        "types": [
+            "node"
+        ]
+    },
+    "exclude": [
+        "node_modules"
     ],
-    "sourceMap": true,
-    "outDir": "./build",
-    "types": [
-        "node"
+    "include": [
+        "./**/*.ts",
+        "./**/*.tsx"
     ]
-},
-"exclude": [
-    "node_modules"
-],
-"include": [
-    "./**/*.ts",
-    "./**/*.tsx"
-]
 }

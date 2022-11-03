@@ -9,6 +9,19 @@ declare var FulfilmentMethod: any;
 declare var sails: any;
 declare var DeliveryPartner: any;
 
+export type GetAvailableDeliveryPartnerFromPoolInputs = {
+  fulfilmentSlotFrom: string;
+  fulfilmentSlotTo: string;
+  pickupFromVendor: number;
+  deliveryContactName: string;
+  deliveryPhoneNumber: string;
+  deliveryComments: string;
+  deliveryAddressLineOne: string;
+  deliveryAddressLineTwo: string;
+  deliveryAddressCity: string;
+  deliveryAddressPostCode: string;
+};
+
 module.exports = {
   friendlyName: "Get available deliveryPartner from pool",
 
@@ -88,7 +101,7 @@ module.exports = {
     }
   },
 
-  fn: async function (inputs, exits) {
+  fn: async function (inputs: GetAvailableDeliveryPartnerFromPoolInputs, exits) {
     var validSlotsForDeliveryPartner:iSlot[] = [];
     var date = moment
       .utc(inputs.fulfilmentSlotFrom, "YYYY-MM-DD HH:mm:ss")
@@ -98,7 +111,7 @@ module.exports = {
       status: "active",
       //contains: {deliversToPostCodes: [inputs.deliveryAddressPostCode]},
     });
-    sails.log(`Got All (${deliveryPartners.length}) DeliveryPartners`);
+    
     const availableDeliveryPartnerInfos = [];
     // check if delivery slot is valid for any delivery partners
     for (let deliveryPartner of deliveryPartners) {
@@ -108,7 +121,8 @@ module.exports = {
       }).populate("openingHours");
 
       if (!deliveryPartnerFulfilmentMethod) {
-        return exits.deliveryPartnerDoesNotHaveDeliveryFulfilmentSetUp();
+        continue;
+        // return exits.deliveryPartnerDoesNotHaveDeliveryFulfilmentSetUp();
       }
 
       try {

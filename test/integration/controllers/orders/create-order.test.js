@@ -106,6 +106,61 @@ const CREATE_ORDER = (fixtures) => {
     },
   };
 };
+const CREATE_ORDER_WITH_CUSTOM_INPUT = (fixtures, overrides) => {
+  const vendor = fixtures.vendors[0];
+  const fulfilmentMethodVendor = fixtures.fulfilmentMethods.filter(
+    (fm) =>
+      fm.vendor === vendor.id &&
+      fm.methodType === 'delivery' &&
+      fixtures.openingHours.filter(
+        (oh) => oh.fulfilmentMethod === fm.id && oh.isOpen === true
+      )
+  )[0];
+  const openAtHours = fixtures.openingHours.filter(
+    (openHrs) =>
+      openHrs.isOpen === true &&
+      openHrs.fulfilmentMethod === fulfilmentMethodVendor.id
+  )[0];
+  return {
+    useAccount: 'TEST_SERVICE',
+    HTTP_TYPE: 'post',
+    ACTION_PATH: 'orders',
+    ACTION_NAME: 'create-order',
+    sendData: {
+      ...overrides,
+      ...{
+        vendor: vendor.id,
+        fulfilmentMethod: fulfilmentMethodVendor.id,
+        fulfilmentSlotFrom:
+          getNextWeekday(openAtHours.dayOfWeek) +
+          ' ' +
+          openAtHours.openTime +
+          ':00', // "2022-10-07 11:00:00"
+        fulfilmentSlotTo:
+          getNextWeekday(openAtHours.dayOfWeek) +
+          ' ' +
+          moment(openAtHours.openTime, 'HH:mm')
+            .add(fulfilmentMethodVendor.slotLength, 'minutes')
+            .format('HH:mm') +
+          ':00', // "2022-10-07 11:00:00"
+      },
+    },
+    expectResponse: {},
+    expectStatusCode: 200,
+    expectResponseCb: async (response, requestPayload) => {
+      expect(response.body).to.have.property('orderId');
+      expect(response.body).to.have.property('paymentIntentID');
+      // await hats.expectedResponse.checkResponse(response);
+      const newOrder = await Order.findOne({
+        id: response.body.orderId,
+      }).populate('items');
+      expect(newOrder).to.have.property('items');
+      assert.isArray(newOrder.items);
+      expect(newOrder.items).to.have.lengthOf(requestPayload.items.length);
+      return;
+    },
+  };
+};
 const GET_ORDER = (fixtures) => {
   return {
     useAccount: 'TEST_SERVICE',
@@ -242,6 +297,55 @@ describe(`Order Model Integration Tests`, () => {
     it('Returns a new order', async () => {
       try {
         const sendOrder = CREATE_ORDER(fixtures);
+        const hats = new HttpAuthTestSenderOrder(sendOrder);
+        const response = await hats.makeAuthCallWith({}, []);
+        expect(response.body).to.have.property('orderId');
+        expect(response.body).to.have.property('paymentIntentID');
+        // await hats.expectedResponse.checkResponse(response);
+        const newOrder = await Order.findOne({
+          id: response.body.orderId,
+        }).populate('items');
+        expect(newOrder).to.have.property('items');
+        assert.isArray(newOrder.items);
+        expect(newOrder.items).to.have.lengthOf(
+          sendOrder.sendData.items.length
+        );
+      } catch (errs) {
+        console.warn(errs);
+        throw errs;
+      }
+    });
+    it('Returns a new order with custom json input', async () => {
+      try {
+        const sendOrder = CREATE_ORDER_WITH_CUSTOM_INPUT(fixtures, {
+          items: [
+            {
+              id: 1940,
+              quantity: 1,
+              options: {
+                150: 1004,
+              },
+            },
+          ],
+          total: 2650,
+          tipAmount: 0,
+          marketingOptIn: false,
+          discountCode: '',
+          vendor: '17',
+          walletAddress: '0x41190Dd82D43129C26955063fa2854350e14554B',
+          address: {
+            name: 'Hussain',
+            email: 'email@notprovided.com',
+            phoneNumber: '+971555353950',
+            lineOne: 'Collection Order',
+            lineTwo: '286 Smithdown Road, L15 5AJ',
+            postCode: 'L15 5AJ',
+            deliveryInstructions: '',
+          },
+          fulfilmentMethod: 34,
+          fulfilmentSlotFrom: '2022-11-04 11:00:00',
+          fulfilmentSlotTo: '2022-11-04 12:00:00', // "2022-10-07 11:00:00"
+        });
         const hats = new HttpAuthTestSenderOrder(sendOrder);
         const response = await hats.makeAuthCallWith({}, []);
         expect(response.body).to.have.property('orderId');

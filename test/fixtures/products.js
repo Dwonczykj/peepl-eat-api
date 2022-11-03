@@ -16,6 +16,24 @@ module.exports = function () {
       category: 2, //coffee
     },
     {
+      createdAt: 1661248511666,
+      updatedAt: 1661275029349,
+      id: 1940,
+      name: 'Mixed fruit & veg boxes',
+      description: 'A mixture of seasonal, organic fruit & veg',
+      shortDescription: '',
+      basePrice: 0,
+      imageUrl:
+        'https://vegiapp-1.s3.us-east-1.amazonaws.com/0bdb581e-7033-430f-b132-c93a4583c95e.png',
+      isAvailable: 1,
+      priority: 1,
+      isFeatured: 1,
+      status: 'active',
+      vendor: 17,
+      options: [13, 14],
+      category: null,
+    },
+    {
       id: 2,
       name: 'Burns Night - Dine @ Home (For 1)',
       description:

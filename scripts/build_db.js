@@ -6,10 +6,12 @@ const _ = require(`lodash`);
 var fixtures = {};
 
 _.each(fs.readdirSync(process.cwd() + `/test/fixtures/`), (file) => {
-  fixtures[file.replace(/\.js$/, ``)] = require(process.cwd() +
-    `/test/fixtures/` +
-    file)();
-  fixtures[file.replace(/\.js$/, ``) + `_fixed`] = _.cloneDeep(fixtures[file.replace(/\.js$/, ``)]);
+  if (file.endsWith('js') || file.endsWith('ts')){
+    fixtures[file.replace(/\.js$/, ``)] = require(process.cwd() +
+      `/test/fixtures/` +
+      file)();
+    fixtures[file.replace(/\.js$/, ``) + `_fixed`] = _.cloneDeep(fixtures[file.replace(/\.js$/, ``)]);
+  }
 });
 
 async function buildDb(sails, test) {

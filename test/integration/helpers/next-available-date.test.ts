@@ -40,7 +40,7 @@ describe("helpers.nextAvailableDate", async () => {
   const dayAfterTomorrowName = getTodayDayName(2);
   it("can get next date for new test vendor", async () => {
     // const response = await login();
-    // const user = await User.findOne({ name: response.body.data.name });
+    // const user = await User.findOne({ name: response.body.name });
 
     const { vendorsDelvFulfMethod, vendorsDeliveryOpeningHours, usedWeekdays } =
       await createVendorWithOpeningHours(

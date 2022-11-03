@@ -5,27 +5,29 @@ const { expect } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
 const { login } = require("../../utils");
 // var util = require("util");
 import moment from 'moment';
+import { SailsModelType, sailsVegi } from '../../../api/interfaces/iSails';
+import { datetimeStrFormat, datetimeStrFormatExact, DeliveryPartnerType, FulfilmentMethodType, OpeningHoursType, UserType, VendorType } from '../../../scripts/utils';
+import {GetAvailableDeliveryPartnerFromPoolInputs} from '../../../api/helpers/get-available-delivery-partner-from-pool';
+import { assert } from 'chai';
 
-declare var User: any;
-declare var DeliveryPartner: any;
-declare var Vendor: any;
-declare var FulfilmentMethod: any;
-declare var OpeningHours: any;
-declare var sails: any;
+declare var User: SailsModelType<UserType>;
+declare var DeliveryPartner: SailsModelType<DeliveryPartnerType>;
+declare var Vendor: SailsModelType<VendorType>;
+declare var FulfilmentMethod: SailsModelType<FulfilmentMethodType>;
+declare var OpeningHours: SailsModelType<OpeningHoursType>;
+declare var sails: sailsVegi;
 
 describe("helpers.getAvailableDeliveryPartnerFromPool", () => {
   it("returns a delivery partner when intersecting slots", async () => {
     const response = await login();
-    const user = await User.findOne({ name: response.body.data.name });
+    const user = await User.findOne({ name: response.body.name });
     
     const deliveryStart = "11:00";
     const deliveryEnd = "13:00";
     // create an order with the fulfilment slot set to one that works for DeliveryPartner
-    sails.log('hey');
-    
     const deliveryPartner = await DeliveryPartner.create({
-      name: "Test helpers getAvailableDeliveryPartnerFromPool Delivery Partner",
-      email: "getAvailableDeliveryPartnerFromPool@sailshelpers.com",
+      name: "getAvailableDeliveryPartnerFromPool DP",
+      email: "getAvailableDeliveryPartnerFromPool@helpers.com",
       phoneNumber: "0123456123",
       status: "active",
       deliversToPostCodes: ["L1"],
@@ -33,7 +35,7 @@ describe("helpers.getAvailableDeliveryPartnerFromPool", () => {
       imageUrl:
         "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
       rating: 5,
-    });
+    }).fetch();
     // Generate collection/delivery blank opening hours
     var openingHoursDel = [];
     var openingHoursCol = [];
@@ -47,7 +49,7 @@ describe("helpers.getAvailableDeliveryPartnerFromPool", () => {
       "sunday",
     ];
     const delv = await FulfilmentMethod.create({
-      deliveryPartner: deliveryPartner,
+      deliveryPartner: deliveryPartner.id,
       methodType: "delivery",
     }).fetch();
     // Create blank opening hours for each day
@@ -77,9 +79,7 @@ describe("helpers.getAvailableDeliveryPartnerFromPool", () => {
     );
 
     const vendor = await Vendor.create({
-      createdAt: 1650878843365,
-      updatedAt: 1651529215649,
-      name: "Test helpers getAvailableDeliveryPartnerFromPool Vendor",
+      name: "getAvailableDeliveryPartnerFromPool Vendor",
       type: "restaurant",
       description:
         "Some test vendor",
@@ -109,36 +109,44 @@ describe("helpers.getAvailableDeliveryPartnerFromPool", () => {
     
     const result = sails.helpers.getAvailableDeliveryPartnerFromPool.with({
       pickupFromVendor: vendor.id,
-      deliverAfter: moment.utc(`${deliveryStart}:00`, "HH:mm:ss"), //moment.utc("01:15:00 PM", "h:mm:ss A")
-      deliverBefore: moment.utc(`${deliveryEnd}:00`, "HH:mm:ss"), //moment.utc("01:15:00 PM", "h:mm:ss A")
+      fulfilmentSlotFrom: moment
+        .utc(`${deliveryStart}:00`, 'HH:mm:ss')
+        .format(datetimeStrFormatExact), //moment.utc("01:15:00 PM", "h:mm:ss A")
+      fulfilmentSlotTo: moment
+        .utc(`${deliveryEnd}:00`, 'HH:mm:ss')
+        .format(datetimeStrFormatExact), //moment.utc("01:15:00 PM", "h:mm:ss A")
 
-      deliveryContactName: "Test Delivery John Smith",
-      deliveryPhoneNumber: "0746564653",
-      deliveryComments: "Bants test comments for delivery instructions",
+      deliveryContactName: 'Test Delivery John Smith',
+      deliveryPhoneNumber: '0746564653',
+      deliveryComments: 'Bants test comments for delivery instructions',
 
-      deliveryAddressLineOne: "23 SomeLane",
-      deliveryAddressLineTwo: "Liverpool",
-      deliveryAddressCity: "Liverpool",
-      deliveryAddressPostCode: "L1 0AR",
+      deliveryAddressLineOne: '23 SomeLane',
+      deliveryAddressLineTwo: 'Liverpool',
+      deliveryAddressCity: 'Liverpool',
+      deliveryAddressPostCode: 'L1 0AR',
     });
-    expect(result).to.be.nonEmpty();
+    assert.isNotEmpty(result);
   });
   it("returns no delivery partners when no intersecting slots", async () => {
     const deliveryStart = "11:00";
     const deliveryEnd = "13:00";
     const response = await login();
-    const user = await User.findOne({ name: response.body.data.name });
+    const user = await User.findOne({ name: response.body.name });
     // create an order with the fulfilment slot set to one that works for DeliveryPartner
     
     const deliveryPartner = await DeliveryPartner.create({
-      name: "Test helpers getAvailableDeliveryPartnerFromPool Delivery Partner 2",
-      email: "getAvailableDeliveryPartnerFromPool2@sailshelpers.com",
-      phoneNumber: "0123456122",
-      status: "active",
-      walletAddress: "0xf039CD9391cB28a7e632D07821deeBc249a32410",
-      deliversToPostCodes: ["L1"],
+      name: 'getAvailableDeliveryPartnerFromPool DP 2',
+      email: 'getAvailableDeliveryPartnerFromPool2@helpers.com',
+      phoneNumber: '0123456122',
+      status: 'active',
+      type: 'bike',
+      walletAddress: '0xf039CD9391cB28a7e632D07821deeBc249a32410',
+      imageUrl:
+        'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
+      deliversToPostCodes: ['L1'],
       rating: 5,
-    });
+      deliveryFulfilmentMethod: null,
+    }).fetch();
     // Generate collection/delivery blank opening hours
     var openingHoursDel = [];
     var openingHoursCol = [];
@@ -152,7 +160,7 @@ describe("helpers.getAvailableDeliveryPartnerFromPool", () => {
       "sunday",
     ];
     const delv = await FulfilmentMethod.create({
-      deliveryPartner: deliveryPartner,
+      deliveryPartner: deliveryPartner.id,
       methodType: "delivery",
     }).fetch();
     // Create blank opening hours for each day
@@ -182,9 +190,7 @@ describe("helpers.getAvailableDeliveryPartnerFromPool", () => {
     );
 
     const vendor = await Vendor.create({
-      createdAt: 1650878843365,
-      updatedAt: 1651529215649,
-      name: "Test helpers getAvailableDeliveryPartnerFromPool Vendor 2",
+      name: "getAvailableDeliveryPartnerFromPool Vendor 2",
       type: "restaurant",
       description:
         "Some test vendor",
@@ -214,18 +220,22 @@ describe("helpers.getAvailableDeliveryPartnerFromPool", () => {
     
     const result = sails.helpers.getAvailableDeliveryPartnerFromPool.with({
       pickupFromVendor: vendor.id,
-      deliverAfter: moment.utc(`${deliveryStart}:00`, "HH:mm:ss"), //moment.utc("01:15:00 PM", "h:mm:ss A")
-      deliverBefore: moment.utc(`${deliveryEnd}:00`, "HH:mm:ss"), //moment.utc("01:15:00 PM", "h:mm:ss A")
+      fulfilmentSlotFrom: moment
+        .utc(`${deliveryStart}:00`, 'HH:mm:ss')
+        .format(datetimeStrFormatExact), //moment.utc("01:15:00 PM", "h:mm:ss A")
+      fulfilmentSlotTo: moment
+        .utc(`${deliveryEnd}:00`, 'HH:mm:ss')
+        .format(datetimeStrFormatExact), //moment.utc("01:15:00 PM", "h:mm:ss A")
 
-      deliveryContactName: "Test Delivery John Smith",
-      deliveryPhoneNumber: "0746564653",
-      deliveryComments: "Bants test comments for delivery instructions",
+      deliveryContactName: 'Test Delivery John Smith',
+      deliveryPhoneNumber: '0746564653',
+      deliveryComments: 'Bants test comments for delivery instructions',
 
-      deliveryAddressLineOne: "23 SomeLane",
-      deliveryAddressLineTwo: "Liverpool",
-      deliveryAddressCity: "Liverpool",
-      deliveryAddressPostCode: "L1 0AR",
+      deliveryAddressLineOne: '23 SomeLane',
+      deliveryAddressLineTwo: 'Liverpool',
+      deliveryAddressCity: 'Liverpool',
+      deliveryAddressPostCode: 'L1 0AR',
     });
-    expect(result).to.be.nonEmpty();
+    assert.isNotEmpty(result);
   });
 });

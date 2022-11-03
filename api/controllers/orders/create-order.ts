@@ -5,8 +5,27 @@ declare var OrderItem: any;
 declare var Order: any;
 // declare var _: any;
 import _ from 'lodash';
-import { OrderType } from 'scripts/utils';
-// import util from 'util';
+import { OrderType } from '../../../scripts/utils';
+import util from 'util';
+export type CreateOrderInputs = {
+  items: Array<{
+    id: number;
+    quantity: number;
+    options: Array<{ [k: number]: number }>;
+    optionValues?: Array<any>;
+    order?: number | OrderType;
+  }>;
+  address: any;
+  total: number;
+  marketingOptIn: boolean;
+  discountCode: string;
+  vendor: number;
+  fulfilmentMethod: number;
+  fulfilmentSlotFrom: string;
+  fulfilmentSlotTo: string;
+  tipAmount: number;
+  walletAddress: string;
+};
 
 export type CreateOrderSuccess = {
   orderId: number;
@@ -110,24 +129,7 @@ module.exports = {
   },
 
   fn: async function (
-    inputs: {
-      items: Array<{
-        id: number;
-        options: Array<{ [k: number]: number }>;
-        optionValues?: Array<any>;
-        order: any;
-      }>;
-      address: any;
-      total: number;
-      marketingOptIn: boolean;
-      discountCode: string;
-      vendor: number;
-      fulfilmentMethod: number;
-      fulfilmentSlotFrom: string;
-      fulfilmentSlotTo: string;
-      tipAmount: number;
-      walletAddress: string;
-    },
+    inputs: CreateOrderInputs,
     exits: {
       success: (unusedResult: CreateOrderSuccess) => CreateOrderSuccess;
       invalidSlot: (unusedArg?: string | Error) => void;
@@ -288,9 +290,11 @@ module.exports = {
 
         // Strip unneccesary data from order items
         var updatedItems = _.map(inputs.items, (object) => {
-          object.order = order.id;
-          // object.product = object.product;
-          return _.pick(object, ['order', 'product', 'optionValues']);
+          return {
+            order: order.id,
+            product: object.id,
+            optionValues: object.optionValues,
+          };
         });
 
         // sails.log(`Update the ${updatedItems.length} order items in the db: ${util.inspect(updatedItems, {depth: null})}`);
@@ -361,19 +365,23 @@ module.exports = {
 
       if (datastore.config.adapter === 'sails-disk') {
         const result = await createOrderTransactionDB(null);
+        sails.log('USING sails-disk');
+        sails.log(util.inspect(result, {depth: 0}));
         if (result) {
           return exits.success(result);
         }
       } else {
-        const result = await sails
+        let result;
+        await sails
           .getDatastore()
           .transaction(async (db) => {
-            await createOrderTransactionDB(db);
+            result = await createOrderTransactionDB(db);
           })
           .intercept((issues) => {
             sails.log(issues);
             return exits.error(new Error('Error creating Order in DB'));
           });
+        sails.log(util.inspect(result, { depth: 0 }));
         return exits.success(result);
       }
     } catch (error) {

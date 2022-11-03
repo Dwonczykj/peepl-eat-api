@@ -250,8 +250,6 @@ module.exports = {
             originalOrderItem.unfulfilledOnOrderId = null;
           }
           originalOrderItem.order = newOrder.id;
-
-          // retainItem.product = retainItem.product;
           return _.pick(originalOrderItem, [
             "order",
             "product",
@@ -325,7 +323,7 @@ module.exports = {
         const result = await sails
           .getDatastore()
           .transaction(async (db) => {
-            await createOrderTransactionDB(db);
+            return await createOrderTransactionDB(db);
           })
           .intercept((issues) => {
             sails.log(issues);

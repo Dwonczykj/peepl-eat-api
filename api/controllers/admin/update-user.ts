@@ -126,7 +126,7 @@ module.exports = {
     }
   ) {
     // TODO: Integration Test this
-    const myUser: UserType = await User.findOne({
+    const myUser = await User.findOne({
       id: this.req.session.userId,
     });
     if (!myUser) {
@@ -134,7 +134,7 @@ module.exports = {
       return exits.notFound();
     }
 
-    const userToUpdate: UserType = await User.findOne({ email: inputs.email });
+    const userToUpdate = await User.findOne({ email: inputs.email });
 
     if (!userToUpdate){
       return exits.notFound();

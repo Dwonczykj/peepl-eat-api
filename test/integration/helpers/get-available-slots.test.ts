@@ -39,7 +39,7 @@ describe("helpers.getAvailableSlots()", async () => {
 
   it(`can get available slots for this coming ${tomorrowName} for new vendor`, async () => {
     // const response = await login();
-    // const user = await User.findOne({ name: response.body.data.name });
+    // const user = await User.findOne({ name: response.body.name });
     const { vendorsDelvFulfMethod, vendorsDeliveryOpeningHours, usedWeekdays } =
       await createVendorWithOpeningHours(
         fixtures,

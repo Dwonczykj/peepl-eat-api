@@ -3,6 +3,7 @@
 const { expect, assert } = require('chai');
 const request = require('supertest');
 const util = require('util');
+const { getNextWeekday } = require('../scripts/utils');
 
 const loginAsUser = async function (name, secret, verbose = false) {
   try {
@@ -120,58 +121,6 @@ const callAuthActionWithCookieAndUser = async (
     }
     return cb(sessionCookie);
   });
-
-function getNextWeekday(weekday) {
-  // ~ https://stackoverflow.com/a/25493271
-  assert.include(
-    [
-      'monday',
-      'tuesday',
-      'wednesday',
-      'thursday',
-      'friday',
-      'saturday',
-      'sunday',
-    ],
-    weekday
-  );
-  const weekdays = [
-    'sunday',
-    'monday',
-    'tuesday',
-    'wednesday',
-    'thursday',
-    'friday',
-    'saturday',
-  ];
-  const dayInd = weekdays.indexOf(weekday.toLowerCase());
-  var today = new Date();
-  var theDay;
-  var day = today.getDay();
-  if (day === dayInd) {
-    return (
-      today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate()
-    );
-  } else {
-    day = today.getDay();
-    var dateOfFirstDayOfThisWeek = today.getDate() - day;
-    var dateOfFirstDayOfNextWeek = dateOfFirstDayOfThisWeek + 7;
-    if (today.getDay() < dayInd) {
-      theDay = dateOfFirstDayOfThisWeek + dayInd;
-    } else {
-      theDay = dateOfFirstDayOfNextWeek + dayInd;
-    }
-  }
-  let closest = new Date(today.setDate(theDay));
-
-  return (
-    closest.getFullYear() +
-    '-' +
-    (closest.getMonth() + 1) +
-    '-' +
-    closest.getDate()
-  );
-}
 
 // console.log(getNextWeekday('thursday') + 'is next thursday');
 // console.log(getNextWeekday("monday") + "is next monday");

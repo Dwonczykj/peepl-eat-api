@@ -1,5 +1,5 @@
 import { CategoryGroupType, ProductCategoryType } from '../../../scripts/utils';
-import { SailsModelType } from '../../interfaces/iSails';
+import { SailsModelType, ShallowSailsModels } from '../../interfaces/iSails';
 declare var ProductCategory: SailsModelType<ProductCategoryType>;
 declare var CategoryGroup: SailsModelType<CategoryGroupType>;
 // import util from 'util';
@@ -58,10 +58,10 @@ module.exports = {
     },
     exits: {
       success: (unusedArg?: {
-        updatedProductCategory: ProductCategoryType;
+        updatedProductCategory: ShallowSailsModels<ProductCategoryType>;
       }) => void;
       successJSON: (unusedArg?: {
-        updatedProductCategory: ProductCategoryType;
+        updatedProductCategory: ShallowSailsModels<ProductCategoryType>;
       }) => void;
       notFound: () => void;
     }
@@ -93,7 +93,7 @@ module.exports = {
     let categoryGroup = null;
     if (useInputs.categoryGroup) {
       categoryGroup = await CategoryGroup.findOne(useInputs.categoryGroup);
-      if(categoryGroup){
+      if (categoryGroup) {
         updateArgs.categoryGroup = categoryGroup.id;
       }
     }

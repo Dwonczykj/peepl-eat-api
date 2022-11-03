@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 // ./test/integration/helpers/is-super-admin.test.js
 
-const { expect } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
+import { expect, assert } from 'chai'; // ~ https://www.chaijs.com/api/bdd/
 const { login } = require("../../utils");
 // var util = require("util");
 import moment from "moment";
@@ -16,7 +16,7 @@ declare var sails: any;
 describe("helpers.calculateOrderTotal", () => {
   it("can calculate a simple order total", async () => {
     const response = await login();
-    const user = await User.findOne({ name: response.body.data.name });
+    const user = await User.findOne({ name: response.body.name });
 
     const deliveryStart = "11:00";
     const deliveryEnd = "13:00";
@@ -35,7 +35,7 @@ describe("helpers.calculateOrderTotal", () => {
       imageUrl:
         "https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png",
       rating: 5,
-    });
+    }).fetch();
     // Generate collection/delivery blank opening hours
     var openingHoursDel = [];
     var openingHoursCol = [];
@@ -49,7 +49,7 @@ describe("helpers.calculateOrderTotal", () => {
       "sunday",
     ];
     const delv = await FulfilmentMethod.create({
-      deliveryPartner: deliveryPartner,
+      deliveryPartner: deliveryPartner.id,
       methodType: "delivery",
     }).fetch();
     // Create blank opening hours for each day
@@ -122,24 +122,26 @@ describe("helpers.calculateOrderTotal", () => {
       deliveryAddressCity: "Liverpool",
       deliveryAddressPostCode: "L1 0AR",
     });
-    expect(result).to.be.nonEmpty();
+    assert.isNotEmpty(result);
   });
   it("returns no delivery partners when no intersecting slots", async () => {
     const deliveryStart = "11:00";
     const deliveryEnd = "13:00";
     const response = await login();
-    const user = await User.findOne({ name: response.body.data.name });
+    const user = await User.findOne({ name: response.body.name });
     // create an order with the fulfilment slot set to one that works for DeliveryPartner
 
     const deliveryPartner = await DeliveryPartner.create({
-      name: "Test helpers calculateOrderTotal Delivery Partner 2",
-      email: "calculateOrderTotal2@sailshelpers.com",
-      phoneNumber: "0123456122",
-      status: "active",
-      walletAddress: "0xf039CD9391cB28a7e632D07821deeBc249a32410",
-      deliversToPostCodes: ["L1"],
+      name: 'helpers.calculateOrderTotal DP2',
+      email: 'calculateOrderTotal2@sailshelpers.com',
+      phoneNumber: '0123456122',
+      status: 'active',
+      walletAddress: '0xf039CD9391cB28a7e632D07821deeBc249a32410',
+      deliversToPostCodes: ['L1'],
+      imageUrl:
+        'https://vegiapp-1.s3.us-east-1.amazonaws.com/89e602bd-3655-4c01-a0c9-39eb04737663.png',
       rating: 5,
-    });
+    }).fetch();
     // Generate collection/delivery blank opening hours
     var openingHoursDel = [];
     var openingHoursCol = [];
@@ -153,7 +155,7 @@ describe("helpers.calculateOrderTotal", () => {
       "sunday",
     ];
     const delv = await FulfilmentMethod.create({
-      deliveryPartner: deliveryPartner,
+      deliveryPartner: deliveryPartner.id,
       methodType: "delivery",
     }).fetch();
     // Create blank opening hours for each day
@@ -185,7 +187,7 @@ describe("helpers.calculateOrderTotal", () => {
     const vendor = await Vendor.create({
       createdAt: 1650878843365,
       updatedAt: 1651529215649,
-      name: "Test helpers calculateOrderTotal Vendor 2",
+      name: "helpers calculateOrderTotal Vendor 2",
       type: "restaurant",
       description: "Some test vendor",
       walletAddress: "0xf039CD9391cB28a7e632D07821deeBc249a32410",
@@ -226,6 +228,6 @@ describe("helpers.calculateOrderTotal", () => {
       deliveryAddressCity: "Liverpool",
       deliveryAddressPostCode: "L1 0AR",
     });
-    expect(result).to.be.nonEmpty();
+    assert.isNotEmpty(result);
   });
 });

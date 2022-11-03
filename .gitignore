@@ -140,3 +140,5 @@ lib-cov
 config/aws.json
 config/local.js
 *.tmp.txt
+
+cloneDb.sh

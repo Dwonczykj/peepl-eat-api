@@ -26,6 +26,11 @@ export function getTodayDayName(offset: number = 0): DaysOfWeek {
   // return weekdays[outDayInd];
 }
 
+const prependLeadingZero = (val: number, prependIfValLessThan: number = 10) =>
+  Math.abs(val) < Math.abs(prependIfValLessThan)
+    ? `${Math.sign(val) === -1 ? '-' : ''}0${Math.abs(val)}`
+    : `${Math.sign(val) === -1 ? '-' : ''}${Math.abs(val)}`;
+
 export function getNextWeekday(
   weekday: DaysOfWeek,
   todayInWeek: boolean = false
@@ -62,9 +67,9 @@ export function getNextWeekday(
     if (todayInWeek) {
       today = new Date(today.setDate(today.getDate() + 7));
     }
-    return (
-      today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate()
-    );
+    return `${today.getFullYear()}-${prependLeadingZero(
+      today.getMonth() + 1
+    )}-${prependLeadingZero(today.getDate())}`;
   } else {
     day = today.getDay();
     var dateOfFirstDayOfThisWeek = today.getDate() - day;
@@ -77,18 +82,15 @@ export function getNextWeekday(
   }
   let closest = new Date(today.setDate(theDay));
 
-  return (
-    closest.getFullYear() +
-    '-' +
-    (closest.getMonth() + 1) +
-    '-' +
-    closest.getDate()
-  );
+  return `${closest.getFullYear()}-${prependLeadingZero(
+    closest.getMonth() + 1
+  )}-${prependLeadingZero(closest.getDate())}`;
 }
 
 export const dateStrFormat = 'YYYY-MM-DD';
 export const timeStrFormat = 'HH:mm';
 export const datetimeStrFormat = 'YYYY-MM-DD HH:mm';
+export const datetimeStrFormatExact = 'YYYY-MM-DD HH:mm:ss';
 export const datetimeStrTzFormat = 'YYYY-MM-DD HH:mm Z';
 export const timeStrTzFormat = 'HH:mm Z';
 
@@ -126,17 +128,30 @@ type _UserTypeHidden = {
   firebaseSessionToken?: string;
 };
 
+export type VendorTypeLiteral = 'restaurant' | 'shop';
+export type StatusLiteral = 'active' | 'inactive';
+export type VendorStatusLiteral = StatusLiteral | 'draft';
+
 type _VendorTypeHidden = {
   id: number;
   name: string;
+  type: VendorTypeLiteral;
+  phoneNumber: string;
+  pickupAddressLineOne?: string;
+  pickupAddressLineTwo?: string;
+  pickupAddressCity?: string;
+  pickupAddressPostCode?: string;
+  costLevel?: number;
+  rating: number;
+  isVegan: boolean;
+  minimumOrderAmount: number;
+  platformFee: number;
+  status: VendorStatusLiteral;
+  walletAddress: string;
   description: string;
   imageUrl: string;
-  // deliveryPartner?: DeliveryPartnerType;
-  // deliveryFulfilmentMethod?: FulfilmentMethodType;
-  // collectionFulfilmentMethod?: FulfilmentMethodType;
 };
 
-export type StatusLiteral = 'active' | 'inactive';
 export type RatingType = 0 | 1 | 2 | 3 | 4 | 5;
 export type CompletedFlagType =
   | ''
@@ -146,10 +161,19 @@ export type CompletedFlagType =
   | 'partially refunded'
   | 'void';
 
+type PostalOutCode = string;
+
 type _DeliveryPartnerTypeHidden = {
   id: number;
   name: string;
+  email: string;
+  walletAddress: string;
+  phoneNumber: string;
+  type?: 'bike' | 'electric';
+  imageUrl: string;
   status: StatusLiteral;
+  deliversToPostCodes: Array<PostalOutCode>;
+  rating: number;
   // deliveryFulfilmentMethod?: FulfilmentMethodType,
 };
 
@@ -167,12 +191,7 @@ type _FulfilmentMethodTypeHidden = {
   maxOrders: number;
 };
 
-export type FulfilmentMethodType = _FulfilmentMethodTypeHidden & {
-  vendor?: _VendorTypeHidden;
-  deliveryPartner?: _DeliveryPartnerTypeHidden;
-};
-
-export type OpeningHoursType = {
+export type _OpeningHoursTypeHidden = {
   id: number;
   openTime: string;
   closeTime: string;
@@ -181,17 +200,20 @@ export type OpeningHoursType = {
   dayOfWeek: DaysOfWeek;
   isOpen: boolean;
   logicId: string;
+};
+
+export type FulfilmentMethodType = _FulfilmentMethodTypeHidden & {
+  vendor?: _VendorTypeHidden;
+  deliveryPartner?: _DeliveryPartnerTypeHidden;
+  openingHours?: _OpeningHoursTypeHidden;
+};
+
+export type OpeningHoursType = _OpeningHoursTypeHidden & {
   fulfilmentMethod?: FulfilmentMethodType;
 };
 
 export type DeliveryPartnerType = _DeliveryPartnerTypeHidden & {
   deliveryFulfilmentMethod?: _FulfilmentMethodTypeHidden;
-};
-
-export type VendorType = _VendorTypeHidden & {
-  deliveryPartner?: _DeliveryPartnerTypeHidden;
-  deliveryFulfilmentMethod?: _FulfilmentMethodTypeHidden;
-  collectionFulfilmentMethod?: _FulfilmentMethodTypeHidden;
 };
 
 export type DiscountType = {
@@ -200,6 +222,12 @@ export type DiscountType = {
 };
 export type _ProductTypeHidden = {
   id: number;
+};
+export type _ProductCategoryTypeHidden = {
+  id: number;
+  name: string;
+  imageUrl: string;
+  products: Array<_ProductTypeHidden>;
 };
 export type _ProductOptionValueTypeHidden = {
   id: number;
@@ -215,6 +243,7 @@ export type _ProductOptionTypeHidden = {
   product: _ProductTypeHidden;
 };
 export type ProductOptionValueType = {
+  id: number;
   option: _ProductOptionTypeHidden;
 };
 export type ProductOptionType = {
@@ -242,13 +271,33 @@ export type CategoryGroupType = {
   imageUrl: string;
   forRestaurantItem: boolean;
 };
-export type ProductCategoryType = {
+export type VendorCategoryType = {
   id: number;
   name: string;
+  imageUrl: string;
+  vendors: Array<_VendorTypeHidden>;
+};
+
+export type PostalDistrictType = {
+  outcode: string;
+  vendors: Array<_VendorTypeHidden>;
+};
+
+export type VendorType = _VendorTypeHidden & {
+  deliveryPartner?: _DeliveryPartnerTypeHidden;
+  deliveryFulfilmentMethod?: _FulfilmentMethodTypeHidden;
+  collectionFulfilmentMethod?: _FulfilmentMethodTypeHidden;
+  products: Array<_ProductTypeHidden>;
+  vendorCategories: Array<VendorCategoryType>; // Cafes
+  productCategories: Array<_ProductCategoryTypeHidden>;
+  fulfilmentPostalDistricts: Array<PostalDistrictType>;
+  users: [];
+};
+export type ProductCategoryType = _ProductCategoryTypeHidden & {
   vendor: VendorType;
   categoryGroup: CategoryGroupType;
-  products: Array<_ProductTypeHidden>;
 };
+
 export type ProductType = _ProductTypeHidden & {
   id: number;
   name: string;
