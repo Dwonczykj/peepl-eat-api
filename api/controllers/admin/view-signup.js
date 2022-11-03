@@ -15,16 +15,17 @@ module.exports = {
 
   fn: async function (inputs, exits) {
     const vendors = await Vendor.find({ status: ['active', 'draft'] });
+    const deliveryPartners = await DeliveryPartner.find({ status: ['active'] });
 
     if (this.req.wantsJSON) {
       return exits.successJSON({
         vendors,
-        deliveryPartners: [],
+        deliveryPartners: deliveryPartners,
       });
     } else {
       return exits.success({
         vendors,
-        deliveryPartners: [],
+        deliveryPartners: deliveryPartners,
       });
     }
   },
