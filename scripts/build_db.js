@@ -40,13 +40,14 @@ async function buildDb(sails, test) {
     ).fetch();
     console.info(`Finished populating Postal Districts for ${_envRT}`);
 
+    // await FulfilmentMethod.createEach(fixtures.fulfilmentMethods);
+
     const vendors = await Vendor.createEach(fixtures.vendors).fetch();
     console.info(`Finished populating Vendors for ${_envRT}`);
 
     const deliveryPartners = await DeliveryPartner.createEach(fixtures.deliveryPartners).fetch();
     console.info(`Finished populating Delivery Partners for ${_envRT}`);
 
-    // await FulfilmentMethod.createEach(fixtures.fulfilmentMethods);
 
     const fms1 = await FulfilmentMethod.find({
       'or': [

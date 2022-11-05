@@ -13,14 +13,12 @@ import {
   OpeningHoursType,
   DeliveryPartnerType,
   OrderType,
-  datetimeStrFormat,
+  DateString,
 } from "../../../scripts/utils";
 import {
-  DaysOfWeek,
-  iSlot,
   TimeWindow,
 } from "../../../api/interfaces/vendors/slot";
-import moment from "moment";
+import { DaysOfWeek } from "../../../scripts/DaysOfWeek";
 
 declare var Order: any;
 declare var DeliveryPartner: any;
@@ -33,12 +31,13 @@ export const createOpeningHoursForFulfilmentMethod = async (
   fixtures,
   fulfilmentMethodId: number,
   openingHoursWindows: TimeWindow[],
-  days: "all" | Array<DaysOfWeek> = [],
-  dayOffsets: Array<number> = []
+  days: 'all' | Array<DaysOfWeek> = [],
+  dayOffsets: Array<number> = [],
+  specialDates: Array<{ [dt: DateString]: TimeWindow[] }> = []
 ) => {
   if (!fulfilmentMethodId) {
     throw new Error(
-      "No FUlfilment Method passed to function: createOpeningHoursForFulfilmentMethod"
+      'No FUlfilment Method passed to function: createOpeningHoursForFulfilmentMethod'
     );
   }
 
@@ -46,15 +45,15 @@ export const createOpeningHoursForFulfilmentMethod = async (
     days = 'all';
   }
   const usedWeekdays =
-    days === "all"
+    days === 'all'
       ? [
-        "monday",
-        "tuesday",
-        "wednesday",
-        "thursday",
-        "friday",
-        "saturday",
-        "sunday",
+        'monday',
+        'tuesday',
+        'wednesday',
+        'thursday',
+        'friday',
+        'saturday',
+        'sunday',
       ]
       : days && days.length > 0
       ? days
@@ -69,7 +68,7 @@ export const createOpeningHoursForFulfilmentMethod = async (
           timezone: 0, // could take from moment.format("Z")
           openTime: timeWindow.startTime.format(timeStrFormat),
           closeTime: timeWindow.endTime.format(timeStrFormat),
-          fulfilmentMethod: fulfilmentMethodId, //todo: set cutoff to now + 5 mins to allow test to run
+          fulfilmentMethod: fulfilmentMethodId,
         };
       })
     )
@@ -79,9 +78,29 @@ export const createOpeningHoursForFulfilmentMethod = async (
   const vendorsDeliveryOpeningHours: Array<OpeningHoursType> =
     await OpeningHours.createEach(openingHoursDelVen).fetch();
 
+  if (specialDates && specialDates.length > 0) {
+    for (const specialDate of Object.keys(specialDates)) {
+      if (specialDate.match(/^[12][0-9]{3}-[01][0-9]-[0-9]{2}$/g)) {
+        //ignore if doesnt match
+        await OpeningHours.createEach(
+          specialDates[specialDate].map((timeWindow) => {
+            return {
+              specialDate: specialDate,
+              isOpen: true,
+              timezone: 0, // could take from moment.format("Z")
+              openTime: timeWindow.startTime.format(timeStrFormat),
+              closeTime: timeWindow.endTime.format(timeStrFormat),
+              fulfilmentMethod: fulfilmentMethodId,
+            };
+          })
+        );
+      }
+    }
+  }
+
   await FulfilmentMethod.addToCollection(
     fulfilmentMethodId,
-    "openingHours"
+    'openingHours'
   ).members(vendorsDeliveryOpeningHours.map(({ id }) => id));
 
   return {
@@ -93,20 +112,21 @@ export const createOpeningHoursForFulfilmentMethod = async (
 export const createVendorWithOpeningHours = async (
   fixtures,
   openingHoursWindows: TimeWindow[],
-  days: "all" | Array<DaysOfWeek> = [],
+  days: 'all' | Array<DaysOfWeek> = [],
   dayOffsets: Array<number> = [],
-  withDeliveryPartnerId: number = null
+  withDeliveryPartnerId: number = null,
+  specialDates: Array<{ [dt: DateString]: TimeWindow[] }> = []
 ) => {
   const vendor: VendorType = await Vendor.create(
     DEFAULT_NEW_VENDOR_OBJECT(fixtures, {
-      name: "TEST_VENDOR_" + uuidv4(),
+      name: 'TEST_VENDOR_' + uuidv4(),
       deliveryPartner: withDeliveryPartnerId,
     })
   );
   let vendorsDelvFulfMethod: FulfilmentMethodType =
     await FulfilmentMethod.findOne({
       vendor: vendor.id,
-      methodType: "delivery",
+      methodType: 'delivery',
     });
 
   if (!vendorsDelvFulfMethod) {
@@ -118,7 +138,7 @@ export const createVendorWithOpeningHours = async (
   let vendorsColnFulfMethod: FulfilmentMethodType =
     await FulfilmentMethod.findOne({
       vendor: vendor.id,
-      methodType: "collection",
+      methodType: 'collection',
     });
 
   if (!vendorsColnFulfMethod) {
@@ -127,14 +147,16 @@ export const createVendorWithOpeningHours = async (
     );
   }
 
-  const { vendorsDeliveryOpeningHours, usedWeekdays: usedWeekdaysForVendorDelivery  } =
-    await createOpeningHoursForFulfilmentMethod(
-      fixtures,
-      vendorsDelvFulfMethod.id,
-      openingHoursWindows,
-      days,
-      dayOffsets
-    );
+  const {
+    vendorsDeliveryOpeningHours,
+    usedWeekdays: usedWeekdaysForVendorDelivery,
+  } = await createOpeningHoursForFulfilmentMethod(
+    fixtures,
+    vendorsDelvFulfMethod.id,
+    openingHoursWindows,
+    days,
+    dayOffsets
+  );
 
   const {
     vendorsDeliveryOpeningHours: vendorsCollectionOpeningHours,
@@ -161,12 +183,13 @@ export const createVendorWithOpeningHours = async (
 export const createDeliveryPartnerWithOpeningHours = async (
   fixtures,
   openingHoursWindows: TimeWindow[],
-  days: "all" | Array<DaysOfWeek> = [],
-  dayOffsets: Array<number> = []
+  days: 'all' | Array<DaysOfWeek> = [],
+  dayOffsets: Array<number> = [],
+  specialDates: Array<{[dt:DateString]: TimeWindow[]}> = []
 ) => {
   const _dp: DeliveryPartnerType = await DeliveryPartner.create(
     DEFAULT_NEW_DELIVERY_PARTNER_OBJECT(fixtures, {
-      name: "TEST_DP_" + uuidv4(),
+      name: 'TEST_DP_' + uuidv4(),
     })
   ).fetch();
   const deliveryPartner: DeliveryPartnerType = await DeliveryPartner.findOne(
@@ -175,8 +198,8 @@ export const createDeliveryPartnerWithOpeningHours = async (
   let deliveryPartnersDelvFulfMethod: FulfilmentMethodType =
     await FulfilmentMethod.findOne({
       deliveryPartner: deliveryPartner.id,
-      methodType: "delivery",
-    });
+      methodType: 'delivery',
+    }); //TODO: Add fm overrides for priceModifier here
 
   if (!deliveryPartnersDelvFulfMethod) {
     throw new Error(
@@ -237,33 +260,4 @@ export const createOrdersForSlot = async (
   };
 };
 
-export const stringifySlot = (slot: iSlot) => ({
-  startTime: slot.startTime.format(timeStrFormat),
-  endTime: slot.endTime.format(timeStrFormat),
-});
-export const stringifySlotWithDate = (slot: iSlot) => ({
-  startTime: slot.startTime.format(datetimeStrFormat),
-  endTime: slot.endTime.format(datetimeStrFormat),
-});
-export const stringifySlots = (availableSlots: iSlot[]) =>
-  availableSlots.map((slot) => ({
-    startTime: slot.startTime.format(timeStrFormat),
-    endTime: slot.endTime.format(timeStrFormat),
-  }));
-export const stringifySlotsHttpResponse = (
-  availableSlots: { startTime: string; endTime: string }[]
-) =>
-  availableSlots.map((slot) => ({
-    startTime: moment.utc(slot.startTime).format(`${timeStrFormat}`),
-    endTime: moment.utc(slot.endTime).format(`${timeStrFormat}`),
-  }));
-export const stringifySlotsWithDateHttpResponse = (availableSlots: {startTime: string, endTime: string}[]) =>
-  availableSlots.map((slot) => ({
-    startTime: moment.utc(slot.startTime).format(`${datetimeStrFormat}`),
-    endTime: moment.utc(slot.endTime).format(`${datetimeStrFormat}`),
-  }));
-export const stringifySlotWithDateHttpResponse = (slot: {startTime: string, endTime: string}) =>
-  ({
-    startTime: moment.utc(slot.startTime).format(`${datetimeStrFormat}`),
-    endTime: moment.utc(slot.endTime).format(`${datetimeStrFormat}`),
-  });
+

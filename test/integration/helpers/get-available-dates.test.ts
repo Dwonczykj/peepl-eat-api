@@ -20,10 +20,10 @@ import {
   OrderType,
 } from "../../../scripts/utils";
 import {
-  DaysOfWeek,
   iSlot,
   TimeWindow,
 } from "../../../api/interfaces/vendors/slot";
+import { DaysOfWeek } from "../../../scripts/DaysOfWeek";
 import { createVendorWithOpeningHours } from "./db-utils";
 import { AvailableDateOpeningHours } from '../../../api/helpers/get-available-dates';
 

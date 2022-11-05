@@ -14,21 +14,25 @@ import {
   OpeningHoursType,
   DeliveryPartnerType,
   OrderType,
+  DateString,
+  TimeHourString,
 } from "../../../../scripts/utils";
 import {
-  DaysOfWeek,
   iSlot,
   TimeWindow,
 } from "../../../../api/interfaces/vendors/slot";
+import { DaysOfWeek } from "../../../../scripts/DaysOfWeek";
 import { GetFulilmentSlotsSuccess } from "../../../../api/controllers/vendors/get-fulfilment-slots";
 import {
   createVendorWithOpeningHours,
   createDeliveryPartnerWithOpeningHours,
   createOrdersForSlot,
-  stringifySlotsHttpResponse,
-  stringifySlot,
-  stringifySlotWithDate,
 } from "../../helpers/db-utils";
+import {
+  stringifySlotsHttpResponse,
+  stringifySlotWithTimes,
+  stringifySlotWithDate
+} from "../../../../scripts/stringifySlot";
 import { AvailableDateOpeningHours } from "../../../../api/helpers/get-available-dates.js";
 
 declare var Order: any;
@@ -38,14 +42,9 @@ declare var FulfilmentMethod: any;
 declare var OpeningHours: any;
 declare var sails: any;
 
-type GetFulilmentSlotsSuccessHttp = {
-  collectionMethod: FulfilmentMethodType;
-  deliveryMethod: FulfilmentMethodType;
-  collectionSlots: { startTime: string; endTime: string }[];
-  deliverySlots: { startTime: string; endTime: string }[];
-  eligibleCollectionDates: AvailableDateOpeningHours;
-  eligibleDeliveryDates: AvailableDateOpeningHours;
-};
+const _isoStr = (date:DateString, time:TimeHourString) => `${date}T${time}:00Z`;
+
+type GetFulilmentSlotsSuccessHttp = GetFulilmentSlotsSuccess;
 
 class CAN_GET_VENDORS_FULFILMENT_SLOTS {
   static readonly useAccount: "TEST_VENDOR" = "TEST_VENDOR";
@@ -160,32 +159,17 @@ class CAN_GET_VENDORS_FULFILMENT_SLOTS {
         response: { body: GetFulilmentSlotsSuccessHttp },
         requestPayload
       ) => {
-        expect(response.body).to.have.property("collectionMethod");
-        expect(response.body.collectionMethod).to.have.property("methodType");
-        expect(response.body.collectionMethod.methodType).to.equal(
-          "collection"
-        );
-        expect(response.body).to.have.property("deliveryMethod");
-        expect(response.body.deliveryMethod).to.have.property("methodType");
-        expect(response.body.deliveryMethod.methodType).to.equal("delivery");
-
-        expect(response.body).to.have.property("collectionSlots");
-        expect(response.body).to.have.property("deliverySlots");
-
-        expect(response.body).to.have.property("eligibleCollectionDates");
-        assert.isNotEmpty(response.body.eligibleCollectionDates);
-        assert.isObject(response.body.eligibleCollectionDates);
-        expect(response.body).to.have.property("eligibleDeliveryDates");
-        assert.isNotEmpty(response.body.eligibleDeliveryDates);
-        assert.isObject(response.body.eligibleDeliveryDates);
-
-        //Todo: TEST if we can handle special dates
+        expect(response.body).to.have.property('dates');
+        expect(response.body).to.have.property('slots');
+        expect(response.body.dates).to.have.property("delivery");
+        expect(response.body.dates).to.have.property("collection");
+        assert.isArray(response.body.slots);
 
         const availableDatesForDelivery = Object.keys(
-          response.body.eligibleDeliveryDates
+          response.body.dates.delivery
         );
         const availableDatesForCollection = Object.keys(
-          response.body.eligibleCollectionDates
+          response.body.dates.collection
         );
 
         const removeToday = moment.utc().format(dateStrFormat);
@@ -447,28 +431,11 @@ class NO_SLOTS_ARE_RETURNED_FOR_PAST_DATES {
         response: { body: GetFulilmentSlotsSuccessHttp },
         requestPayload
       ) => {
-        expect(response.body).to.have.property("collectionMethod");
-        expect(response.body.collectionMethod).to.have.property("methodType");
-        expect(response.body.collectionMethod.methodType).to.equal(
-          "collection"
-        );
-        expect(response.body).to.have.property("deliveryMethod");
-        expect(response.body.deliveryMethod).to.have.property("methodType");
-        expect(response.body.deliveryMethod.methodType).to.equal("delivery");
-
-        expect(response.body).to.have.property("collectionSlots");
-        assert.isArray(response.body.collectionSlots);
-        assert.isEmpty(response.body.collectionSlots);
-
-        expect(response.body).to.have.property("deliverySlots");
-        assert.isArray(response.body.deliverySlots);
-        assert.isEmpty(response.body.deliverySlots);
-
-        expect(response.body).to.have.property("eligibleDeliveryDates");
-        // assert.isEmpty(response.body.eligibleDeliveryDates);
-
-        expect(response.body).to.have.property("eligibleCollectionDates");
-        // assert.isEmpty(response.body.eligibleCollectionDates);
+        expect(response.body).to.have.property('dates');
+        expect(response.body).to.have.property('slots');
+        expect(response.body.dates).to.have.property('delivery');
+        expect(response.body.dates).to.have.property('collection');
+        assert.isArray(response.body.slots);
 
         return;
       },
@@ -663,10 +630,11 @@ describe("Can process overlaps between vendors and their delivery partner's open
       fixtures
     );
     const hats = new HttpAuthTestSenderVendor(_hatsInit);
+    const useDate = getNextWeekday(tomorrowName);
     const response: { body: GetFulilmentSlotsSuccessHttp } =
       await hats.makeAuthCallWith(
         {
-          date: getNextWeekday(tomorrowName),
+          date: useDate,
           vendor: vendor.id,
         },
         []
@@ -674,32 +642,34 @@ describe("Can process overlaps between vendors and their delivery partner's open
     await hats.expectedResponse.checkResponse(response);
 
     // Check returns first overlapping slot only that works for deliverypartner too
-    assert.isArray(response.body.deliverySlots);
-    assert.isArray(response.body.collectionSlots);
+    assert.isArray(response.body.slots);
+    assert.isNotEmpty(response.body.slots);
 
-    assert.isNotEmpty(response.body.deliverySlots);
-    expect(response.body.deliverySlots[0]).to.have.property('startTime');
-    expect(response.body.deliverySlots[0]).to.have.property('endTime');
-    assert.isNotEmpty(response.body.collectionSlots);
-    expect(response.body.collectionSlots[0]).to.have.property("startTime");
-    expect(response.body.collectionSlots[0]).to.have.property("endTime");
+    expect(response.body.slots[0]).to.have.property('startTime');
+    expect(response.body.slots[0]).to.have.property('endTime');
 
     expect(
-      stringifySlotsHttpResponse(response.body.deliverySlots)
+      response.body.slots.filter(
+        (slot) => slot.fulfilmentMethod.methodType === 'delivery'
+      ).map(s => ({startTime: s.startTime, endTime:s.endTime}))
     ).to.deep.equal([
       {
-        startTime: "10:00",
-        endTime: "11:00",
+        startTime: _isoStr(useDate, '10:00'),
+        endTime: _isoStr(useDate, '11:00'),
       },
     ]);
-    expect(stringifySlotsHttpResponse(response.body.collectionSlots)).to.deep.equal([
+    expect(
+      response.body.slots
+        .filter((slot) => slot.fulfilmentMethod.methodType === 'collection')
+        .map((s) => ({ startTime: s.startTime, endTime: s.endTime }))
+    ).to.deep.equal([
       {
-        startTime: "10:00",
-        endTime: "11:00",
+        startTime: _isoStr(useDate, '10:00'),
+        endTime: _isoStr(useDate, '11:00'),
       },
       {
-        startTime: "11:00",
-        endTime: "12:00",
+        startTime: _isoStr(useDate, '11:00'),
+        endTime: _isoStr(useDate, '12:00'),
       },
     ]);
   });
@@ -773,10 +743,11 @@ describe("Can process overlaps between vendors and their delivery partner's open
       fixtures
     );
     const hats = new HttpAuthTestSenderVendor(_hatsInit);
+    const useDate = getNextWeekday(tomorrowName);
     const response: { body: GetFulilmentSlotsSuccessHttp } =
       await hats.makeAuthCallWith(
         {
-          date: getNextWeekday(tomorrowName),
+          date: useDate,
           vendor: vendor.id,
         },
         []
@@ -784,35 +755,43 @@ describe("Can process overlaps between vendors and their delivery partner's open
     await hats.expectedResponse.checkResponse(response);
 
     // Check returns first overlapping slot only that works for deliverypartner too
-    assert.isArray(response.body.deliverySlots);
-    assert.isArray(response.body.collectionSlots);
+    assert.isArray(response.body.slots);
+    
 
-    expect(stringifySlotsHttpResponse(response.body.deliverySlots)).to.deep.equal([
+    expect(
+      response.body.slots
+        .filter((slot) => slot.fulfilmentMethod.methodType === 'delivery')
+        .map((s) => ({ startTime: s.startTime, endTime: s.endTime }))
+    ).to.deep.equal([
       {
-        startTime: "10:00",
-        endTime: "10:30",
+        startTime: _isoStr(useDate, '10:00'),
+        endTime: _isoStr(useDate, '10:30'),
       },
       {
-        startTime: "10:30",
-        endTime: "11:00",
+        startTime: _isoStr(useDate, '10:30'),
+        endTime: _isoStr(useDate, '11:00'),
       },
     ]);
-    expect(stringifySlotsHttpResponse(response.body.collectionSlots)).to.deep.equal([
+    expect(
+      response.body.slots
+        .filter((slot) => slot.fulfilmentMethod.methodType === 'collection')
+        .map((s) => ({ startTime: s.startTime, endTime: s.endTime }))
+    ).to.deep.equal([
       {
-        startTime: "10:00",
-        endTime: "10:30",
+        startTime: _isoStr(useDate, '10:00'),
+        endTime: _isoStr(useDate, '10:30'),
       },
       {
-        startTime: "10:30",
-        endTime: "11:00",
+        startTime: _isoStr(useDate, '10:30'),
+        endTime: _isoStr(useDate, '11:00'),
       },
       {
-        startTime: "11:00",
-        endTime: "11:30",
+        startTime: _isoStr(useDate, '11:00'),
+        endTime: _isoStr(useDate, '11:30'),
       },
       {
-        startTime: "11:30",
-        endTime: "12:00",
+        startTime: _isoStr(useDate, '11:30'),
+        endTime: _isoStr(useDate, '12:00'),
       },
     ]);
   });

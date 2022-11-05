@@ -152,17 +152,6 @@ module.exports = {
 
     // Iterate through the items in the order
     for (let item of inputs.items) {
-      // Check that the product exists
-
-      sails.log(
-        util.inspect(
-          {
-            products,
-            item,
-          },
-          { depth: null }
-        )
-      );
       let product = products.find((product) => product.id === item.id);
       if (!product) {
         sails.log.warn(

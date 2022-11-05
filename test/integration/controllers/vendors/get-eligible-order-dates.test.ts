@@ -18,19 +18,21 @@ import {
   OrderType,
 } from "../../../../scripts/utils";
 import {
-  DaysOfWeek,
   iSlot,
   TimeWindow,
 } from "../../../../api/interfaces/vendors/slot";
-import { getEligibleOrderDatesSuccess } from "../../../../api/interfaces/vendors/iGetEligibleOrderUpdates";
+import { DaysOfWeek } from "../../../../scripts/DaysOfWeek";
+import { getEligibleOrderDatesSuccess } from "../../../../api/controllers/vendors/get-eligible-order-dates";
 import {
   createVendorWithOpeningHours,
   createDeliveryPartnerWithOpeningHours,
   createOrdersForSlot,
-  stringifySlots,
-  stringifySlot,
-  stringifySlotWithDate,
 } from "../../helpers/db-utils";
+import {
+  stringifySlots,
+  stringifySlotWithTimes,
+  stringifySlotWithDate
+} from "../../../../scripts/stringifySlot";
 
 declare var Order: any;
 declare var DeliveryPartner: any;
@@ -153,31 +155,11 @@ class CAN_GET_ELIGIBLE_DATES_AS_USER {
         response: { body: getEligibleOrderDatesSuccess },
         requestPayload
       ) => {
-        expect(response.body).to.have.property("collectionMethod");
-        expect(response.body.collectionMethod).to.have.property("methodType");
-        expect(response.body.collectionMethod.methodType).to.equal(
-          "collection"
-        );
-        expect(response.body).to.have.property("deliveryMethod");
-        expect(response.body.deliveryMethod).to.have.property("methodType");
-        expect(response.body.deliveryMethod.methodType).to.equal("delivery");
+        expect(Object.keys(response.body)).to.deep.members(["collection", "delivery"]);
 
-        expect(response.body).to.not.have.property("collectionSlots");
-        expect(response.body).to.not.have.property("deliverySlots");
-
-        expect(response.body).to.have.property("eligibleCollectionDates");
-        assert.isNotEmpty(response.body.eligibleCollectionDates);
-        assert.isObject(response.body.eligibleCollectionDates);
-        expect(response.body).to.have.property("eligibleDeliveryDates");
-        assert.isNotEmpty(response.body.eligibleDeliveryDates);
-        assert.isObject(response.body.eligibleDeliveryDates);
-
-        
-        //Todo: TEST if we can handle special dates
-
-        const availableDatesForDelivery = Object.keys(response.body.eligibleDeliveryDates);
+        const availableDatesForDelivery = Object.keys(response.body.delivery);
         const availableDatesForCollection =
-          Object.keys(response.body.eligibleCollectionDates);
+          Object.keys(response.body.collection);
 
         const removeToday = moment.utc().format(dateStrFormat);
         const removeTomorrow = moment //* also remove for when past cutoff

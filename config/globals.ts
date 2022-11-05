@@ -22,6 +22,7 @@ declare var Cloud: any;
 declare var sails: any;
 
 import './date.extensions';
+import './fulfilmentPriority';
 
 // Date.prototype.addHours = function(h) {
 //   this.setTime(this.getTime() + (h*60*60*1000));

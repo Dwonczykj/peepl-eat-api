@@ -1,16 +1,25 @@
 /* eslint-disable no-unused-vars */
-import { iCollectionDates, intersectTimeWindowArrays, iSlot, mergeAvailableDates, mergeICollectionDates, TimeWindow } from '../../interfaces/vendors/slot';
+import { iCollectionDates, iFulfilmentSlot, intersectTimeWindowArrays, iSlot, mergeAvailableDates, mergeICollectionDates, FulfilmentTimeWindow } from '../../interfaces/vendors/slot';
 import util from 'util';
-import { FulfilmentMethodType } from '../../../scripts/utils';
+import { FulfilmentMethodType, timeStrFormat, TimeHourString, datetimeStrFormat, datetimeMomentUtcStrTzFormat } from '../../../scripts/utils';
 import { AvailableDateOpeningHours } from '../../../api/helpers/get-available-dates';
+import { sailsVegi } from 'api/interfaces/iSails';
+
+declare var sails: sailsVegi;
+
+type iFulfilmentSlotStrDate = {
+  fulfilmentMethod: FulfilmentMethodType;
+  startTime: TimeHourString;
+  endTime: TimeHourString;
+};
+
+const outFormatSlotTime = datetimeMomentUtcStrTzFormat;
 
 export type GetFulilmentSlotsSuccess = {
-  collectionMethod: FulfilmentMethodType;
-  deliveryMethod: FulfilmentMethodType;
-  collectionSlots: iSlot[];
-  deliverySlots: iSlot[];
-  eligibleCollectionDates: AvailableDateOpeningHours;
-  eligibleDeliveryDates: AvailableDateOpeningHours;
+  slots: Array<iFulfilmentSlotStrDate>;
+  dates: {
+    [unusedMethodType in FulfilmentMethodType['methodType']]: AvailableDateOpeningHours;
+  };
 };
 
 module.exports = {
@@ -53,9 +62,9 @@ module.exports = {
       deliveryPartnerNotFound: () => void;
     }
   ) {
-    var collectionSlots: iSlot[] = [];
-    var deliveryPartnerDeliverySlots: iSlot[] = [];
-    var deliverySlots: iSlot[] = [];
+    var collectionSlots: iFulfilmentSlotStrDate[] = [];
+    var deliveryPartnerDeliverySlots: iFulfilmentSlot[] = [];
+    var deliverySlots: iFulfilmentSlotStrDate[] = [];
     var eligibleDeliveryDates: AvailableDateOpeningHours = {};
     var eligibleCollectionDates: AvailableDateOpeningHours = {};
     var eligibleDeliveryPartnerDeliveryDates: AvailableDateOpeningHours = {};
@@ -106,7 +115,7 @@ module.exports = {
 
       deliveryFulfilmentMethod = deliveryPartner.deliveryFulfilmentMethod;
       if (vendor.deliveryFulfilmentMethod) {
-        let vendorDeliverySlots: iSlot[] = [];
+        let vendorDeliverySlots: iFulfilmentSlot[] = [];
         let vendorEligibleDeliveryDates: AvailableDateOpeningHours = {};
 
         try {
@@ -123,9 +132,15 @@ module.exports = {
           );
         }
         deliverySlots = intersectTimeWindowArrays(
-          deliveryPartnerDeliverySlots.map((slot) => TimeWindow.from(slot)),
-          vendorDeliverySlots.map((slot) => TimeWindow.from(slot))
-        );
+          deliveryPartnerDeliverySlots.map((slot) => FulfilmentTimeWindow.from(slot)),
+          vendorDeliverySlots.map((slot) => FulfilmentTimeWindow.from(slot))
+        ).map(ftw => {
+          return {
+            startTime: ftw.startTime.format(),
+            endTime: ftw.endTime.format(),
+            fulfilmentMethod: ftw.fulfilmentMethod
+          } as iFulfilmentSlotStrDate;
+        });
         eligibleDeliveryDates = mergeAvailableDates(
           eligibleDeliveryPartnerDeliveryDates,
           vendorEligibleDeliveryDates
@@ -133,10 +148,17 @@ module.exports = {
       }
     } else if (vendor.deliveryFulfilmentMethod) {
       try {
-        deliverySlots = await sails.helpers.getAvailableSlots(
+        const deliverySlotsArr = await sails.helpers.getAvailableSlots(
           inputs.date,
           vendor.deliveryFulfilmentMethod.id
         );
+        deliverySlots = deliverySlotsArr.map(ftw => {
+          return {
+            startTime: ftw.startTime.format(),
+            endTime: ftw.endTime.format(),
+            fulfilmentMethod: ftw.fulfilmentMethod,
+          } as iFulfilmentSlotStrDate;
+        });
         eligibleDeliveryDates = await sails.helpers.getAvailableDates(
           vendor.deliveryFulfilmentMethod.id
         );
@@ -149,10 +171,17 @@ module.exports = {
 
     if (vendor.collectionFulfilmentMethod) {
       try {
-        collectionSlots = await sails.helpers.getAvailableSlots(
+        const _collectionSlots = await sails.helpers.getAvailableSlots(
           inputs.date,
           vendor.collectionFulfilmentMethod.id
-        );
+        )
+        collectionSlots = _collectionSlots.map(ftw => {
+          return {
+            startTime: ftw.startTime.format(),
+            endTime: ftw.endTime.format(),
+            fulfilmentMethod: ftw.fulfilmentMethod,
+          } as iFulfilmentSlotStrDate;
+        });
         eligibleCollectionDates = await sails.helpers.getAvailableDates(
           vendor.collectionFulfilmentMethod.id
         );
@@ -164,12 +193,14 @@ module.exports = {
     }
 
     return exits.success({
-      collectionMethod: collectionFulfilmentMethod,
-      deliveryMethod: deliveryFulfilmentMethod,
-      collectionSlots,
-      deliverySlots,
-      eligibleCollectionDates,
-      eligibleDeliveryDates,
+      slots: [
+        ...deliverySlots,
+        ...collectionSlots
+      ],
+      dates: {
+        collection: eligibleCollectionDates,
+        delivery: eligibleDeliveryDates,
+      }
     });
   },
 };

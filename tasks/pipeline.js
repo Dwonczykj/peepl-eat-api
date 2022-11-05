@@ -31,14 +31,14 @@
 // > you'll want to change `assets/styles/importer.less` instead.
 //
 var cssFilesToInject = [
-
   // Bring in `.css` files for themes and style guides (e.g. Bootstrap, Foundation)
   'dependencies/**/*.css',
+  // 'https://cdn.jsdelivr.net/npm/toastify-js',
 
   // All of the rest of your custom `.css` files will be injected here,
   // in no particular order.  To customize the ordering, add additional
   // items here, _above_ this one.
-  'styles/**/*.css'
+  'styles/**/*.css',
 ];
 
 
@@ -59,7 +59,6 @@ var cssFilesToInject = [
 // Client-side javascript files to inject as <script> tags, in order.
 //
 var jsFilesToInject = [
-
   // Load `sails.io` before everything else.
   'dependencies/sails.io.js',
   'js/io.socket.config.js',
@@ -74,6 +73,7 @@ var jsFilesToInject = [
   'dependencies/popper.min.js',
   'dependencies/bootstrap.min.js',
   'dependencies/portal-vue.umd.min.js',
+  // 'https://cdn.jsdelivr.net/npm/toastify-js',
   'dependencies/**/*.js',
 
   // First amongst the app-level files, bring in cloud configuration
@@ -86,7 +86,7 @@ var jsFilesToInject = [
   // All of the rest of your custom client-side js files will be injected here,
   // in no particular order.  To customize the ordering, add additional items
   // here, _above_ this one.
-  'js/**/*.js'
+  'js/**/*.js',
 ];
 
 

@@ -33,5 +33,7 @@
     "include": [
         "./**/*.ts",
         "./**/*.tsx"
-    ]
+,
+"../scripts/stringifySlot.ts"
+]
 }

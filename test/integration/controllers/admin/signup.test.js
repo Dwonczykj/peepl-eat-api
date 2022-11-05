@@ -44,7 +44,7 @@ const REGISTER_USER_PHONE = (fixtures) => {
     sendData: {
       phoneNoCountry: userPhone,
       phoneCountryCode: 1,
-      email: userEmail,
+      emailAddress: userEmail,
       name: userName,
       vendor: vendor.id,
       deliveryPartner: null,
@@ -73,7 +73,7 @@ const REGISTER_USER_PHONE_THROWS_IF_USER_EXISTS = (fixtures) => {
     sendData: {
       phoneNoCountry: '',
       phoneCountryCode: 1,
-      email: 'userEmail',
+      emailAddress: 'userEmail',
       name: 'userName',
       vendor: 1,
       deliveryPartner: null,
@@ -118,12 +118,12 @@ describe('Signup Tests', () => {
   });
   describe('Can Register User', () => {
     // it("Can Register Vendor User using Email & Password", (done) => {
-    //   supertest(sails.hooks.http.app) //TODO: Convert the mock firebase using the Firebase Emulator Sweet for Web Apps
+    //   supertest(sails.hooks.http.app) //TODO: Convert the mock firebase using the Firebase Emulator suite for Web Apps
     //     .post("/api/v1/admin/signup-with-password")
     //     .send({
     //       phoneNoCountry: 44,
     //       phoneCountryCode: 7905511111,
-    //       email: "user@example.com",
+    //       emailAddress: "user@example.com",
     //       password: "DummyPass123",
     //       name: "Can Signup Password Vendor User",
     //       vendor: 1,
@@ -159,13 +159,8 @@ describe('Signup Tests', () => {
     // });
     it('Can Register Vendor User using Phone (no firebase)', async () => {
       try {
-        const hats = new HttpAuthTestSenderAdmin(
-          REGISTER_USER_PHONE(fixtures)
-        );
-        const response = await hats.makeAuthCallWith(
-          {},
-          []
-        );
+        const hats = new HttpAuthTestSenderAdmin(REGISTER_USER_PHONE(fixtures));
+        const response = await hats.makeAuthCallWith({}, []);
         await hats.expectedResponse.checkResponse(response);
       } catch (error) {
         console.warn(error);
@@ -174,17 +169,19 @@ describe('Signup Tests', () => {
     });
     it('Registration using Phone throws userExists if user already exists', async () => {
       try {
-	      const user = await User.findOne({
-	        phoneNoCountry: 7905532512,
-	        phoneCountryCode: 44,
-	      }).populate('deliveryPartner&vendor');
+        const user = await User.findOne({
+          phoneNoCountry: 7905532512,
+          phoneCountryCode: 44,
+        }).populate('deliveryPartner&vendor');
 
-	      const hats = new HttpAuthTestSenderAdmin(REGISTER_USER_PHONE_THROWS_IF_USER_EXISTS(fixtures));
-	      const response = await hats.makeAuthCallWith(
+        const hats = new HttpAuthTestSenderAdmin(
+          REGISTER_USER_PHONE_THROWS_IF_USER_EXISTS(fixtures)
+        );
+        const response = await hats.makeAuthCallWith(
           {
             phoneNoCountry: user.phoneNoCountry,
             phoneCountryCode: user.phoneCountryCode,
-            email: user.email,
+            emailAddress: user.email,
             name: user.name,
             vendor: user.vendor && user.vendor.id,
             deliveryPartner: user.deliveryPartner && user.deliveryPartner.id,
@@ -194,7 +191,7 @@ describe('Signup Tests', () => {
           },
           []
         );
-	      await hats.expectedResponse.checkResponse(response);
+        await hats.expectedResponse.checkResponse(response);
       } catch (error) {
         console.warn(error);
         throw error;

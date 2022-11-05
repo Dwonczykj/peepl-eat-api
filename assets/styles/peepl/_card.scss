@@ -27,10 +27,10 @@ $card-carousel-peek-overlap: 30px;
 .card-carousel__item {
   padding: 1.5rem calc($grid-gutter-width / -2);
   display: flex;
-  flex: 0 0 (100vw - #{$card-carousel-peek-overlap});
+  flex: 0 0 unquote("100vw - #{$card-carousel-peek-overlap}");
   scroll-snap-align: start;
 
     &+& {
-      margin-left: $grid-gutter-width/-2;
+      margin-left: calc($grid-gutter-width/-2);
   }
 }

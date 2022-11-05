@@ -21,8 +21,10 @@ import {
   DeliveryPartnerType,
   OrderType,
 } from "../../../scripts/utils";
-import { DaysOfWeek, iSlot, TimeWindow } from "../../../api/interfaces/vendors/slot";
-import { createVendorWithOpeningHours, createDeliveryPartnerWithOpeningHours, createOrdersForSlot, stringifySlots } from "./db-utils";
+import { iSlot, TimeWindow } from "../../../api/interfaces/vendors/slot";
+import { DaysOfWeek } from "../../../scripts/DaysOfWeek";
+import { createVendorWithOpeningHours, createDeliveryPartnerWithOpeningHours, createOrdersForSlot } from "./db-utils";
+import { stringifySlots } from "../../../scripts/stringifySlot";
 
 declare var Order: any;
 declare var DeliveryPartner: any;

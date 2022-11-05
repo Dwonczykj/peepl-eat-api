@@ -5,6 +5,8 @@ import {
   setPersistence,
   signInWithPhoneNumber
 } from 'firebase/auth';
+import Toastify from 'toastify-js';
+// import 'toastify-js/src/toastify.css'; // ~ https://github.com/apvarun/toastify-js/blob/master/README.md
 
 parasails.registerPage('login', {
   //  ╦╔╗╔╦╔╦╗╦╔═╗╦    ╔═╗╔╦╗╔═╗╔╦╗╔═╗
@@ -84,14 +86,11 @@ parasails.registerPage('login', {
         'recaptcha-container',
         {
           size: 'normal',
-          callback: (response) => {
+          callback: (unusedResponse) => {
             // window.alert('repatcha  callback called -> call the getVerificationCode flow' + response.toString());
-
-            console.log('createRecaptcha callback');
             //unhide phone number form
             this.viewForm = 'numberForm';
             document.getElementById('numberForm').classList.remove('hidden');
-            console.log('Invisible Recaptcha callback called');
             return this.clickVerifyPhoneNumber();
           },
           'expired-callback': () => {
@@ -108,6 +107,41 @@ parasails.registerPage('login', {
         }
       }
     },
+    loadFirstCaptchaUser: async function () {
+      this.syncing = true;
+
+      if (!window.recaptchaVerifier) {
+        this.createRecaptcha();
+      }
+
+      try {
+        if (this.phoneNumber && Object.keys(this.formErrors).length < 1) {
+          document
+            .getElementById('recaptcha-container')
+            .classList.remove('hidden');
+          return window.recaptchaVerifier.render().then((unusedWidgetId) => {
+            this.syncing = false;
+            // document.getElementById('register').classList.add('hidden');
+            // document.getElementById('start-recaptcha').classList.add('hidden');
+            document
+              .getElementById('login-button-container')
+              .classList.add('hidden');
+            if (this._hideRecaptcha) {
+              return this.clickVerifyPhoneNumber();
+            } else {
+              return;
+            }
+          });
+        }
+      } catch (unusedErr) {
+        this.syncing = false;
+        return undefined;
+      }
+      this.syncing = false;
+      return undefined;
+    },
+
+    // * login handles
     clickVerifyPhoneNumber: async function () {
       const phoneNumber = this.phoneNumber;
       const appVerifier = window.recaptchaVerifier;
@@ -128,8 +162,6 @@ parasails.registerPage('login', {
         return;
       }
 
-      console.log('fetching SMS Code for phoneNumber');
-
       const auth = getAuth();
       var _signInToFirebase = () => {
         return signInWithPhoneNumber(auth, phoneNumber, appVerifier)
@@ -137,10 +169,7 @@ parasails.registerPage('login', {
             // SMS sent. Prompt user to type the code from the message, then sign the
             // user in with confirmationResult.confirm(code).
             window.confirmationResult = confirmationResult;
-            console.log(
-              'clickVerifyPhoneNumber.signInWithPhoneNumber callback'
-            );
-
+            
             document.getElementById('numberForm').classList.add('hidden');
             document
               .getElementById('verificationForm')
@@ -177,72 +206,6 @@ parasails.registerPage('login', {
         return await _signInToFirebase();
       }
     },
-    diplayErrorFields: function (hide) {
-      hide = !!hide;
-      var elements = document.querySelectorAll('[role="alert"]');
-      for (var el in elements) {
-        if (hide && el.classList) {
-          el.classList.add('hidden');
-        } else {
-          el.classList.remove('hidden');
-        }
-      }
-    },
-    phoneNumberFocusOut: function (event) {
-      if (['Arrow', 'Backspace', 'Shift'].includes(event.key)) {
-        this.preventNextIteration = true;
-        return;
-      }
-      if (this.preventNextIteration) {
-        this.preventNextIteration = false;
-        return;
-      }
-      this.phoneNoCountryNoFormat = this.phoneNoCountry.match(/\d/g)
-        ? this.phoneNoCountry.replace(/-/g, '').match(/([1-9]\d{0,9})/g)[0]
-        : '';
-
-      // Format display value based on calculated currencyValue
-      this.phoneNoCountry = this.phoneNoCountryNoFormat
-        ? this.phoneNoCountryNoFormat.replace(
-            /(\d{1,3})(\d{1,3})(\d{1,4})/g,
-            '$1-$2-$3'
-        )
-        : '';
-    },
-    loadFirstCaptchaUser: async function () {
-      this.syncing = true;
-
-      if (!window.recaptchaVerifier) {
-        this.createRecaptcha();
-      }
-
-      try {
-        if (this.phoneNumber && Object.keys(this.formErrors).length < 1) {
-          document
-            .getElementById('recaptcha-container')
-            .classList.remove('hidden');
-          return window.recaptchaVerifier.render().then((widgetId) => {
-            this.syncing = false;
-            // document.getElementById('register').classList.add('hidden');
-            // document.getElementById('start-recaptcha').classList.add('hidden');
-            document
-              .getElementById('login-button-container')
-              .classList.add('hidden');
-            if (this._hideRecaptcha) {
-              return this.clickVerifyPhoneNumber();
-            } else {
-              return;
-            }
-          });
-        }
-      } catch (err) {
-        this.syncing = false;
-        return undefined;
-      }
-      this.syncing = false;
-      return undefined;
-    },
-
     clickCheckVerificationCode: async function () {
       const code = this.verificationCode.trim();
       if (code) {
@@ -257,27 +220,21 @@ parasails.registerPage('login', {
           //* https://firebase.google.com/docs/auth/admin/verify-id-tokens#retrieve_id_tokens_on_clients
           token = await result.user.getIdToken(true); //* https://firebase.google.com/docs/auth/admin/verify-id-tokens#:~:text=Retrieve%20ID%20tokens%20on%20clients%20When%20a%20user,user%20or%20device%20on%20your%20custom%20backend%20server.
           // var refreshToken = await result.user.getRefreshToken(true);
-          console.log(token);
         } catch (error) {
           window.alert(
-            'Firebase unable to confirm the verificationCode and threw'
+            `Firebase unable to confirm the verificationCode and threw: ${error}`
           );
           return;
         }
         try {
-          var user = await Cloud.loginWithFirebase(this.phoneNumber, token);
-
+          const user = await Cloud.loginWithFirebase(this.phoneNumber, token);
+          this.showToast(`Login Success: Hi ${user.name || user.email || 'user'}`);
           window.location.replace('/admin');
         } catch (error) {
           // User couldn't sign in (bad verification code?)
           if (error.status === 404) {
             window.location.replace('/admin/signup');
           } else {
-            if (error.name === 'FirebaseError') {
-              console.log(error);
-            } else {
-              console.log(error);
-            }
             window.alert(error);
           }
         }
@@ -311,6 +268,18 @@ parasails.registerPage('login', {
       }
     },
 
+    // displayErrorFields: function (hide) {
+    //   hide = !!hide;
+    //   var elements = document.querySelectorAll('[role="alert"]');
+    //   for (var el in elements) {
+    //     if (hide && el.classList) {
+    //       el.classList.add('hidden');
+    //     } else {
+    //       el.classList.remove('hidden');
+    //     }
+    //   }
+    // },
+
     // * navigation functions
     toRegister: function () {
       window.location.replace('/admin/signup');
@@ -318,7 +287,30 @@ parasails.registerPage('login', {
     toLoginWithPassword: function () {
       window.location.replace('/admin/login-with-password');
     },
+    
+    // * parse inputs
     // * Front End Form Valiadation, parse and styling functions
+    phoneNumberFocusOut: function (event) {
+      if (['Arrow', 'Backspace', 'Shift'].includes(event.key)) {
+        this.preventNextIteration = true;
+        return;
+      }
+      if (this.preventNextIteration) {
+        this.preventNextIteration = false;
+        return;
+      }
+      this.phoneNoCountryNoFormat = this.phoneNoCountry.match(/\d/g)
+        ? this.phoneNoCountry.replace(/-/g, '').match(/([1-9]\d{0,9})/g)[0]
+        : '';
+
+      // Format display value based on calculated currencyValue
+      this.phoneNoCountry = this.phoneNoCountryNoFormat
+        ? this.phoneNoCountryNoFormat.replace(
+            /(\d{1,3})(\d{1,3})(\d{1,4})/g,
+            '$1-$2-$3'
+        )
+        : '';
+    },
     parseNumberInputsToArgIns: function () {
       // Clear out any pre-existing error messages.
       this.formErrors = {};
@@ -384,5 +376,23 @@ parasails.registerPage('login', {
         // throw new Error('badVerificationCode');
       }
     },
+
+    // * display functions
+    showToast: function (message) {
+      Toastify({
+        text: message,
+        duration: 3000,
+        destination: 'https://github.com/apvarun/toastify-js',
+        newWindow: true,
+        close: true,
+        gravity: 'top', // `top` or `bottom`
+        position: 'left', // `left`, `center` or `right`
+        stopOnFocus: true, // Prevents dismissing of toast on hover
+        style: {
+          background: 'linear-gradient(to right, #00b09b, #96c93d)',
+        },
+        onClick: function () {}, // Callback after click
+      }).showToast();
+    }
   },
 });

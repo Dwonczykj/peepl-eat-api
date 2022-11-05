@@ -1,7 +1,8 @@
 export {}; //SOLVED TypeScript Cannot Redeclare Block Scoped Variable Name https://backbencher.dev/articles/typescript-solved-cannot-redeclare-block-scoped-variable-name
 declare let FulfilmentMethod: any;
-declare let sails: any;
 import {
+  FulfilmentTimeWindow,
+  iFulfilmentSlot,
   intersectTimeWindowArrays,
   iSlot,
   TimeWindow as TimeWindow,
@@ -13,37 +14,36 @@ import {
   FulfilmentMethodType,
 } from "../../scripts/utils";
 import { AvailableDateOpeningHours } from "./get-available-dates";
+import { sailsVegi } from "api/interfaces/iSails";
+declare let sails: sailsVegi;
 // import util from 'util';
 
 module.exports = {
-  friendlyName: "Next available slot",
+  friendlyName: 'Next available slot',
 
   description:
-    "Get the  next available time slot for a given date and fulfilmentMethod.",
+    'Get the  next available time slot for a given date and fulfilmentMethod.',
 
   inputs: {
     fulfilmentMethodIds: {
-      type: "ref",
+      type: 'ref',
       description:
-        "The IDs of the fulfilmentMethods which are being requested.",
+        'The IDs of the fulfilmentMethods which are being requested.',
     },
   },
 
   exits: {
     success: {
-      outputFriendlyName: "Available slot",
+      outputFriendlyName: 'Available slot',
     },
   },
 
   fn: async function (
     inputs: { fulfilmentMethodIds?: Array<number> },
-    exits: { success: CallableFunction }
+    exits: { success: (unusedArg: iFulfilmentSlot) => iFulfilmentSlot }
   ) {
-    let nextAvailableSlot: {
-      startTime: moment.Moment;
-      endTime: moment.Moment;
-    };
-    const noAvailableSlot = {};
+    let nextAvailableSlot: iFulfilmentSlot;
+    let noAvailableSlot: iFulfilmentSlot;
 
     const fulfilmentMethods: Array<FulfilmentMethodType> =
       await FulfilmentMethod.find({
@@ -61,8 +61,8 @@ module.exports = {
     const availableDates = Object.keys(nextAvailableDateDict)
       .map((dateStr) => moment.utc(dateStr, dateStrFormat))
       .sort((a, b) => (a.isBefore(b) ? -1 : 1));
-  
-    for (const nextAvailableDate of availableDates){
+
+    for (const nextAvailableDate of availableDates) {
       const nextAvailableDateOpeningHours =
         nextAvailableDateDict[nextAvailableDate.format(dateStrFormat)];
 
@@ -82,18 +82,19 @@ module.exports = {
       );
 
       const allAvailableSlots: {
-        [fulfilmentMethodId: string]: TimeWindow[];
+        [fulfilmentMethodId: string]: FulfilmentTimeWindow[];
       } = {};
       const _cb = async (fm) => {
-        const x: iSlot[] = await sails.helpers.getAvailableSlots.with({
+        const x = await sails.helpers.getAvailableSlots.with({
           date: nextAvailableDate.format(dateStrFormat),
           fulfilmentMethodId: fm.id, // * for vendor fm, should not return 10 - 11am where this has 1 order
         });
         allAvailableSlots[fm.id] = x.map(
           (_islot) =>
-            new TimeWindow({
+            new FulfilmentTimeWindow({
               startTime: _islot.startTime,
               endTime: _islot.endTime,
+              fulfilmentMethod: _islot.fulfilmentMethod
             })
         );
       };
@@ -101,13 +102,13 @@ module.exports = {
       const combine = Promise.all(fmToSlotsCb);
       await combine;
 
-      let intersectedSlots: TimeWindow[] = null;
+      let intersectedSlots: FulfilmentTimeWindow[] = null;
       for (let i = 0; i < possibleFulfilmentMethods.length; i += 1) {
         if (intersectedSlots === null) {
           intersectedSlots = allAvailableSlots[possibleFulfilmentMethods[i].id];
         } else {
           try {
-            intersectedSlots = intersectTimeWindowArrays(
+            intersectedSlots = intersectTimeWindowArrays<FulfilmentTimeWindow>(
               intersectedSlots,
               allAvailableSlots[possibleFulfilmentMethods[i].id]
             );
@@ -119,9 +120,14 @@ module.exports = {
       }
 
       if (intersectedSlots.length > 0) {
-        nextAvailableSlot = intersectedSlots.sort((a, b) =>
+        const _nextAvailableSlot = intersectedSlots.sort((a, b) =>
           a.startsBefore(b) ? -1 : 1
         )[0];
+        nextAvailableSlot = { // Removes class properties
+          startTime: _nextAvailableSlot.startTime,
+          endTime: _nextAvailableSlot.endTime,
+          fulfilmentMethod: _nextAvailableSlot.fulfilmentMethod,
+        };
 
         return exits.success(nextAvailableSlot);
       }

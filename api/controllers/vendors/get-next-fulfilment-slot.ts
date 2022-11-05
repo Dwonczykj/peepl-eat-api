@@ -1,16 +1,20 @@
 import util from "util";
-import moment from 'moment';
+// import moment from 'moment';
 import { DeliveryPartnerType, FulfilmentMethodType, VendorType } from "../../../scripts/utils";
 import { NextAvailableDateHelperReturnType } from "../../../api/helpers/next-available-date";
-import { iSlot } from "../../../api/interfaces/vendors/slot";
+import { iFulfilmentSlotHttpResponse, iFulfilmentSlot } from '../../../api/interfaces/vendors/slot';
+import { sailsVegi } from "../../../api/interfaces/iSails";
+import { stringifySlotUsingMomentUTCDefault } from "../../../scripts/stringifySlot";
 
-type GetNextFulfilmentSlotSuccess = {
-  collectionMethod: FulfilmentMethodType;
-  deliveryMethods: FulfilmentMethodType[];
-  nextCollectionSlot: iSlot;
-  nextDeliverySlot: iSlot;
-  nextEligibleCollectionDate: NextAvailableDateHelperReturnType;
-  nextEligibleDeliveryDate: NextAvailableDateHelperReturnType;
+declare var sails: sailsVegi;
+
+export type GetNextFulfilmentSlotSuccess = {
+  slot: {
+    [unusedMethodType in FulfilmentMethodType['methodType']]: iFulfilmentSlotHttpResponse; //TODO: turn startTime of type moment into a string
+  };
+  date: {
+    [unusedMethodType in FulfilmentMethodType['methodType']]: NextAvailableDateHelperReturnType;
+  };
 };
 
 module.exports = {
@@ -87,13 +91,10 @@ module.exports = {
       }
     }
 
-    let nextDeliverySlot: {
-      startTime: moment.Moment;
-      endTime: moment.Moment;
-    };
+    let deliverySlot: iFulfilmentSlot;
     let nextEligibleDeliveryDate: NextAvailableDateHelperReturnType;
     try {
-      nextDeliverySlot = await sails.helpers.nextAvailableSlot.with({
+      deliverySlot = await sails.helpers.nextAvailableSlot.with({
         fulfilmentMethodIds: deliveryFulfilmentMethods.map((dfm) => dfm.id),
       });
       nextEligibleDeliveryDate = await sails.helpers.nextAvailableDate.with({
@@ -105,14 +106,11 @@ module.exports = {
       );
     }
 
-    let nextCollectionSlot: {
-      startTime: moment.Moment;
-      endTime: moment.Moment;
-    };
+    let collectionSlot: iFulfilmentSlot;
     let nextEligibleCollectionDate: NextAvailableDateHelperReturnType;
     if (vendor.collectionFulfilmentMethod) {
       try {
-        nextCollectionSlot = await sails.helpers.nextAvailableSlot.with({
+        collectionSlot = await sails.helpers.nextAvailableSlot.with({
           fulfilmentMethodIds: [vendor.collectionFulfilmentMethod.id],
         });
         nextEligibleCollectionDate = await sails.helpers.nextAvailableDate.with(
@@ -128,12 +126,14 @@ module.exports = {
     }
 
     return exits.success({
-      collectionMethod: collectionFulfilmentMethod,
-      deliveryMethods: deliveryFulfilmentMethods,
-      nextCollectionSlot,
-      nextDeliverySlot,
-      nextEligibleCollectionDate,
-      nextEligibleDeliveryDate,
+      slot: {
+        collection: stringifySlotUsingMomentUTCDefault(collectionSlot),
+        delivery: stringifySlotUsingMomentUTCDefault(deliverySlot),
+      },
+      date: {
+        collection: nextEligibleCollectionDate,
+        delivery: nextEligibleDeliveryDate,
+      },
     });
   },
 };

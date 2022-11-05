@@ -1,8 +1,8 @@
 export {}; //SOLVED TypeScript Cannot Redeclare Block Scoped Variable Name https://backbencher.dev/articles/typescript-solved-cannot-redeclare-block-scoped-variable-name
 import moment from "moment";
 // import util from 'util';
-import { iSlot } from "../../api/interfaces/vendors/slot";
-import { dateStrFormat, FulfilmentMethodType, OpeningHoursType, OrderType, timeStrFormat } from "../../scripts/utils";
+import { iFulfilmentSlot } from "../../api/interfaces/vendors/slot";
+import { dateStrFormat, DateString, FulfilmentMethodType, OpeningHoursType, OrderType, timeStrFormat } from "../../scripts/utils";
 declare let OpeningHours: any;
 declare let FulfilmentMethod: any;
 
@@ -35,16 +35,16 @@ module.exports = {
   },
 
   fn: async function (
-    inputs: { date: string; fulfilmentMethodId: number },
+    inputs: { date: DateString; fulfilmentMethodId: number },
     exits: {
-      success: (unusedAv: iSlot[]) => iSlot[];
+      success: (unusedAv: iFulfilmentSlot[]) => iFulfilmentSlot[];
     }
   ) {
     // TODO: Consider timezones
     // TODO: Account for overnight opening hours
     // TODO: Limit to ordering 7 days in future
 
-    let availableSlots: iSlot[] = [];
+    let availableSlots: iFulfilmentSlot[] = [];
 
     let fulfilmentMethod:FulfilmentMethodType = await FulfilmentMethod.findOne(
       inputs.fulfilmentMethodId
@@ -115,11 +115,11 @@ module.exports = {
         let startTime = moment.utc(openTime, "YYYY-MM-DD HH:mm"); // Start time for creating slots.
         let endTime = moment.utc(closeTime, "YYYY-MM-DD HH:mm"); // End time for creating slots.
 
-        let slots: iSlot[] = [];
+        let slots: iFulfilmentSlot[] = [];
 
         // Generate slots based on slotLength within opening hours.
         while (startTime < endTime) {
-          let slot: iSlot;
+          let slot: iFulfilmentSlot;
 
           try {
 	          const _startTime = startTime.clone();
@@ -127,7 +127,8 @@ module.exports = {
 	          const _endTime = startTime.clone();
             slot = {
               startTime: _startTime,
-              endTime: _endTime
+              endTime: _endTime,
+              fulfilmentMethod: fulfilmentMethod,
             };
           } catch (error) {
             sails.log.error(`Unable to calculate fulfilment slots for opening hours window with error: ${error}`);

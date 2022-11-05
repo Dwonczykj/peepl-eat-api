@@ -8,6 +8,9 @@ const _ = require("lodash");
 // var util = require("util");
 import moment from 'moment';
 import util from 'util';
+import { SailsModelType } from "../../../../api/interfaces/iSails";
+import { DeliveryPartnerType, FulfilmentMethodType, OpeningHoursType, OrderType, UserType, VendorType } from "../../../../scripts/utils";
+import { DaysOfWeek } from "../../../../scripts/DaysOfWeek";
 require("ts-node/register");
 const { v4: uuidv4 } = require("uuid");
 const {
@@ -17,12 +20,12 @@ const {
 const {fixtures} = require('../../../../scripts/build_db');
 const {getNextWeekday} = require('../../../utils');
 
-declare var Order:any;
-declare var User:any;
-declare var OpeningHours:any;
-declare var DeliveryPartner:any;
-declare var FulfilmentMethod:any;
-declare var Vendor:any;
+declare var Order:SailsModelType<OrderType>;
+declare var User:SailsModelType<UserType>;
+declare var OpeningHours: SailsModelType<OpeningHoursType>;
+declare var DeliveryPartner: SailsModelType<DeliveryPartnerType>;
+declare var FulfilmentMethod: SailsModelType<FulfilmentMethodType>;
+declare var Vendor: SailsModelType<VendorType>;
 
 const DEFAULT_NEW_ORDER_OBJECT = (fixtures, overrides = {}) => {
   const vendor = fixtures.vendors[0];
@@ -962,7 +965,13 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
         }).populate("deliveryPartner");
         const userDeliveryPartner = currentUser.deliveryPartner;
         assert.isDefined(userDeliveryPartner);
-        const deliveryPartner = await DeliveryPartner.findOne(userDeliveryPartner.id).populate('deliveryFulfilmentMethod');
+        const deliveryPartner = await DeliveryPartner.findOne(
+          userDeliveryPartner.id
+        ).populate('deliveryFulfilmentMethod');
+
+        assert.isDefined(deliveryPartner.deliveryFulfilmentMethod);
+        assert.isNotNull(deliveryPartner.deliveryFulfilmentMethod);
+        assert.isDefined(deliveryPartner.deliveryFulfilmentMethod.id);
         
         const vendor = await Vendor.create({
           createdAt: 1650878843365,
@@ -1009,7 +1018,7 @@ describe(`DeliveryPartner Model Integration Tests`, () => {
           "friday",
           "saturday",
           "sunday",
-        ];
+        ] as DaysOfWeek[];
         const deliveryStartDP = "11:00";
         const deliveryEndDP = "13:00";
         const deliveryStartVen = "17:30";

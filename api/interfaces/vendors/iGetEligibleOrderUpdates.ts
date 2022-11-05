@@ -9,6 +9,4 @@ export interface GetEligibleOrderUpdates {
 export interface getEligibleOrderDatesSuccess {
   eligibleCollectionDates: AvailableDateOpeningHours;
   eligibleDeliveryDates: AvailableDateOpeningHours;
-  deliveryMethod: FulfilmentMethodType;
-  collectionMethod: FulfilmentMethodType;
 }

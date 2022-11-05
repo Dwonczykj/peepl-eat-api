@@ -5,6 +5,8 @@
  * @docs        :: https://sailsjs.com/docs/concepts/models-and-orm/models
  */
 
+const FulfilmentMethod = require("./FulfilmentMethod");
+
 module.exports = {
   attributes: {
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
@@ -100,6 +102,15 @@ module.exports = {
           deliveryPartner: newlyCreatedRecord.id,
         });
       } catch (error) {
+        sails.log.error(error);
+        return proceed(error);
+      }
+    }else{
+      const fm = await FulfilmentMethod.findOne(
+        newlyCreatedRecord.deliveryFulfilmentMethod
+      );
+      if(!fm){
+        const error = new Error('Bad Fulfilment Method Passed to DeliveryPartner.create');
         sails.log.error(error);
         return proceed(error);
       }

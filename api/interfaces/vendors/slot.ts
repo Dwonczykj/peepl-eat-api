@@ -1,15 +1,86 @@
-import { AvailableDateOpeningHours } from 'api/helpers/get-available-dates';
+import { AvailableDateOpeningHours } from '../../../api/helpers/get-available-dates';
 import _ from 'lodash';
 import moment from 'moment';
-import { dateStrFormat, timeStrFormat } from '../../../scripts/utils';
+import { dateStrFormat, FulfilmentMethodType, momentUtcString, timeStrFormat } from '../../../scripts/utils';
+import { FulfilmentMethodPriorityHandler } from '../../../config/fulfilmentPriority';
+import { DaysOfWeek } from '../../../scripts/DaysOfWeek';
 
+// eslint-disable-next-line no-unused-vars
+function arraysEqual<T>(a:Array<T>, b:Array<T>) {
+  if (a === b) {return true;}
+  if (a === null || b === null) {return false;}
+  if (a.length !== b.length) {return false;}
 
-export interface iSlot {
-  startTime: (moment.Moment);
-  endTime: (moment.Moment);
+  // If you don't care about the order of the elements inside
+  // the array, you should sort both arrays here.
+  // Please note that calling sort on an array will modify that array.
+  // you might want to clone your array first.
+
+  for (var i = 0; i < a.length; ++i) {
+    if (a[i] !== b[i]) {return false;}
+  }
+  return true;
 }
 
-export class TimeWindow implements iSlot {
+
+export type iSlot = {
+  startTime: moment.Moment;
+  endTime: moment.Moment;
+}
+
+export type iFulfilmentSlot = iSlot & {
+  fulfilmentMethod: FulfilmentMethodType;
+}
+
+export type iFulfilmentSlotHttpResponse = {
+  startTime: momentUtcString;
+  endTime: momentUtcString;
+  fulfilmentMethod: FulfilmentMethodType;
+};
+
+export interface iSlotMethods {
+  intersectWith: (unusedOtherSlot: this) => this;
+  mergeWith: (unusedOtherSlot: this) => this;
+  overlapsWith: (unusedOtherSlot: this) => boolean;
+}
+
+export interface iSlotClass extends iSlotMethods, iSlot {}
+
+export interface iFulfilmentSlotClass extends iSlotClass, iFulfilmentSlot {}
+
+interface ConstructorOf<T extends iSlotClass> {
+  // ~ https://stackoverflow.com/questions/38877252/typescript-getting-a-class-constructor-of-the-object-at-runtime
+  new (
+    unusedArgs: T extends iFulfilmentSlotClass
+      ?
+          | {
+              startTime: moment.Moment;
+              endTime: moment.Moment;
+              date?: moment.Moment;
+              fulfilmentMethod: FulfilmentMethodType;
+            }
+          | {
+              startTime: string;
+              endTime: string;
+              date: moment.Moment;
+              fulfilmentMethod: FulfilmentMethodType;
+            }
+      :
+          | {
+              startTime: moment.Moment;
+              endTime: moment.Moment;
+              date?: moment.Moment;
+            }
+          | {
+              startTime: string;
+              endTime: string;
+              date: moment.Moment;
+            }
+  ): T;
+}
+
+
+export class TimeWindow implements iSlotClass {
   startTime: moment.Moment;
   endTime: moment.Moment;
   constructor(
@@ -38,7 +109,7 @@ export class TimeWindow implements iSlot {
           `${dateStrFormat} ${timeStrFormat}`
       );
   }
-  
+
   static from(iSlot: iSlot) {
     return new TimeWindow({
       startTime: iSlot.startTime,
@@ -65,10 +136,10 @@ export class TimeWindow implements iSlot {
   public endsBefore(other: iSlot) {
     return moment.utc(this.endTime).isBefore(moment.utc(other.startTime));
   }
-  public overlapsWith = (otherSlot: TimeWindow) => {
-    return this.intersectWith(otherSlot) !== null;
+  public overlapsWith = (otherSlot: this) => {
+    return this.intersectWithTimeWindow(otherSlot) !== null;
   };
-  public contains = (otherSlot: TimeWindow) => {
+  public contains = (otherSlot: this) => {
     const slot1 = this;
     if (slot1.startsBefore(otherSlot) && slot1.endsAfter(otherSlot)) {
       return true;
@@ -76,7 +147,20 @@ export class TimeWindow implements iSlot {
       return false;
     }
   };
-  public intersectWith = (otherSlot: TimeWindow) => {
+
+  get cls(): ConstructorOf<iSlotClass> {
+    return this.constructor as ConstructorOf<iSlotClass>;
+  }
+
+  clone() {
+    const ret = new this.cls({
+      startTime: this.startTime,
+      endTime: this.endTime,
+    });
+    return ret;
+  }
+
+  public intersectWithTimeWindow = (otherSlot: this) => {
     const slot1 = this;
     if (slot1.startsBefore(otherSlot) && slot1.endsAfter(otherSlot)) {
       return otherSlot;
@@ -84,7 +168,7 @@ export class TimeWindow implements iSlot {
       if (slot1.endsBefore(otherSlot) || slot1.endsAsOtherStarts(otherSlot)) {
         return null;
       }
-      return new TimeWindow({
+      return new this.cls({
         startTime: otherSlot.startTime,
         endTime: slot1.endTime,
       });
@@ -92,7 +176,7 @@ export class TimeWindow implements iSlot {
       if (slot1.startsAfter(otherSlot) || slot1.startsAsOtherEnds) {
         return null;
       }
-      return new TimeWindow({
+      return new this.cls({
         startTime: slot1.startTime,
         endTime: otherSlot.endTime,
       });
@@ -100,25 +184,120 @@ export class TimeWindow implements iSlot {
       return slot1;
     }
   };
+  public mergeWithTimeWindow = (otherSlot: this) => {
+    return new this.cls({
+      startTime: moment.min(this.startTime, otherSlot.startTime),
+      endTime: moment.max(this.endTime, otherSlot.endTime),
+    });
+  };
+
+  public intersectWith = (otherSlot: this) =>
+    this.intersectWithTimeWindow(otherSlot) as this;
+
+  public mergeWith = (otherSlot: this) =>
+    this.mergeWithTimeWindow(otherSlot) as this;
 }
 
-export const mergeOverlappingTimeWindowsInArray = (slotArr:TimeWindow[]) => { 
-  const result: TimeWindow[] = [];
+export class FulfilmentTimeWindow extends TimeWindow implements iFulfilmentSlotClass {
+  fulfilmentMethod: FulfilmentMethodType;
+  constructor(
+    args:
+      | {
+          startTime: moment.Moment;
+          endTime: moment.Moment;
+          date?: moment.Moment;
+          fulfilmentMethod: FulfilmentMethodType;
+        }
+      | {
+          startTime: string;
+          endTime: string;
+          date: moment.Moment;
+          fulfilmentMethod: FulfilmentMethodType;
+        }
+  ) {
+    super(args);
+    this.fulfilmentMethod = args.fulfilmentMethod;
+  }
+  static from(iSlot: iFulfilmentSlot) {
+    return new FulfilmentTimeWindow({
+      startTime: iSlot.startTime,
+      endTime: iSlot.endTime,
+      fulfilmentMethod: iSlot.fulfilmentMethod
+    });
+  }
+
+  get cls(): ConstructorOf<iFulfilmentSlotClass> {
+    return this.constructor as ConstructorOf<iFulfilmentSlotClass>;
+  }
+
+  clone() {
+    const ret = new this.cls({
+      startTime: this.startTime,
+      endTime: this.endTime,
+      fulfilmentMethod: this.fulfilmentMethod,
+    });
+    return ret;
+  }
+
+  public intersectWith = (otherSlot: this) =>
+    this.intersectWithFulfilment(otherSlot) as this;
+
+  public intersectWithFulfilment = (otherSlot: this) => {
+    const tw = this.intersectWithTimeWindow(otherSlot);
+    if (
+      !tw ||
+      this.fulfilmentMethod.methodType !== otherSlot.fulfilmentMethod.methodType
+    ) {
+      return null;
+    }
+    return new this.cls({
+      startTime: tw.startTime,
+      endTime: tw.endTime,
+      fulfilmentMethod: FulfilmentMethodPriorityHandler.pickFulfilmentMethod([
+        this.fulfilmentMethod,
+        otherSlot.fulfilmentMethod,
+      ]),
+    });
+  };
+  public mergeWith = (otherSlot: this) =>
+    this.mergeWithFulfilment(otherSlot) as this;
+
+  public mergeWithFulfilment = (otherSlot: this) => {
+    const tw = this.mergeWithTimeWindow(otherSlot);
+    if (
+      this.fulfilmentMethod.methodType !== otherSlot.fulfilmentMethod.methodType
+    ) {
+      throw new Error(
+        'Can only merge FulfilmentTimeWindows of same methodType'
+      );
+    }
+    return new FulfilmentTimeWindow({
+      startTime: tw.startTime,
+      endTime: tw.endTime,
+      fulfilmentMethod: FulfilmentMethodPriorityHandler.pickFulfilmentMethod([
+        this.fulfilmentMethod,
+        otherSlot.fulfilmentMethod,
+      ]),
+    });
+  };
+}
+
+export const mergeOverlappingTimeWindowsInArray = <T extends iSlotClass>(slotArr:T[]) => { 
+  const result: T[] = [];
   for (let i = 0; i < slotArr.length; i++) {
-    let slotIStart = slotArr[i].startTime;
-    let slotIEnd = slotArr[i].endTime;
+    let merged:T;
     for (let j = i; j < slotArr.length; j++) {
       if(slotArr[i].overlapsWith(slotArr[j])){
-        slotIStart = moment.min(slotIStart, slotArr[j].startTime);
-        slotIEnd = moment.max(slotIEnd, slotArr[j].endTime);
+        merged = slotArr[i].mergeWith(slotArr[j]);
       }
     }
-    result.push(new TimeWindow({startTime: slotIStart, endTime: slotIEnd}));
+    if(merged){
+      result.push(merged);
+    }
   }
   return result;
 };
 
-//TODO: Test this function
 export const intersectOverlappingSlotsInArray = (slotArr:TimeWindow[]) => { 
   const result: TimeWindow[] = [];
   for (let i = 0; i < slotArr.length; i++) {
@@ -135,7 +314,6 @@ export const intersectOverlappingSlotsInArray = (slotArr:TimeWindow[]) => {
   return result;
 };
 
-//TODO: Test this function
 export const findIntersectingSlotFromSlots = (slots:TimeWindow[]) => {
   if(!slots || slots.length <= 0){
     return null;
@@ -150,22 +328,23 @@ export const findIntersectingSlotFromSlots = (slots:TimeWindow[]) => {
   return instersectionOfAllSlots;
 };
 
-export const intersectTimeWindowArrays = (slotArr1:TimeWindow[],slotArr2:TimeWindow[]) => {
-  const result: TimeWindow[] = [];
+export const intersectTimeWindowArrays = <T extends iSlotClass>(
+  slotArr1: T[],
+  slotArr2: T[]
+) => {
+  const result: T[] = [];
   let slots1 = mergeOverlappingTimeWindowsInArray(slotArr1);
   let slots2 = mergeOverlappingTimeWindowsInArray(slotArr2);
   for (const slot1 of slots1) {
     for (const slot2 of slots2) {
       const intersectionSlot = slot1.intersectWith(slot2);
-      if (intersectionSlot){
+      if (intersectionSlot) {
         result.push(intersectionSlot);
       }
     }
   }
   return result;
 };
-
-export type DaysOfWeek = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
 
 export interface iCollectionDates {
   availableDaysOfWeek: DaysOfWeek[];

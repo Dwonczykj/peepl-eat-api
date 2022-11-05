@@ -5,6 +5,7 @@ import { NextAvailableDateHelperReturnType } from "../../api/helpers/next-availa
 import { bool } from "aws-sdk/clients/signer";
 import { GetAvailableDeliveryPartnerFromPoolInputs } from "api/helpers/get-available-delivery-partner-from-pool";
 import { CreateOrderInputs } from "../../api/controllers/orders/create-order";
+import { iFulfilmentSlot, iSlot } from "./vendors/slot";
 
 // ~ https://stackoverflow.com/a/53809800
 export type KeysOfType<T, U> = {
@@ -69,6 +70,15 @@ export type sailsVegi = {
         fulfilmentMethodIds?: Array<number>;
       }) => Promise<AvailableDateOpeningHours>;
     } & ((unusedArgs: Array<number>) => Promise<AvailableDateOpeningHours>);
+    getAvailableSlots: {
+      with: (unusedArgs: {
+        date: string;
+        fulfilmentMethodId: number;
+      }) => Promise<iFulfilmentSlot[]>;
+    } & ((
+      unusedArg1: string,
+      unusedArg2: number
+    ) => Promise<iFulfilmentSlot[]>);
     nextAvailableDate: {
       with: (unusedArgs: {
         fulfilmentMethodIds?: Array<number>;
@@ -76,6 +86,11 @@ export type sailsVegi = {
     } & ((
       unusedArgs: Array<number>
     ) => Promise<NextAvailableDateHelperReturnType>);
+    nextAvailableSlot: {
+      with: (unusedArgs: {
+        fulfilmentMethodIds?: Array<number>;
+      }) => Promise<iFulfilmentSlot>;
+    } & ((unusedArgs: Array<number>) => Promise<iFulfilmentSlot>);
     updateItemsForOrder: {
       with: (unusedArgs: {
         orderId: string;
@@ -124,8 +139,8 @@ export type ShallowSailsModels<T> = {
     ? number[]
     : number;
 };
-type SailsFindPopulateType<T> = Promise<
-  | ({
+
+type _sailsModelKVP<T> = ({
       [key in RequiredKeys<T>]: T[key] extends
         | ValueType
         | Array<ValueType>
@@ -142,9 +157,21 @@ type SailsFindPopulateType<T> = Promise<
         : T[key] extends Array<any>
         ? number[]
         : number;
-    })
-  | null
-> & {
+    });
+
+// type SailsFindPopulateType<T, A extends Array<T> | T = T> =
+//   Promise<
+//     (A extends Array<T>
+//       ? _sailsModelKVP<T>[]
+//       : _sailsModelKVP<T>) | null
+//   > & {
+//     populate: (unusedArg: string) => Promise<T | null>;
+//   };
+
+type SailsFindPopulateType<T> = Promise<_sailsModelKVP<T>[] | null> & {
+  populate: (unusedArg: string) => Promise<T[] | null>;
+};
+type SailsFindOnePopulateType<T> = Promise<_sailsModelKVP<T> | null> & {
   populate: (unusedArg: string) => Promise<T | null>;
 };
 
@@ -165,7 +192,7 @@ export type SailsModelType<T> = {
             : number | number[];
         }
       | WaterlineQueryKeys<T>
-  ) => SailsFindPopulateType<Array<T>>;
+  ) => SailsFindPopulateType<T>;
   findOne: (
     unusedArg:
       | number
@@ -175,17 +202,17 @@ export type SailsModelType<T> = {
             : number | number[];
         }
       | WaterlineQueryKeys<T>
-  ) => SailsFindPopulateType<T>;
+  ) => SailsFindOnePopulateType<T>;
   update: (
     unusedArg:
       | number
-      | { [key in keyof T]?: T[key] | number | Array<number> }
+      | { [key in keyof T]?: T[key] | number | Array<T[key] | number> }
       | WaterlineQueryKeys<T>
   ) => SailsUpdateSetType<T>;
   updateOne: (
     unusedArg:
       | number
-      | { [key in keyof T]?: T[key] | number | Array<number> }
+      | { [key in keyof T]?: T[key] | number | Array<T[key] | number> }
       | WaterlineQueryKeys<T>
   ) => SailsUpdateSetType<T>;
   create: (

@@ -3,6 +3,8 @@ import {
   connectAuthEmulator, getAuth,
   signInWithEmailAndPassword
 } from 'firebase/auth';
+import Toastify from 'toastify-js';
+// import 'toastify-js/src/toastify.css'; // ~ https://github.com/apvarun/toastify-js/blob/master/README.md
 
 parasails.registerPage('login-with-password', {
   //  ╦╔╗╔╦╔╦╗╦╔═╗╦    ╔═╗╔╦╗╔═╗╔╦╗╔═╗
@@ -153,13 +155,16 @@ parasails.registerPage('login-with-password', {
       const fbUser = userCredential.user;
       const sessionToken = await fbUser.getIdToken(true);
 
-      var _vegiSigninResponse;
+      var _vegiUser;
       try {
         this.cloudCode = false;
-        _vegiSigninResponse = await Cloud.loginWithPassword(
+        _vegiUser = await Cloud.loginWithPassword(
           email,
           sessionToken,
           rememberMe
+        );
+        this.showToast(
+          `Login Success: Hi ${_vegiUser.name || _vegiUser.email || 'user'}`
         );
       } catch (err) {
         this.cloudCode = err.exit;
@@ -232,6 +237,24 @@ parasails.registerPage('login-with-password', {
     },
     toLoginWithPassword: function () {
       window.location.replace('/admin/login-with-password');
+    },
+
+    // * display functions
+    showToast: function (message) {
+      Toastify({
+        text: message,
+        duration: 3000,
+        destination: 'https://github.com/apvarun/toastify-js',
+        newWindow: true,
+        close: true,
+        gravity: 'top', // `top` or `bottom`
+        position: 'left', // `left`, `center` or `right`
+        stopOnFocus: true, // Prevents dismissing of toast on hover
+        style: {
+          background: 'linear-gradient(to right, #00b09b, #96c93d)',
+        },
+        onClick: function () {}, // Callback after click
+      }).showToast();
     },
   },
 });

@@ -20,18 +20,20 @@ import {
   OrderType,
 } from "../../../scripts/utils";
 import {
-  DaysOfWeek,
   iSlot,
   TimeWindow,
 } from "../../../api/interfaces/vendors/slot";
+import { DaysOfWeek } from "../../../scripts/DaysOfWeek";
 import {
   createVendorWithOpeningHours,
   createDeliveryPartnerWithOpeningHours,
   createOrdersForSlot,
-  stringifySlots,
-  stringifySlot,
-  stringifySlotWithDate,
 } from "./db-utils";
+import {
+  stringifySlots,
+  stringifySlotWithTimes,
+  stringifySlotWithDate
+} from "../../../scripts/stringifySlot";
 
 declare var Order: any;
 declare var DeliveryPartner: any;
@@ -73,7 +75,7 @@ describe("helpers.nextAvailableSlot", async () => {
     expect(nextAvail).to.have.property("endTime");
 
 
-    expect(stringifySlot(nextAvail)).to.deep.equal({
+    expect(stringifySlotWithTimes(nextAvail)).to.deep.equal({
       startTime: "12:30",
       endTime: "13:30",
     });
@@ -337,7 +339,7 @@ describe("Can process overlaps between vendors and their delivery partner's open
     expect(availableSlot).to.have.property("startTime");
     expect(availableSlot).to.have.property("endTime");
 
-    const expected = stringifySlot(availableSlot);
+    const expected = stringifySlotWithTimes(availableSlot);
     expect(expected).to.deep.equal({
       startTime: "10:00",
       endTime: "11:00",
@@ -412,7 +414,7 @@ describe("Can process overlaps between vendors and their delivery partner's open
     expect(availableSlot).to.have.property("startTime");
     expect(availableSlot).to.have.property("endTime");
 
-    const expected = stringifySlot(availableSlot);
+    const expected = stringifySlotWithTimes(availableSlot);
     expect(expected).to.deep.equal({
       startTime: "10:00",
       endTime: "10:30",

@@ -1,7 +1,16 @@
-import { AvailableDateOpeningHours } from 'api/helpers/get-available-dates';
-import { getEligibleOrderDatesSuccess, GetEligibleOrderUpdates } from '../../interfaces';
+import { AvailableDateOpeningHours } from '../../../api/helpers/get-available-dates';
+import { DateString, FulfilmentMethodType, OpeningHoursType } from '../../../scripts/utils';
 import { sailsVegi } from '../../interfaces/iSails';
 declare var sails: sailsVegi;
+
+export type GetEligibleOrderUpdates = {
+  vendor: number;
+  deliveryPartner?: number;
+}
+
+export type getEligibleOrderDatesSuccess = {
+  [unusedMethodType in FulfilmentMethodType['methodType']]: AvailableDateOpeningHours;
+};
 
 
 module.exports = {
@@ -25,49 +34,6 @@ module.exports = {
   exits: {
     success: {
       statusCode: 200,
-      data: null,
-      exampleOutput: {
-        data: {
-          collectionMethod: {
-            createdAt: 1661434438245,
-            updatedAt: 1661434438245,
-            id: 2,
-            name: "",
-            description: "",
-            priceModifier: 0,
-            methodType: "collection",
-            slotLength: 60,
-            bufferLength: 0,
-            orderCutoff: null,
-            maxOrders: 0,
-            vendor: 1,
-            deliveryPartner: null,
-          },
-          deliveryMethod: {
-            createdAt: 1661434438220,
-            updatedAt: 1661434438220,
-            id: 1,
-            name: "",
-            description: "",
-            priceModifier: 0,
-            methodType: "delivery",
-            slotLength: 60,
-            bufferLength: 0,
-            orderCutoff: null,
-            maxOrders: 0,
-            vendor: 1,
-            deliveryPartner: null,
-          },
-          eligibleCollectionDates: {
-            availableDaysOfWeek: ["friday"],
-            availableSpecialDates: [],
-          },
-          eligibleDeliveryDates: {
-            availableDaysOfWeek: ["monday", "wednesday"],
-            availableSpecialDates: [],
-          },
-        },
-      },
     },
   },
 
@@ -117,10 +83,8 @@ module.exports = {
     }
 
     return exits.success({
-      collectionMethod: vendor.collectionFulfilmentMethod,
-      deliveryMethod: vendor.deliveryFulfilmentMethod, // *always use vendor deliveryFM for orders
-      eligibleCollectionDates,
-      eligibleDeliveryDates,
+      collection: eligibleCollectionDates,
+      delivery: eligibleDeliveryDates,
     });
   },
 };
