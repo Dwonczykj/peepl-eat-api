@@ -6639,6 +6639,71 @@
         }
       }
     },
+    "/api/v1/admin/bulk-update-data": {
+      "post": {
+        "summary": "Edit product category",
+        "tags": [
+          "Edit product category"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "modelTypeName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The id of the product category"
+          },
+          {
+            "in": "query",
+            "name": "data",
+            "required": true,
+            "schema": {},
+            "description": "json[] format of data to create or update"
+          },
+          {
+            "in": "query",
+            "name": "createOrUpdateMode",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "create",
+                "update"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "New product category created."
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/api/v1/admin/logout": {
       "all": {
         "summary": "Logout",

@@ -26,6 +26,8 @@ export function getTodayDayName(offset: number = 0): DaysOfWeek {
   // return weekdays[outDayInd];
 }
 
+export type OmitId<T extends {id: number}> = Omit<T,'id'>;
+
 const prependLeadingZero = (val: number, prependIfValLessThan: number = 10) =>
   Math.abs(val) < Math.abs(prependIfValLessThan)
     ? `${Math.sign(val) === -1 ? '-' : ''}0${Math.abs(val)}`
@@ -277,6 +279,15 @@ export type DiscountType = {
 };
 export type _ProductTypeHidden = {
   id: number;
+  name: string;
+  description: string;
+  shortDescription: string;
+  basePrice: number;
+  imageUrl: string;
+  isAvailable: boolean;
+  priority: number;
+  isFeatured: boolean;
+  status: StatusLiteral;
 };
 export type _ProductCategoryTypeHidden = {
   id: number;
@@ -354,16 +365,6 @@ export type ProductCategoryType = _ProductCategoryTypeHidden & {
 };
 
 export type ProductType = _ProductTypeHidden & {
-  id: number;
-  name: string;
-  description: string;
-  shortDescription: string;
-  basePrice: number;
-  imageUrl: string;
-  isAvailable: boolean;
-  priority: number;
-  isFeatured: boolean;
-  status: StatusLiteral;
   vendor: VendorType;
   options: Array<ProductOptionType>;
   category: ProductCategoryType;

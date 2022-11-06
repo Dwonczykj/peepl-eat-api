@@ -1,8 +1,10 @@
 import { CategoryGroupType, ProductCategoryType } from '../../../scripts/utils';
-import { SailsModelType } from '../../../api/interfaces/iSails';
+import { SailsModelType, sailsVegi } from '../../../api/interfaces/iSails';
 declare var ProductCategory: SailsModelType<ProductCategoryType>;
 declare var CategoryGroup: SailsModelType<CategoryGroupType>;
 import util from 'util';
+declare var sails: sailsVegi;
+
 module.exports = {
   friendlyName: 'Create product category',
 
@@ -56,59 +58,22 @@ module.exports = {
       successJSON: (unusedArg?: {
         newProductCategory: ProductCategoryType;
       }) => void;
-      alreadyExists: () => void;
+      alreadyExists: (unusedError?: Error | string) => void;
     }
   ) {
-    var exist = await ProductCategory.find({
-      name: inputs.name,
-    });
-    if (exist && exist.length > 0) {
-      sails.log(
-        `CategoryGroup: ${util.inspect(exist[0], {
-          depth: null,
-        })} already exists.`
+    const newProductCategories =
+      await sails.helpers.createProductCategories.with({
+        productCategories: [inputs],
+      });
+    if (!newProductCategories || newProductCategories.length < 1) {
+      return exits.alreadyExists(
+        `ProductCategory with name: ${inputs.name} already exists.`
       );
-      return exits.alreadyExists();
     }
-
-    const inputsWithImage = {
-      ...inputs,
-      ...{
-        imageUrl: '',
-      },
-    };
-
-    if (inputsWithImage.image) {
-      let imageInfo = await sails.helpers.uploadOneS3(inputsWithImage.image);
-      if (imageInfo) {
-        inputsWithImage.imageUrl =
-          sails.config.custom.amazonS3BucketUrl + imageInfo.fd;
-      }
-      delete inputsWithImage.image; 
-    }
-
-    const categoryGroup = await CategoryGroup.findOne(inputsWithImage.categoryGroup);
-    if (!categoryGroup) {
-      delete inputsWithImage.categoryGroup;
-    }
-    const vendor = await Vendor.findOne(inputsWithImage.vendor);
-    if(!vendor){
-      delete inputsWithImage.vendor;
-    }
-
-    // Create a new product category
-    var newProductCategory = await ProductCategory.create({
-      ...inputsWithImage,
-      ...{products: [],}
-    }).fetch();
-
-    // Return the new product category
-    // return exits.success(newCategoryGroup);
-    // Respond with view or JSON.
     if (this.req.wantsJSON) {
-      return exits.successJSON({ newProductCategory: newProductCategory });
+      return exits.successJSON({ newProductCategory: newProductCategories[0] });
     } else {
-      return exits.success({ newProductCategory: newProductCategory });
+      return exits.success({ newProductCategory: newProductCategories[0] });
     }
   },
 };

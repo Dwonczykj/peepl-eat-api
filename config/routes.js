@@ -233,4 +233,8 @@ module.exports.routes = {
   'POST /api/v1/admin/edit-vendor-postal-districts': {
     action: 'admin/edit-vendor-postal-districts',
   },
+
+  'POST /api/v1/admin/bulk-update-data': {
+    action: 'admin/bulk-update-data',
+  },
 };

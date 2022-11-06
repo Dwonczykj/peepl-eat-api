@@ -2,10 +2,16 @@
 import { UpdateItemsForOrderSuccess } from "../../api/helpers/update-items-for-order";
 import { AvailableDateOpeningHours } from "../../api/helpers/get-available-dates";
 import { NextAvailableDateHelperReturnType } from "../../api/helpers/next-available-date";
-import { bool } from "aws-sdk/clients/signer";
 import { GetAvailableDeliveryPartnerFromPoolInputs } from "api/helpers/get-available-delivery-partner-from-pool";
 import { CreateOrderInputs } from "../../api/controllers/orders/create-order";
 import { iFulfilmentSlot, iSlot } from "./vendors/slot";
+import { CreateProductCategoriesInput } from "../helpers/create-product-categories";
+import { ProductCategoryType } from '../../scripts/utils';
+import { EditProductCategoriesInput } from "../helpers/edit-product-categories";
+
+export type UploadImageInfoType = {
+  fd: string;
+}
 
 // ~ https://stackoverflow.com/a/53809800
 export type KeysOfType<T, U> = {
@@ -34,82 +40,6 @@ type WaterlineQueryType<T> = T extends
   | Array<string | number | boolean>
   ? T
   : number | number[];
-
-export type sailsVegi = {
-  helpers: {
-    isSuperAdmin: {
-      with: (unusedArgs: { userId: number }) => Promise<{ data: boolean }>;
-    } & ((unusedArgs: number) => Promise<{ data: boolean }>);
-    isAuthorisedForVendor: {
-      with: (unusedArgs: {
-        userId: number;
-        vendorId: number;
-      }) => Promise<boolean>;
-    } & ((unusedUserId: number, unusedVendorId: number) => Promise<boolean>);
-    isAuthorisedForDeliveryPartner: {
-      with: (unusedArgs: {
-        userId: number;
-        deliveryPartnerId: number;
-      }) => Promise<boolean>;
-    } & ((
-      unusedUserId: number,
-      unusedDeliveryPartnerId: number
-    ) => Promise<boolean>);
-    getAvailableDeliveryPartnerFromPool: {
-      with: (
-        unusedArgs: GetAvailableDeliveryPartnerFromPoolInputs
-      ) => Promise<AvailableDateOpeningHours>;
-    };
-    validateOrder: {
-      with: (
-        unusedArgs: CreateOrderInputs
-      ) => Promise<AvailableDateOpeningHours>;
-    };
-    getAvailableDates: {
-      with: (unusedArgs: {
-        fulfilmentMethodIds?: Array<number>;
-      }) => Promise<AvailableDateOpeningHours>;
-    } & ((unusedArgs: Array<number>) => Promise<AvailableDateOpeningHours>);
-    getAvailableSlots: {
-      with: (unusedArgs: {
-        date: string;
-        fulfilmentMethodId: number;
-      }) => Promise<iFulfilmentSlot[]>;
-    } & ((
-      unusedArg1: string,
-      unusedArg2: number
-    ) => Promise<iFulfilmentSlot[]>);
-    nextAvailableDate: {
-      with: (unusedArgs: {
-        fulfilmentMethodIds?: Array<number>;
-      }) => Promise<NextAvailableDateHelperReturnType>;
-    } & ((
-      unusedArgs: Array<number>
-    ) => Promise<NextAvailableDateHelperReturnType>);
-    nextAvailableSlot: {
-      with: (unusedArgs: {
-        fulfilmentMethodIds?: Array<number>;
-      }) => Promise<iFulfilmentSlot>;
-    } & ((unusedArgs: Array<number>) => Promise<iFulfilmentSlot>);
-    updateItemsForOrder: {
-      with: (unusedArgs: {
-        orderId: string;
-        customerWalletAddress: string;
-        retainItems: Array<number>;
-        removeItems: Array<number>;
-      }) => Promise<UpdateItemsForOrderSuccess>;
-    } & ((
-      unusedOrderId: string,
-      customerWalletAddress: string,
-      retainItems: number[],
-      removeItems: Array<number>
-    ) => Promise<AvailableDateOpeningHours>);
-  };
-  log: any;
-  config: {
-    custom: { [configKey: string]: any };
-  };
-};
 
 type SailsFetchType<T> = {
   fetch: () => Promise<T>;
@@ -140,7 +70,7 @@ export type ShallowSailsModels<T> = {
     : number;
 };
 
-type _sailsModelKVP<T> = ({
+export type sailsModelKVP<T> = ({
       [key in RequiredKeys<T>]: T[key] extends
         | ValueType
         | Array<ValueType>
@@ -168,10 +98,10 @@ type _sailsModelKVP<T> = ({
 //     populate: (unusedArg: string) => Promise<T | null>;
 //   };
 
-type SailsFindPopulateType<T> = Promise<_sailsModelKVP<T>[] | null> & {
+type SailsFindPopulateType<T> = Promise<sailsModelKVP<T>[] | null> & {
   populate: (unusedArg: string) => Promise<T[] | null>;
 };
-type SailsFindOnePopulateType<T> = Promise<_sailsModelKVP<T> | null> & {
+type SailsFindOnePopulateType<T> = Promise<sailsModelKVP<T> | null> & {
   populate: (unusedArg: string) => Promise<T | null>;
 };
 
@@ -248,4 +178,98 @@ export type SailsModelType<T> = {
   ) => SailsFetchType<Array<T> | null>; // ~ https://bobbyhadz.com/blog/typescript-index-signature-parameter-cannot-be-union-type#:~:text=The%20error%20%22An%20index%20signature%20parameter%20type%20cannot,type%20MyType%20%3D%20%7B%20%5Bkey%20in%20MyUnion%5D%3A%20string%3B%7D.
 };
 
+export type sailsVegi = {
+  helpers: {
+    isSuperAdmin: {
+      with: (unusedArgs: { userId: number }) => Promise<{ data: boolean }>;
+    } & ((unusedArgs: number) => Promise<{ data: boolean }>);
+    isAuthorisedForVendor: {
+      with: (unusedArgs: {
+        userId: number;
+        vendorId: number;
+      }) => Promise<boolean>;
+    } & ((unusedUserId: number, unusedVendorId: number) => Promise<boolean>);
+    isAuthorisedForDeliveryPartner: {
+      with: (unusedArgs: {
+        userId: number;
+        deliveryPartnerId: number;
+      }) => Promise<boolean>;
+    } & ((
+      unusedUserId: number,
+      unusedDeliveryPartnerId: number
+    ) => Promise<boolean>);
+    getAvailableDeliveryPartnerFromPool: {
+      with: (
+        unusedArgs: GetAvailableDeliveryPartnerFromPoolInputs
+      ) => Promise<AvailableDateOpeningHours>;
+    };
 
+    validateOrder: {
+      with: (
+        unusedArgs: CreateOrderInputs
+      ) => Promise<AvailableDateOpeningHours>;
+    };
+
+    getAvailableDates: {
+      with: (unusedArgs: {
+        fulfilmentMethodIds?: Array<number>;
+      }) => Promise<AvailableDateOpeningHours>;
+    } & ((unusedArgs: Array<number>) => Promise<AvailableDateOpeningHours>);
+    getAvailableSlots: {
+      with: (unusedArgs: {
+        date: string;
+        fulfilmentMethodId: number;
+      }) => Promise<iFulfilmentSlot[]>;
+    } & ((
+      unusedArg1: string,
+      unusedArg2: number
+    ) => Promise<iFulfilmentSlot[]>);
+    nextAvailableDate: {
+      with: (unusedArgs: {
+        fulfilmentMethodIds?: Array<number>;
+      }) => Promise<NextAvailableDateHelperReturnType>;
+    } & ((
+      unusedArgs: Array<number>
+    ) => Promise<NextAvailableDateHelperReturnType>);
+    nextAvailableSlot: {
+      with: (unusedArgs: {
+        fulfilmentMethodIds?: Array<number>;
+      }) => Promise<iFulfilmentSlot>;
+    } & ((unusedArgs: Array<number>) => Promise<iFulfilmentSlot>);
+
+    updateItemsForOrder: {
+      with: (unusedArgs: {
+        orderId: string;
+        customerWalletAddress: string;
+        retainItems: Array<number>;
+        removeItems: Array<number>;
+      }) => Promise<UpdateItemsForOrderSuccess>;
+    } & ((
+      unusedOrderId: string,
+      customerWalletAddress: string,
+      retainItems: number[],
+      removeItems: Array<number>
+    ) => Promise<AvailableDateOpeningHours>);
+
+    createProductCategories: {
+      with: (
+        unusedArgs: CreateProductCategoriesInput
+      ) => Promise<Array<ProductCategoryType | null>>;
+    } & ((
+      unusedOrunusedArg: CreateProductCategoriesInput
+    ) => Promise<Array<ProductCategoryType | null>>);
+    editProductCategories: {
+      with: (
+        unusedArgs: EditProductCategoriesInput
+      ) => Promise<Array<sailsModelKVP<ProductCategoryType> | null>>;
+    } & ((
+      unusedOrunusedArg: EditProductCategoriesInput
+    ) => Promise<Array<sailsModelKVP<ProductCategoryType> | null>>);
+
+    uploadOneS3: (image: any) => Promise<UploadImageInfoType>;
+  };
+  log: any;
+  config: {
+    custom: { [configKey: string]: any };
+  };
+};

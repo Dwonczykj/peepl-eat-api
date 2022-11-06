@@ -147,6 +147,21 @@ module.exports = {
   afterCreate: async function (newlyCreatedRecord, proceed) {
     try{
       await sails.helpers.initialiseDeliveryMethods.with({vendor: newlyCreatedRecord.id});
+      const generalCategoryGroup = CategoryGroup.findOrCreate({
+        name: 'General'
+      });
+      if (generalCategoryGroup && generalCategoryGroup.id){
+        await sails.helpers.createProductCategories.with({
+          productCategories: [
+            {
+              vendor: newlyCreatedRecord.id,
+              name: 'General',
+              categoryGroup: generalCategoryGroup,
+              //todo: upload an image for general and link it here using imageUrl key
+            },
+          ],
+        });
+      }
     } catch(err) {
       sails.log.warn(err);
       return proceed(err);

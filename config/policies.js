@@ -49,17 +49,18 @@ module.exports.policies = {
   'admin/customer-update-paid-order': true, //TODO: add 'is-logged-in' and 'is-vendor' poligices to this
   'admin/customer-cancel-order': true, //TODO: add 'is-logged-in' and 'is-vendor' poligices to this
   'admin/customer-received-order': true, //TODO: add 'is-logged-in' and 'is-vendor' poligices to this
+  'admin/bulk-update-data': ['is-super-admin'],
   'admin/*': 'is-logged-in',
   'home/*': 'is-logged-in',
   'discounts/*': true, // ['localize', 'firebase', 'firebase-auth', 'is-logged-in'],
   'orders/*': true, // ["localize", "firebase", "firebase-auth", "is-logged-in"],
   'products/*': true, // ["localize", "firebase", "firebase-auth", "is-logged-in"],
-  'vendors/*': true, /*[    "localize",
+  'vendors/*': true /*[    "localize",
     "firebase",
     "firebase-auth",
     "is-logged-in",
     "is-vendor",
-  ],*/
+  ],*/,
   'couriers/*': true, // ["is-logged-in", "is-delivery-partner"],
   '*': true, // "is-logged-in",
 };

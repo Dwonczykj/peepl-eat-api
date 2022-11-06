@@ -1,7 +1,8 @@
-import { CategoryGroupType, ProductCategoryType } from '../../../scripts/utils';
-import { SailsModelType, ShallowSailsModels } from '../../interfaces/iSails';
+import { ProductCategoryType } from '../../../scripts/utils';
+import { SailsModelType, sailsVegi, ShallowSailsModels } from '../../interfaces/iSails';
 declare var ProductCategory: SailsModelType<ProductCategoryType>;
-declare var CategoryGroup: SailsModelType<CategoryGroupType>;
+
+declare var sails: sailsVegi;
 // import util from 'util';
 module.exports = {
   friendlyName: 'Edit product category',
@@ -66,51 +67,15 @@ module.exports = {
       notFound: () => void;
     }
   ) {
-    var exist = await ProductCategory.find(inputs.id);
-    if (!exist || exist.length === 0) {
+    const productCategories =
+      await sails.helpers.editProductCategories.with({
+        productCategories: [inputs],
+      });
+    if (!productCategories || productCategories.length < 1) {
+      sails.log(`No product categories updated`);
       return exits.notFound();
     }
-
-    const useInputs = {
-      ...inputs,
-      ...{
-        imageUrl: '',
-      },
-    };
-    let updateArgs;
-    if (useInputs.image) {
-      let imageInfo = await sails.helpers.uploadOneS3(useInputs.image);
-      if (imageInfo) {
-        useInputs.imageUrl =
-          sails.config.custom.amazonS3BucketUrl + imageInfo.fd;
-      }
-      delete useInputs.image;
-      updateArgs = useInputs;
-    } else {
-      updateArgs = inputs;
-    }
-
-    let categoryGroup = null;
-    if (useInputs.categoryGroup) {
-      categoryGroup = await CategoryGroup.findOne(useInputs.categoryGroup);
-      if (categoryGroup) {
-        updateArgs.categoryGroup = categoryGroup.id;
-      }
-    }
-    let vendor = null;
-    if (useInputs.vendor) {
-      vendor = await Vendor.findOne(useInputs.vendor);
-      if (vendor) {
-        updateArgs.vendor = vendor.id;
-      }
-    }
-
-    // Update product category
-    await ProductCategory.updateOne(inputs.id).set({
-      ...updateArgs,
-      ...(useInputs.imageUrl ? { imageUrl: useInputs.imageUrl } : {}),
-    });
-    const updatedProductCategory = await ProductCategory.findOne(useInputs.id);
+    const updatedProductCategory = await ProductCategory.findOne(inputs.id);
 
     // Return the new product category
     // return exits.success(newCategoryGroup);
