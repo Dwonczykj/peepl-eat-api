@@ -237,4 +237,7 @@ module.exports.routes = {
   'POST /api/v1/admin/bulk-update-data': {
     action: 'admin/bulk-update-data',
   },
+  'GET /admin/bulk-update-data': {
+    action: 'admin/view-bulk-update-data',
+  },
 };

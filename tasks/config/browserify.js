@@ -58,13 +58,21 @@ module.exports = function (grunt) {
       ],
       options: {
         browserifyOptions: { debug: true },
-        // transform: [[
-        //     'babelify', {
-        //         presets: [['@babel/preset-env', { modules: 'auto' }]],
-        //         sourceMaps: true,
-        //         ignore: ['node_modules']
-        //     }
-        // ]],
+        transform: [
+          [
+            //     'babelify', {
+            //         presets: [['@babel/preset-env', { modules: 'auto' }]],
+            //         sourceMaps: true,
+            //         ignore: ['node_modules']
+            //     }
+            'browserify-css', {
+              global: true,
+              // autoInject: true,
+              // minify: true,
+              // rootDir: '.',
+            },
+          ],
+        ],
         plugin: [
           [
             require('esmify'),

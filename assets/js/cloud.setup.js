@@ -48,6 +48,15 @@ Cloud.setup({
       url: '/api/v1/discounts/check-discount-code/:discountCode',
       args: ['discountCode', 'vendorId'],
     },
+    bulkUpdateData: {
+      verb: 'POST',
+      url: '/api/v1/admin/bulk-update-data',
+      args: [
+        'modelType',
+        'data',
+        'createOrUpdateMode'
+      ]
+    },
     createOrder: {
       verb: 'POST',
       url: '/api/v1/orders/create-order',

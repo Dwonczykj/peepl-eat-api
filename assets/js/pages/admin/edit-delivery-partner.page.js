@@ -1,3 +1,6 @@
+import Toastify from 'toastify-js';
+import 'toastify-js/src/toastify.css'; // ~ https://github.com/apvarun/toastify-js/blob/master/README.md
+
 parasails.registerPage('admin-edit-delivery-partner', {
   //  ╦╔╗╔╦╔╦╗╦╔═╗╦    ╔═╗╔╦╗╔═╗╔╦╗╔═╗
   //  ║║║║║ ║ ║╠═╣║    ╚═╗ ║ ╠═╣ ║ ║╣
@@ -5,8 +8,7 @@ parasails.registerPage('admin-edit-delivery-partner', {
   data: {
     syncing: false,
     cloudError: '',
-    formErrors: {
-    },
+    formErrors: {},
     deliveryPartner: {
       name: '',
       emailAddress: '',
@@ -17,11 +19,11 @@ parasails.registerPage('admin-edit-delivery-partner', {
     formRules: {
       name: {
         required: true,
-        maxLength: 50
+        maxLength: 50,
       },
       email: {
         maxLength: 50,
-        required: true
+        required: true,
       },
       phoneNumber: {
         required: true,
@@ -33,13 +35,12 @@ parasails.registerPage('admin-edit-delivery-partner', {
   //  ╦  ╦╔═╗╔═╗╔═╗╦ ╦╔═╗╦  ╔═╗
   //  ║  ║╠╣ ║╣ ║  ╚╦╝║  ║  ║╣
   //  ╩═╝╩╚  ╚═╝╚═╝ ╩ ╚═╝╩═╝╚═╝
-  beforeMount: function() {
-  },
-  mounted: async function() {
+  beforeMount: function () {},
+  mounted: async function () {
     _.extend(this, SAILS_LOCALS);
   },
   filters: {
-    capitalise: function(value) {
+    capitalise: function (value) {
       if (!value) {
         return '';
       }
@@ -47,21 +48,42 @@ parasails.registerPage('admin-edit-delivery-partner', {
       return value.charAt(0).toUpperCase() + value.slice(1);
     },
     convertToPounds: function (value) {
-      if (!value) {return '£0';}
-      value = '£' + (value/100).toFixed(2);
+      if (!value) {
+        return '£0';
+      }
+      value = '£' + (value / 100).toFixed(2);
       value = value.toString();
       return value;
-    }
+    },
   },
 
   //  ╦╔╗╔╔╦╗╔═╗╦═╗╔═╗╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
   //  ║║║║ ║ ║╣ ╠╦╝╠═╣║   ║ ║║ ║║║║╚═╗
   //  ╩╝╚╝ ╩ ╚═╝╩╚═╩ ╩╚═╝ ╩ ╩╚═╝╝╚╝╚═╝
   methods: {
-    deliveryPartnerSubmitted: function({id}) {
+    showToast: function (message, cb) {
+      Toastify({
+        text: message,
+        duration: 1000,
+        destination: './',
+        newWindow: true,
+        close: false,
+        gravity: 'top', // `top` or `bottom`
+        position: 'right', // `left`, `center` or `right`
+        stopOnFocus: true, // Prevents dismissing of toast on hover
+        style: {
+          background: 'linear-gradient(to right, #00b09b, #96c93d)',
+        },
+        onClick: function () {}, // Callback after click
+        callback: cb,
+      }).showToast();
+    },
+    deliveryPartnerSubmitted: function ({ id }) {
       if (id) {
         this.deliveryPartner.id = id;
-        window.history.pushState({}, '', '/admin/delivery-partners/' + id);
+        this.showToast(`Delivery Partner updated`, () => {
+          window.history.pushState({}, '', '/admin/delivery-partners/' + id);
+        });
       }
     },
   },

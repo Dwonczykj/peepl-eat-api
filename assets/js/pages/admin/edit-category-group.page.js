@@ -1,3 +1,6 @@
+import Toastify from 'toastify-js';
+import 'toastify-js/src/toastify.css'; // ~ https://github.com/apvarun/toastify-js/blob/master/README.md
+
 parasails.registerPage('edit-category-group', {
   //  ╦╔╗╔╦╔╦╗╦╔═╗╦    ╔═╗╔╦╗╔═╗╔╦╗╔═╗
   //  ║║║║║ ║ ║╠═╣║    ╚═╗ ║ ╠═╣ ║ ║╣
@@ -11,7 +14,7 @@ parasails.registerPage('edit-category-group', {
     categoryGroup: {
       name: '',
       forRestaurantItem: false,
-      imageUrl: '',
+      image: null,
     },
     formRules: {
       name: {
@@ -26,6 +29,7 @@ parasails.registerPage('edit-category-group', {
   beforeMount: function () {},
   mounted: async function () {
     _.extend(this, SAILS_LOCALS);
+    this.categoryGroup.image = '';
   },
   filters: {
     capitalise: function (value) {
@@ -49,11 +53,30 @@ parasails.registerPage('edit-category-group', {
   //  ║║║║ ║ ║╣ ╠╦╝╠═╣║   ║ ║║ ║║║║╚═╗
   //  ╩╝╚╝ ╩ ╚═╝╩╚═╩ ╩╚═╝ ╩ ╩╚═╝╝╚╝╚═╝
   methods: {
+    showToast: function (message, cb) {
+      Toastify({
+        text: message,
+        duration: 1000,
+        destination: './',
+        newWindow: true,
+        close: false,
+        gravity: 'top', // `top` or `bottom`
+        position: 'right', // `left`, `center` or `right`
+        stopOnFocus: true, // Prevents dismissing of toast on hover
+        style: {
+          background: 'linear-gradient(to right, #00b09b, #96c93d)',
+        },
+        onClick: function () {}, // Callback after click
+        callback: cb,
+      }).showToast();
+    },
     categoryGroupSubmitted: function () {
       if (!this.formErrorsExist()) {
         // this.categoryGroup.id = id;
         // window.history.pushState({}, '', '/admin/category-groups/' + id);
-        window.location.replace('/admin/category-groups/');
+        this.showToast(`CategoryGroup Updated`, () => {
+          window.location.replace('/admin/category-groups/');
+        });
       }
     },
     formErrorsExist: function () {

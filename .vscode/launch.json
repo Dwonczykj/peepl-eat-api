@@ -55,6 +55,42 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Mocha Test Entire Codebase",
+            "program": "${workspaceFolder}/node_modules/mocha/bin/mocha",
+            "env": {
+                "NODE_ENV": "test",
+                "test": "true",
+                "useFirebaseEmulator": "true",
+            },
+            "args": [
+                "--exit",
+                "-t",
+                "20000",
+                "--bail",
+                // "--require",
+                // "esm",
+                "--require",
+                "ts-node/register",
+                // "--require",
+                // "--reporter",
+                // "dot",
+                // "--slow",
+                // "5000",
+                // "--timeout",
+                // "999999",
+                "--colors",
+                "${workspaceFolder}/test/lifecycle.test.js",
+                "${workspaceFolder}/test/integration/**/*.test.ts",
+                "${workspaceFolder}/test/integration/**/*.test.js",
+            ],
+            "internalConsoleOptions": "openOnSessionStart",
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Mocha Test All Controllers",
             "program": "${workspaceFolder}/node_modules/mocha/bin/mocha",
             "env": {

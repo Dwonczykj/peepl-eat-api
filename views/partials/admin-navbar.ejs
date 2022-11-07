@@ -28,6 +28,12 @@
           <a class="nav-link" :class="(pageName == 'all-orders') ? 'active' : ''" href="/admin/orders?acceptanceStatus=accepted&timePeriod=upcoming">Orders</a>
         </li>
         <li class="nav-item">
+          <a class="nav-link" :class="(pageName == 'bulk-update-data') ? 'active' : ''" href="/admin/bulk-update-data">Bulk Update</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" :class="(pageName == 'all-orders') ? 'active' : ''" href="/admin/orders?acceptanceStatus=accepted&timePeriod=upcoming">Orders</a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link" href="/admin/logout">Logout</a>
         </li>
       </ul>

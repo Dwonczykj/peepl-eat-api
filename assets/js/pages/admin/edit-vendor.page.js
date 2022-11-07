@@ -1,3 +1,6 @@
+import Toastify from 'toastify-js';
+import 'toastify-js/src/toastify.css'; // ~ https://github.com/apvarun/toastify-js/blob/master/README.md
+
 parasails.registerPage('admin-edit-vendor', {
   //  ╦╔╗╔╦╔╦╗╦╔═╗╦    ╔═╗╔╦╗╔═╗╔╦╗╔═╗
   //  ║║║║║ ║ ║╠═╣║    ╚═╗ ║ ╠═╣ ║ ║╣
@@ -5,8 +8,7 @@ parasails.registerPage('admin-edit-vendor', {
   data: {
     syncing: false,
     cloudError: '',
-    formErrors: {
-    },
+    formErrors: {},
     imageName: 'Choose image',
     vendor: {
       name: '',
@@ -29,21 +31,19 @@ parasails.registerPage('admin-edit-vendor', {
     formRules: {
       name: {
         required: true,
-        maxLength: 50
+        maxLength: 50,
       },
       description: {
         maxLength: 400,
-        required: true
+        required: true,
       },
-      type: {
-      },
+      type: {},
       walletAddress: {
         required: true,
         maxLength: 100,
-        regex: /^0x[a-fA-F0-9]{40}$/
+        regex: /^0x[a-fA-F0-9]{40}$/,
       },
-      status: {
-      }
+      status: {},
     },
     fulfilmethod: 'col',
     deliveryPartners: [],
@@ -52,14 +52,13 @@ parasails.registerPage('admin-edit-vendor', {
   //  ╦  ╦╔═╗╔═╗╔═╗╦ ╦╔═╗╦  ╔═╗
   //  ║  ║╠╣ ║╣ ║  ╚╦╝║  ║  ║╣
   //  ╩═╝╩╚  ╚═╝╚═╝ ╩ ╚═╝╩═╝╚═╝
-  beforeMount: function() {
-  },
-  mounted: async function() {
+  beforeMount: function () {},
+  mounted: async function () {
     _.extend(this, SAILS_LOCALS);
     this.vendor.image = '';
   },
   filters: {
-    capitalise: function(value) {
+    capitalise: function (value) {
       if (!value) {
         return '';
       }
@@ -67,20 +66,24 @@ parasails.registerPage('admin-edit-vendor', {
       return value.charAt(0).toUpperCase() + value.slice(1);
     },
     convertToPounds: function (value) {
-      if (!value) {return '£0';}
-      value = '£' + (value/100).toFixed(2);
+      if (!value) {
+        return '£0';
+      }
+      value = '£' + (value / 100).toFixed(2);
       value = value.toString();
       return value;
-    }
+    },
   },
 
   //  ╦╔╗╔╔╦╗╔═╗╦═╗╔═╗╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
   //  ║║║║ ║ ║╣ ╠╦╝╠═╣║   ║ ║║ ║║║║╚═╗
   //  ╩╝╚╝ ╩ ╚═╝╩╚═╩ ╩╚═╝ ╩ ╩╚═╝╝╚╝╚═╝
   methods: {
-    changeVendorImageInput: function(files) {
+    changeVendorImageInput: function (files) {
       if (files.length !== 1 && !this.vendor.image) {
-        throw new Error('Consistency violation: `changeFileInput` was somehow called with an empty array of files, or with more than one file in the array!  This should never happen unless there is already an uploaded file tracked.');
+        throw new Error(
+          'Consistency violation: `changeFileInput` was somehow called with an empty array of files, or with more than one file in the array!  This should never happen unless there is already an uploaded file tracked.'
+        );
       }
       var selectedFile = files[0];
 
@@ -97,7 +100,7 @@ parasails.registerPage('admin-edit-vendor', {
 
       // Set up the file preview for the UI:
       var reader = new FileReader();
-      reader.onload = (event)=>{
+      reader.onload = (event) => {
         this.previewImageSrc = event.target.result;
 
         // Unbind this "onload" event.
@@ -106,20 +109,39 @@ parasails.registerPage('admin-edit-vendor', {
       // Clear out any error messages about not providing an image.
       reader.readAsDataURL(selectedFile);
     },
-    vendorSubmitted: function({id}) {
+    vendorSubmitted: function ({ id }) {
       if (id) {
-        this.vendor.id = id;
-        window.history.pushState({}, '', '/admin/vendors/' + id);
+        this.vendor.id = id;  
+        this.showToast(`Vendor Updated`, () => {
+          window.history.pushState({}, '', '/admin/vendors/' + id);
+        });
       }
     },
-    clickAddProduct: function(){
+    showToast: function (message, cb) {
+      Toastify({
+        text: message,
+        duration: 1000,
+        destination: './',
+        newWindow: true,
+        close: false,
+        gravity: 'top', // `top` or `bottom`
+        position: 'right', // `left`, `center` or `right`
+        stopOnFocus: true, // Prevents dismissing of toast on hover
+        style: {
+          background: 'linear-gradient(to right, #00b09b, #96c93d)',
+        },
+        onClick: function () {}, // Callback after click
+        callback: cb,
+      }).showToast();
+    },
+    clickAddProduct: function () {
       var newProduct = {
         name: '[Draft]',
         description: '',
         basePrice: '',
         isAvailable: false,
         image: '',
-        options: []
+        options: [],
       };
       this.vendor.products.push(newProduct);
     },
@@ -131,12 +153,15 @@ parasails.registerPage('admin-edit-vendor', {
         categoryGroup: '',
       };
 
-
       this.vendor.productCategories.push(newCategory);
     },
-    updatePostalDistricts: function() {
-      var postalDistricts = this.postalDistricts.filter(district => district.checked).map((a)=>{return a.id;});
-      return {districts: postalDistricts, vendorId: this.vendor.id};
-    }
+    updatePostalDistricts: function () {
+      var postalDistricts = this.postalDistricts
+        .filter((district) => district.checked)
+        .map((a) => {
+          return a.id;
+        });
+      return { districts: postalDistricts, vendorId: this.vendor.id };
+    },
   },
 });

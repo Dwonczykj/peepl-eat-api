@@ -12,21 +12,22 @@
     <ajax-form :form-data="categoryGroup" :syncing.sync="syncing" :form-rules="formRules" :form-errors.sync="formErrors" :cloud-error.sync="cloudError" @submitted="categoryGroupSubmitted" :action="(categoryGroup.id) ?  'editCategoryGroup' : 'createCategoryGroup'">
       <div class="form-group">
         <label for="name">Category Group Name</label>
-        <input type="text" :class="{ 'is-invalid': formErrors.name }" v-model="categoryGroup.name" class="form-control" id="name">
+        <input type="text" :class="{ 'is-invalid': formErrors.name || cloudError === 'alreadyExists' }" v-model="categoryGroup.name" class="form-control" id="name">
+        
       </div>
 
       <div class="form-group">
         <label for="forRestaurantItem">Restaurant Category</label>
         <select class="form-control" id="forRestaurantItem" v-model="categoryGroup.forRestaurantItem" >
           <!-- <option value="draft">Draft</option> -->
-          <option value=0>Grocers</option>
-          <option value=1>Restaurant</option>
+          <option value=false>Grocers</option>
+          <option value=true>Restaurant</option>
         </select>
       </div>
 
       <fieldset>
         <h2 class="h5 mt-3">Featured Image</h2>
-        <img v-if="previewImageSrc || categoryGroup.id" :src="(previewImageSrc) ? previewImageSrc : categoryGroup.imageUrl" />
+        <img v-if="previewImageSrc || categoryGroup.imageUrl" :src="(previewImageSrc) ? previewImageSrc : categoryGroup.imageUrl" />
         <div class="custom-file">
           <input :class="{ 'is-invalid': formErrors.image }" type="file" class="custom-file-input" accept="image/*" id="customFile" @change="changeProductImageInput($event.target.files)">
           <label class="custom-file-label" for="customFile">{{imageName}}</label>
@@ -37,8 +38,11 @@
       <div v-if="cloudError === 'notFound'" class="alert alert-danger mt-4" role="alert">
         category group not found.
       </div>
+      <div v-else-if="cloudError === 'alreadyExists'" class="alert alert-danger mt-4" role="alert">
+        A Category Group already exists with the name: "{{categoryGroup.name}}"
+      </div>
       <div v-else-if="cloudError" class="alert alert-danger mt-4" role="alert">
-        There has been an error updating the vendor. Please try again.
+        There has been an error updating the category group. Please try again.
       </div>
     </ajax-form>
 

@@ -1,0 +1,75 @@
+<div id="bulk-update-data" class="admin" v-cloak>
+  <%- partial('../../partials/admin-navbar.ejs') %>
+  <div class="container">
+    <h1 class="h4 text-center my-4">Bulk Update</h1>
+    <div v-if="user.isSuperAdmin">
+      <ajax-form
+        id="accountDetailsForm"
+        :handle-submitting="clickUploadData"
+        :syncing.sync="syncing"
+        :cloud-error.sync="cloudError"
+        @submitted="submittedBulkUpdateDataForm()"
+        :handle-parsing="parseForm"
+      >
+        <div class="form-group">
+          <label for="create-mode">Create or Update</label>
+          <select
+            class="form-control"
+            id="create-mode"
+            v-model="createOrUpdateMode"
+          >
+            <option value="create">Create</option>
+            <option value="update">Update</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="model-type">Model Type</label>
+          <select
+            class="form-control"
+            id="model-type"
+            @change="modelTypeOnChange($event)"
+            v-model="modelType"
+          >
+            <!-- <option value="admin">Vegi Admin</option> -->
+            <option value="ProductCategory">ProductCategory</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="data">Structured Data</label>
+          <textarea
+            type="text"
+            class="form-control"
+            rows="16"
+            :class="{ 'is-invalid': formErrors.data }"
+            @change="dataOnChange($event)"
+            v-model="data"
+            id="data"
+            :class="{ 'is-invalid': formErrors.data }"
+          ></textarea>
+          <div class="invalid-feedback" v-if="formErrors.data">
+            {{formErrors.data}}
+          </div>
+        </div>
+
+        <ajax-button
+          class="btn btn-peepl mt-4"
+          :class="{ 'is-loading': syncing }"
+          type="submit"
+          :syncing="syncing"
+        >
+          Update Details</ajax-button
+        >
+        
+        <div
+          v-if="cloudError"
+          class="alert alert-danger mt-4 hidden"
+          role="alert"
+        >
+          There has been an error uploading the json.
+        </div>
+      </ajax-form>
+    </div>
+  </div>
+</div>
+<%- /* Expose server-rendered data as window.SAILS_LOCALS :: */
+exposeLocalsToBrowser() %>

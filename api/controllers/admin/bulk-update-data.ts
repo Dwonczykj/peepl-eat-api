@@ -4,6 +4,11 @@ declare var ProductCategory: SailsModelType<ProductCategoryType>;
 declare var CategoryGroup: SailsModelType<CategoryGroupType>;
 declare var sails: sailsVegi;
 
+type BulkUpdateDataResponseType = {
+  success: false;
+  message: string
+} | {success: true};
+
 
 module.exports = {
   friendlyName: 'Edit product category',
@@ -11,7 +16,7 @@ module.exports = {
   description: '',
 
   inputs: {
-    modelTypeName: {
+    modelType: {
       type: 'string',
       required: true,
       description: 'The id of the product category',
@@ -36,33 +41,36 @@ module.exports = {
     successJSON: {
       statusCode: 200,
     },
-    notFound: {
-      statusCode: 404,
-      responseType: 'notFound',
+    notSupported: {
+      statusCode: 400,
     },
   },
 
   fn: async function (
     inputs: {
-      modelTypeName: string;
+      modelType: string;
       data: any[];
       createOrUpdateMode: 'create' | 'update';
     },
     exits: {
-      success: () => void;
-      successJSON: () => void;
-      notFound: () => void;
-      notSupported: (unusedMessage:string) => void;
+      success: (
+        unusedArg: BulkUpdateDataResponseType
+      ) => BulkUpdateDataResponseType;
+      successJSON: (
+        unusedArg: BulkUpdateDataResponseType
+      ) => BulkUpdateDataResponseType;
+      // notFound: () => void;
+      notSupported: (unusedMessage: string) => void;
     }
   ) {
-    if(!Array.isArray(inputs.data)){
+    if (!Array.isArray(inputs.data)) {
       return exits.notSupported(`Data must be in array format`);
     }
 
-    if (inputs.modelTypeName === 'ProductCategory') {
-      if (inputs.createOrUpdateMode === 'create'){
+    if (inputs.modelType === 'ProductCategory') {
+      if (inputs.createOrUpdateMode === 'create') {
         await sails.helpers.createProductCategories.with({
-          productCategories: inputs.data
+          productCategories: inputs.data,
         });
         // await ProductCategory.createEach(inputs.data.map<OmitId<ProductCategoryType>>((_dataEntry:OmitId<ProductCategoryType>) => {
         //   return {
@@ -97,14 +105,14 @@ module.exports = {
         //     }),
         //   };
         // }))
-      } else if (inputs.createOrUpdateMode === 'update'){
+      } else if (inputs.createOrUpdateMode === 'update') {
         await sails.helpers.editProductCategories.with({
-          productCategories: inputs.data
+          productCategories: inputs.data,
         });
       }
     } else {
       return exits.notSupported(
-        `Updating data for model type: ${inputs.modelTypeName} is not supported`
+        `Updating data for model type: ${inputs.modelType} is not supported`
       );
     }
 
@@ -112,9 +120,13 @@ module.exports = {
     // return exits.success(newCategoryGroup);
     // Respond with view or JSON.
     if (this.req.wantsJSON) {
-      return exits.successJSON();
+      return exits.successJSON({
+        success: true
+      });
     } else {
-      return exits.success();
+      return exits.success({
+        success: true,
+      });
     }
   },
 };

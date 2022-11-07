@@ -1,38 +1,40 @@
 declare var CategoryGroup: any;
 import util from 'util';
 module.exports = {
-  friendlyName: "Create category group",
+  friendlyName: 'Create category group',
 
-  description: "",
+  description: '',
+
+  files: ['image'],
 
   inputs: {
     name: {
-      type: "string",
+      type: 'string',
       required: true,
-      description: "The name of the group of product categories",
+      description: 'The name of the group of product categories',
       maxLength: 50,
     },
     forRestaurantItem: {
-      type: "boolean",
+      type: 'boolean',
       required: true,
       description:
-        "Whether the category applies to product categories for restaurants or grocers",
+        'Whether the category applies to product categories for restaurants or grocers',
     },
     image: {
-      type: "ref",
+      type: 'ref',
     },
   },
 
   exits: {
     success: {
-      description: "New category group created.",
+      description: 'New category group created.',
       statusCode: 200,
     },
     successJSON: {
       statusCode: 200,
     },
     alreadyExists: {
-      description: "category group already exists",
+      description: 'category group already exists',
       statusCode: 400,
     },
   },
@@ -42,14 +44,9 @@ module.exports = {
       name: inputs.name,
     });
     if (exist && exist.length > 0) {
-      sails.log(
-        `CategoryGroup: ${util.inspect(exist[0], {
-          depth: null,
-        })} already exists.`
-      );
       return exits.alreadyExists();
     }
-    
+
     inputs.imageUrl = '';
     if (inputs.image) {
       let imageInfo = await sails.helpers.uploadOneS3(inputs.image);

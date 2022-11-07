@@ -6,7 +6,7 @@ import {
   signInWithPhoneNumber
 } from 'firebase/auth';
 import Toastify from 'toastify-js';
-// import 'toastify-js/src/toastify.css'; // ~ https://github.com/apvarun/toastify-js/blob/master/README.md
+import 'toastify-js/src/toastify.css'; // ~ https://github.com/apvarun/toastify-js/blob/master/README.md
 
 parasails.registerPage('login', {
   //  ╦╔╗╔╦╔╦╗╦╔═╗╦    ╔═╗╔╦╗╔═╗╔╦╗╔═╗

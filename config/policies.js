@@ -15,6 +15,7 @@ module.exports.policies = {
    * (`true` allows public access)                                            *
    *                                                                          *
    ***************************************************************************/
+  'home/view-dashboard': ['is-logged-in'],
   'admin/view-login': true,
   'admin/login-with-firebase': true,
   'admin/view-login-with-password': true,

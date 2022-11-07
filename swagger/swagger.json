@@ -64,6 +64,9 @@
       "name": "View category groups"
     },
     {
+      "name": "View Bulk Update Data"
+    },
+    {
       "name": "View deliveries"
     },
     {
@@ -2500,6 +2503,42 @@
         "description": "Display \"Category Groups\" page.",
         "tags": [
           "View category groups"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/admin/bulk-update-data": {
+      "get": {
+        "summary": "View Bulk Update Data",
+        "tags": [
+          "View Bulk Update Data"
         ],
         "parameters": [],
         "responses": {
@@ -6648,7 +6687,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "modelTypeName",
+            "name": "modelType",
             "required": true,
             "schema": {
               "type": "string"
@@ -6695,8 +6734,11 @@
               }
             }
           },
+          "400": {
+            "description": "Success"
+          },
           "404": {
-            "description": "Not found"
+            "description": "Resource not found"
           },
           "500": {
             "description": "Internal server error"
