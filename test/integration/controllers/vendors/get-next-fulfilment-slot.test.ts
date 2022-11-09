@@ -162,10 +162,10 @@ class CAN_GET_NEXT_AVAIL_SLOT_AS_USER {
         response: { body: GetNextFulfilmentSlotSuccessHttp },
         requestPayload
       ) => {
-        expect(response.body).to.be.an('object').that.includes.all.keys(['slot', 'date']);
-        expect(response.body.date)
-          .to.be.an('object')
-          .that.includes.all.keys(['collection', 'delivery']);
+        expect(response.body).to.be.an('object').that.includes.all.keys(['slot']);
+        // expect(response.body.date)
+        //   .to.be.an('object')
+        //   .that.includes.all.keys(['collection', 'delivery']);
         expect(response.body.slot)
           .to.be.an('object')
           .that.includes.all.keys(['collection', 'delivery']);
@@ -342,11 +342,7 @@ class CAN_GET_NEXT_AVAIL_SLOT_WITH_SPECIAL_DATE_AS_USER {
         response: { body: GetNextFulfilmentSlotSuccessHttp },
         requestPayload
       ) => {
-        expect(response.body).to.be.an('object').that.includes.all.keys(['slot', 'date']);
-        expect(response.body.date).to.be.an('object').that.includes.all.keys([
-          'collection',
-          'delivery',
-        ]);
+        expect(response.body).to.be.an('object').that.includes.all.keys(['slot']);
         expect(response.body.slot).to.be.an('object').that.includes.all.keys([
           'collection',
           'delivery',

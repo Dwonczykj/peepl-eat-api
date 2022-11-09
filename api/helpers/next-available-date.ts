@@ -18,23 +18,24 @@ export type NextAvailableDateHelperReturnType = {
 
 // const moment = require('moment');
 module.exports = {
-  friendlyName: "Next available date",
+  friendlyName: 'Next available date',
 
   description:
-    "Get the next available date for a given list of fulfilmentMethods.",
+    'Get the next available date for a given list of fulfilmentMethods.',
 
   inputs: {
     fulfilmentMethodIds: {
-      type: "ref",
+      type: 'ref',
       description:
-        "The List of IDs of the fulfilmentMethods which are being requested.",
+        'The List of IDs of the fulfilmentMethods which are being requested.',
     },
   },
 
   exits: {
     success: {
-      outputFriendlyName: "Next available slot",
+      outputFriendlyName: 'Next available slot',
     },
+    noIntersectingDates: {},
   },
 
   fn: async function (
@@ -43,6 +44,7 @@ module.exports = {
       success: (
         unused: NextAvailableDateHelperReturnType
       ) => NextAvailableDateHelperReturnType;
+      noIntersectingDates: (unusedMessage:string) => void;
     }
   ) {
     const intersectionDates: AvailableDateOpeningHours =
@@ -50,6 +52,15 @@ module.exports = {
         fulfilmentMethodIds: inputs.fulfilmentMethodIds,
       });
 
+    if (Object.keys(intersectionDates).length < 1) {
+      sails.log.warn(
+        `No dates intersect [` + inputs.fulfilmentMethodIds.join(',') + ']'
+      );
+      return exits.success({
+        nextAvailableDate: '',
+        nextAvailableOpeningHours: [],
+      });
+    }
     const nextAvailableDate = _.min(
       Object.keys(intersectionDates).map((_dt) =>
         moment.utc(_dt, dateStrFormat)

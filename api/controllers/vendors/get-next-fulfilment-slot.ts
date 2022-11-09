@@ -10,11 +10,11 @@ declare var sails: sailsVegi;
 
 export type GetNextFulfilmentSlotSuccess = {
   slot: {
-    [unusedMethodType in FulfilmentMethodType['methodType']]: iFulfilmentSlotHttpResponse; //TODO: turn startTime of type moment into a string
+    [unusedMethodType in FulfilmentMethodType['methodType']]: iFulfilmentSlotHttpResponse;
   };
-  date: {
-    [unusedMethodType in FulfilmentMethodType['methodType']]: NextAvailableDateHelperReturnType;
-  };
+  // date: {
+  //   [unusedMethodType in FulfilmentMethodType['methodType']]: NextAvailableDateHelperReturnType;
+  // };
 };
 
 module.exports = {
@@ -127,13 +127,15 @@ module.exports = {
 
     return exits.success({
       slot: {
-        collection: stringifySlotUsingMomentUTCDefault(collectionSlot),
-        delivery: stringifySlotUsingMomentUTCDefault(deliverySlot),
+        collection:
+          collectionSlot && stringifySlotUsingMomentUTCDefault(collectionSlot),
+        delivery:
+          deliverySlot && stringifySlotUsingMomentUTCDefault(deliverySlot),
       },
-      date: {
-        collection: nextEligibleCollectionDate,
-        delivery: nextEligibleDeliveryDate,
-      },
+      // date: {
+      //   collection: nextEligibleCollectionDate,
+      //   delivery: nextEligibleDeliveryDate,
+      // },
     });
   },
 };

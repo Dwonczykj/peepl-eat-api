@@ -1,12 +1,14 @@
 /* eslint-disable no-console */
 import moment from 'moment';
+import util from 'util';
 import {
   DeliveryInformation, DeliveryPartnerObject, getDeliveryPartnerHelpers, IDeliveryPartner
 } from "../interfaces/orders/deliveryPartnerHelperObjects";
 import { iSlot, TimeWindow } from "../interfaces/vendors/slot";
+import { sailsVegi } from '../../api/interfaces/iSails';
 
 declare var FulfilmentMethod: any;
-declare var sails: any;
+declare var sails: sailsVegi;
 declare var DeliveryPartner: any;
 
 export type GetAvailableDeliveryPartnerFromPoolInputs = {
@@ -97,6 +99,7 @@ module.exports = {
       // outputFriendlyName: 'Available slots',
     },
     deliveryPartnerDoesNotHaveDeliveryFulfilmentSetUp: {},
+    vendorNotFound: {},
   },
 
   fn: async function (
@@ -108,10 +111,24 @@ module.exports = {
       .utc(inputs.fulfilmentSlotFrom, 'YYYY-MM-DD HH:mm:ss')
       .format('YYYY-MM-DD');
 
-    const deliveryPartners = await DeliveryPartner.find({
-      status: 'active',
-      //contains: {deliversToPostCodes: [inputs.deliveryAddressPostCode]},
-    });
+    const vendor = await Vendor.findOne({ id: inputs.pickupFromVendor }).populate('deliveryPartner');
+
+    if (!vendor) {
+      return exits.vendorNotFound();
+    }
+    let deliveryPartners;
+    if (vendor.deliveryPartner){
+      deliveryPartners = await DeliveryPartner.find({
+        // status: 'active',
+        id: vendor.deliveryPartner.id
+      });
+    }else{
+      sails.log(`No DeliveryPartner set for vendor so take any from the pool`);
+      deliveryPartners = await DeliveryPartner.find({
+        status: 'active',
+        //contains: {deliversToPostCodes: [inputs.deliveryAddressPostCode]},
+      });
+    }
 
     const availableDeliveryPartnerInfos = [];
     // check if delivery slot is valid for any delivery partners
@@ -138,11 +155,17 @@ module.exports = {
         );
       }
 
-      if (!validSlotsForDeliveryPartner) {
+      if (
+        !validSlotsForDeliveryPartner ||
+        validSlotsForDeliveryPartner.length < 1
+      ) {
         sails.log(
-          `helpers.getAvailableDeliveryPartnerFromPool found no valid slots from helpers.getAvailableSlots`
+          `helpers.getAvailableDeliveryPartnerFromPool found no valid slots from helpers.getAvailableSlots for fm: ${util.inspect(
+            deliveryPartnerFulfilmentMethod,
+            { depth: null }
+          )}`
         );
-        return exits.noValidSlots();
+        // return exits.noValidSlots();
       }
 
       // Find slot within list of valid slots
@@ -168,8 +191,27 @@ module.exports = {
       }
     }
 
-    if (!availableDeliveryPartnerInfos) {
-      return exits.success({});
+    if (
+      !availableDeliveryPartnerInfos ||
+      availableDeliveryPartnerInfos.length < 1
+    ) {
+      sails.log.warn(
+        `No Delivery Partners Slots were available from pool for order to ${
+          inputs.deliveryAddressLineOne
+        }.\nSlot requested of ${util.inspect(
+          {
+            startTime: moment.utc(inputs.fulfilmentSlotFrom),
+            endTime: moment.utc(inputs.fulfilmentSlotTo),
+          },
+          { depth: null }
+        )} doesnt match available slots for dp: ${util.inspect(
+          validSlotsForDeliveryPartner,
+          {
+            depth: null,
+          }
+        )}`
+      );
+      return exits.success(false);
     }
 
     const availableDeliveryPartners = availableDeliveryPartnerInfos.map(
@@ -177,6 +219,18 @@ module.exports = {
     );
     const deliveryPartnerHelpers: Array<DeliveryPartnerObject> =
       getDeliveryPartnerHelpers(sails, availableDeliveryPartners);
+
+    if (!deliveryPartnerHelpers || deliveryPartnerHelpers.length < 1) {
+      sails.log.warn(
+        `No Delivery Partners available from hardcoded pool for order to ${
+          inputs.deliveryAddressLineOne
+        }.\nAvailable slots were: ${util.inspect(
+          availableDeliveryPartnerInfos,
+          { depth: null }
+        )}`
+      );
+      return exits.success(false);
+    }
 
     var chosenDeliveryPartner: IDeliveryPartner = null;
     var deliverBefore = moment.utc(
@@ -187,8 +241,6 @@ module.exports = {
       inputs.fulfilmentSlotTo,
       'YYYY-MM-DD HH:mm:ss'
     );
-
-    const vendor = await Vendor.findOne({ id: inputs.pickupFromVendor });
 
     for (const deliveryPartner of deliveryPartnerHelpers) {
       const deliveryAvailability =

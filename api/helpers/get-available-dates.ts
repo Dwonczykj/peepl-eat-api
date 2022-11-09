@@ -9,33 +9,40 @@ import {
 } from "../../scripts/utils";
 import moment, { Moment } from 'moment';
 import _ from 'lodash';
+import util  from "util";
 
 export type AvailableDateOpeningHours = {
   [dateString: string]: Array<OpeningHoursType>;
 };
 
 module.exports = {
-  friendlyName: "Get available dates",
+  friendlyName: 'Get available dates',
 
-  description: "Get the available dates for a given fulfilmentMethod.",
+  description: 'Get the available dates for a given fulfilmentMethod.',
 
   inputs: {
     fulfilmentMethodIds: {
-      type: "ref",
+      type: 'ref',
       description:
-        "The List of IDs of the fulfilmentMethods which are being requested.",
+        'The List of IDs of the fulfilmentMethods which are being requested.',
     },
   },
 
   exits: {
     success: {
-      outputFriendlyName: "Available slots",
+      outputFriendlyName: 'Available slots',
     },
+    noAvailableDates: {},
   },
 
   fn: async function (
     inputs: { fulfilmentMethodIds?: Array<number> },
-    exits: { success: (unusedAv:AvailableDateOpeningHours) => AvailableDateOpeningHours }
+    exits: {
+      success: (
+        unusedAv: AvailableDateOpeningHours
+      ) => AvailableDateOpeningHours;
+      noAvailableDates: (unusedMessage: string) => void;
+    }
   ) {
     // var availableDaysOfWeek: Array<DaysOfWeek> = [];
     // var availableSpecialDates: Array<moment.Moment> = [];
@@ -118,7 +125,7 @@ module.exports = {
               dateStrFormat
             );
             if (
-              _dt.diff(moment.utc(), "month") >
+              _dt.diff(moment.utc(), 'month') >
               sails.config.custom.ignoreSpecialDatesMoreThanXMonthsAway
             ) {
               // ignore special date as more than 12 months away
@@ -139,10 +146,10 @@ module.exports = {
           const cutoffTime = fulfilmentMethod.orderCutoff; // e.g. 22:00
 
           if (cutoffTime) {
-            const tomorrow = moment.utc().add(1, "days").startOf("day"); // End of day tomorrow
+            const tomorrow = moment.utc().add(1, 'days').startOf('day'); // End of day tomorrow
 
             // If dt is today
-            if (dt.isSame(moment.utc(), "day")) {
+            if (dt.isSame(moment.utc(), 'day')) {
               isAfterCutoff = true;
               const dtStrNextWeek = dt
                 .clone()

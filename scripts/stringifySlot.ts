@@ -64,7 +64,7 @@ export const stringifySlotWithDate = (slot: iSlot) => ({
 });
 export const stringifySlotUsingMomentUTCDefault = <T extends iSlot>(
   slot: T
-): T & { startTime: momentUtcString; endTime: momentUtcString } => ({
+): T & { startTime: momentUtcString; endTime: momentUtcString } => slot && ({
     ...slot,
     ...{
       startTime: slot.startTime.toISOString() as momentUtcString,
