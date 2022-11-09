@@ -4,7 +4,7 @@ import { ProductCategoryType, CategoryGroupType } from "../../scripts/utils";
 declare var sails: sailsVegi;
 declare var ProductCategory: SailsModelType<ProductCategoryType>;
 declare var CategoryGroup: SailsModelType<CategoryGroupType>;
-import util from 'util';
+// import util from 'util';
 
 export type CreateProductCategoriesInput = {
   productCategories: Array<

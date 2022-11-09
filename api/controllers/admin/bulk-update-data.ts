@@ -1,7 +1,5 @@
-import { CategoryGroupType, OmitId, ProductCategoryType, ProductOptionType, ProductType } from '../../../scripts/utils';
-import { SailsModelType, sailsVegi, ShallowSailsModels } from '../../interfaces/iSails';
-declare var ProductCategory: SailsModelType<ProductCategoryType>;
-declare var CategoryGroup: SailsModelType<CategoryGroupType>;
+import { sailsVegi } from '../../interfaces/iSails';
+
 declare var sails: sailsVegi;
 
 type BulkUpdateDataResponseType = {

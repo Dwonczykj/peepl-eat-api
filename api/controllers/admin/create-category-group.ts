@@ -1,5 +1,5 @@
 declare var CategoryGroup: any;
-import util from 'util';
+// import util from 'util';
 module.exports = {
   friendlyName: 'Create category group',
 
