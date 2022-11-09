@@ -150,7 +150,9 @@ module.exports = {
       return exits.badRequest(err);
     }
 
-    let vendor = await Vendor.findOne({ id: inputs.vendor }).populate('deliveryPartner');
+    let vendor = await Vendor.findOne({ id: inputs.vendor }).populate(
+      'deliveryPartner'
+    );
     let discount;
 
     if (inputs.discountCode) {
@@ -166,59 +168,72 @@ module.exports = {
           'Vendor did not match the vendor on the requested fulfilment method'
         );
       }
-    }
-    else if (
+    } else if (
       fulfilmentMethod.deliveryPartner &&
       fulfilmentMethod.deliveryPartner.id
     ) {
-      if(!vendor.deliveryPartner){
+      if (
+        vendor.deliveryPartner &&
+        fulfilmentMethod.deliveryPartner.id !== vendor.deliveryPartner.id
+      ) {
         return exits.badRequest(
-          'No deliverypartner exists on the requested vendor for the requested fulfilment method'
+          'DeliveryPartner of the fulfilment method did not match vendor\'s CHOSEN DeliveryPartner. No other DP should be used.'
         );
       }
-      else if (fulfilmentMethod.deliveryPartner.id !== vendor.deliveryPartner.id) {
-        return exits.badRequest(
-          'DeliveryPartner of the fulfilment method did not match vendors DeliveryPartner.'
-        );
-      }
+      // ! Ignore as we want to allow a deliverypartner from the pool to service this request.
+      // if (!vendor.deliveryPartner) {
+      //   return exits.badRequest(
+      //     'No deliverypartner exists on the requested vendor for the requested fulfilment method'
+      //   );
+      // } else if (
+      //   fulfilmentMethod.deliveryPartner.id !== vendor.deliveryPartner.id
+      // ) {
+      //   return exits.badRequest(
+      //     'DeliveryPartner of the fulfilment method did not match vendors DeliveryPartner.'
+      //   );
+      // }
     }
 
-    const isDelivery = fulfilmentMethod.methodType === 'delivery';
+    // const isDelivery = fulfilmentMethod.methodType === 'delivery';
 
-    let availableDeliveryPartner;
-    if (isDelivery) {
-      try {
-        availableDeliveryPartner =
-          await sails.helpers.getAvailableDeliveryPartnerFromPool.with({
-            fulfilmentSlotFrom: inputs.fulfilmentSlotFrom, //moment.utc("01:15:00 PM", "h:mm:ss A")
-            fulfilmentSlotTo: inputs.fulfilmentSlotTo, //moment.utc("01:15:00 PM", "h:mm:ss A")
+    let availableDeliveryPartner = null;
+    //! Removed available deliveryPartners from pool as inputs.fulfilmentMethod will specify the dp fm id which it receives in the get-fulfilment-slots get call in slots[i].fulfilmentMethod
+    //TODO: This option to use the rest of the pull needs to be added to the get-fulfilment-slots call
+    // if (isDelivery) {
+    //   try {
+    //     availableDeliveryPartner =
+    //       await sails.helpers.getAvailableDeliveryPartnerFromPool.with({
+    //         fulfilmentSlotFrom: inputs.fulfilmentSlotFrom, //moment.utc("01:15:00 PM", "h:mm:ss A")
+    //         fulfilmentSlotTo: inputs.fulfilmentSlotTo, //moment.utc("01:15:00 PM", "h:mm:ss A")
 
-            pickupFromVendor: vendor.id,
+    //         pickupFromVendor: vendor.id,
 
-            deliveryContactName: inputs.address.name,
-            deliveryPhoneNumber: inputs.address.phoneNumber,
-            deliveryComments: inputs.address.deliveryInstructions,
+    //         deliveryContactName: inputs.address.name,
+    //         deliveryPhoneNumber: inputs.address.phoneNumber,
+    //         deliveryComments: inputs.address.deliveryInstructions,
 
-            deliveryAddressLineOne: inputs.address.lineOne,
-            deliveryAddressLineTwo: inputs.address.lineTwo,
-            deliveryAddressCity: inputs.address.city,
-            deliveryAddressPostCode: inputs.address.postCode,
-          });
-      } catch (error) {
-        sails.log.error(
-          `helpers.getAvailableDeliveryPartnerFromPool errored: ${error}`
-        );
-        availableDeliveryPartner = null;
-      }
+    //         deliveryAddressLineOne: inputs.address.lineOne,
+    //         deliveryAddressLineTwo: inputs.address.lineTwo,
+    //         deliveryAddressCity: inputs.address.city,
+    //         deliveryAddressPostCode: inputs.address.postCode,
+    //       });
+    //   } catch (error) {
+    //     sails.log.error(
+    //       `helpers.getAvailableDeliveryPartnerFromPool errored: ${error}`
+    //     );
+    //     availableDeliveryPartner = null;
+    //   }
 
-      if (!availableDeliveryPartner) {
-        return exits.invalidSlot(
-          'No deliveryPartner available for requested fulfilment'
-        );
-      }
-    } else {
-      availableDeliveryPartner = null;
-    }
+    //   if (!availableDeliveryPartner) {
+    //     //todo: allow order if the vendor can service the delivery.
+
+    //     return exits.invalidSlot(
+    //       'Neither vendor nor any deliveryPartner from the pool is available for requested delivery fulfilment'
+    //     );
+    //   }
+    // } else {
+    //   availableDeliveryPartner = null;
+    // }
 
     if (inputs.discountCode) {
       discount = await Discount.findOne({ code: inputs.discountCode });
