@@ -116,7 +116,7 @@ module.exports = {
 
     // Check that the vendor exists
     let vendor = await Vendor.findOne({ id: inputs.vendor }).populate(
-      'fulfilmentPostalDistricts&vendor'
+      'fulfilmentPostalDistricts&deliveryPartner'
     );
 
     if (!vendor) {

@@ -26,7 +26,7 @@ module.exports = {
 
   fn: async function (inputs, exits) {
     var vendor = await Vendor.findOne(inputs.vendorid).populate(
-      'fulfilmentPostalDistricts&products&products.category&products.category.categoryGroup'
+      'fulfilmentPostalDistricts&productCategories&products&products.category&products.category.categoryGroup'
     );
 
     if(!vendor){

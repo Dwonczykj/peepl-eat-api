@@ -46,7 +46,7 @@ module.exports = {
     },
     address: {
       type: 'ref',
-      description: 'The user\'s address.',
+      description: "The user's address.",
       required: true,
     },
     total: {
@@ -122,6 +122,7 @@ module.exports = {
     },
     badRequest: {
       responseType: 'badRequest',
+      statusCode: 400,
     },
     error: {
       statusCode: 400,
@@ -149,51 +150,67 @@ module.exports = {
       return exits.badRequest(err);
     }
 
-    let vendor = await Vendor.findOne({ id: inputs.vendor });
+    let vendor = await Vendor.findOne({ id: inputs.vendor }).populate('deliveryPartner');
     let discount;
 
     if (inputs.discountCode) {
       discount = await Discount.findOne({ code: inputs.discountCode });
     }
 
-    const vendorFulfilmentMethod = await FulfilmentMethod.findOne(
+    const fulfilmentMethod = await FulfilmentMethod.findOne(
       inputs.fulfilmentMethod
-    ).populate("vendor");
-
-    if (vendorFulfilmentMethod.vendor.id !== inputs.vendor) {
-      return exits.badRequest(
-        "Vendor did not match the vendor on the requested fulfilment method"
-      );
+    ).populate('vendor&deliveryPartner');
+    if (fulfilmentMethod.vendor && fulfilmentMethod.vendor.id) {
+      if (fulfilmentMethod.vendor.id !== inputs.vendor) {
+        return exits.badRequest(
+          'Vendor did not match the vendor on the requested fulfilment method'
+        );
+      }
+    }
+    else if (
+      fulfilmentMethod.deliveryPartner &&
+      fulfilmentMethod.deliveryPartner.id
+    ) {
+      if(!vendor.deliveryPartner){
+        return exits.badRequest(
+          'No deliverypartner exists on the requested vendor for the requested fulfilment method'
+        );
+      }
+      else if (fulfilmentMethod.deliveryPartner.id !== vendor.deliveryPartner.id) {
+        return exits.badRequest(
+          'DeliveryPartner of the fulfilment method did not match vendors DeliveryPartner.'
+        );
+      }
     }
 
-    const isDelivery = vendorFulfilmentMethod.methodType === "delivery";
+    const isDelivery = fulfilmentMethod.methodType === 'delivery';
 
     let availableDeliveryPartner;
     if (isDelivery) {
       try {
-	      availableDeliveryPartner =
-	        await sails.helpers.getAvailableDeliveryPartnerFromPool.with({
-	          fulfilmentSlotFrom: inputs.fulfilmentSlotFrom, //moment.utc("01:15:00 PM", "h:mm:ss A")
-	          fulfilmentSlotTo: inputs.fulfilmentSlotTo, //moment.utc("01:15:00 PM", "h:mm:ss A")
-	          
-	          pickupFromVendor: vendor.id,
-	
-	          deliveryContactName: inputs.address.name,
-	          deliveryPhoneNumber: inputs.address.phoneNumber,
-	          deliveryComments: inputs.address.deliveryInstructions,
-	
-	          deliveryAddressLineOne: inputs.address.lineOne,
-	          deliveryAddressLineTwo: inputs.address.lineTwo,
-	          deliveryAddressCity: inputs.address.city,
-	          deliveryAddressPostCode: inputs.address.postCode,
-	        });
+        availableDeliveryPartner =
+          await sails.helpers.getAvailableDeliveryPartnerFromPool.with({
+            fulfilmentSlotFrom: inputs.fulfilmentSlotFrom, //moment.utc("01:15:00 PM", "h:mm:ss A")
+            fulfilmentSlotTo: inputs.fulfilmentSlotTo, //moment.utc("01:15:00 PM", "h:mm:ss A")
+
+            pickupFromVendor: vendor.id,
+
+            deliveryContactName: inputs.address.name,
+            deliveryPhoneNumber: inputs.address.phoneNumber,
+            deliveryComments: inputs.address.deliveryInstructions,
+
+            deliveryAddressLineOne: inputs.address.lineOne,
+            deliveryAddressLineTwo: inputs.address.lineTwo,
+            deliveryAddressCity: inputs.address.city,
+            deliveryAddressPostCode: inputs.address.postCode,
+          });
       } catch (error) {
         sails.log.error(
           `helpers.getAvailableDeliveryPartnerFromPool errored: ${error}`
         );
         availableDeliveryPartner = null;
       }
-      
+
       if (!availableDeliveryPartner) {
         return exits.invalidSlot(
           'No deliveryPartner available for requested fulfilment'
@@ -211,7 +228,7 @@ module.exports = {
 
     try {
       const datastore = sails.getDatastore();
-      
+
       const wrapWithDb = (db, cb) => {
         try {
           if (db) {
@@ -228,7 +245,7 @@ module.exports = {
 
       var newPaymentIntent;
       var order;
-      
+
       const createOrderTransactionDB = async (db: any) => {
         for (var item in inputs.items) {
           var orderItemOptionValues = [];
@@ -366,7 +383,7 @@ module.exports = {
       if (datastore.config.adapter === 'sails-disk') {
         const result = await createOrderTransactionDB(null);
         sails.log('USING sails-disk');
-        sails.log(util.inspect(result, {depth: 0}));
+        sails.log(util.inspect(result, { depth: 0 }));
         if (result) {
           return exits.success(result);
         }

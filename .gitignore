@@ -142,3 +142,4 @@ config/local.js
 *.tmp.txt
 
 cloneDb.sh
+cloneLocalDb.sh

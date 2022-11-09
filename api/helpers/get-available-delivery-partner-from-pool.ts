@@ -23,10 +23,10 @@ export type GetAvailableDeliveryPartnerFromPoolInputs = {
 };
 
 module.exports = {
-  friendlyName: "Get available deliveryPartner from pool",
+  friendlyName: 'Get available deliveryPartner from pool',
 
   description:
-    "Get an available deliveryPartner from the pool of deliveryPartners",
+    'Get an available deliveryPartner from the pool of deliveryPartners',
 
   inputs: {
     // fulfilmentMethodId: {
@@ -35,51 +35,51 @@ module.exports = {
     //   description: 'The ID of the fulfilmentMethod which is being requested.'
     // },
     fulfilmentSlotFrom: {
-      type: "string",
+      type: 'string',
       required: true,
       description:
-        "The date for which time slots need to be generated. Format YYYY-MM-DD",
+        'The date for which time slots need to be generated. Format YYYY-MM-DD',
       // example: '2022-03-24',
       // regex: /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/
     },
     fulfilmentSlotTo: {
-      type: "string",
+      type: 'string',
       required: true,
       description:
-        "The date for which time slots need to be generated. Format YYYY-MM-DD",
+        'The date for which time slots need to be generated. Format YYYY-MM-DD',
       // example: '2022-03-24',
       // regex: /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/
     },
     pickupFromVendor: {
-      type: "number",
+      type: 'number',
       required: true,
     },
     deliveryContactName: {
-      type: "string",
+      type: 'string',
       required: true,
     },
     deliveryPhoneNumber: {
-      type: "string",
+      type: 'string',
       required: true,
     },
     deliveryComments: {
-      type: "string",
-      required: true,
+      type: 'string',
+      defaultsTo: '',
     },
     deliveryAddressLineOne: {
-      type: "string",
+      type: 'string',
       required: true,
     },
     deliveryAddressLineTwo: {
-      type: "string",
-      defaultsTo: "",
+      type: 'string',
+      defaultsTo: '',
     },
     deliveryAddressCity: {
-      type: "string",
+      type: 'string',
       required: true,
     },
     deliveryAddressPostCode: {
-      type: "string",
+      type: 'string',
       required: true,
     },
     // deliverBefore: {
@@ -96,29 +96,30 @@ module.exports = {
     success: {
       // outputFriendlyName: 'Available slots',
     },
-    deliveryPartnerDoesNotHaveDeliveryFulfilmentSetUp: {
-      
-    }
+    deliveryPartnerDoesNotHaveDeliveryFulfilmentSetUp: {},
   },
 
-  fn: async function (inputs: GetAvailableDeliveryPartnerFromPoolInputs, exits) {
-    var validSlotsForDeliveryPartner:iSlot[] = [];
+  fn: async function (
+    inputs: GetAvailableDeliveryPartnerFromPoolInputs,
+    exits
+  ) {
+    var validSlotsForDeliveryPartner: iSlot[] = [];
     var date = moment
-      .utc(inputs.fulfilmentSlotFrom, "YYYY-MM-DD HH:mm:ss")
-      .format("YYYY-MM-DD");
+      .utc(inputs.fulfilmentSlotFrom, 'YYYY-MM-DD HH:mm:ss')
+      .format('YYYY-MM-DD');
 
     const deliveryPartners = await DeliveryPartner.find({
-      status: "active",
+      status: 'active',
       //contains: {deliversToPostCodes: [inputs.deliveryAddressPostCode]},
     });
-    
+
     const availableDeliveryPartnerInfos = [];
     // check if delivery slot is valid for any delivery partners
     for (let deliveryPartner of deliveryPartners) {
       const deliveryPartnerFulfilmentMethod = await FulfilmentMethod.findOne({
         deliveryPartner: deliveryPartner.id,
-        methodType: "delivery",
-      }).populate("openingHours");
+        methodType: 'delivery',
+      }).populate('openingHours');
 
       if (!deliveryPartnerFulfilmentMethod) {
         continue;
@@ -180,11 +181,11 @@ module.exports = {
     var chosenDeliveryPartner: IDeliveryPartner = null;
     var deliverBefore = moment.utc(
       inputs.fulfilmentSlotFrom,
-      "YYYY-MM-DD HH:mm:ss"
+      'YYYY-MM-DD HH:mm:ss'
     );
     var deliverAfter = moment.utc(
       inputs.fulfilmentSlotTo,
-      "YYYY-MM-DD HH:mm:ss"
+      'YYYY-MM-DD HH:mm:ss'
     );
 
     const vendor = await Vendor.findOne({ id: inputs.pickupFromVendor });
@@ -216,11 +217,11 @@ module.exports = {
         chosenDeliveryPartner = deliveryPartner;
         return exits.success(chosenDeliveryPartner.deliveryPartner);
       }
-      if (deliveryAvailability.status === "accepted") {
+      if (deliveryAvailability.status === 'accepted') {
         chosenDeliveryPartner = deliveryPartner;
         return exits.success(chosenDeliveryPartner.deliveryPartner);
       } else if (
-        deliveryAvailability.status === "pending" &&
+        deliveryAvailability.status === 'pending' &&
         chosenDeliveryPartner === null
       ) {
         chosenDeliveryPartner = deliveryPartner;
