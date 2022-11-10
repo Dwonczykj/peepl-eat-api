@@ -36,6 +36,7 @@ parasails.registerComponent('order-card', {
     <p class="m-0"><b>Fulfilment Time:</b> {{order.fulfilmentSlotFrom | formatDeliverySlot}} - {{order.fulfilmentSlotTo | formatDeliverySlot}}</p>
     <p class="m-0"><b>Fulfilment Type:</b> {{order.fulfilmentMethod.methodType | capitalise}}</p>
     <p class="m-0"><b>Ordered:</b> {{order.paidDateTime | formatOrderedTime}}</p>
+    <p class="m-0"><b>Payment:</b> {{order.paymentStatus}}</p>
 
     <h2 class="h3 border-top pt-3 mt-3 mb-0">Items:</h2>
     <div v-for="item in order.items">

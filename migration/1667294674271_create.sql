@@ -20,7 +20,7 @@ CREATE TABLE `notification` (
   `type` varchar(255) DEFAULT NULL,
   `sentAt` double DEFAULT NULL,
   `publicId` varchar(255) DEFAULT NULL,
-  `title` varchar(255) DEFAULT NULL,
+  `title` longtext DEFAULT '',
   `metadata` longtext,
   `order` int DEFAULT NULL,
   PRIMARY KEY (`id`),

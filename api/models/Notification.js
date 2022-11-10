@@ -30,6 +30,7 @@ module.exports = {
     },
     title: {
       type: 'string',
+      
     },
     metadata: {
       type: 'ref',
