@@ -33,6 +33,8 @@ const prependLeadingZero = (val: number, prependIfValLessThan: number = 10) =>
     ? `${Math.sign(val) === -1 ? '-' : ''}0${Math.abs(val)}`
     : `${Math.sign(val) === -1 ? '-' : ''}${Math.abs(val)}`;
 
+export type walletAddressString = `0x${string}`;
+
 export const dateStrFormat = 'YYYY-MM-DD';
 export const timeStrFormat = 'HH:mm';
 export const datetimeStrFormat = 'YYYY-MM-DD HH:mm';
