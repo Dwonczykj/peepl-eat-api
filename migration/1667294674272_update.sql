@@ -1,11 +1,9 @@
+
 SET sql_safe_updates=0;
 update `vegi`.`product` set 
 	status = 'active'
 where 
 	status is null;
-SET sql_safe_updates=1;
-
-SET sql_safe_updates=0;
 update `vegi`.`deliverypartner` set 
 	type = ''
 where 

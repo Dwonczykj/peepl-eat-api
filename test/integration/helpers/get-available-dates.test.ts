@@ -18,6 +18,7 @@ import {
   OpeningHoursType,
   DeliveryPartnerType,
   OrderType,
+  DateString,
 } from "../../../scripts/utils";
 import {
   iSlot,
@@ -147,7 +148,7 @@ describe("helpers.getAvailableDates", async () => {
     const includeNextWeekToday = moment
       .utc()
       .add(7, 'days')
-      .format(dateStrFormat);
+      .format(dateStrFormat) as DateString;
     const removeTomorrow = moment.utc().add(1, "days").format(dateStrFormat);
     const expectAvailDateStrs = usedWeekdays
       .map((wd) => getNextWeekday(wd as DaysOfWeek))

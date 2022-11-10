@@ -33,6 +33,21 @@ const DEFAULT_NEW_PRODUCT_OPTION_OBJECT = (fixtures, overrides = {}) => {
     ...overrides,
   };
 };
+const DEFAULT_NEW_PRODUCT_OPTION_VALUE_OBJECT = (
+  productOption, fixtures,
+  overrides = {}
+) => {
+  return {
+    ...{
+      name: 'Test product option value',
+      description: 'test descritpion',
+      priceModifier: 50,
+      isAvailable: true,
+      option: productOption,
+    },
+    ...overrides,
+  };
+};
 
 /* Check if string is valid UUID */
 function checkIfValidUUID(str) {
@@ -105,6 +120,8 @@ class HttpAuthTestSenderProduct extends HttpAuthTestSender {
 module.exports = {
   DEFAULT_NEW_PRODUCT_OBJECT: DEFAULT_NEW_PRODUCT_OBJECT,
   DEFAULT_NEW_PRODUCT_OPTION_OBJECT: DEFAULT_NEW_PRODUCT_OPTION_OBJECT,
+  DEFAULT_NEW_PRODUCT_OPTION_VALUE_OBJECT:
+    DEFAULT_NEW_PRODUCT_OPTION_VALUE_OBJECT,
   ExpectResponseProduct: ExpectResponseProduct,
   HttpAuthTestSenderProduct: HttpAuthTestSenderProduct,
 };

@@ -267,16 +267,28 @@ module.exports = {
           var orderItemOptionValues = [];
           for (var option in inputs.items[item].options) {
             // options is a dictionary of <string, int> where the int is the selectedProductOptions.id
-            orderItemOptionValues.push({
-              option: option,
-              optionValue: inputs.items[item].options[option],
-            });
+            if (Object.keys(inputs.items[item]).includes('quantity')){
+              orderItemOptionValues.push(
+                ...Array(inputs.items[item].quantity).fill({
+                  option: option,
+                  optionValue: inputs.items[item].options[option],
+                })
+              );
+            }else{
+              orderItemOptionValues.push({
+                option: option,
+                optionValue: inputs.items[item].options[option],
+              });
+            }
           }
           var newOrderItemOptionValues = [];
           try {
-            newOrderItemOptionValues = await wrapWithDb(db, () =>
-              OrderItemOptionValue.createEach(orderItemOptionValues)
-            ).fetch();
+            const dbPromises = orderItemOptionValues.map((o) =>
+              wrapWithDb(db, () =>
+                OrderItemOptionValue.create(o)
+              ).fetch()
+            );
+            newOrderItemOptionValues = await Promise.all(dbPromises);
           } catch (err) {
             sails.log.error(err);
             exits.badItemsRequest();
@@ -322,17 +334,25 @@ module.exports = {
         }
 
         // Strip unneccesary data from order items
-        var updatedItems = _.map(inputs.items, (object) => {
-          return {
-            order: order.id,
-            product: object.id,
-            optionValues: object.optionValues,
-          };
-        });
+        var updatedItems = _.flatten(_.map(inputs.items, (object) => {
+          return Object.keys(object).includes('quantity')
+            ? Array(object.quantity).fill({
+              order: order.id,
+              product: object.id,
+              optionValues: object.optionValues,
+            })
+            : [{
+              order: order.id,
+              product: object.id,
+              optionValues: object.optionValues,
+            }];
+        }));
 
-        // sails.log(`Update the ${updatedItems.length} order items in the db: ${util.inspect(updatedItems, {depth: null})}`);
         // Create each order item
-        await wrapWithDb(db, () => OrderItem.createEach(updatedItems));
+        const dbPromises = updatedItems.map((o) =>
+          wrapWithDb(db, () => OrderItem.create(o))//.fetch()
+        );
+        await Promise.all(dbPromises);
 
         // Calculate the order total on the backend
         var calculatedOrderTotal = await sails.helpers.calculateOrderTotal.with(
@@ -343,9 +363,8 @@ module.exports = {
 
         // If frontend total is incorrect
         if (order.total !== calculatedOrderTotal.finalAmount) {
-          // TODO: Log any instances of this, as it shouldn't happen (indicated frontend logic error)
-          sails.log.info(`Order total mismatch`);
-          sails.log.info(
+          sails.log.warn(`Order total mismatch`);
+          sails.log.warn(
             `Order total is ${order.total} but is calculated to be total ${calculatedOrderTotal.finalAmount}`
           );
 
