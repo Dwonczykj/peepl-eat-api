@@ -31,6 +31,15 @@ module.exports = {
 
   fn: async function (inputs, exits) {
 
+    if (
+      process.env.NODE_ENV &&
+      !process.env.NODE_ENV.toLowerCase().startsWith('prod')
+    ) {
+      sails.log(
+        `peepl-pay-webhook updating order w/ payIntId: [${inputs.paymentIntentId}] to ${inputs.status}!`
+      );
+    }
+
     var unixtime = Date.now();
 
     // Update order with payment ID and time

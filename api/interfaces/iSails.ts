@@ -6,7 +6,7 @@ import { GetAvailableDeliveryPartnerFromPoolInputs } from "api/helpers/get-avail
 import { CreateOrderInputs } from "../../api/controllers/orders/create-order";
 import { iFulfilmentSlot, iSlot } from "./vendors/slot";
 import { CreateProductCategoriesInput } from "../helpers/create-product-categories";
-import { ProductCategoryType } from '../../scripts/utils';
+import { ProductCategoryType, walletAddressString } from '../../scripts/utils';
 import { EditProductCategoriesInput } from "../helpers/edit-product-categories";
 
 export type UploadImageInfoType = {
@@ -178,7 +178,12 @@ export type SailsModelType<T> = {
   ) => SailsFetchType<Array<T> | null>; // ~ https://bobbyhadz.com/blog/typescript-index-signature-parameter-cannot-be-union-type#:~:text=The%20error%20%22An%20index%20signature%20parameter%20type%20cannot,type%20MyType%20%3D%20%7B%20%5Bkey%20in%20MyUnion%5D%3A%20string%3B%7D.
 };
 
+export type NewPaymentIntent = {
+  paymentIntentId: string;
+};
+
 export type sailsVegi = {
+  getDatastore: () => any;
   helpers: {
     isSuperAdmin: {
       with: (unusedArgs: { userId: number }) => Promise<{ data: boolean }>;
@@ -208,6 +213,12 @@ export type sailsVegi = {
       with: (
         unusedArgs: CreateOrderInputs
       ) => Promise<AvailableDateOpeningHours>;
+    };
+    calculateOrderTotal: {
+      with: (unusedArg: { orderId: string }) => Promise<{
+        finalAmount: number;
+        withoutFees: number;
+      }>;
     };
 
     getAvailableDates: {
@@ -266,10 +277,59 @@ export type sailsVegi = {
       unusedOrunusedArg: EditProductCategoriesInput
     ) => Promise<Array<sailsModelKVP<ProductCategoryType> | null>>);
 
+    createPaymentIntent: (
+      unusedFinalAmount: number,
+      unusedWalletAddress: walletAddressString,
+      unusedVendorName: string
+    ) => Promise<NewPaymentIntent>;
+
     uploadOneS3: (image: any) => Promise<UploadImageInfoType>;
   };
   log: any;
   config: {
     custom: { [configKey: string]: any };
+    uploads: {
+      adapter: any;
+    };
+    datastores: { [configKey: string]: {
+      adapter: string;
+      url: string;
+      charset?: string;
+      collation?: string;
+      ssl?: boolean;
+    } };
+    port: 1337;
+    http: {
+      cache: number;
+      trustProxy: boolean;
+    };
+    log: {
+      level: 'debug' | '';
+    };
+    sockets: {
+      onlyAllowOrigins: string[];
+    };
+    session: {
+      //redis
+      url: string;
+      adapter: string;
+      cookie: number;
+    };
+    security: {
+      cors: {
+        // allowOrigins: [
+        //   'https://vegi.itsaboutpeepl.com',
+        // ]
+        allRoutes: boolean;
+        allowOrigins: '*' | string | string[];
+      };
+    };
+    models: {
+      migrate: 'safe' | 'drop' | 'alter';
+    };
+    blueprints: {
+      shortcuts: boolean;
+    };
+    hookTimeout: number;
   };
 };
