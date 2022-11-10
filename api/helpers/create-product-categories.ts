@@ -62,15 +62,13 @@ module.exports = {
     for (const productCatInput of inputs.productCategories) {
       var exist = await ProductCategory.find({
         name: productCatInput.name,
+        vendor: productCatInput.vendor
       });
       if (exist && exist.length > 0) {
         sails.log(
-          `ProductCategory with name: ${productCatInput.name} already exists.`
+          `ProductCategory with name: ${productCatInput.name} already exists for vendorId: ${productCatInput.vendor}.`
         );
         continue;
-        // return exits.alreadyExists(
-        //   `ProductCategory with name: ${productCatInput.name} already exists.`
-        // );
       }
 
       const inputsWithImage = {

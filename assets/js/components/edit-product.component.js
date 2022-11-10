@@ -13,27 +13,22 @@ parasails.registerComponent('editProduct', {
   //  ╔═╗╦═╗╔═╗╔═╗╔═╗
   //  ╠═╝╠╦╝║ ║╠═╝╚═╗
   //  ╩  ╩╚═╚═╝╩  ╚═╝
-  props: [
-    'product',
-    'productcategories',
-    'vendorid'
-  ],
+  props: ['product', 'productcategories', 'vendorid'],
   //  ╦╔╗╔╦╔╦╗╦╔═╗╦    ╔═╗╔╦╗╔═╗╔╦╗╔═╗
   //  ║║║║║ ║ ║╠═╣║    ╚═╗ ║ ╠═╣ ║ ║╣
   //  ╩╝╚╝╩ ╩ ╩╩ ╩╩═╝  ╚═╝ ╩ ╩ ╩ ╩ ╚═╝
-  data: function (){
+  data: function () {
     return {
       syncing: false,
       formRules: {
         name: {
-          required: true
-        }
+          required: true,
+        },
       },
       previewImageSrc: '',
-      formErrors: {
-      },
+      formErrors: {},
       cloudError: '',
-      imageName: 'Choose image'
+      imageName: 'Choose image',
     };
   },
 
@@ -60,8 +55,15 @@ parasails.registerComponent('editProduct', {
             <textarea :class="{ 'is-invalid': formErrors.description }" v-model="product.description" class="form-control" id="productDescription" required></textarea>
           </div>
           <div class="form-group">
-            <label for="productCategory">Category</label>
-            <select class="form-control" id="productCategory" v-model="product.productCategory" >
+            <label for="status">Status</label>
+            <select class="form-control" id="status" v-model="product.status" >
+              <option value="inactive">Discontinued</option>
+              <option value="active">Active</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="category">Category</label>
+            <select class="form-control" id="category" v-model="product.category" >
               <!-- TODO: Add image urls to dropdown  options as leading icon -->
               <option v-for="productCategory in productcategories" :value="productCategory.id">{{productCategory.name}}</option> 
             </select>
@@ -123,42 +125,50 @@ parasails.registerComponent('editProduct', {
   //  ╦  ╦╔═╗╔═╗╔═╗╦ ╦╔═╗╦  ╔═╗
   //  ║  ║╠╣ ║╣ ║  ╚╦╝║  ║  ║╣
   //  ╩═╝╩╚  ╚═╝╚═╝ ╩ ╚═╝╩═╝╚═╝
-  beforeMount: function() {
+  beforeMount: function () {
     //…
+    if (!this.product.status) {
+      this.product.status = 'active';
+    }
   },
-  mounted: async function(){
+  mounted: async function () {
     //…
     this.product.vendor = this.vendorid;
-    if(!this.product.options){
+    if (!this.product.options) {
       Vue.set(this.product, 'options', []);
     }
   },
-  beforeDestroy: function() {
+  beforeDestroy: function () {
     //…
   },
 
   filters: {
     convertToPounds: function (value) {
-      if (!value) {return '£0';}
-      value = '£' + (value/100).toFixed(2);
+      if (!value) {
+        return '£0';
+      }
+      value = '£' + (value / 100).toFixed(2);
       value = value.toString();
       return value;
-    }
+    },
   },
 
   //  ╦╔╗╔╔╦╗╔═╗╦═╗╔═╗╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
   //  ║║║║ ║ ║╣ ╠╦╝╠═╣║   ║ ║║ ║║║║╚═╗
   //  ╩╝╚╝ ╩ ╚═╝╩╚═╩ ╩╚═╝ ╩ ╩╚═╝╝╚╝╚═╝
   methods: {
-    click: async function(){
+    click: async function () {
       this.$emit('click');
     },
-    createdProduct: function({id}){
+    createdProduct: function ({ id }) {
       Vue.set(this.product, 'id', id);
+      this.showToast('Product Update Succeeded');
     },
-    changeProductImageInput: function(files) {
+    changeProductImageInput: function (files) {
       if (files.length !== 1 && !this.product.image) {
-        throw new Error('Consistency violation: `changeFileInput` was somehow called with an empty array of files, or with more than one file in the array!  This should never happen unless there is already an uploaded file tracked.');
+        throw new Error(
+          'Consistency violation: `changeFileInput` was somehow called with an empty array of files, or with more than one file in the array!  This should never happen unless there is already an uploaded file tracked.'
+        );
       }
       var selectedFile = files[0];
 
@@ -175,7 +185,7 @@ parasails.registerComponent('editProduct', {
 
       // Set up the file preview for the UI:
       var reader = new FileReader();
-      reader.onload = (event)=>{
+      reader.onload = (event) => {
         this.previewImageSrc = event.target.result;
 
         // Unbind this "onload" event.
@@ -184,12 +194,29 @@ parasails.registerComponent('editProduct', {
       // Clear out any error messages about not providing an image.
       reader.readAsDataURL(selectedFile);
     },
-    clickAddProductOption: function(){
+    clickAddProductOption: function () {
       var newProductOption = {
         name: '[Draft Option]',
-        values: []
+        values: [],
       };
       this.product.options.push(newProductOption);
-    }
-  }
+    },
+    showToast: function (message) {
+      // const Toastify = require('toastify-js');
+      // Toastify({
+      //   text: message,
+      //   duration: 3000,
+      //   destination: './',
+      //   newWindow: true,
+      //   close: false,
+      //   gravity: 'top', // `top` or `bottom`
+      //   position: 'right', // `left`, `center` or `right`
+      //   stopOnFocus: true, // Prevents dismissing of toast on hover
+      //   style: {
+      //     background: 'linear-gradient(to right, #00b09b, #96c93d)',
+      //   },
+      //   onClick: function () {}, // Callback after click
+      // }).showToast();
+    },
+  },
 });

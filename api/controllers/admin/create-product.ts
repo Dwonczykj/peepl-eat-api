@@ -3,60 +3,60 @@ declare var Product: any;
 import {v4 as uuidv4} from 'uuid';
 
 module.exports = {
-  friendlyName: "Create product",
+  friendlyName: 'Create product',
 
-  description: "",
+  description: '',
 
-  files: ["image"],
+  files: ['image'],
 
   inputs: {
     name: {
-      type: "string",
+      type: 'string',
       required: true,
       maxLength: 50,
     },
     description: {
-      type: "string",
+      type: 'string',
       required: true,
     },
     basePrice: {
-      type: "number",
+      type: 'number',
       required: true,
     },
     image: {
-      type: "ref",
+      type: 'ref',
     },
     isAvailable: {
-      type: "boolean",
+      type: 'boolean',
     },
     priority: {
-      type: "number",
+      type: 'number',
     },
     isFeatured: {
-      type: "boolean",
+      type: 'boolean',
     },
     vendor: {
-      type: "number",
+      type: 'number',
       required: true,
     },
     category: {
-      type: "string",
+      type: 'string',
       required: true,
     },
   },
 
   exits: {
     success: {
-      outputDescription: "The newly created `Product`s ID.",
+      outputDescription: 'The newly created `Product`s ID.',
       outputExample: {},
     },
     noFileAttached: {
-      description: "No file was attached.",
-      responseType: "badRequest",
+      description: 'No file was attached.',
+      responseType: 'badRequest',
     },
     tooBig: {
-      description: "The file is too big.",
-      responseType: "badRequest",
+      description: 'The file is too big.',
+      responseType: 'badRequest',
     },
   },
 
@@ -69,14 +69,14 @@ module.exports = {
 
     if (!isAuthorisedForVendor) {
       return exits.error(
-        new Error("You are not authorised to create products for this vendor.")
+        new Error('You are not authorised to create products for this vendor.')
       );
     }
 
     var newProduct;
 
     let imageInfo = await sails.helpers.uploadOneS3(inputs.image);
-    
+
     if (!imageInfo) {
       // Create the new product
       newProduct = await Product.create({
@@ -86,6 +86,7 @@ module.exports = {
         isAvailable: inputs.isAvailable,
         priority: inputs.priority,
         vendor: inputs.vendor,
+        category: inputs.category,
       }).fetch();
     } else {
       newProduct = await Product.create({
@@ -96,6 +97,7 @@ module.exports = {
         isAvailable: inputs.isAvailable,
         priority: inputs.priority,
         vendor: inputs.vendor,
+        category: inputs.category,
       }).fetch();
     }
 

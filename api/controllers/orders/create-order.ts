@@ -1,12 +1,13 @@
-
-/* eslint-disable camelcase */
-declare var OrderItemOptionValue: any;
-declare var OrderItem: any;
-declare var Order: any;
-// declare var _: any;
 import _ from 'lodash';
 import { OrderType } from '../../../scripts/utils';
 import util from 'util';
+import { sailsVegi } from '../../../api/interfaces/iSails';
+
+declare var sails: sailsVegi;
+declare var OrderItemOptionValue: any;
+declare var OrderItem: any;
+declare var Order: any;
+
 export type CreateOrderInputs = {
   items: Array<{
     id: number;
@@ -368,7 +369,7 @@ module.exports = {
         newPaymentIntent = await sails.helpers
           .createPaymentIntent(
             calculatedOrderTotal.finalAmount,
-            vendor.walletAddress, //pushes an update to user via firebase when order has comnpleted via peeplPay posting back to peeplEatWebHook
+            vendor.walletAddress,
             vendor.name
           )
           .catch(() => {
@@ -397,8 +398,14 @@ module.exports = {
 
       if (datastore.config.adapter === 'sails-disk') {
         const result = await createOrderTransactionDB(null);
-        sails.log('USING sails-disk');
-        sails.log(util.inspect(result, { depth: 0 }));
+        if(process.env.NODE_ENV && ! process.env.NODE_ENV.toLowerCase().startsWith('prod')){
+          sails.log('USING sails-disk');
+          sails.log(
+            `create-order -> order created -> ${util.inspect(result, {
+              depth: 0,
+            })}`
+          );
+        }
         if (result) {
           return exits.success(result);
         }
@@ -413,7 +420,9 @@ module.exports = {
             sails.log(issues);
             return exits.error(new Error('Error creating Order in DB'));
           });
-        sails.log(util.inspect(result, { depth: 0 }));
+        if(process.env.NODE_ENV && ! process.env.NODE_ENV.toLowerCase().startsWith('prod')){
+          sails.log(`create-order -> order created -> ${util.inspect(result, { depth: 0 })}`);
+        }
         return exits.success(result);
       }
     } catch (error) {

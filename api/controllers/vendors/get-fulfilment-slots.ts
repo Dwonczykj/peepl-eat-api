@@ -81,6 +81,8 @@ module.exports = {
     let deliveryFulfilmentMethod = vendor.deliveryFulfilmentMethod;
 
     // If the vendor has a delivery partner associated with it, then we need to get the delivery slots for that partner.
+    //TODO: Add Allow this to fetch delivery partners from the pool if there !vendor.deliveryPartner or perhaps vendor.deliveryPartner === SPECIAL_DP_POOL
+    // todocont: which gets deliveryPartners from the pool that fulfil that vendors postCode (geoLocation) & the deliveryAddress.
     if (vendor.deliveryPartner && vendor.deliveryPartner.status === "active") {
       var deliveryPartner = await DeliveryPartner.findOne(
         vendor.deliveryPartner.id

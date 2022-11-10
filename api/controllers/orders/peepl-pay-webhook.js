@@ -42,15 +42,24 @@ module.exports = {
 
     var unixtime = Date.now();
 
+    if(!['paid', 'unpaid', 'failed'].includes(inputs.status)){
+      sails.log.warn(`peepl-pay-webhook received inputs.status="${inputs.status}". This is not handled!`);
+    }
+    if (sails.config.custom.baseUrl !== 'https://vegi.itsaboutpeepl.com') {
+      const util = require('util');
+      sails.log(`peepl-pay-webook called with inputs: ${util.inspect(inputs, {depth: null})}`);
+    }
+
     // Update order with payment ID and time
     var order = await Order.updateOne({
       paymentIntentId: inputs.publicId,
       completedFlag: '',
-    })
-      .set({
-        paymentStatus: inputs.status === 'paid' ? 'paid' : 'failed',
-        paidDateTime: unixtime,
-      });
+    }).set({
+      paymentStatus: ['paid', 'unpaid', 'failed'].includes(inputs.status)
+        ? inputs.status
+        : 'failed',
+      paidDateTime: unixtime,
+    });
 
     if(!order){
       return exits.orderNotFound();
@@ -58,6 +67,8 @@ module.exports = {
 
     order = await Order.findOne(order.id)
       .populate('vendor');
+
+    await sails.helpers.sendSlackNotification.with({ order: order });
 
     try {
 	    if(order.paymentStatus === 'paid'){
@@ -91,8 +102,6 @@ Delivery/Collection on ${order.fulfilmentSlotFrom} - ${order.fulfilmentSlotTo}`,
     } catch (error) {
       sails.log.error(`peepl-pay-webhook errored sending sms notification to vendor for paid order: ${error}`);
     }
-
-    await sails.helpers.sendSlackNotification.with({order: order});
     // // Send order confirmation email
     // await sails.helpers.sendTemplateEmail.with({
     //   template: 'email-order-confirmation-new',

@@ -51,7 +51,7 @@ module.exports = {
       title: inputs.title,
       order: inputs.data && inputs.data.orderId || null,
       metadata:
-        inputs.data && inputs.data.orderId
+        JSON.stringify(inputs.data && inputs.data.orderId
           ? {
             model: 'order',
             id: inputs.data.orderId,
@@ -59,7 +59,7 @@ module.exports = {
           : {
             model: '',
             id: null,
-          },
+          }),
     }).fetch();
 
     var dontActuallySend =

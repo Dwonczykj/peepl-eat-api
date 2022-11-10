@@ -74,6 +74,9 @@ parasails.registerComponent('editProductCategory', {
           <div v-if="cloudError === 'notFound'" class="alert alert-danger mt-4" role="alert">
             Product Category not found.
           </div>
+          <div v-else-if="cloudError === 'alreadyExists'" class="alert alert-danger mt-4" role="alert">
+            A product category with this name already exists for this vendor
+          </div>
           <div v-else-if="cloudError" class="alert alert-danger mt-4" role="alert">
             There has been an error updating the product. Please try again.
           </div>
@@ -160,6 +163,7 @@ parasails.registerComponent('editProductCategory', {
     },
     createdProductCategory: function ({ id }) {
       Vue.set(this.category, 'id', id);
+      this.showToast('Product Category Update Succeeded');
     },
     changeProductImageInput: function (files) {
       if (files.length !== 1 && !this.category.image) {
@@ -190,6 +194,23 @@ parasails.registerComponent('editProductCategory', {
       };
       // Clear out any error messages about not providing an image.
       reader.readAsDataURL(selectedFile);
+    },
+    showToast: function (message) {
+      // const Toastify = require('toastify-js');
+      // Toastify({
+      //   text: message,
+      //   duration: 3000,
+      //   destination: './',
+      //   newWindow: true,
+      //   close: false,
+      //   gravity: 'top', // `top` or `bottom`
+      //   position: 'right', // `left`, `center` or `right`
+      //   stopOnFocus: true, // Prevents dismissing of toast on hover
+      //   style: {
+      //     background: 'linear-gradient(to right, #00b09b, #96c93d)',
+      //   },
+      //   onClick: function () {}, // Callback after click
+      // }).showToast();
     },
   },
 });
