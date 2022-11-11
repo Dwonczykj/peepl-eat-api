@@ -276,7 +276,7 @@ module.exports = {
         '/admin/approve-order/' +
         newOrder.publicId,
       data: {
-        orderId: newOrder.id
+        orderId: newOrder.id,
       },
     });
 
@@ -288,12 +288,12 @@ module.exports = {
     //   peeplPayPaymentIntentId: newOrder.paymentIntentId,
     //   recipient: newOrder.customerWalletAddress,
     //   rewardsIssued: ...
-    //   paymentAmountBeingRefunded: oldOrder.total - newOrder.total //! this part calls sails.helpers.calculatePPLReward internally
+    //   paymentAmountBeingRefunded: oldOrder.total - newOrder.total //! this part calls sails.helpers.calculatePplReward internally
     // });
 
     // ! Do NOT NEED TO REVERT The the PPL reward as it is only issued once the
     // ! order has been accepted by the vendor in approve-or-decline-order.js
-    // const revertRewardPPLAmount = await sails.helpers.calculatePPLReward.with({
+    // const revertRewardPPLAmount = await sails.helpers.calculatePplReward.with({
     //   amount: (oldOrder.total - newOrder.total),
     //   orderType: OrderTypeEnum.vegiEats
     // });

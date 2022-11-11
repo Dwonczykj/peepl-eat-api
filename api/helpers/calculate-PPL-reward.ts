@@ -42,7 +42,9 @@ module.exports = {
   fn: async function (inputs, exits) {
 
     // (5% order total in pence (GBPx)) / 10 pence (value of PPL token)
-    var rewardAmount = (inputs.amount * sails.config.custom.vegiEatsRewardPcnt) / sails.config.custom.PPLTokenValueInPence;
+    var rewardAmount =
+      (inputs.amount * sails.config.custom.vegiEatsRewardPcnt) /
+      sails.config.custom.PPLTokenValueInPence;
 
     return exits.success({
       data: rewardAmount

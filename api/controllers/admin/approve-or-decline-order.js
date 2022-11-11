@@ -1,6 +1,7 @@
 const moment = require('moment');
 
 const OrderTypeEnum = {
+  //type: OrderTypeEnumLiteral
   vegiEats: 'vegiEats',
   vegiPays: 'vegiPays',
 };

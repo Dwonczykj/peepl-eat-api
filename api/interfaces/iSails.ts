@@ -13,6 +13,8 @@ export type UploadImageInfoType = {
   fd: string;
 }
 
+export type OrderTypeEnumLiteral = 'vegiEats' | 'vegiPays'
+
 // ~ https://stackoverflow.com/a/53809800
 export type KeysOfType<T, U> = {
   [K in keyof T]: T[K] extends U ? K : never;
@@ -215,11 +217,22 @@ export type sailsVegi = {
       ) => Promise<AvailableDateOpeningHours>;
     };
     calculateOrderTotal: {
-      with: (unusedArg: { orderId: string }) => Promise<{
+      with: (unusedArg: { orderId: number }) => Promise<{
         finalAmount: number;
         withoutFees: number;
       }>;
     };
+
+    calculatePplReward: {
+      with: (unusedArgs: {
+        amount: number;
+        orderType: OrderTypeEnumLiteral;
+      }) => Promise<{
+        data: number;
+      }>;
+    } & ((unusedArgAmount: number, unusedArgOrderType: OrderTypeEnumLiteral) => Promise<{
+      data: number;
+    }>);
 
     getAvailableDates: {
       with: (unusedArgs: {
@@ -291,13 +304,15 @@ export type sailsVegi = {
     uploads: {
       adapter: any;
     };
-    datastores: { [configKey: string]: {
-      adapter: string;
-      url: string;
-      charset?: string;
-      collation?: string;
-      ssl?: boolean;
-    } };
+    datastores: {
+      [configKey: string]: {
+        adapter: string;
+        url: string;
+        charset?: string;
+        collation?: string;
+        ssl?: boolean;
+      };
+    };
     port: 1337;
     http: {
       cache: number;

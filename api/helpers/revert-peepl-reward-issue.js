@@ -86,10 +86,10 @@ module.exports = {
 
     let _revertRewardAmount;
     try {
-	    _revertRewardAmount = await sails.helpers.calculatePPLReward.with({
-	      amount: inputs.paymentAmountBeingRefunded,
-	      orderType: OrderTypeEnum.vegiEats
-	    });
+	    _revertRewardAmount = await sails.helpers.calculatePplReward.with({
+        amount: inputs.paymentAmountBeingRefunded,
+        orderType: OrderTypeEnum.vegiEats,
+      });
     } catch (error) {
       return exits.requestFailed(
         new Error(
