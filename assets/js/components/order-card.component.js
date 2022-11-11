@@ -13,13 +13,11 @@ parasails.registerComponent('order-card', {
   //  ╔═╗╦═╗╔═╗╔═╗╔═╗
   //  ╠═╝╠╦╝║ ║╠═╝╚═╗
   //  ╩  ╩╚═╚═╝╩  ╚═╝
-  props: [
-    'order',
-  ],
+  props: ['order'],
   //  ╦╔╗╔╦╔╦╗╦╔═╗╦    ╔═╗╔╦╗╔═╗╔╦╗╔═╗
   //  ║║║║║ ║ ║╠═╣║    ╚═╗ ║ ╠═╣ ║ ║╣
   //  ╩╝╚╝╩ ╩ ╩╩ ╩╩═╝  ╚═╝ ╩ ╩ ╩ ╩ ╚═╝
-  data: function (){
+  data: function () {
     return {
       //…
     };
@@ -77,9 +75,9 @@ parasails.registerComponent('order-card', {
       <h2 class="h5 border-top pt-3 mt-3 mb-0 d-flex">
         <span class="mr-auto"></span>
       </h2>
-      <button class="btn btn-peepl-green" @click="clickApproveOrDeclineOrder('accept')">Approve</button>
-      <button class="btn btn-peepl-red" @click="clickApproveOrDeclineOrder('reject')">Decline</button>
-      <button class="btn btn-peepl-red" @click="clickApproveOrDeclineOrder('partial')">Partially fulfil</button>
+      <button :disabled="order.paymentStatus !== 'paid'" class="btn btn-peepl-green" @click="clickApproveOrDeclineOrder('accept')">Approve</button>
+      <button :disabled="order.paymentStatus !== 'paid'"  class="btn btn-peepl-red" @click="clickApproveOrDeclineOrder('reject')">Decline</button>
+      <button disabled class="btn btn-peepl-red" @click="clickApproveOrDeclineOrder('partial')">Partially fulfil</button>
     </div>
     <div v-else-if="order.restaurantAcceptanceStatus == 'pending' && !isInFuture(order.fulfilmentSlotFrom)">
       <p class="border-top pt-3 mt-3 mb-0 d-flex">
@@ -104,30 +102,36 @@ parasails.registerComponent('order-card', {
   //  ╦  ╦╔═╗╔═╗╔═╗╦ ╦╔═╗╦  ╔═╗
   //  ║  ║╠╣ ║╣ ║  ╚╦╝║  ║  ║╣
   //  ╩═╝╩╚  ╚═╝╚═╝ ╩ ╚═╝╩═╝╚═╝
-  beforeMount: function() {
+  beforeMount: function () {
     //…
   },
-  mounted: async function(){
+  mounted: async function () {
     //…
   },
-  beforeDestroy: function() {
+  beforeDestroy: function () {
     //…
   },
 
   filters: {
     capitalise: function (value) {
-      if (!value) {return ''; }
+      if (!value) {
+        return '';
+      }
       value = value.toString();
       return value.charAt(0).toUpperCase() + value.slice(1);
     },
-    formatDeliverySlot: function(dateTime) {
-      if (!dateTime) {return '';}
+    formatDeliverySlot: function (dateTime) {
+      if (!dateTime) {
+        return '';
+      }
       dateTime = moment(dateTime).utc().calendar();
       return dateTime;
     },
-    formatOrderedTime: function(unixtime) {
-      if (!unixtime) {return '';}
-      unixtime = moment.unix(Math.round(unixtime/1000)).calendar();
+    formatOrderedTime: function (unixtime) {
+      if (!unixtime) {
+        return '';
+      }
+      unixtime = moment.unix(Math.round(unixtime / 1000)).calendar();
       return unixtime;
     },
   },
@@ -136,14 +140,32 @@ parasails.registerComponent('order-card', {
   //  ║║║║ ║ ║╣ ╠╦╝╠═╣║   ║ ║║ ║║║║╚═╗
   //  ╩╝╚╝ ╩ ╚═╝╩╚═╩ ╩╚═╝ ╩ ╩╚═╝╝╚╝╚═╝
   methods: {
-    click: async function(){
+    click: async function () {
       this.$emit('click');
     },
     clickApproveOrDeclineOrder: function (orderFulfilled) {
       var that = this;
-
-      Cloud.approveOrDeclineOrder(this.order.publicId, orderFulfilled)
-        .then(() => {
+      var retainItems = this.order.items.map((item) => item.id);
+      var removeItems = [];
+      if (orderFulfilled === 'reject') {
+        retainItems = [];
+        removeItems = this.order.items.map((item) => item.id);
+      } else if (orderFulfilled === 'accept') {
+        retainItems = this.order.items.map((item) => item.id);
+        removeItems = [];
+      } else if (orderFulfilled === 'partial') {
+        removeItems = this.order.items.map((item) => item.id);
+        retainItems = [];
+      } else {
+        //ignore
+      }
+      try {
+        Cloud.approveOrDeclineOrder(
+          this.order.publicId,
+          orderFulfilled,
+          retainItems,
+          removeItems
+        ).then(() => {
           if (orderFulfilled === 'accept') {
             that.order.restaurantAcceptanceStatus = 'accepted';
           } else if (orderFulfilled === 'reject') {
@@ -152,11 +174,18 @@ parasails.registerComponent('order-card', {
             that.order.restaurantAcceptanceStatus = 'rejected';
           }
         });
+      } catch (err) {
+        if (err.exit === 'orderNotPaidFor') {
+          this.cloudErr = 'Order has not been paid for';
+        }
+      }
     },
-    isInFuture: function(dateTimeString){
-      if (!dateTimeString) {return false;}
+    isInFuture: function (dateTimeString) {
+      if (!dateTimeString) {
+        return false;
+      }
       var dateTime = moment.utc(dateTimeString);
       return dateTime.isAfter(moment.utc());
-    }
-  }
+    },
+  },
 });
