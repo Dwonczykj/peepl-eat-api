@@ -2,7 +2,7 @@ import { expect, assert } from 'chai'; // ~ https://www.chaijs.com/api/bdd/
 // import util from "util";
 import { v4 as uuidv4 } from 'uuid';
 const { fixtures } = require('../../../../scripts/build_db.js');
-import { HttpAuthTestSenderVendor } from '../vendors/defaultVendor.js';
+import { HttpAuthTestSenderVendor } from '../vendors/defaultVendor';
 import {
   ProductCategoryType,
 } from '../../../../scripts/utils';

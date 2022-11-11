@@ -89,9 +89,3 @@ export class HttpAuthTestSenderDeliveryPartner extends HttpAuthTestSender {
     });
   }
 }
-
-module.exports = {
-  DEFAULT_NEW_DELIVERY_PARTNER_OBJECT: DEFAULT_NEW_DELIVERY_PARTNER_OBJECT,
-  ExpectResponseDeliveryPartner: ExpectResponseDeliveryPartner,
-  HttpAuthTestSenderDeliveryPartner: HttpAuthTestSenderDeliveryPartner,
-};

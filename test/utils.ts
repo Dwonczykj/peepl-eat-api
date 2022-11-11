@@ -1,17 +1,19 @@
 /* eslint-disable no-console */
 /* eslint-disable no-undef */
-const { expect, assert } = require('chai');
-const request = require('supertest');
-const util = require('util');
-const { getNextWeekday } = require('../scripts/utils');
+import supertest from 'supertest';
+import util from 'util';
+import { assert, expect } from 'chai'; // ~ https://www.chaijs.com/api/bdd/
+import { getNextWeekday } from '../scripts/utils';
+import { sailsVegi } from '../api/interfaces/iSails';
+declare var sails: sailsVegi;
 
-const loginAsUser = async function (name, secret, verbose = false) {
+export const loginAsUser = async function (name, secret, verbose = false) {
   try {
     if (verbose) {
       console.log(`Login with ${name}'s Account`);
     }
 
-    return request(sails.hooks.http.app)
+    return supertest(sails.hooks.http.app)
       .post('/api/v1/admin/login-with-secret')
       .send({
         name: name,
@@ -34,7 +36,7 @@ const loginAsUser = async function (name, secret, verbose = false) {
   }
 };
 
-const login = async function (verbose = false) {
+export const login = async function (verbose = false) {
   assert.containsAllKeys(
     sails.config.custom,
     [
@@ -54,13 +56,13 @@ const login = async function (verbose = false) {
   );
 };
 
-const logout = async function (verbose = false) {
+export const logout = async function (verbose = false) {
   try {
     if (verbose) {
       console.log('Logout with Test Account');
     }
 
-    return request(sails.hooks.http.app)
+    return supertest(sails.hooks.http.app)
       .get('/api/v1/admin/logout')
       .expect(200)
       .then((response) => {
@@ -81,12 +83,12 @@ const logout = async function (verbose = false) {
   }
 };
 
-const logoutCbLogin = async (cb, verbose = false) =>
+export const logoutCbLogin = async (cb, verbose = false) =>
   logout(verbose)
     .then(() => cb())
     .then((unused) => login(verbose));
 
-const callAuthActionWithCookie = async (cb, verbose = false, data = {}) =>
+export const callAuthActionWithCookie = async (cb, verbose = false, data = {}) =>
   login(verbose).then((response) => {
     expect(response.statusCode).to.equal(
       200,
@@ -101,7 +103,7 @@ const callAuthActionWithCookie = async (cb, verbose = false, data = {}) =>
     return cb(sessionCookie);
   });
 
-const callAuthActionWithCookieAndUser = async (
+export const callAuthActionWithCookieAndUser = async (
   cb,
   name,
   secret,
@@ -121,15 +123,3 @@ const callAuthActionWithCookieAndUser = async (
     }
     return cb(sessionCookie);
   });
-
-// console.log(getNextWeekday('thursday') + 'is next thursday');
-// console.log(getNextWeekday("monday") + "is next monday");
-
-module.exports = {
-  login,
-  logout,
-  logoutCbLogin,
-  callAuthActionWithCookie,
-  callAuthActionWithCookieAndUser,
-  getNextWeekday,
-};

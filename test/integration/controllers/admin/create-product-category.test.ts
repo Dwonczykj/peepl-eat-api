@@ -2,44 +2,13 @@ import { expect, assert } from 'chai'; // ~ https://www.chaijs.com/api/bdd/
 // import util from "util";
 import { v4 as uuidv4 } from 'uuid';
 const { fixtures } = require('../../../../scripts/build_db.js');
-import { HttpAuthTestSenderVendor } from '../../controllers/vendors/defaultVendor.js';
+import { HttpAuthTestSenderVendor } from '../../controllers/vendors/defaultVendor';
 import {
   ProductCategoryType,
 } from '../../../../scripts/utils';
 
-import { DEFAULT_NEW_PRODUCT_CATEGORY_OBJECT } from './defaultProductCategory';
 import { SailsModelType } from '../../../../api/interfaces/iSails';
 declare var ProductCategory: SailsModelType<ProductCategoryType>;
-
-export const createProductCategories = async (
-  fixtures,
-  numberOfObjects: number,
-  overrides: { [k: string]: any } = {}
-) => {
-  numberOfObjects = Math.max(1, numberOfObjects);
-
-  const _objs = new Array(numberOfObjects)
-    .fill(null)
-    .map((unusedNull, unusedInd) =>
-      DEFAULT_NEW_PRODUCT_CATEGORY_OBJECT(fixtures, {
-        ...{},
-        ...overrides,
-      })
-    );
-
-  const newObjs: Array<ProductCategoryType> = await ProductCategory.createEach(_objs).fetch();
-
-  return {
-    productCategories: newObjs,
-  };
-};
-
-declare var Order: any;
-declare var DeliveryPartner: any;
-declare var Vendor: any;
-declare var FulfilmentMethod: any;
-declare var OpeningHours: any;
-declare var sails: any;
 
 class CAN_CREATE_PRODUCT_CATEGORIES {
   static readonly useAccount = 'TEST_ADMIN';

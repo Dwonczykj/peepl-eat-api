@@ -91,6 +91,9 @@
       "name": "Get fulfilment slots"
     },
     {
+      "name": "view vendor product categories"
+    },
+    {
       "name": "Get eligible order dates"
     },
     {
@@ -2815,6 +2818,36 @@
         }
       }
     },
+    "/api/v1/vendors/view-product-categories": {
+      "get": {
+        "summary": "view vendor product categories",
+        "tags": [
+          "view vendor product categories"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "vendor",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "vendor not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/api/v1/vendors/get-next-fulfilment-slot": {
       "get": {
         "summary": "Get fulfilment slots",
@@ -3321,7 +3354,7 @@
           {
             "in": "query",
             "name": "orderId",
-            "required": false,
+            "required": true,
             "schema": {
               "type": "number",
               "format": "double"

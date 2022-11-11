@@ -18,6 +18,11 @@ Cloud.setup({
       url: '/api/v1/postal-districts/get-all-postal-districts',
       args: [],
     },
+    viewProductCategories: {
+      verb: 'GET',
+      url: '/api/v1/vendors/view-product-categories',
+      args: ['vendor'],
+    },
     getFulfilmentSlots: {
       verb: 'GET',
       url: '/api/v1/vendors/get-fulfilment-slots',

@@ -1,10 +1,10 @@
-const {
+import {
   HttpAuthTestSender,
   ExpectResponse,
-} = require('../../../httpTestSender');
-const { assert, expect } = require('chai'); // ~ https://www.chaijs.com/api/bdd/
+} from '../../../httpTestSender';
+import { assert, expect } from 'chai'; // ~ https://www.chaijs.com/api/bdd/
 
-const DEFAULT_NEW_VENDOR_OBJECT = (fixtures, overrides = {}) => {
+export const DEFAULT_NEW_VENDOR_OBJECT = (fixtures, overrides = {}) => {
   const vendor = fixtures.vendors[0];
   const fulfilmentMethodVendor = fixtures.fulfilmentMethods.filter(
     (fm) =>
@@ -53,13 +53,15 @@ function checkIfValidUUID(str) {
   return regexExp.test(str);
 }
 
-class ExpectResponseVendor extends ExpectResponse {
+export class ExpectResponseVendor extends ExpectResponse {
   constructor({
     HTTP_TYPE = 'get',
     ACTION_PATH = '',
     ACTION_NAME = '',
     sendData = {},
     expectResponse = {},
+    expectResponseCb = async (response, requestPayload) => {},
+    expectStatusCode = 200,
   }) {
     super({
       HTTP_TYPE,
@@ -67,6 +69,8 @@ class ExpectResponseVendor extends ExpectResponse {
       ACTION_NAME,
       sendData,
       expectResponse,
+      expectResponseCb,
+      expectStatusCode,
     });
   }
 
@@ -84,7 +88,7 @@ class ExpectResponseVendor extends ExpectResponse {
   }
 }
 
-class HttpAuthTestSenderVendor extends HttpAuthTestSender {
+export class HttpAuthTestSenderVendor extends HttpAuthTestSender {
   constructor({
     HTTP_TYPE = 'get',
     ACTION_PREFIX = '/api/v1',
@@ -104,15 +108,9 @@ class HttpAuthTestSenderVendor extends HttpAuthTestSender {
       useAccount,
       sendData,
       expectResponse,
-      ExpectResponseVendor: ExpectResponseVendor,
+      expectResponseChecker: ExpectResponseVendor,
       expectResponseCb,
       expectStatusCode,
     });
   }
 }
-
-module.exports = {
-  DEFAULT_NEW_VENDOR_OBJECT: DEFAULT_NEW_VENDOR_OBJECT,
-  ExpectResponseVendor: ExpectResponseVendor,
-  HttpAuthTestSenderVendor: HttpAuthTestSenderVendor,
-};

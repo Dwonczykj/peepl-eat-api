@@ -1,5 +1,5 @@
 import { AvailableDateOpeningHours } from '../../../api/helpers/get-available-dates';
-import { DateString, FulfilmentMethodType, OpeningHoursType } from '../../../scripts/utils';
+import { FulfilmentMethodType } from '../../../scripts/utils';
 import { sailsVegi } from '../../interfaces/iSails';
 declare var sails: sailsVegi;
 

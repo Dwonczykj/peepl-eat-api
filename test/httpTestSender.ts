@@ -1,12 +1,24 @@
-var supertest = require('supertest');
-const util = require('util');
-const { callAuthActionWithCookieAndUser } = require('./utils');
-const { assert, expect } = require('chai'); // ~ https://www.chaijs.com/api/bdd/
+import supertest from 'supertest';
+import util from 'util';
+import { assert, expect } from 'chai'; // ~ https://www.chaijs.com/api/bdd/
+import _ from 'lodash';
+import { callAuthActionWithCookieAndUser } from './utils';
+import { SailsModelType, sailsVegi } from '../api/interfaces/iSails';
+import { UserType } from '../scripts/utils';
+declare var sails: sailsVegi;
+declare var User: SailsModelType<UserType>;
 
 const cwd = process.cwd();
 const routesRead = require(cwd + '/config/routes.js')['routes'];
 
-class ExpectResponse {
+export class ExpectResponse {
+  private _EXPECTED_RESPONSE: any;
+  private _send: any;
+  private _expectedResposeWithUpdates: any;
+  private expectedResponseCb: any;
+  private payloadRequestedWith: any;
+  private expectStatusCode: number;
+  public customChecks({ responseBody, expectedResponse }) {}
   constructor({
     HTTP_TYPE = 'get',
     ACTION_PATH = '',
@@ -69,7 +81,7 @@ class ExpectResponse {
         depth: null,
       })}`
     );
-    if(this.expectedResponseCb){
+    if (this.expectedResponseCb) {
       await this.expectedResponseCb(response, this.payloadRequestedWith);
     }
   }
@@ -78,13 +90,16 @@ class ExpectResponse {
     let expectedResponse =
       overrideExpectedResponse || this.expectedResposeWithUpdates;
 
-    const filteredResponse = _.pick(responseBody, Object.keys(expectedResponse));
+    const filteredResponse = _.pick(
+      responseBody,
+      Object.keys(expectedResponse)
+    );
 
     for (var prop of Object.keys(expectedResponse)) {
       expect(filteredResponse).to.have.property(prop);
     }
 
-    if(this.customChecks){
+    if (this.customChecks) {
       expectedResponse = this.customChecks({ responseBody, expectedResponse });
     }
 
@@ -92,7 +107,14 @@ class ExpectResponse {
   }
 }
 
-class HttpTestSender {
+export class HttpTestSender {
+  public ACTION_PREFIX: string;
+  public ACTION_PATH: string;
+  public ACTION_NAME: string;
+  public HTTP_TYPE: 'get' | 'post';
+  public baseUrl: string;
+  public httpCall: () => any;
+  private _expectedResponse: any;
   constructor({
     HTTP_TYPE = 'get',
     ACTION_PREFIX = '/api/v1',
@@ -107,15 +129,15 @@ class HttpTestSender {
     this.ACTION_PREFIX = ACTION_PREFIX;
     this.ACTION_PATH = ACTION_PATH;
     this.ACTION_NAME = ACTION_NAME;
-    this.HTTP_TYPE = HTTP_TYPE;
+    this.HTTP_TYPE = HTTP_TYPE as 'get' | 'post';
     const relUrl = `${this.ACTION_PATH}/${this.ACTION_NAME}`;
     let baseUrl = !relUrl
       ? this.ACTION_NAME === ''
         ? `${this.ACTION_PREFIX}/${this.ACTION_PATH}`
         : `${this.ACTION_PREFIX}/${this.ACTION_PATH}/${this.ACTION_NAME}`
       : `${this.ACTION_PREFIX}/${relUrl}`;
-    for(const key of Object.keys(sendData)){
-      if(baseUrl.endsWith(`/:${key}`)){
+    for (const key of Object.keys(sendData)) {
+      if (baseUrl.endsWith(`/:${key}`)) {
         baseUrl = baseUrl.replace(`:${key}`, sendData[key]);
         delete sendData[key];
         break;
@@ -151,7 +173,11 @@ class HttpTestSender {
   }
 
   makeCallWith(cookie) {
-    return async (updatedPostDataWith, updatedPostDataWithOutKeys = [], filesByName = {}) => {
+    return async (
+      updatedPostDataWith,
+      updatedPostDataWithOutKeys = [],
+      filesByName = {}
+    ) => {
       const _sw = this.expectedResponse.sendWith(
         updatedPostDataWith,
         updatedPostDataWithOutKeys
@@ -178,17 +204,16 @@ class HttpTestSender {
               )
           : self.httpCall().send(_sw);
 
-      if(Object.keys(filesByName).length > 0){
+      if (Object.keys(filesByName).length > 0) {
         // for (const fileName of Object.keys(filesByName)){
         //   console.log(`Adding file: '${fileName}' to supertest request...`);
         //   _makeCall = () => _makeCall().attach(fileName, filesByName[fileName]);
         // }
-        let _makeCallAttached = () =>
-          self
-            .httpCall();
-        for (var field of Object.keys(_sw)){
+        let _makeCallAttached = () => self.httpCall();
+        for (var field of Object.keys(_sw)) {
           console.log(`Adding field: '${field}' to supertest request...`);
-          _makeCallAttached = () => _makeCallAttached().field(field, _sw[field]);
+          _makeCallAttached = () =>
+            _makeCallAttached().field(field, _sw[field]);
         }
         // for (var fileName of Object.keys(filesByName)) {
         //   console.log(`Adding fileName: '${fileName}' to supertest request...`);
@@ -202,16 +227,16 @@ class HttpTestSender {
           );
       }
 
-      const response = _makeCall()
+      const response = await _makeCall()
         .set('Cookie', cookie)
         .set('Accept', 'application/json');
 
-      console.log(`Supertest: -> ${response.method} ${response.url}`);
+      console.log(`Supertest: -> ${response.request.method} ${response.request.url}`);
 
       if (response.statusCode === 400 || response.statusCode >= 402) {
         // we might want to expect a 401
         // eslint-disable-next-line no-console
-        if(response.statusCode === 404){
+        if (response.statusCode === 404) {
           const route = `${this.HTTP_TYPE} ${this.baseUrl}`;
           if (!Object.keys(routesRead).includes(route)) {
             console.warn(`Could not locate "${route}" in config/routes.js`);
@@ -228,7 +253,8 @@ class HttpTestSender {
   }
 }
 
-class HttpAuthTestSender extends HttpTestSender {
+export class HttpAuthTestSender extends HttpTestSender {
+  public useAccount: string;
   constructor({
     HTTP_TYPE = 'get',
     ACTION_PREFIX = '/api/v1',
@@ -307,8 +333,3 @@ class HttpAuthTestSender extends HttpTestSender {
     );
   }
 }
-
-module.exports = {
-  HttpAuthTestSender,
-  ExpectResponse,
-};

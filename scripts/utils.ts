@@ -347,6 +347,7 @@ export type VendorCategoryType = {
 };
 
 export type PostalDistrictType = {
+  id: number;
   outcode: string;
   vendors: Array<_VendorTypeHidden>;
 };

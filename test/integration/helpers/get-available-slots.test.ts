@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 const { fixtures } = require("../../../scripts/build_db.js");
 import {
   DEFAULT_NEW_VENDOR_OBJECT,
-} from "../controllers/vendors/defaultVendor.js";
+} from "../controllers/vendors/defaultVendor";
 import { DEFAULT_NEW_DELIVERY_PARTNER_OBJECT } from "../controllers/deliveryPartners/defaultDeliveryPartner";
 import { DEFAULT_NEW_ORDER_OBJECT } from "../controllers/orders/defaultOrder.js";
 import {

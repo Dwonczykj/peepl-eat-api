@@ -4,7 +4,7 @@ import moment from "moment";
 const { fixtures } = require("../../../../scripts/build_db.js");
 import {
   HttpAuthTestSenderVendor,
-} from "../../controllers/vendors/defaultVendor.js";
+} from "../../controllers/vendors/defaultVendor";
 import {
   getNextWeekday,
   timeStrFormat,

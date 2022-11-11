@@ -31,6 +31,9 @@ module.exports.routes = {
   'GET /api/v1/vendors/get-fulfilment-slots': {
     action: 'vendors/get-fulfilment-slots',
   },
+  'GET /api/v1/vendors/view-product-categories': {
+    action: 'vendors/view-product-categories',
+  },
   'GET /api/v1/vendors/get-next-fulfilment-slot': {
     action: 'vendors/get-next-fulfilment-slot',
   },

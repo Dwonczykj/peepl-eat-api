@@ -332,4 +332,9 @@ export type sailsVegi = {
     };
     hookTimeout: number;
   };
+  hooks: {
+    http: {
+      app: any;
+    };
+  };
 };

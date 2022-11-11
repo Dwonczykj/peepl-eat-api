@@ -11,7 +11,7 @@ const {
   DEFAULT_NEW_VENDOR_OBJECT,
   ExpectResponseVendor,
   HttpAuthTestSenderVendor
-} = require('../vendors/defaultVendor.js');
+} = require('../vendors/defaultVendor');
 
 const CAN_EDIT_VENDORS = (fixtures) => {
   return {

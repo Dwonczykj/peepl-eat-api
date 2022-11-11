@@ -707,11 +707,3 @@ export const getDeliveryPartnerHelpers = (sails, deliveryPartners: Array<any>) =
       ? new deliveryPartnerHelperLookup[deliveryPartner.name](sails, deliveryPartner)
       : new EmailDeliveryPartner(sails, deliveryPartner)
   );
-
-// module.exports = {
-//   DeliveryPartnerObject,
-//   EmailDeliveryPartner,
-//   HttpDeliveryPartner,
-//   getDeliveryPartnerHelpers: (deliveryPartners: Array<any>) =>
-//     getDeliveryPartnerHelpers(deliveryPartners),
-// };
