@@ -62,6 +62,8 @@
     "VendorCategory": true,
     // …and any others (e.g. `"Organization": true`)
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // TS:
+    "Awaited": true,
   },
 
   "extends": [

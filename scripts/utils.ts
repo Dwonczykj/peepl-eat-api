@@ -310,7 +310,7 @@ export type _ProductOptionTypeHidden = {
   isRequired: boolean;
   product: _ProductTypeHidden;
 };
-export type ProductOptionValueType = {
+export type ProductOptionValueType = _ProductOptionValueTypeHidden & {
   id: number;
   option: _ProductOptionTypeHidden;
 };
@@ -425,7 +425,7 @@ export type OrderItemType = _OrderItemTypeHidden & {
   unfulfilledOnOrderId: number;
   order: _OrderTypeHidden;
   product: ProductType;
-  optionValues: OrderItemOptionValueType;
+  optionValues: Array<OrderItemOptionValueType>;
 };
 
 export type OrderType = _OrderTypeHidden & {

@@ -23,8 +23,8 @@ ALTER TABLE `vegitemp`.`order`
 ADD COLUMN `refundDateTime` DOUBLE NULL DEFAULT NULL AFTER `subtotal`,
 ADD COLUMN `deliveryAddressCity` VARCHAR(255) NULL DEFAULT `` AFTER `refundDateTime`,
 ADD COLUMN `deliveryId` VARCHAR(255) NULL DEFAULT `` AFTER `deliveryAddressCity`,
-ADD COLUMN `deliveryPartnerAccepted` TINYINT(1) NULL DEFAULT NULL AFTER `deliveryId`,
-ADD COLUMN `deliveryPartnerConfirmed` TINYINT(1) NULL DEFAULT NULL AFTER `deliveryPartnerAccepted`,
+ADD COLUMN `deliveryPartnerAccepted` TINYINT(1) NULL DEFAULT 0 AFTER `deliveryId`,
+ADD COLUMN `deliveryPartnerConfirmed` TINYINT(1) NULL DEFAULT 0 AFTER `deliveryPartnerAccepted`,
 ADD COLUMN `completedFlag` VARCHAR(255) NULL DEFAULT `` AFTER `deliveryPartnerConfirmed`,
 ADD COLUMN `completedOrderFeedback` VARCHAR(255) NULL DEFAULT `` AFTER `completedFlag`,
 ADD COLUMN `deliveryPunctuality` INT NULL DEFAULT NULL AFTER `completedOrderFeedback`,
@@ -33,7 +33,7 @@ ADD COLUMN `deliveryPartner` INT NULL DEFAULT NULL AFTER `orderCondition`,
 ADD COLUMN `parentOrder` INT NULL DEFAULT NULL AFTER `deliveryPartner`;
 
 ALTER TABLE `vegitemp`.`orderitem` 
-ADD COLUMN `unfulfilled` TINYINT(1) NULL DEFAULT NULL AFTER `id`,
+ADD COLUMN `unfulfilled` TINYINT(1) NULL DEFAULT 0 AFTER `id`,
 ADD COLUMN `unfulfilledOnOrderId` DOUBLE NULL DEFAULT NULL AFTER `unfulfilled`;
 
 ALTER TABLE `vegitemp`.`product` 
@@ -49,7 +49,7 @@ ADD COLUMN `phoneCountryCode` DOUBLE NULL DEFAULT 0 AFTER `phoneNoCountry`,
 ADD COLUMN `vendorRole` VARCHAR(255) NULL DEFAULT `none` AFTER `role`,
 ADD COLUMN `deliveryPartnerRole` VARCHAR(255) NULL DEFAULT `none` AFTER `vendorRole`,
 ADD COLUMN `roleConfirmedWithOwner` TINYINT(1) NULL DEFAULT 0 AFTER `deliveryPartnerRole`,
-ADD COLUMN `vendorConfirmed` TINYINT(1) NULL DEFAULT NULL AFTER `roleConfirmedWithOwner`,
+ADD COLUMN `vendorConfirmed` TINYINT(1) NULL DEFAULT 0 AFTER `roleConfirmedWithOwner`,
 ADD COLUMN `fbUid` VARCHAR(255) NULL DEFAULT `` AFTER `vendorConfirmed`,
 ADD COLUMN `firebaseSessionToken` VARCHAR(1020) NULL DEFAULT `` AFTER `fbUid`,
 ADD COLUMN `secret` VARCHAR(255) NULL DEFAULT `` AFTER `firebaseSessionToken`,

@@ -32,6 +32,18 @@ type WaterlineQueryKeys<T> = {
   and: Array<{ [key in keyof T]?: T[key] }>;
 };
 
+type WaterlineValueComparisonKeys<T extends number | string | boolean> = T extends number ? {
+  '>'?: T,
+  '>='?: T,
+  '<'?: T,
+  '<='?: T,
+  '=='?: T,
+  '!='?: T,
+} : {
+  '=='?: T,
+  '!='?: T,
+}
+
 /**
  * Exclude SailsModel types from find queries
  */
@@ -120,7 +132,7 @@ export type SailsModelType<T> = {
       | number
       | {
           [key in keyof T]?: T[key] extends ValueType
-            ? T[key] | Array<T[key]>
+            ? T[key] | Array<T[key]> | WaterlineValueComparisonKeys<T[key]>
             : number | number[];
         }
       | WaterlineQueryKeys<T>
