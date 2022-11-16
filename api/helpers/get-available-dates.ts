@@ -9,7 +9,6 @@ import {
 } from "../../scripts/utils";
 import moment, { Moment } from 'moment';
 import _ from 'lodash';
-import util  from "util";
 
 export type AvailableDateOpeningHours = {
   [dateString: string]: Array<OpeningHoursType>;
@@ -112,7 +111,6 @@ module.exports = {
       // If there are opening hours available
       openingHoursList.forEach((openingHours) => {
         if (openingHours && openingHours.isOpen) {
-          // If generating slots for tomorrow, check if it is before the cutoff time
           let _dt: Moment;
           if (!openingHours.specialDate) {
             _dt = moment.utc(
@@ -144,7 +142,7 @@ module.exports = {
           }
           let isAfterCutoff = false;
           const cutoffTime = fulfilmentMethod.orderCutoff; // e.g. 22:00
-
+          // If generating slots for tomorrow, check if it is before the cutoff time
           if (cutoffTime) {
             const tomorrow = moment.utc().add(1, 'days').startOf('day'); // End of day tomorrow
 

@@ -18,7 +18,7 @@ const outFormatSlotTime = datetimeMomentUtcStrTzFormat;
 export type GetFulilmentSlotsSuccess = {
   slots: Array<iFulfilmentSlotStrDate>;
   dates: {
-    [unusedMethodType in FulfilmentMethodType['methodType']]: AvailableDateOpeningHours;
+    [unusedMethodType in FulfilmentMethodType['methodType']]?: AvailableDateOpeningHours;
   };
 };
 
@@ -37,6 +37,12 @@ module.exports = {
       required: true,
       regex: /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/,
     },
+    methodType: {
+      type: "string",
+      required: false,
+      isIn: ["delivery", "collection", ""],
+      defaultsTo: ""
+    }
   },
 
   exits: {
@@ -55,6 +61,7 @@ module.exports = {
     inputs: {
       vendor: number;
       date: string;
+      methodType: FulfilmentMethodType["methodType"] | ""
     },
     exits: {
       success: (args: GetFulilmentSlotsSuccess) => GetFulilmentSlotsSuccess;
@@ -176,7 +183,7 @@ module.exports = {
         const _collectionSlots = await sails.helpers.getAvailableSlots(
           inputs.date,
           vendor.collectionFulfilmentMethod.id
-        )
+        );
         collectionSlots = _collectionSlots.map(ftw => {
           return {
             startTime: ftw.startTime.format(),
@@ -195,14 +202,20 @@ module.exports = {
     }
 
     return exits.success({
-      slots: [
-        ...deliverySlots,
-        ...collectionSlots
-      ],
-      dates: {
-        collection: eligibleCollectionDates,
-        delivery: eligibleDeliveryDates,
-      }
+      slots: !inputs.methodType
+        ? [...deliverySlots, ...collectionSlots]
+        : inputs.methodType === 'collection'
+        ? collectionSlots
+        : deliverySlots,
+      dates: !inputs.methodType
+        ? 
+        {
+          collection: eligibleCollectionDates,
+          delivery: eligibleDeliveryDates,
+        }
+        : inputs.methodType === 'collection'
+        ? { collection: eligibleCollectionDates }
+        : { delivery: eligibleDeliveryDates },
     });
   },
 };

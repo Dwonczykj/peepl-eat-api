@@ -2803,6 +2803,20 @@
               "type": "string",
               "pattern": "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$"
             }
+          },
+          {
+            "in": "query",
+            "name": "methodType",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "enum": [
+                "delivery",
+                "collection",
+                ""
+              ]
+            }
           }
         ],
         "responses": {
@@ -2910,8 +2924,27 @@
           "200": {
             "description": "Success"
           },
+          "400": {
+            "description": "BadRequest as deliveryPartner input doesnt match the deliveryPartner assigned to the vendor."
+          },
           "404": {
-            "description": "Resource not found"
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal server error"
