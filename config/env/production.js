@@ -232,7 +232,12 @@ module.exports = {
      * > Be sure to use the right protocol!  ("http://" vs. "https://")         *
      *                                                                          *
      ***************************************************************************/
-    onlyAllowOrigins: ['https://vegi.itsaboutpeepl.com', 'https://qa-vegi.vegiapp.co.uk','http://localhost'],
+    onlyAllowOrigins: [
+      'https://vegi.vegiapp.co.uk',
+      'https://vegi.itsaboutpeepl.com',
+      'https://qa-vegi.vegiapp.co.uk',
+      'http://localhost',
+    ],
 
     /***************************************************************************
      *                                                                          *

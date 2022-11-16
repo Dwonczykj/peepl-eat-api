@@ -128,7 +128,7 @@ export type SailsModelType<T> = {
   };
   find: (
     // ~ https://www.typescriptlang.org/docs/handbook/utility-types.html#extracttype-union
-    unusedArg:
+    unusedArg?:
       | number
       | {
           [key in keyof T]?: T[key] extends ValueType
