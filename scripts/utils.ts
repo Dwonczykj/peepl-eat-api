@@ -70,7 +70,7 @@ const unusedTestMarkerTime: MarkerTime = '09:00';
 
 export function getNextWeekday(
   weekday: DaysOfWeek,
-  todayInWeek: boolean = false
+  inWeekIfToday: boolean = false
 ): DateString {
   // ~ https://stackoverflow.com/a/25493271
   weekday = weekday.toLowerCase() as DaysOfWeek;
@@ -101,7 +101,7 @@ export function getNextWeekday(
   var theDay;
   var day = today.getDay();
   if (day === dayInd) {
-    if (todayInWeek) {
+    if (inWeekIfToday) {
       today = new Date(today.setDate(today.getDate() + 7));
     }
     return `${today.getFullYear()}-${prependLeadingZero(

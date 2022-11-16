@@ -18,7 +18,7 @@ const {
   ExpectResponse,
 } = require("../../../httpTestSender");
 const {fixtures} = require('../../../../scripts/build_db');
-const {getNextWeekday} = require('../../../utils');
+const { getNextWeekday } = require('../../../../scripts/utils');
 
 declare var Order:SailsModelType<OrderType>;
 declare var User:SailsModelType<UserType>;

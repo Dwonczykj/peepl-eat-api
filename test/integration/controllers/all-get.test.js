@@ -11,7 +11,9 @@ var util = require('util');
 require('ts-node/register');
 
 
-const { callAuthActionWithCookie, getNextWeekday } = require('../../utils');
+const { callAuthActionWithCookie } = require('../../utils');
+
+const { getNextWeekday } = require('../../../scripts/utils');
 
 
 const cwd = process.cwd();

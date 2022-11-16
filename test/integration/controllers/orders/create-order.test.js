@@ -6,7 +6,7 @@ var util = require('util');
 const moment = require('moment/moment');
 require('ts-node/register');
 const { fixtures } = require('../../../../scripts/build_db');
-const { getNextWeekday } = require('../../../utils');
+const { getNextWeekday } = require('../../../../scripts/utils');
 
 // const { v4: uuidv4 } = require("uuid");
 

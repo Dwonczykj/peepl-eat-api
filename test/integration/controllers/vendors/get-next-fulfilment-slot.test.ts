@@ -2,7 +2,7 @@ import { expect, assert } from "chai"; // ~ https://www.chaijs.com/api/bdd/
 // import util from "util";
 import moment from "moment";
 const { fixtures } = require("../../../../scripts/build_db.js");
-import { HttpAuthTestSenderVendor } from "./defaultVendor.js";
+import { HttpAuthTestSenderVendor } from "./defaultVendor";
 import {
   getNextWeekday,
   timeStrFormat,

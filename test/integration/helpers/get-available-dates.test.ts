@@ -155,7 +155,7 @@ describe("helpers.getAvailableDates", async () => {
       .filter((dt) => dt !== removeToday && dt !== removeTomorrow);
     expectAvailDateStrs.push(includeNextWeekToday);
 
-    expect(availableDates).to.deep.members(expectAvailDateStrs);
+    expect(availableDates).to.be.an('object').that.includes.all.keys(expectAvailDateStrs);
   });
   it("returns no dates when no fulfilmentIds passed", async () => {
     const nextAvail = await sails.helpers.getAvailableDates.with({

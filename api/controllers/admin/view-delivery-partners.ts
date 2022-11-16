@@ -2,6 +2,7 @@ import { sailsModelKVP, SailsModelType } from "../../../api/interfaces/iSails";
 import { DeliveryPartnerType } from "../../../scripts/utils";
 
 declare var DeliveryPartner: SailsModelType<DeliveryPartnerType>;
+
 module.exports = {
   friendlyName: 'View delivery partners',
 
