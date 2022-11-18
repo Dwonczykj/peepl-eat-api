@@ -35,11 +35,27 @@ module.exports = {
       return exits.notFound();
     }
 
-    var deliveryPartner = await DeliveryPartner.findOne(inputs.deliveryPartnerId)
-    .populate('deliveryFulfilmentMethod&deliveryFulfilmentMethod.openingHours');
+    var deliveryPartner = await DeliveryPartner.findOne(
+      inputs.deliveryPartnerId
+    ).populate(
+      'deliveryOriginAddress&deliveryFulfilmentMethod&deliveryFulfilmentMethod.openingHours'
+    );
 
     if(!deliveryPartner) {
       return exits.notFound();
+    }
+
+    if(!deliveryPartner.deliveryOriginAddress){
+      deliveryPartner.deliveryOriginAddress = {
+        label: '',
+        addressLineOne: '',
+        addressLineTwo: '',
+        addressTownCity: '',
+        addressPostCode: '',
+        addressCountryCode: '',
+        latitude: null,
+        longitude: null,
+      };
     }
 
     // Respond with view or JSON.

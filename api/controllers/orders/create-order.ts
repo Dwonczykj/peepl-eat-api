@@ -1,12 +1,12 @@
 import _ from 'lodash';
-import { OrderType } from '../../../scripts/utils';
+import { OrderItemOptionValueType, OrderItemType, OrderType } from '../../../scripts/utils';
 import util from 'util';
-import { sailsVegi } from '../../../api/interfaces/iSails';
+import { SailsModelType, sailsVegi } from '../../../api/interfaces/iSails';
 
 declare var sails: sailsVegi;
-declare var OrderItemOptionValue: any;
-declare var OrderItem: any;
-declare var Order: any;
+declare var OrderItemOptionValue: SailsModelType<OrderItemOptionValueType>;
+declare var OrderItem: SailsModelType<OrderItemType>;
+declare var Order: SailsModelType<OrderType>;
 
 export type CreateOrderInputs = {
   items: Array<{
@@ -16,7 +16,18 @@ export type CreateOrderInputs = {
     optionValues?: Array<any>;
     order?: number | OrderType;
   }>;
-  address: any;
+  address: {
+    lineOne: string;
+    lineTwo?: string;
+    city?: string;
+    postCode: string;
+    phoneNumber?: string;
+    email?: string;
+    name: string;
+    deliveryInstructions?: string;
+    lat?: undefined | number;
+    lng?: undefined | number;
+  };
   total: number;
   marketingOptIn: boolean;
   discountCode: string;
@@ -27,6 +38,12 @@ export type CreateOrderInputs = {
   tipAmount: number;
   walletAddress: string;
 };
+
+export type ValidateOrderResult = {
+  orderInputs: CreateOrderInputs;
+  orderIsValid: boolean;
+};
+
 
 export type CreateOrderSuccess = {
   orderId: number;
@@ -146,7 +163,12 @@ module.exports = {
     }
   ) {
     try {
-      await sails.helpers.validateOrder.with(inputs);
+      const validateOrderResult = await sails.helpers.validateOrder.with(inputs);
+      if(validateOrderResult.orderIsValid){
+        inputs = validateOrderResult.orderInputs;
+      } else {
+        return exits.badRequest(`Order invalid`);
+      }
     } catch (err) {
       return exits.badRequest(err);
     }
@@ -317,6 +339,8 @@ module.exports = {
               deliveryAddressLineTwo: inputs.address.lineTwo,
               deliveryAddressCity: inputs.address.city,
               deliveryAddressPostCode: inputs.address.postCode,
+              deliveryAddressLatitude: inputs.address.lat,
+              deliveryAddressLongitude: inputs.address.lng,
               deliveryAddressInstructions: inputs.address.deliveryInstructions,
               customerWalletAddress: inputs.walletAddress,
               discount: discount ? discount.id : undefined,

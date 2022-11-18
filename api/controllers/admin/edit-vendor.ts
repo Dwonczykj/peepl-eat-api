@@ -1,3 +1,29 @@
+import { sailsVegi } from "../../../api/interfaces/iSails";
+import { StatusLiteral } from "../../../scripts/utils";
+declare var sails: sailsVegi;
+
+
+export type EditVendorInputs = {
+  id: number;
+  name: string;
+  description: string;
+  image: any;
+  walletAddress: string;
+  phoneNumber?: string | null;
+  pickupAddressLineOne?: string | null;
+  pickupAddressLineTwo?: string | null;
+  pickupAddressCity?: string | null;
+  pickupAddressPostCode?: string | null;
+  pickupAddressLatitude?: number | null;
+  pickupAddressLongitude?: number | null;
+  status: StatusLiteral;
+  deliveryPartner?: string |null;
+  costLevel: number | null;
+  rating: number | null;
+  isVegan: boolean;
+  minimumOrderAmount: number;
+}
+
 module.exports = {
 
   friendlyName: 'Edit vendor',
@@ -46,6 +72,14 @@ module.exports = {
     },
     pickupAddressPostCode: {
       type: 'string',
+      allowNull: true
+    },
+    pickupAddressLatitude: {
+      type: 'number',
+      allowNull: true
+    },
+    pickupAddressLongitude: {
+      type: 'number',
       allowNull: true
     },
     status: {
@@ -105,7 +139,9 @@ module.exports = {
     },
   },
 
-  fn: async function (inputs, exits) {
+  fn: async function (inputs: EditVendorInputs & {
+    imageUrl?: string;
+  }, exits) {
     // Fix errors to do with strings as association IDs
     if(inputs.deliveryPartner && inputs.deliveryPartner === 'null') {
       inputs.deliveryPartner = null;
@@ -149,6 +185,31 @@ module.exports = {
     {
       return exits.badPostalCode();
     }
+    
+    let coordinates = {
+      lat: inputs.pickupAddressLatitude,
+      lng: inputs.pickupAddressLongitude,
+    };
+
+    try{
+      if(inputs.pickupAddressLineOne && inputs.pickupAddressPostCode){
+        const _coordinates = await sails.helpers.getCoordinatesForAddress.with({
+          addressLineOne: inputs.pickupAddressLineOne || '',
+          addressLineTwo: inputs.pickupAddressLineTwo || '',
+          addressTownCity: inputs.pickupAddressCity || '',
+          addressPostCode: inputs.pickupAddressPostCode || '',
+          addressCountryCode: 'UK',
+        });
+        coordinates = {
+          lat:_coordinates.lat,
+          lng:_coordinates.lng,
+        };
+      }
+    } catch (err) {
+      sails.log.error(`Failed to fetch coordinates of editted vendor pickup address: ${err}`);
+    }
+    inputs.pickupAddressLatitude = coordinates.lat;
+    inputs.pickupAddressLongitude = coordinates.lng;
 
     try {
 	    var newVendor = await Vendor.updateOne(inputs.id).set(inputs);

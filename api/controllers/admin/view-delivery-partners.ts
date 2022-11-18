@@ -3,6 +3,10 @@ import { DeliveryPartnerType } from "../../../scripts/utils";
 
 declare var DeliveryPartner: SailsModelType<DeliveryPartnerType>;
 
+type ViewDeliveryPartnersResponse = {
+  deliveryPartners: Array<DeliveryPartnerType>;
+};
+
 module.exports = {
   friendlyName: 'View delivery partners',
 
@@ -17,15 +21,17 @@ module.exports = {
   fn: async function (
     inputs: {},
     exits: {
-      success: (unusedArg: {
-        deliveryPartners: Array<sailsModelKVP<DeliveryPartnerType>>;
-      }) => { deliveryPartners: Array<sailsModelKVP<DeliveryPartnerType>> };
-      successJSON: (unusedArg: {
-        deliveryPartners: Array<sailsModelKVP<DeliveryPartnerType>>;
-      }) => { deliveryPartners: Array<sailsModelKVP<DeliveryPartnerType>> };
+      success: (
+        unusedArg: ViewDeliveryPartnersResponse
+      ) => ViewDeliveryPartnersResponse;
+      successJSON: (
+        unusedArg: ViewDeliveryPartnersResponse
+      ) => ViewDeliveryPartnersResponse;
     }
   ) {
-    var deliveryPartners = await DeliveryPartner.find();
+    var deliveryPartners = await DeliveryPartner.find().populate(
+      'deliveryOriginAddress'
+    );
 
     // Respond with view or JSON.
     if (this.req.wantsJSON) {

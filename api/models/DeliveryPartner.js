@@ -84,6 +84,9 @@ module.exports = {
     deliveryFulfilmentMethod: {
       model: 'FulfilmentMethod',
     },
+    deliveryOriginAddress: {
+      model: 'address'
+    },
     users: {
       // a collection of users that belong to a delivery partner
       collection: 'user',

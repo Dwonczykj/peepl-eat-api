@@ -124,6 +124,8 @@ export function getNextWeekday(
   )}-${prependLeadingZero(closest.getDate())}` as DateString;
 }
 
+export type PostCodeString = `${string}${number} ${number}${string}`; // TODO: -> Convert to this`/^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})$/i,`;
+
 export type UserRoleLiteral =
   | 'consumer'
   | 'admin'
@@ -182,6 +184,18 @@ type _VendorTypeHidden = {
   imageUrl: string;
 };
 
+export type _AddressTypeHidden = {
+  id: number;
+  label: string;
+  addressLineOne: string;
+  addressLineTwo: string;
+  addressTownCity: string;
+  addressPostCode: PostCodeString;
+  addressCountryCode: string;
+  latitude: number;
+  longitude: number;
+};
+
 export type RatingType = 0 | 1 | 2 | 3 | 4 | 5;
 export type CompletedFlagType =
   | ''
@@ -219,6 +233,7 @@ type _FulfilmentMethodTypeHidden = {
   bufferLength: number;
   orderCutoff: string;
   maxOrders: number;
+  maxDeliveryDistance?: number | null;
   priceModifier: number;
 };
 
@@ -237,6 +252,7 @@ export type FulfilmentMethodType = _FulfilmentMethodTypeHidden & {
   vendor?: _VendorTypeHidden;
   deliveryPartner?: _DeliveryPartnerTypeHidden;
   openingHours?: _OpeningHoursTypeHidden;
+  fulfilmentOrigin?: _AddressTypeHidden;
 };
 
 export type DeliveryPartnerFulfilmentMethodType = _FulfilmentMethodTypeHidden & {
@@ -271,8 +287,16 @@ export type OpeningHoursType = _OpeningHoursTypeHidden & {
   fulfilmentMethod?: FulfilmentMethodType;
 };
 
+export type AddressType = _AddressTypeHidden & {
+  vendor?: _VendorTypeHidden;
+  deliveryPartner?: _DeliveryPartnerTypeHidden;
+  user?: _UserTypeHidden;
+}
+
 export type DeliveryPartnerType = _DeliveryPartnerTypeHidden & {
   deliveryFulfilmentMethod?: _FulfilmentMethodTypeHidden;
+  deliveryOriginAddress?: _AddressTypeHidden,
+  users?: Array<_UserTypeHidden>;
 };
 
 export type DiscountType = {
@@ -403,6 +427,8 @@ export type _OrderTypeHidden = {
   deliveryAddressLineTwo: string;
   deliveryAddressCity: string;
   deliveryAddressPostCode: string;
+  deliveryAddressLatitude?: number | null;
+  deliveryAddressLongitude?: number | null;
   deliveryAddressInstructions: string;
   customerWalletAddress: string;
   deliveryId?: string;

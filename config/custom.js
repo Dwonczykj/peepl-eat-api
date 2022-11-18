@@ -29,6 +29,10 @@ module.exports.custom = {
   pplRewardsPoolAddress: '0x29249e06e8D3e4933cc403AB73136e698a08c38b',
   coopcycleUrl: 'https://agile-delivery.coopcycle.org',
   peeplPayUrl: 'https://pay.itsaboutpeepl.com/api/v1',
+  placesApiKey: '', //*in local.js
+  googleApiBaseUrl: 'https://maps.googleapis.com/maps/api/',
+  placesApiRelUrlFindPlace: 'place/findplacefromtext/json', // ~ https://googlemaps.github.io/google-maps-services-js/modules/_places_findplacefromtext_.html#:~:text=Const-,defaultUrl,-defaultUrl%3A
+  distancesApiRelUrlGetDistance: 'distancematrix/json', // ~ https://googlemaps.github.io/google-maps-services-js/modules/_distance_.html#:~:text=Const-,defaultUrl,-defaultUrl%3A
   amazonS3BucketUrl: 'https://vegiapp-1.s3.us-east-1.amazonaws.com/',
   amazonS3Bucket: 'vegiapp-1',
   amazonS3MaxUploadSizeBytes: 30000000,

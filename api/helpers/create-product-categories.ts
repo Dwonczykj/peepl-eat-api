@@ -30,7 +30,7 @@ module.exports = {
     productCategories: {
       type: 'ref',
       required: true,
-    }
+    },
   },
 
   exits: {
@@ -40,6 +40,11 @@ module.exports = {
     },
     badInput: {
       description: 'Input arguments of incorrect type',
+      data: null,
+      error: null,
+    },
+    alreadyExists: {
+      description: 'Product Category already exists.',
       data: null,
       error: null,
     },
@@ -62,7 +67,7 @@ module.exports = {
     for (const productCatInput of inputs.productCategories) {
       var exist = await ProductCategory.find({
         name: productCatInput.name,
-        vendor: productCatInput.vendor
+        vendor: productCatInput.vendor,
       });
       if (exist && exist.length > 0) {
         sails.log(

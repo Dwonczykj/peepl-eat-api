@@ -50,6 +50,11 @@ module.exports = {
       type: 'number',
       description: 'The maximum number of orders allowed per slot.',
     },
+    maxDeliveryDistance: {
+      type: 'number',
+      description: 'Max Distance (by road) in KILOMETERS that a FulfilmentMethod will fulfill',
+      allowNull: true,
+    },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
@@ -67,6 +72,10 @@ module.exports = {
     openingHours: {
       collection: 'openingHours',
       via: 'fulfilmentMethod',
+    },
+    fulfilmentOrigin: {
+      model: 'address',
+      description: 'Origin Address for deliveries that can be used by vendors to determine delivery distances, particularly if delivery not from store address.',
     },
   },
 

@@ -55,6 +55,7 @@
         </div>
 
         <label for="pickupAddressGeocoordinate">Vendor Address Geocoordinate</label>
+        <!-- <p>Latitude: {{vendor.pickupAddressLatitude}}, Longitude: {{vendor.pickupAddressLongitude}}</p> -->
         <input type="number" :class="{ 'is-invalid': formErrors.pickupAddressLatitude }" v-model="vendor.pickupAddressLatitude"
           class="form-control" id="pickupAddressLatitude">
         <input type="number" :class="{ 'is-invalid': formErrors.pickupAddressLongitude }"

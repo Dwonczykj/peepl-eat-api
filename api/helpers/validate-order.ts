@@ -1,10 +1,16 @@
 import util from 'util';
-import { CreateOrderInputs } from '../../api/controllers/orders/create-order';
-import { SailsModelType } from '../../api/interfaces/iSails';
+import {
+  CreateOrderInputs,
+  ValidateOrderResult,
+} from '../../api/controllers/orders/create-order';
+import { SailsModelType, sailsVegi } from '../../api/interfaces/iSails';
 import { FulfilmentMethodType, ProductType, VendorType } from '../../scripts/utils';
+import { GetCoordinatesForAddressResult } from './get-coordinates-for-address';
+declare var sails: sailsVegi;
 declare var Product: SailsModelType<ProductType>;
 declare var Vendor: SailsModelType<VendorType>;
 declare var FulfilmentMethod: SailsModelType<FulfilmentMethodType>;
+
 module.exports = {
   friendlyName: 'Validate order',
 
@@ -97,7 +103,7 @@ module.exports = {
   fn: async function (
     inputs: CreateOrderInputs,
     exits: {
-      success: () => void;
+      success: (unusedArg: ValidateOrderResult) => ValidateOrderResult;
       noItemsFound: () => void;
       invalidVendor: () => void;
       invalidFulfilmentMethod: () => void;
@@ -132,8 +138,7 @@ module.exports = {
     if (!fulfilmentMethod) {
       sails.log.warn('helpers.validateOrder: invalidFulfilmentMethod');
       return exits.invalidFulfilmentMethod();
-    }
-    else if (
+    } else if (
       fulfilmentMethod.vendor !== vendor.id &&
       fulfilmentMethod.deliveryPartner !== vendor.deliveryPartner.id
     ) {
@@ -197,12 +202,38 @@ module.exports = {
       }
     }
     if (fulfilmentMethod.methodType === 'delivery') {
+      let deliveryCoordinates: GetCoordinatesForAddressResult | null;
+      try {
+        const _deliveryCoordinates =
+          await sails.helpers.getCoordinatesForAddress.with({
+            addressLineOne: inputs.address.lineOne,
+            addressLineTwo: inputs.address.lineTwo,
+            addressTownCity: inputs.address.city,
+            addressPostCode: inputs.address.postCode,
+            addressCountryCode: 'UK',
+          });
+        deliveryCoordinates = _deliveryCoordinates;
+        inputs.address.lat = _deliveryCoordinates.lat;
+        inputs.address.lng = _deliveryCoordinates.lng;
+      } catch (err) {
+        sails.log.error(
+          `Unable to get coordinates of address with postcode: ${inputs.address.postCode} from api: ${err}`
+        );
+        deliveryCoordinates = null;
+      }
+
       // Check if vendor delivers to postal district
       const postcodeRegex =
         /^(((([A-Z][A-Z]{0,1})[0-9][A-Z0-9]{0,1}) {0,}[0-9])[A-Z]{2})$/;
 
       const m = postcodeRegex.exec(inputs.address.postCode);
       if (m !== null) {
+        const canFulfilDelivery =
+          await sails.helpers.fulfilmentMethodDeliversToAddress.with({
+            fulfilmentMethod: fulfilmentMethod.id,
+            latitude: deliveryCoordinates.lat,
+            longitude: deliveryCoordinates.lng,
+          });
         let postalDistrict = m[3]; // 3rd match group is the postal district
         let postalDistrictStringArray = vendor.fulfilmentPostalDistricts.map(
           (postalDistrict) => postalDistrict.outcode
@@ -286,7 +317,10 @@ module.exports = {
       }
     }
 
-    return exits.success();
+    return exits.success({
+      orderInputs: inputs,
+      orderIsValid: true,
+    });
   },
 };
 

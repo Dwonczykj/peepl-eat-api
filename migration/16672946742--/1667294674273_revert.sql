@@ -2,7 +2,7 @@
 -- DROP [COLUMN] column_name_1, 
 -- DROP [COLUMN] column_name_2, 
 
-ALTER TABLE `vegitemp`.`deliverypartner` 
+ALTER TABLE `vegi`.`deliverypartner` 
 DROP UNIQUE INDEX `name_UNIQUE`,
 DROP UNIQUE INDEX `id_UNIQUE`;
 DROP COLUMN `type`,
@@ -13,11 +13,11 @@ DROP COLUMN `rating`,
 DROP COLUMN `deliversToPostCodes`,
 ;
 
-ALTER TABLE `vegitemp`.`openinghours` 
+ALTER TABLE `vegi`.`openinghours` 
 DROP COLUMN `logicId`,
 DROP COLUMN `timezone`;
 
-ALTER TABLE `vegitemp`.`order` 
+ALTER TABLE `vegi`.`order` 
 DROP COLUMN `refundDateTime`,
 DROP COLUMN `deliveryAddressCity`,
 DROP COLUMN `deliveryId`,
@@ -30,17 +30,17 @@ DROP COLUMN `orderCondition`,
 DROP COLUMN `deliveryPartner`,
 DROP COLUMN `parentOrder`;
 
-ALTER TABLE `vegitemp`.`orderitem` 
+ALTER TABLE `vegi`.`orderitem` 
 DROP COLUMN `unfulfilled`,
 DROP COLUMN `unfulfilledOnOrderId`;
 
-ALTER TABLE `vegitemp`.`product` 
+ALTER TABLE `vegi`.`product` 
 DROP COLUMN `status`;
 
-ALTER TABLE `vegitemp`.`productcategory` 
+ALTER TABLE `vegi`.`productcategory` 
 DROP COLUMN `categoryGroup`;
 
-ALTER TABLE `vegitemp`.`user` 
+ALTER TABLE `vegi`.`user` 
 DROP COLUMN `phoneNoCountry`,
 DROP COLUMN `phoneCountryCode`,
 DROP COLUMN `vendorRole`,
@@ -52,7 +52,7 @@ DROP COLUMN `firebaseSessionToken`,
 DROP COLUMN `secret`,
 DROP COLUMN `deliveryPartner`;
 
-ALTER TABLE `vegitemp`.`vendor` 
+ALTER TABLE `vegi`.`vendor` 
 DROP COLUMN `pickupAddressLatitude`,
 DROP COLUMN `pickupAddressLongitude`;
 

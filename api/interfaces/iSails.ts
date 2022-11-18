@@ -2,12 +2,16 @@
 import { UpdateItemsForOrderSuccess } from "../../api/helpers/update-items-for-order";
 import { AvailableDateOpeningHours } from "../../api/helpers/get-available-dates";
 import { NextAvailableDateHelperReturnType } from "../../api/helpers/next-available-date";
-import { GetAvailableDeliveryPartnerFromPoolInputs } from "api/helpers/get-available-delivery-partner-from-pool";
-import { CreateOrderInputs } from "../../api/controllers/orders/create-order";
+import { GetAvailableDeliveryPartnerFromPoolInputs } from "../../api/helpers/get-available-delivery-partner-from-pool";
+import { CreateOrderInputs, ValidateOrderResult } from "../../api/controllers/orders/create-order";
 import { iFulfilmentSlot, iSlot } from "./vendors/slot";
 import { CreateProductCategoriesInput } from "../helpers/create-product-categories";
-import { ProductCategoryType, walletAddressString } from '../../scripts/utils';
+import { DiscountType, ProductCategoryType, walletAddressString } from '../../scripts/utils';
 import { EditProductCategoriesInput } from "../helpers/edit-product-categories";
+import { InitialiseDeliveryMethodsInput, InitialiseDeliveryMethodsResult } from "../../api/helpers/initialise-delivery-methods";
+import { GetCoordinatesForAddressInput, GetCoordinatesForAddressResult } from "../../api/helpers/get-coordinates-for-address";
+import { CheckAddressIsValidInput, CheckAddressIsValidResult } from "../../api/helpers/check-address-is-valid";
+import { FulfilmentMethodDeliversToAddressInput, FulfilmentMethodDeliversToAddressResult } from "../../api/helpers/fulfilment-method-delivers-to-address";
 
 export type UploadImageInfoType = {
   fd: string;
@@ -113,7 +117,7 @@ export type sailsModelKVP<T> = ({
 //   };
 
 type SailsFindPopulateType<T> = Promise<sailsModelKVP<T>[] | null> & {
-  populate: (unusedArg: string) => Promise<T[] | null>;
+  populate: (unusedArg: keyof T | string) => Promise<T[] | null>;
 };
 type SailsFindOnePopulateType<T> = Promise<sailsModelKVP<T> | null> & {
   populate: (unusedArg: string) => Promise<T | null>;
@@ -223,10 +227,29 @@ export type sailsVegi = {
       ) => Promise<AvailableDateOpeningHours>;
     };
 
-    validateOrder: {
+    getCoordinatesForAddress: {
       with: (
-        unusedArgs: CreateOrderInputs
-      ) => Promise<AvailableDateOpeningHours>;
+        unusedArgs: GetCoordinatesForAddressInput
+      ) => Promise<GetCoordinatesForAddressResult>;
+    };
+    checkAddressIsValid: {
+      with: (
+        unusedArgs: CheckAddressIsValidInput
+      ) => Promise<CheckAddressIsValidResult>;
+    };
+    fulfilmentMethodDeliversToAddress: {
+      with: (
+        unusedArgs: FulfilmentMethodDeliversToAddressInput
+      ) => Promise<FulfilmentMethodDeliversToAddressResult>;
+    };
+    initialiseDeliveryMethods: {
+      with: (
+        unusedArgs: InitialiseDeliveryMethodsInput
+      ) => Promise<InitialiseDeliveryMethodsResult>;
+    };
+
+    validateOrder: {
+      with: (unusedArgs: CreateOrderInputs) => Promise<ValidateOrderResult>;
     };
     calculateOrderTotal: {
       with: (unusedArg: { orderId: number }) => Promise<{
@@ -242,7 +265,10 @@ export type sailsVegi = {
       }) => Promise<{
         data: number;
       }>;
-    } & ((unusedArgAmount: number, unusedArgOrderType: OrderTypeEnumLiteral) => Promise<{
+    } & ((
+      unusedArgAmount: number,
+      unusedArgOrderType: OrderTypeEnumLiteral
+    ) => Promise<{
       data: number;
     }>);
 
@@ -260,6 +286,27 @@ export type sailsVegi = {
       unusedArg1: string,
       unusedArg2: number
     ) => Promise<iFulfilmentSlot[]>);
+    validateDeliverySlot: {
+      with: (unusedArgs: {
+        fulfilmentMethodId: number;
+        fulfilmentSlotFrom: string;
+        fulfilmentSlotTo: string;
+      }) => Promise<boolean>;
+    } & ((
+      unusedArg3: number,
+      unusedArg1: string,
+      unusedArg2: string
+    ) => Promise<boolean>);
+    checkDiscountCode: {
+      with: (unusedArgs: {
+        discountCode: string;
+        vendor?: number | null;
+      }) => Promise<false | DiscountType>;
+    } & ((
+      unusedArg1: string,
+      unusedArg2: number | null
+    ) => Promise<false | DiscountType>);
+
     nextAvailableDate: {
       with: (unusedArgs: {
         fulfilmentMethodIds?: Array<number>;

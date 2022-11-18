@@ -34,6 +34,40 @@
         </select>
       </div>
 
+      <h2 class="h5 mt-3">Delivery Hub</h2>
+      <div class="form-group">
+        <label for="addressLineOne">Delivery Hub Address Line 1</label>
+        <input type="text" :class="{ 'is-invalid': formErrors.addressLineOne }" 
+          v-model="deliveryPartner.deliveryOriginAddress.addressLineOne"
+          class="form-control" id="addressLineOne">
+      
+        <label for="addressLineTwo">Delivery Hub Address Line 2</label>
+        <input type="text" :class="{ 'is-invalid': formErrors.addressLineTwo }" 
+          v-model="deliveryPartner.deliveryOriginAddress.addressLineTwo"
+          class="form-control" id="addressLineTwo">
+      
+        <label for="addressTownCity">Delivery Hub Address City</label>
+        <input type="text" :class="{ 'is-invalid': formErrors.addressTownCity }" v-model="deliveryPartner.deliveryOriginAddress.addressTownCity"
+          class="form-control" id="addressTownCity">
+      
+        <label for="addressZipCode">Delivery Hub Address Post Code</label>
+        <input type="text" :class="{ 'is-invalid': formErrors.addressPostCode || cloudError === 'badPostalCode' }" 
+          v-model="deliveryPartner.deliveryOriginAddress.addressPostCode"
+          class="form-control" id="addressZipCode" oninput="this.value = this.value.toUpperCase()">
+        <div v-if="cloudError === 'badPostalCode'" class="alert alert-danger mt-4" role="alert">
+          Bad PostalCode
+        </div>
+
+        <label for="pickupAddressGeocoordinate">Delivery Hub Address Geocoordinate</label>
+        <p>Latitude: {{deliveryPartner.deliveryOriginAddress.latitude}}, Longitude: {{deliveryPartner.deliveryOriginAddress.longitude}}</p>
+        <!-- <input type="number" :class="{ 'is-invalid': formErrors.latitude }" 
+          v-model="deliveryPartner.deliveryOriginAddress.latitude"
+          class="form-control" id="latitude">
+        <input type="number" :class="{ 'is-invalid': formErrors.longitude }"
+          v-model="deliveryPartner.deliveryOriginAddress.longitude" 
+          class="form-control" id="longitude"> -->
+      </div>
+
       <ajax-button class="btn btn-peepl mt-4" type="submit" :syncing="syncing" v-bind:class="{ 'is-loading': syncing }">Save changes</ajax-button>
       <div v-if="cloudError === 'notFound'" class="alert alert-danger mt-4" role="alert">
         Delivery Partner not found.

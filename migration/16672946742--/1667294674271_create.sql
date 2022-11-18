@@ -1,4 +1,4 @@
-USE vegitemp;
+USE vegi;
 
 CREATE TABLE `categorygroup` (
   `createdAt` bigint DEFAULT NULL,

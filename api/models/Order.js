@@ -79,6 +79,14 @@ module.exports = {
       description: 'Details about how/where to deliver the order.',
       maxLength: 200,
     },
+    deliveryAddressLatitude: {
+      type: 'number',
+      allowNull: true,
+    },
+    deliveryAddressLongitude: {
+      type: 'number',
+      allowNull: true,
+    },
     customerWalletAddress: {
       type: 'string',
       description: 'The wallet address of the customer.',
