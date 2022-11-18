@@ -108,6 +108,11 @@ module.exports = {
       lng: fulfilmentMethod.fulfilmentOrigin.longitude,
     };
 
+    if (inputs.latitude === 0 && inputs.longitude === 0){
+      // assume delivery coordinates are not defined
+      return exits.success({ canDeliver: false });
+    }
+
     const deliveryDestination = {
       lat: inputs.latitude,
       lng: inputs.longitude,
@@ -118,13 +123,18 @@ module.exports = {
       sails
     );
 
-    const distance = await mapsApi.getDistanceBetweenPlaces(vendorOrigin, deliveryDestination);
-    if(distance !== null){
-      if (distance > fulfilmentMethod.maxDeliveryDistance) {
-        return exits.success({ canDeliver: false });
-      }
-      return exits.success({ canDeliver: true });
-    }else{
+    try {
+	    const distance = await mapsApi.getDistanceBetweenPlaces(vendorOrigin, deliveryDestination);
+	    if(distance !== null){
+	      if (distance <= fulfilmentMethod.maxDeliveryDistance) {
+	        return exits.success({ canDeliver: true });
+	      }
+	      return exits.success({ canDeliver: false });
+	    } else {
+	      return exits.success({ canDeliver: false });
+	    }
+    } catch (error) {
+      sails.log.error(error);
       return exits.success({ canDeliver: false });
     }
 

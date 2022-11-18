@@ -7,7 +7,7 @@ module.exports = {
     openingHours: {
       type: 'json',
       description: 'The opening hours to be added to the vendor',
-      required: true
+      required: true,
     },
     id: {
       type: 'number',
@@ -15,7 +15,8 @@ module.exports = {
     },
     priceModifier: {
       type: 'number',
-      description: 'A positive or negative integer representing the amount of pence to adjust the base price by.'
+      description:
+        'A positive or negative integer representing the amount of pence to adjust the base price by.',
     },
     slotLength: {
       type: 'number',
@@ -26,46 +27,49 @@ module.exports = {
     bufferLength: {
       type: 'number',
       min: 0,
-      description: 'The required buffer time before booking a slot.'
+      description: 'The required buffer time before booking a slot.',
     },
     orderCutoff: {
       type: 'ref',
-      description: 'The time after which no new bookings can be made.'
+      description: 'The time after which no new bookings can be made.',
     },
     maxOrders: {
       type: 'number',
-      description: 'The maximum number of orders allowed per slot.'
-    }
+      description: 'The maximum number of orders allowed per slot.',
+    },
+    maxDeliveryDistance: {
+      type: 'number',
+      description: 'The max delivery distance allowed by a fulfilment method by road in KM.',
+    },
   },
 
   exits: {
     success: {
       outputDescription: 'The updated opening hours',
-      outputExample: {}
-    }
+      outputExample: {},
+    },
   },
 
   fn: async function (inputs, exits) {
     // Todo: Authorise this request
 
     // Update fulfilment method
-    let fulfilmentMethod = await FulfilmentMethod.update({id: inputs.id})
-    .set({
-      priceModifier: inputs.priceModifier,
-      slotLength: inputs.slotLength,
-      bufferLength: inputs.bufferLength,
-      orderCutoff: inputs.orderCutoff,
-      maxOrders: inputs.maxOrders,
-    });
-
-    // Update all opening hours
-    inputs.openingHours.forEach(
-      async hours => {
-        await OpeningHours.updateOne(hours.id).set(hours);
+    let fulfilmentMethod = await FulfilmentMethod.update({ id: inputs.id }).set(
+      {
+        priceModifier: inputs.priceModifier,
+        slotLength: inputs.slotLength,
+        bufferLength: inputs.bufferLength,
+        orderCutoff: inputs.orderCutoff,
+        maxOrders: inputs.maxOrders,
+        maxDeliveryDistance: inputs.maxDeliveryDistance,
       }
     );
 
-    return exits.success(fulfilmentMethod);
-  }
+    // Update all opening hours
+    inputs.openingHours.forEach(async (hours) => {
+      await OpeningHours.updateOne(hours.id).set(hours);
+    });
 
+    return exits.success(fulfilmentMethod);
+  },
 };

@@ -4,6 +4,10 @@ ALTER TABLE `vegi`.`deliverypartner`
 ADD COLUMN `deliveryOriginAddress` INT NULL DEFAULT NULL AFTER `deliveryFulfilmentMethod`
 ;
 
+ALTER TABLE `vegi`.`vendor` 
+ADD COLUMN `pickupAddress` INT NULL DEFAULT NULL AFTER `deliveryFulfilmentMethod`
+;
+
 ALTER TABLE `vegi`.`fulfilmentmethod`
 ADD COLUMN `maxDeliveryDistance` DOUBLE NULL DEFAULT NULL AFTER `maxOrders`,
 ADD COLUMN `fulfilmentOrigin` INT NULL DEFAULT NULL AFTER `deliveryPartner`

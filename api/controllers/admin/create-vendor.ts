@@ -1,9 +1,9 @@
-import { StatusLiteral, VendorType } from '../../../scripts/utils';
-import {v4 as uuidv4} from 'uuid';
-import { SailsModelType } from 'api/interfaces/iSails';
+import { AddressType, StatusLiteral, VendorType } from '../../../scripts/utils';
+import { SailsModelType } from '../../../api/interfaces/iSails';
 
 declare var sails: any;
 declare var Vendor: SailsModelType<VendorType>;
+declare var Address: SailsModelType<AddressType>;
 
 export type CreateVendorInputs = {
   name: string;
@@ -12,12 +12,13 @@ export type CreateVendorInputs = {
   image: any;
   walletAddress: string;
   phoneNumber?: string | null;
-  pickupAddressLineOne?: string | null;
-  pickupAddressLineTwo?: string | null;
-  pickupAddressCity?: string | null;
-  pickupAddressPostCode?: string | null;
-  pickupAddressLatitude?: number | null;
-  pickupAddressLongitude?: number | null;
+  // pickupAddress.addressLineOne?: string | null;
+  // pickupAddress.addressLineTwo?: string | null;
+  // pickupAddress.addressTownCity?: string | null;
+  // pickupAddress.addressPostCode?: string | null;
+  // pickupAddress.latitude?: number | null;
+  // pickupAddress.longitude?: number | null;
+  pickupAddress: AddressType;
   status: StatusLiteral;
   deliveryPartner?: string | null;
   costLevel: number | null;
@@ -60,29 +61,32 @@ module.exports = {
     phoneNumber: {
       type: 'string',
     },
-    pickupAddressLineOne: {
-      type: 'string',
-      allowNull: true,
-    },
-    pickupAddressLineTwo: {
-      type: 'string',
-      allowNull: true,
-    },
-    pickupAddressCity: {
-      type: 'string',
-      allowNull: true,
-    },
-    pickupAddressPostCode: {
-      type: 'string',
-      allowNull: true,
-    },
-    pickupAddressLatitude: {
-      type: 'number',
-      allowNull: true,
-    },
-    pickupAddressLongitude: {
-      type: 'number',
-      allowNull: true,
+    // pickupAddress.addressLineOne: {
+    //   type: 'string',
+    //   allowNull: true,
+    // },
+    // pickupAddress.addressLineTwo: {
+    //   type: 'string',
+    //   allowNull: true,
+    // },
+    // pickupAddress.addressTownCity: {
+    //   type: 'string',
+    //   allowNull: true,
+    // },
+    // pickupAddress.addressPostCode: {
+    //   type: 'string',
+    //   allowNull: true,
+    // },
+    // pickupAddress.latitude: {
+    //   type: 'number',
+    //   allowNull: true,
+    // },
+    // pickupAddress.longitude: {
+    //   type: 'number',
+    //   allowNull: true,
+    // },
+    pickupAddress: {
+      type: 'ref'
     },
     // deliveryRestrictionDetails: {
     //   type: 'string'
@@ -151,48 +155,80 @@ module.exports = {
     }
 
     if (
-      inputs.pickupAddressLatitude > 180 ||
-      inputs.pickupAddressLatitude < -180
+      inputs.pickupAddress.latitude > 180 ||
+      inputs.pickupAddress.latitude < -180
     ) {
       return exits.badGeoCoordinate({
-        latitudeAboveBounds: inputs.pickupAddressLatitude > 180,
+        latitudeAboveBounds: inputs.pickupAddress.latitude > 180,
       });
     }
     if (
-      inputs.pickupAddressLongitude > 180 ||
-      inputs.pickupAddressLongitude < -180
+      inputs.pickupAddress.longitude > 180 ||
+      inputs.pickupAddress.longitude < -180
     ) {
       return exits.badGeoCoordinate({
-        longitudeAboveBounds: inputs.pickupAddressLongitude > 180,
+        longitudeAboveBounds: inputs.pickupAddress.longitude > 180,
       });
     }
 
     let coordinates = {
-      lat: inputs.pickupAddressLatitude,
-      lng: inputs.pickupAddressLongitude,
+      lat: 0, //inputs.pickupAddressLatitude,
+      lng: 0, //inputs.pickupAddressLongitude,
     };
 
     try {
-      if (inputs.pickupAddressLineOne && inputs.pickupAddressPostCode) {
+      if (inputs.pickupAddress.addressLineOne && inputs.pickupAddress.addressPostCode) {
         const _coordinates = await sails.helpers.getCoordinatesForAddress.with({
-          addressLineOne: inputs.pickupAddressLineOne || '',
-          addressLineTwo: inputs.pickupAddressLineTwo || '',
-          addressTownCity: inputs.pickupAddressCity || '',
-          addressPostCode: inputs.pickupAddressPostCode || '',
+          addressLineOne: inputs.pickupAddress.addressLineOne || '',
+          addressLineTwo: inputs.pickupAddress.addressLineTwo || '',
+          addressTownCity: inputs.pickupAddress.addressTownCity || '',
+          addressPostCode: inputs.pickupAddress.addressPostCode || '',
           addressCountryCode: 'UK',
         });
-        coordinates = {
-          lat: _coordinates.lat,
-          lng: _coordinates.lng,
-        };
+        if(_coordinates){
+          coordinates = {
+            lat: _coordinates.lat,
+            lng: _coordinates.lng,
+          };
+        }
       }
     } catch (err) {
       sails.log.error(
         `Failed to fetch coordinates of editted vendor pickup address: ${err}`
       );
     }
-    inputs.pickupAddressLatitude = coordinates.lat;
-    inputs.pickupAddressLongitude = coordinates.lng;
+
+    if (
+      inputs.pickupAddress &&
+      inputs.pickupAddress.addressLineOne &&
+      inputs.pickupAddress.addressPostCode
+    ) {
+      try {
+        const _coordinates = await sails.helpers.getCoordinatesForAddress.with({
+          addressLineOne: inputs.pickupAddress.addressLineOne,
+          addressLineTwo: inputs.pickupAddress.addressLineTwo,
+          addressTownCity: inputs.pickupAddress.addressTownCity,
+          addressPostCode: inputs.pickupAddress.addressPostCode,
+          addressCountryCode: 'UK',
+        });
+        if (_coordinates) {
+          coordinates = _coordinates;
+        }
+      } catch (error) {
+        sails.log.error(error);
+      }
+    }
+
+    let newAddress = await Address.create({
+      label: 'Store',
+      addressLineOne: inputs.pickupAddress.addressLineOne,
+      addressLineTwo: inputs.pickupAddress.addressLineTwo,
+      addressTownCity: inputs.pickupAddress.addressTownCity,
+      addressPostCode: inputs.pickupAddress.addressPostCode,
+      addressCountryCode: 'UK',
+      latitude: coordinates.lat,
+      longitude: coordinates.lng,
+    }).fetch();
 
     var newVendor = await Vendor.create({
       imageUrl: sails.config.custom.amazonS3BucketUrl + imageInfo.fd,
@@ -201,12 +237,7 @@ module.exports = {
       description: inputs.description,
       walletAddress: inputs.walletAddress,
       phoneNumber: inputs.phoneNumber,
-      pickupAddressLineOne: inputs.pickupAddressLineOne,
-      pickupAddressLineTwo: inputs.pickupAddressLineTwo,
-      pickupAddressCity: inputs.pickupAddressCity,
-      pickupAddressPostCode: inputs.pickupAddressPostCode.toLocaleUpperCase(),
-      pickupAddressLatitude: inputs.pickupAddressLatitude,
-      pickupAddressLongitude: inputs.pickupAddressLongitude,
+      pickupAddress: newAddress.id,
       deliveryPartner: inputs.deliveryPartner,
       status: inputs.status,
       rating: inputs.rating,
@@ -214,6 +245,9 @@ module.exports = {
       isVegan: inputs.isVegan,
       minimumOrderAmount: inputs.minimumOrderAmount,
     }).fetch();
+    await Address.update(newAddress.id).set({
+      vendor: newVendor.id
+    });
 
     // All done.
     return exits.success({

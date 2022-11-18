@@ -13,19 +13,15 @@ parasails.registerComponent('openingHours', {
   //  ╔═╗╦═╗╔═╗╔═╗╔═╗
   //  ╠═╝╠╦╝║ ║╠═╝╚═╗
   //  ╩  ╩╚═╚═╝╩  ╚═╝
-  props: [
-    'fulfilment-method',
-  ],
+  props: ['fulfilment-method'],
   //  ╦╔╗╔╦╔╦╗╦╔═╗╦    ╔═╗╔╦╗╔═╗╔╦╗╔═╗
   //  ║║║║║ ║ ║╠═╣║    ╚═╗ ║ ╠═╣ ║ ║╣
   //  ╩╝╚╝╩ ╩ ╩╩ ╩╩═╝  ╚═╝ ╩ ╩ ╩ ╩ ╚═╝
-  data: function (){
+  data: function () {
     return {
       syncing: false,
-      formRules: {
-      },
-      formErrors: {
-      },
+      formRules: {},
+      formErrors: {},
       cloudError: '',
     };
   },
@@ -70,6 +66,10 @@ parasails.registerComponent('openingHours', {
           <input type="number" :class="{ 'is-invalid': formErrors.maxOrders }" v-model="fulfilmentMethod.maxOrders" class="form-control" id="maxOrders" >
         </div>
         <div class="form-group">
+          <label for="maxDeliveryDistance">Max Delivery Distance (KM)</label>
+          <input type="number" :class="{ 'is-invalid': formErrors.maxDeliveryDistance }" v-model="fulfilmentMethod.maxDeliveryDistance" class="form-control" id="maxDeliveryDistance" >
+        </div>
+        <div class="form-group">
           <label for="orderCutoff">Order Cutoff (on day prior)</label><br/>
           <input type="time" id="orderCutoff" v-model="fulfilmentMethod.orderCutoff">
         </div>
@@ -80,18 +80,18 @@ parasails.registerComponent('openingHours', {
   //  ╦  ╦╔═╗╔═╗╔═╗╦ ╦╔═╗╦  ╔═╗
   //  ║  ║╠╣ ║╣ ║  ╚╦╝║  ║  ║╣
   //  ╩═╝╩╚  ╚═╝╚═╝ ╩ ╚═╝╩═╝╚═╝
-  beforeMount: function() {
+  beforeMount: function () {
     //…
   },
-  mounted: async function(){
+  mounted: async function () {
     //…
   },
-  beforeDestroy: function() {
+  beforeDestroy: function () {
     //…
   },
 
   filters: {
-    capitalise: function(value) {
+    capitalise: function (value) {
       if (!value) {
         return '';
       }
@@ -99,11 +99,13 @@ parasails.registerComponent('openingHours', {
       return value.charAt(0).toUpperCase() + value.slice(1);
     },
     convertToPounds: function (value) {
-      if (!value) {return '£0';}
-      value = '£' + (value/100).toFixed(2);
+      if (!value) {
+        return '£0';
+      }
+      value = '£' + (value / 100).toFixed(2);
       value = value.toString();
       return value;
-    }
+    },
   },
 
   //  ╦╔╗╔╔╦╗╔═╗╦═╗╔═╗╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
@@ -111,5 +113,5 @@ parasails.registerComponent('openingHours', {
   //  ╩╝╚╝ ╩ ╚═╝╩╚═╩ ╩╚═╝ ╩ ╩╚═╝╝╚╝╚═╝
   methods: {
     //…
-  }
+  },
 });

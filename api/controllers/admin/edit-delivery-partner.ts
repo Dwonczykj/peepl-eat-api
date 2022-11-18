@@ -77,6 +77,7 @@ module.exports = {
     if (!deliveryPartner) {
       return exits.notFound();
     }
+    
     var coordinates = {
       lat: 0.0,
       lng: 0.0

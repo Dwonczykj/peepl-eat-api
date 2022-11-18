@@ -1855,33 +1855,6 @@
             "type": "string",
             "description": "Phone number of the restaurant."
           },
-          "pickupAddressLineOne": {
-            "type": "string",
-            "nullable": true
-          },
-          "pickupAddressLineTwo": {
-            "type": "string",
-            "nullable": true
-          },
-          "pickupAddressCity": {
-            "type": "string",
-            "nullable": true
-          },
-          "pickupAddressPostCode": {
-            "type": "string",
-            "pattern": "^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\\s?[0-9][A-Za-z]{2})$/",
-            "nullable": true
-          },
-          "pickupAddressLatitude": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "pickupAddressLongitude": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
           "costLevel": {
             "type": "number",
             "format": "double",
@@ -1932,6 +1905,14 @@
             "oneOf": [
               {
                 "$ref": "#/components/schemas/fulfilmentmethod"
+              }
+            ]
+          },
+          "pickupAddress": {
+            "description": "JSON dictionary representing the **address** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/address"
               }
             ]
           },
@@ -4921,59 +4902,9 @@
           },
           {
             "in": "query",
-            "name": "pickupAddressLineOne",
+            "name": "pickupAddress",
             "required": false,
-            "schema": {
-              "type": "string",
-              "nullable": true
-            }
-          },
-          {
-            "in": "query",
-            "name": "pickupAddressLineTwo",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "nullable": true
-            }
-          },
-          {
-            "in": "query",
-            "name": "pickupAddressCity",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "nullable": true
-            }
-          },
-          {
-            "in": "query",
-            "name": "pickupAddressPostCode",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "nullable": true
-            }
-          },
-          {
-            "in": "query",
-            "name": "pickupAddressLatitude",
-            "required": false,
-            "schema": {
-              "type": "number",
-              "format": "double",
-              "nullable": true
-            }
-          },
-          {
-            "in": "query",
-            "name": "pickupAddressLongitude",
-            "required": false,
-            "schema": {
-              "type": "number",
-              "format": "double",
-              "nullable": true
-            }
+            "schema": {}
           },
           {
             "in": "query",
@@ -5136,59 +5067,9 @@
           },
           {
             "in": "query",
-            "name": "pickupAddressLineOne",
+            "name": "pickupAddress",
             "required": false,
-            "schema": {
-              "type": "string",
-              "nullable": true
-            }
-          },
-          {
-            "in": "query",
-            "name": "pickupAddressLineTwo",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "nullable": true
-            }
-          },
-          {
-            "in": "query",
-            "name": "pickupAddressCity",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "nullable": true
-            }
-          },
-          {
-            "in": "query",
-            "name": "pickupAddressPostCode",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "nullable": true
-            }
-          },
-          {
-            "in": "query",
-            "name": "pickupAddressLatitude",
-            "required": false,
-            "schema": {
-              "type": "number",
-              "format": "double",
-              "nullable": true
-            }
-          },
-          {
-            "in": "query",
-            "name": "pickupAddressLongitude",
-            "required": false,
-            "schema": {
-              "type": "number",
-              "format": "double",
-              "nullable": true
-            }
+            "schema": {}
           },
           {
             "in": "query",
@@ -6728,6 +6609,16 @@
               "format": "double"
             },
             "description": "The maximum number of orders allowed per slot."
+          },
+          {
+            "in": "query",
+            "name": "maxDeliveryDistance",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "The max delivery distance allowed by a fulfilment method by road in KM."
           }
         ],
         "responses": {

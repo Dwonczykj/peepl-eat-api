@@ -33,34 +33,35 @@
         <label for="phoneNumber">Vendor Phone Number</label>
         <input type="text" :class="{ 'is-invalid': formErrors.phoneNumber }" v-model="vendor.phoneNumber" class="form-control" id="phoneNumber" >
       </div>
-
+      
+      <h2 class="h5 mt-3">Vendor Address</h2>
       <div class="form-group">
-        <label for="pickupAddressLineOne">Vendor Address Line 1</label>
-        <input type="text" :class="{ 'is-invalid': formErrors.pickupAddressLineOne }" v-model="vendor.pickupAddressLineOne"
-          class="form-control" id="pickupAddressLineOne">
+        <label for="addressLineOne">Vendor Address Line 1</label>
+        <input type="text" :class="{ 'is-invalid': formErrors.addressLineOne }" 
+          v-model="vendor.pickupAddress.addressLineOne"
+          class="form-control" id="addressLineOne">
       
-        <label for="pickupAddressLineTwo">Vendor Address Line 2</label>
-        <input type="text" :class="{ 'is-invalid': formErrors.pickupAddressLineTwo }" v-model="vendor.pickupAddressLineTwo"
-          class="form-control" id="pickupAddressLineTwo">
+        <label for="addressLineTwo">Vendor Address Line 2</label>
+        <input type="text" :class="{ 'is-invalid': formErrors.addressLineTwo }" 
+          v-model="vendor.pickupAddress.addressLineTwo"
+          class="form-control" id="addressLineTwo">
       
-        <label for="pickupAddressCity">Vendor Address City</label>
-        <input type="text" :class="{ 'is-invalid': formErrors.pickupAddressCity }" v-model="vendor.pickupAddressCity"
-          class="form-control" id="pickupAddressCity">
+        <label for="addressTownCity">Vendor Address City</label>
+        <input type="text" :class="{ 'is-invalid': formErrors.addressTownCity }" v-model="vendor.pickupAddress.addressTownCity"
+          class="form-control" id="addressTownCity">
       
-        <label for="pickupAddressPostCode">Vendor Address Post Code</label>
-        <input type="text" :class="{ 'is-invalid': formErrors.pickupAddressPostCode || cloudError === 'badPostalCode' }" v-model="vendor.pickupAddressPostCode"
-          class="form-control" id="pickupAddressPostCode" oninput="this.value = this.value.toUpperCase()">
+        <label for="addressZipCode">Vendor Address Post Code</label>
+        <input type="text" :class="{ 'is-invalid': formErrors.addressPostCode || cloudError === 'badPostalCode' }" 
+          v-model="vendor.pickupAddress.addressPostCode"
+          class="form-control" id="addressZipCode" oninput="this.value = this.value.toUpperCase()">
         <div v-if="cloudError === 'badPostalCode'" class="alert alert-danger mt-4" role="alert">
           Bad PostalCode
         </div>
 
         <label for="pickupAddressGeocoordinate">Vendor Address Geocoordinate</label>
-        <!-- <p>Latitude: {{vendor.pickupAddressLatitude}}, Longitude: {{vendor.pickupAddressLongitude}}</p> -->
-        <input type="number" :class="{ 'is-invalid': formErrors.pickupAddressLatitude }" v-model="vendor.pickupAddressLatitude"
-          class="form-control" id="pickupAddressLatitude">
-        <input type="number" :class="{ 'is-invalid': formErrors.pickupAddressLongitude }"
-          v-model="vendor.pickupAddressLongitude" class="form-control" id="pickupAddressLongitude">
+        <p>Latitude: {{vendor.pickupAddress.latitude}}, Longitude: {{vendor.pickupAddress.longitude}}</p>
       </div>
+
       <div class="form-group">
         <label for="vendorType">Vendor Type</label>
         <select class="form-control" id="vendorType" v-model="vendor.type" :disabled="vendor.id">

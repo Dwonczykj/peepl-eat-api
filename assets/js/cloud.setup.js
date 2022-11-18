@@ -56,11 +56,7 @@ Cloud.setup({
     bulkUpdateData: {
       verb: 'POST',
       url: '/api/v1/admin/bulk-update-data',
-      args: [
-        'modelType',
-        'data',
-        'createOrUpdateMode'
-      ]
+      args: ['modelType', 'data', 'createOrUpdateMode'],
     },
     createOrder: {
       verb: 'POST',
@@ -364,6 +360,7 @@ Cloud.setup({
         'bufferLength',
         'orderCutoff',
         'maxOrders',
+        'maxDeliveryDistance',
       ],
     },
     updateOpeninghours: {

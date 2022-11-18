@@ -169,10 +169,10 @@ type _VendorTypeHidden = {
   name: string;
   type: VendorTypeLiteral;
   phoneNumber: string;
-  pickupAddressLineOne?: string;
-  pickupAddressLineTwo?: string;
-  pickupAddressCity?: string;
-  pickupAddressPostCode?: string;
+  // pickupAddressLineOne?: string;
+  // pickupAddressLineTwo?: string;
+  // pickupAddressCity?: string;
+  // pickupAddressPostCode?: string;
   costLevel?: number;
   rating: number;
   isVegan: boolean;
@@ -379,6 +379,7 @@ export type PostalDistrictType = {
 export type VendorType = _VendorTypeHidden & {
   deliveryPartner?: _DeliveryPartnerTypeHidden;
   deliveryFulfilmentMethod?: _FulfilmentMethodTypeHidden;
+  pickupAddress?: _AddressTypeHidden;
   collectionFulfilmentMethod?: _FulfilmentMethodTypeHidden;
   products: Array<_ProductTypeHidden>;
   vendorCategories: Array<VendorCategoryType>; // Cafes

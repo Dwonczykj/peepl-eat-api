@@ -60,12 +60,6 @@
 
         <label for="pickupAddressGeocoordinate">Delivery Hub Address Geocoordinate</label>
         <p>Latitude: {{deliveryPartner.deliveryOriginAddress.latitude}}, Longitude: {{deliveryPartner.deliveryOriginAddress.longitude}}</p>
-        <!-- <input type="number" :class="{ 'is-invalid': formErrors.latitude }" 
-          v-model="deliveryPartner.deliveryOriginAddress.latitude"
-          class="form-control" id="latitude">
-        <input type="number" :class="{ 'is-invalid': formErrors.longitude }"
-          v-model="deliveryPartner.deliveryOriginAddress.longitude" 
-          class="form-control" id="longitude"> -->
       </div>
 
       <ajax-button class="btn btn-peepl mt-4" type="submit" :syncing="syncing" v-bind:class="{ 'is-loading': syncing }">Save changes</ajax-button>

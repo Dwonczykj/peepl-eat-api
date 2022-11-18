@@ -222,33 +222,40 @@ module.exports = {
         deliveryCoordinates = null;
       }
 
-      // Check if vendor delivers to postal district
-      const postcodeRegex =
-        /^(((([A-Z][A-Z]{0,1})[0-9][A-Z0-9]{0,1}) {0,}[0-9])[A-Z]{2})$/;
-
-      const m = postcodeRegex.exec(inputs.address.postCode);
-      if (m !== null) {
+      if (!inputs.address.postCode){
         const canFulfilDelivery =
           await sails.helpers.fulfilmentMethodDeliversToAddress.with({
             fulfilmentMethod: fulfilmentMethod.id,
             latitude: deliveryCoordinates.lat,
             longitude: deliveryCoordinates.lng,
           });
-        let postalDistrict = m[3]; // 3rd match group is the postal district
-        let postalDistrictStringArray = vendor.fulfilmentPostalDistricts.map(
-          (postalDistrict) => postalDistrict.outcode
-        );
-
-        if (!postalDistrictStringArray.includes(postalDistrict)) {
-          // throw new Error('Vendor does not deliver to this postal district.');
-          sails.log.warn('helpers.validateOrder: invalidPostalDistrict');
+        if (!canFulfilDelivery.canDeliver){
+          sails.log.warn('helpers.validateOrder: invalidPostalDistrict as out of delivery radius');
           return exits.invalidPostalDistrict();
         }
       } else {
-        // Postcode is invalid
-        sails.log.warn('helpers.validateOrder: invalidPostalDistrict');
-        return exits.invalidPostalDistrict();
-      }
+        // Check if vendor delivers to postal district
+        const postcodeRegex =
+          /^(((([A-Z][A-Z]{0,1})[0-9][A-Z0-9]{0,1}) {0,}[0-9])[A-Z]{2})$/;
+
+        const m = postcodeRegex.exec(inputs.address.postCode);
+        if (m !== null) {
+          let postalDistrict = m[3]; // 3rd match group is the postal district
+          let postalDistrictStringArray = vendor.fulfilmentPostalDistricts.map(
+            (postalDistrict) => postalDistrict.outcode
+          );
+
+          if (!postalDistrictStringArray.includes(postalDistrict)) {
+            // throw new Error('Vendor does not deliver to this postal district.');
+            sails.log.warn('helpers.validateOrder: invalidPostalDistrict');
+            return exits.invalidPostalDistrict();
+          } 
+        } else {
+          // Postcode is invalid
+          sails.log.warn('helpers.validateOrder: invalidPostalDistrict');
+          return exits.invalidPostalDistrict();
+        }
+      }  
     }
     if (fulfilmentMethod.methodType === 'collection') {
       // require user to submit their name and address for identification purposes on collection

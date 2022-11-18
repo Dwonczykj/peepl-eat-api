@@ -39,7 +39,7 @@ module.exports = {
     }
 
     var vendor = await Vendor.findOne(vendorid).populate(
-      "productCategories&products&products.category&products.options&options.values"
+      "pickupAddress&productCategories&products&products.category&products.options&options.values"
     );
 
     if(!vendor) {
@@ -79,6 +79,19 @@ module.exports = {
     var deliveryPartners = await DeliveryPartner.find({status: 'active'});
 
     var categoryGroups = await CategoryGroup.find();
+
+    if(!vendor.pickupAddress){
+      vendor.pickupAddress = {
+        label: '',
+        addressLineOne: '',
+        addressLineTwo: '',
+        addressTownCity: '',
+        addressPostCode: '',
+        addressCountryCode: '',
+        latitude: null,
+        longitude: null,
+      };
+    }
 
     // Respond with view or JSON.
     if(this.req.wantsJSON) {

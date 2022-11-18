@@ -1,7 +1,8 @@
-import { sailsVegi } from "../../../api/interfaces/iSails";
-import { StatusLiteral } from "../../../scripts/utils";
+import { sailsModelKVP, SailsModelType, sailsVegi } from "../../../api/interfaces/iSails";
+import { AddressType, PostCodeString, StatusLiteral } from "../../../scripts/utils";
 declare var sails: sailsVegi;
 
+declare var Address: SailsModelType<AddressType>;
 
 export type EditVendorInputs = {
   id: number;
@@ -10,12 +11,13 @@ export type EditVendorInputs = {
   image: any;
   walletAddress: string;
   phoneNumber?: string | null;
-  pickupAddressLineOne?: string | null;
-  pickupAddressLineTwo?: string | null;
-  pickupAddressCity?: string | null;
-  pickupAddressPostCode?: string | null;
-  pickupAddressLatitude?: number | null;
-  pickupAddressLongitude?: number | null;
+  // pickupAddressLineOne?: string | null;
+  // pickupAddressLineTwo?: string | null;
+  // pickupAddressCity?: string | null;
+  // pickupAddressPostCode?: string | null;
+  // pickupAddressLatitude?: number | null;
+  // pickupAddressLongitude?: number | null;
+  pickupAddress?: AddressType,
   status: StatusLiteral;
   deliveryPartner?: string |null;
   costLevel: number | null;
@@ -58,29 +60,8 @@ module.exports = {
       type: 'string',
       allowNull: true
     },
-    pickupAddressLineOne: {
-      type: 'string',
-      allowNull: true
-    },
-    pickupAddressLineTwo: {
-      type: 'string',
-      allowNull: true
-    },
-    pickupAddressCity: {
-      type: 'string',
-      allowNull: true
-    },
-    pickupAddressPostCode: {
-      type: 'string',
-      allowNull: true
-    },
-    pickupAddressLatitude: {
-      type: 'number',
-      allowNull: true
-    },
-    pickupAddressLongitude: {
-      type: 'number',
-      allowNull: true
+    pickupAddress: {
+      type: 'ref',
     },
     status: {
       type: 'string',
@@ -163,6 +144,63 @@ module.exports = {
       return exits.unauthorised();
     }
 
+    let coordinates = {
+      lat: 0, //inputs.pickupAddressLatitude,
+      lng: 0, //inputs.pickupAddressLongitude,
+    };
+
+    if (
+      inputs.pickupAddress &&
+      inputs.pickupAddress.addressLineOne &&
+      inputs.pickupAddress.addressPostCode
+    ) {
+      try {
+	      const _coordinates = await sails.helpers.getCoordinatesForAddress.with({
+	        addressLineOne: inputs.pickupAddress.addressLineOne,
+	        addressLineTwo: inputs.pickupAddress.addressLineTwo,
+	        addressTownCity: inputs.pickupAddress.addressTownCity,
+	        addressPostCode: inputs.pickupAddress.addressPostCode,
+	        addressCountryCode: 'UK',
+	      });
+	      if (_coordinates) {
+	        coordinates = _coordinates;
+	      }
+      } catch (error) {
+        sails.log.error(error);
+      }
+    }
+
+    let existingAddress = await Address.findOne({
+      vendor: inputs.id,
+    });
+    let newAddress: AddressType | sailsModelKVP<AddressType>;
+    if (!existingAddress) {
+      newAddress = await Address.create({
+        vendor: inputs.id,
+        label: 'Store',
+        addressLineOne: inputs.pickupAddress.addressLineOne,
+        addressLineTwo: inputs.pickupAddress.addressLineTwo,
+        addressTownCity: inputs.pickupAddress.addressTownCity,
+        addressPostCode: inputs.pickupAddress.addressPostCode,
+        addressCountryCode: 'UK',
+        latitude: coordinates.lat,
+        longitude: coordinates.lng,
+      }).fetch();
+    } else {
+      await Address.update(existingAddress.id).set({
+        vendor: inputs.id,
+        label: 'Store',
+        addressLineOne: inputs.pickupAddress.addressLineOne,
+        addressLineTwo: inputs.pickupAddress.addressLineTwo,
+        addressTownCity: inputs.pickupAddress.addressTownCity,
+        addressPostCode: inputs.pickupAddress.addressPostCode,
+        addressCountryCode: 'UK',
+        latitude: coordinates.lat,
+        longitude: coordinates.lng,
+      });
+      newAddress = await Address.findOne(existingAddress.id);
+    }
+
     if(inputs.image /*&& sails.config.custom.amazonS3Secret && sails.config.custom.amazonS3AccessKey*/){
       let imageInfo = await sails.helpers.uploadOneS3(inputs.image);
       if(imageInfo) {
@@ -176,43 +214,25 @@ module.exports = {
     //   inputs.imageUrl = vendor.imageUrl;
     // }
 
-    if(inputs.pickupAddressPostCode){
-      inputs.pickupAddressPostCode = inputs.pickupAddressPostCode.toLocaleUpperCase();
+    if(inputs.pickupAddress.addressPostCode){
+      inputs.pickupAddress.addressPostCode =
+        (inputs.pickupAddress.addressPostCode.toLocaleUpperCase() as PostCodeString);
     }
     var regPostcode = /^([a-zA-Z]){1}([0-9][0-9]|[0-9]|[a-zA-Z][0-9][a-zA-Z]|[a-zA-Z][0-9][0-9]|[a-zA-Z][0-9]){1}([ ])([0-9][a-zA-z][a-zA-z]){1}$/;
     //TODO: Validate the address input and use google maps service to validate the postcode using google services
-    if (!inputs.pickupAddressPostCode || !inputs.pickupAddressPostCode.match(regPostcode))
-    {
+    if (
+      !inputs.pickupAddress.addressPostCode ||
+      !inputs.pickupAddress.addressPostCode.match(regPostcode)
+    ) {
       return exits.badPostalCode();
     }
-    
-    let coordinates = {
-      lat: inputs.pickupAddressLatitude,
-      lng: inputs.pickupAddressLongitude,
-    };
-
-    try{
-      if(inputs.pickupAddressLineOne && inputs.pickupAddressPostCode){
-        const _coordinates = await sails.helpers.getCoordinatesForAddress.with({
-          addressLineOne: inputs.pickupAddressLineOne || '',
-          addressLineTwo: inputs.pickupAddressLineTwo || '',
-          addressTownCity: inputs.pickupAddressCity || '',
-          addressPostCode: inputs.pickupAddressPostCode || '',
-          addressCountryCode: 'UK',
-        });
-        coordinates = {
-          lat:_coordinates.lat,
-          lng:_coordinates.lng,
-        };
-      }
-    } catch (err) {
-      sails.log.error(`Failed to fetch coordinates of editted vendor pickup address: ${err}`);
-    }
-    inputs.pickupAddressLatitude = coordinates.lat;
-    inputs.pickupAddressLongitude = coordinates.lng;
 
     try {
-	    var newVendor = await Vendor.updateOne(inputs.id).set(inputs);
+      const updateVendor = {
+        ...inputs,
+        pickupAddress: newAddress.id,
+      };
+	    var newVendor = await Vendor.updateOne(inputs.id).set(updateVendor);
       return exits.success({
         id: newVendor.id,
       });

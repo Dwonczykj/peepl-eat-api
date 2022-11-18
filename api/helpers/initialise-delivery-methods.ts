@@ -54,29 +54,12 @@ module.exports = {
 
     // Add FulfilmentMethods to Vendor/DeliveryPartner
     if(inputs.vendor){
-      const vendor = await Vendor.findOne(inputs.vendor);
-      const geoLocation = await sails.helpers.getCoordinatesForAddress.with({
-        addressLineOne: vendor.pickupAddressLineOne,
-        addressLineTwo: vendor.pickupAddressLineTwo,
-        addressTownCity: vendor.pickupAddressCity,
-        addressPostCode: vendor.pickupAddressPostCode,
-        addressCountryCode: 'UK',
-      });
-      const vendorDeliveryAddressOrigin = await Address.create({
-        label: 'home',
-        addressLineOne: vendor.pickupAddressLineOne,
-        addressLineTwo: vendor.pickupAddressLineTwo,
-        addressTownCity: vendor.pickupAddressCity,
-        addressPostCode: vendor.pickupAddressPostCode,
-        addressCountryCode: 'UK',
-        latitude: geoLocation.lat,
-        longitude: geoLocation.lng,
-        vendor: inputs.vendor,
-      }).fetch();
+      const vendor = await Vendor.findOne(inputs.vendor).populate('pickupAddress');
+      
       delv = await FulfilmentMethod.create({
         vendor: inputs.vendor,
         methodType: 'delivery',
-        fulfilmentOrigin: vendorDeliveryAddressOrigin.id,
+        fulfilmentOrigin: vendor.pickupAddress && vendor.pickupAddress.id,
       }).fetch();
 
       col = await FulfilmentMethod.create({vendor:inputs.vendor, methodType:'collection'}).fetch();
