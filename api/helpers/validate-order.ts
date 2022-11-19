@@ -133,14 +133,16 @@ module.exports = {
     // Check that fulfilment method belongs to vendor or delivery partner
     let fulfilmentMethod = await FulfilmentMethod.findOne({
       id: inputs.fulfilmentMethod,
-    });
+    }).populate('fulfilmentOrigin&vendor&deliveryPartner');
 
     if (!fulfilmentMethod) {
       sails.log.warn('helpers.validateOrder: invalidFulfilmentMethod');
       return exits.invalidFulfilmentMethod();
     } else if (
-      fulfilmentMethod.vendor !== vendor.id &&
-      fulfilmentMethod.deliveryPartner !== vendor.deliveryPartner.id
+      (fulfilmentMethod.vendor &&
+      fulfilmentMethod.vendor.id !== vendor.id) ||
+      (fulfilmentMethod.deliveryPartner &&
+      fulfilmentMethod.deliveryPartner.id !== vendor.deliveryPartner.id)
     ) {
       sails.log.warn('helpers.validateOrder: invalidFulfilmentMethod');
       return exits.invalidFulfilmentMethod();
@@ -202,35 +204,36 @@ module.exports = {
       }
     }
     if (fulfilmentMethod.methodType === 'delivery') {
-      let deliveryCoordinates: GetCoordinatesForAddressResult | null;
-      try {
-        const _deliveryCoordinates =
-          await sails.helpers.getCoordinatesForAddress.with({
-            addressLineOne: inputs.address.lineOne,
-            addressLineTwo: inputs.address.lineTwo,
-            addressTownCity: inputs.address.city,
-            addressPostCode: inputs.address.postCode,
-            addressCountryCode: 'UK',
-          });
-        deliveryCoordinates = _deliveryCoordinates;
-        inputs.address.lat = _deliveryCoordinates.lat;
-        inputs.address.lng = _deliveryCoordinates.lng;
-      } catch (err) {
-        sails.log.error(
-          `Unable to get coordinates of address with postcode: ${inputs.address.postCode} from api: ${err}`
-        );
-        deliveryCoordinates = null;
-      }
-
-      if (!inputs.address.postCode){
+      if (fulfilmentMethod.maxDeliveryDistance > 0 && fulfilmentMethod.fulfilmentOrigin) {
+        let deliveryCoordinates: GetCoordinatesForAddressResult | null;
+        try {
+          const _deliveryCoordinates =
+            await sails.helpers.getCoordinatesForAddress.with({
+              addressLineOne: inputs.address.lineOne,
+              addressLineTwo: inputs.address.lineTwo,
+              addressTownCity: inputs.address.city,
+              addressPostCode: inputs.address.postCode,
+              addressCountryCode: 'UK',
+            });
+          deliveryCoordinates = _deliveryCoordinates;
+          inputs.address.lat = _deliveryCoordinates.lat;
+          inputs.address.lng = _deliveryCoordinates.lng;
+        } catch (err) {
+          sails.log.error(
+            `Unable to get coordinates of address with postcode: ${inputs.address.postCode} from api: ${err}`
+          );
+          deliveryCoordinates = null;
+        }
         const canFulfilDelivery =
           await sails.helpers.fulfilmentMethodDeliversToAddress.with({
             fulfilmentMethod: fulfilmentMethod.id,
             latitude: deliveryCoordinates.lat,
             longitude: deliveryCoordinates.lng,
           });
-        if (!canFulfilDelivery.canDeliver){
-          sails.log.warn('helpers.validateOrder: invalidPostalDistrict as out of delivery radius');
+        if (!canFulfilDelivery.canDeliver) {
+          sails.log.warn(
+            'helpers.validateOrder: invalidPostalDistrict as out of delivery radius'
+          );
           return exits.invalidPostalDistrict();
         }
       } else {
@@ -249,7 +252,7 @@ module.exports = {
             // throw new Error('Vendor does not deliver to this postal district.');
             sails.log.warn('helpers.validateOrder: invalidPostalDistrict');
             return exits.invalidPostalDistrict();
-          } 
+          }
         } else {
           // Postcode is invalid
           sails.log.warn('helpers.validateOrder: invalidPostalDistrict');

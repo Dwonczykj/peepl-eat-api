@@ -69,6 +69,36 @@ parasails.registerComponent('openingHours', {
           <label for="maxDeliveryDistance">Max Delivery Distance (KM)</label>
           <input type="number" :class="{ 'is-invalid': formErrors.maxDeliveryDistance }" v-model="fulfilmentMethod.maxDeliveryDistance" class="form-control" id="maxDeliveryDistance" >
         </div>
+        <div v-if="fulfilmentMethod.methodType !== 'collection'">
+          <h2 class="h5 mt-3">Fulfilment Origin</h2>
+          <div class="form-group">
+            <label for="addressLineOne">Address Line 1</label>
+            <input type="text" :class="{ 'is-invalid': formErrors.addressLineOne }" 
+              v-model="fulfilmentMethod.fulfilmentOrigin.addressLineOne"
+              class="form-control" id="addressLineOne">
+          
+            <label for="addressLineTwo">Address Line 2</label>
+            <input type="text" :class="{ 'is-invalid': formErrors.addressLineTwo }" 
+              v-model="fulfilmentMethod.fulfilmentOrigin.addressLineTwo"
+              class="form-control" id="addressLineTwo">
+          
+            <label for="addressTownCity">Address City</label>
+            <input type="text" :class="{ 'is-invalid': formErrors.addressTownCity }" v-model="fulfilmentMethod.fulfilmentOrigin.addressTownCity"
+              class="form-control" id="addressTownCity">
+          
+            <label for="addressZipCode">Address Post Code</label>
+            <input type="text" :class="{ 'is-invalid': formErrors.addressPostCode || cloudError === 'badPostalCode' }" 
+              v-model="fulfilmentMethod.fulfilmentOrigin.addressPostCode"
+              class="form-control" id="addressZipCode" oninput="this.value = this.value.toUpperCase()">
+            <div v-if="cloudError === 'badPostalCode'" class="alert alert-danger mt-4" role="alert">
+              Bad PostalCode
+            </div>
+
+            <label for="pickupAddressGeocoordinate">Address Geocoordinate</label>
+            <p>Latitude: {{fulfilmentMethod.fulfilmentOrigin.latitude}}, Longitude: {{fulfilmentMethod.fulfilmentOrigin.longitude}}</p>
+          </div>
+        </div>
+
         <div class="form-group">
           <label for="orderCutoff">Order Cutoff (on day prior)</label><br/>
           <input type="time" id="orderCutoff" v-model="fulfilmentMethod.orderCutoff">

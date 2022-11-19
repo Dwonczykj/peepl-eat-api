@@ -361,6 +361,7 @@ Cloud.setup({
         'orderCutoff',
         'maxOrders',
         'maxDeliveryDistance',
+        'fulfilmentOrigin',
       ],
     },
     updateOpeninghours: {

@@ -39,19 +39,6 @@ module.exports = {
       isIn: ['active', 'inactive'],
       defaultsTo: 'inactive',
     },
-    deliveryOriginAddress: {
-      type: 'ref',
-      defaultsTo: {
-        label: '',
-        addressLineOne: '',
-        addressLineTwo: '',
-        addressTownCity: '',
-        addressPostCode: '',
-        addressCountryCode: '',
-        latitude: null,
-        longitude: null,
-      }
-    },
   },
 
   exits: {
@@ -78,57 +65,57 @@ module.exports = {
       return exits.notFound();
     }
     
-    var coordinates = {
-      lat: 0.0,
-      lng: 0.0
-    };
-    if (
-      inputs.deliveryOriginAddress &&
-      inputs.deliveryOriginAddress.addressLineOne &&
-      inputs.deliveryOriginAddress.addressPostCode
-    ) {
-      const _coordinates = await sails.helpers.getCoordinatesForAddress.with({
-        addressLineOne: inputs.deliveryOriginAddress.addressLineOne,
-        addressLineTwo: inputs.deliveryOriginAddress.addressLineTwo,
-        addressTownCity: inputs.deliveryOriginAddress.addressTownCity,
-        addressPostCode: inputs.deliveryOriginAddress.addressPostCode,
-        addressCountryCode: 'UK',
-      });
-      if(_coordinates){
-        coordinates = _coordinates;
-      }
-    }
+    // var coordinates = {
+    //   lat: 0.0,
+    //   lng: 0.0
+    // };
+    // if (
+    //   inputs.deliveryOriginAddress &&
+    //   inputs.deliveryOriginAddress.addressLineOne &&
+    //   inputs.deliveryOriginAddress.addressPostCode
+    // ) {
+    //   const _coordinates = await sails.helpers.getCoordinatesForAddress.with({
+    //     addressLineOne: inputs.deliveryOriginAddress.addressLineOne,
+    //     addressLineTwo: inputs.deliveryOriginAddress.addressLineTwo,
+    //     addressTownCity: inputs.deliveryOriginAddress.addressTownCity,
+    //     addressPostCode: inputs.deliveryOriginAddress.addressPostCode,
+    //     addressCountryCode: 'UK',
+    //   });
+    //   if(_coordinates){
+    //     coordinates = _coordinates;
+    //   }
+    // }
 
-    let existingAddress = await Address.findOne({
-      deliveryPartner: inputs.id
-    });
-    let newAddress: AddressType | sailsModelKVP<AddressType>;
-    if (!existingAddress) {
-      newAddress = await Address.create({
-        deliveryPartner: inputs.id,
-        label: 'Delivery Hub',
-        addressLineOne: inputs.deliveryOriginAddress.addressLineOne,
-        addressLineTwo: inputs.deliveryOriginAddress.addressLineTwo,
-        addressTownCity: inputs.deliveryOriginAddress.addressTownCity,
-        addressPostCode: inputs.deliveryOriginAddress.addressPostCode,
-        addressCountryCode: 'UK',
-        latitude: coordinates.lat,
-        longitude: coordinates.lng,
-      }).fetch();
-    } else {
-      await Address.update(existingAddress.id).set({
-        deliveryPartner: inputs.id,
-        label: 'Delivery Hub',
-        addressLineOne: inputs.deliveryOriginAddress.addressLineOne,
-        addressLineTwo: inputs.deliveryOriginAddress.addressLineTwo,
-        addressTownCity: inputs.deliveryOriginAddress.addressTownCity,
-        addressPostCode: inputs.deliveryOriginAddress.addressPostCode,
-        addressCountryCode: 'UK',
-        latitude: coordinates.lat,
-        longitude: coordinates.lng,
-      });
-      newAddress = await Address.findOne(existingAddress.id);
-    }
+    // let existingAddress = await Address.findOne({
+    //   deliveryPartner: inputs.id
+    // });
+    // let newAddress: AddressType | sailsModelKVP<AddressType>;
+    // if (!existingAddress) {
+    //   newAddress = await Address.create({
+    //     deliveryPartner: inputs.id,
+    //     label: 'Delivery Hub',
+    //     addressLineOne: inputs.deliveryOriginAddress.addressLineOne,
+    //     addressLineTwo: inputs.deliveryOriginAddress.addressLineTwo,
+    //     addressTownCity: inputs.deliveryOriginAddress.addressTownCity,
+    //     addressPostCode: inputs.deliveryOriginAddress.addressPostCode,
+    //     addressCountryCode: 'UK',
+    //     latitude: coordinates.lat,
+    //     longitude: coordinates.lng,
+    //   }).fetch();
+    // } else {
+    //   await Address.update(existingAddress.id).set({
+    //     deliveryPartner: inputs.id,
+    //     label: 'Delivery Hub',
+    //     addressLineOne: inputs.deliveryOriginAddress.addressLineOne,
+    //     addressLineTwo: inputs.deliveryOriginAddress.addressLineTwo,
+    //     addressTownCity: inputs.deliveryOriginAddress.addressTownCity,
+    //     addressPostCode: inputs.deliveryOriginAddress.addressPostCode,
+    //     addressCountryCode: 'UK',
+    //     latitude: coordinates.lat,
+    //     longitude: coordinates.lng,
+    //   });
+    //   newAddress = await Address.findOne(existingAddress.id);
+    // }
 
     // Update the delivery partner
     await DeliveryPartner.updateOne({
@@ -138,7 +125,6 @@ module.exports = {
       email: inputs.email,
       phoneNumber: inputs.phoneNumber,
       status: inputs.status,
-      deliveryOriginAddress: newAddress.id,
     });
 
     deliveryPartner = await DeliveryPartner.findOne(inputs.id);

@@ -4,7 +4,7 @@ import { DeliveryPartnerType } from "../../../scripts/utils";
 declare var DeliveryPartner: SailsModelType<DeliveryPartnerType>;
 
 type ViewDeliveryPartnersResponse = {
-  deliveryPartners: Array<DeliveryPartnerType>;
+  deliveryPartners: Array<DeliveryPartnerType | sailsModelKVP<DeliveryPartnerType>>;
 };
 
 module.exports = {
@@ -29,9 +29,7 @@ module.exports = {
       ) => ViewDeliveryPartnersResponse;
     }
   ) {
-    var deliveryPartners = await DeliveryPartner.find().populate(
-      'deliveryOriginAddress'
-    );
+    var deliveryPartners = await DeliveryPartner.find();
 
     // Respond with view or JSON.
     if (this.req.wantsJSON) {

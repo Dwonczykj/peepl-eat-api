@@ -46,11 +46,13 @@ module.exports = {
       return exits.notFound();
     }
 
-    var delFul = await Vendor.findOne(vendorid)
-    .populate('deliveryFulfilmentMethod&deliveryFulfilmentMethod.openingHours');
+    var delFul = await Vendor.findOne(vendorid).populate(
+      'deliveryFulfilmentMethod&deliveryFulfilmentMethod.openingHours&fulfilmentOrigin'
+    );
 
-    var colFul = await Vendor.findOne(vendorid)
-    .populate('collectionFulfilmentMethod&collectionFulfilmentMethod.openingHours');
+    var colFul = await Vendor.findOne(vendorid).populate(
+      'collectionFulfilmentMethod&collectionFulfilmentMethod.openingHours'
+    );
 
     var vendorFulfilmentPostalDistricts = await Vendor.findOne(vendorid)
     .populate('fulfilmentPostalDistricts');
@@ -90,6 +92,17 @@ module.exports = {
         addressCountryCode: '',
         latitude: null,
         longitude: null,
+      };
+    }
+    if (!delFul.fulfilmentOrigin) {
+      delFul.fulfilmentOrigin = {
+        addressLineOne: vendor.pickupAddress.addressLineOne,
+        addressLineTwo: vendor.pickupAddress.addressLineTwo,
+        addressTownCity: vendor.pickupAddress.addressTownCity,
+        addressPostCode: vendor.pickupAddress.addressPostCode,
+        addressCountryCode: vendor.pickupAddress.addressCountryCode,
+        latitude: vendor.pickupAddress.latitude,
+        longitude: vendor.pickupAddress.longitude,
       };
     }
 

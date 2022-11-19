@@ -37,16 +37,17 @@ module.exports = {
 
     var deliveryPartner = await DeliveryPartner.findOne(
       inputs.deliveryPartnerId
-    ).populate(
-      'deliveryOriginAddress&deliveryFulfilmentMethod&deliveryFulfilmentMethod.openingHours'
-    );
+    )
+      .populate(
+        'deliveryFulfilmentMethod.fulfilmentOrigin&openingHours'
+      );
 
     if(!deliveryPartner) {
       return exits.notFound();
     }
 
-    if(!deliveryPartner.deliveryOriginAddress){
-      deliveryPartner.deliveryOriginAddress = {
+    if (!deliveryPartner.deliveryFulfilmentMethod.fulfilmentOrigin) {
+      deliveryPartner.deliveryFulfilmentMethod.fulfilmentOrigin = {
         label: '',
         addressLineOne: '',
         addressLineTwo: '',

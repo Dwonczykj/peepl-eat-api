@@ -295,7 +295,6 @@ export type AddressType = _AddressTypeHidden & {
 
 export type DeliveryPartnerType = _DeliveryPartnerTypeHidden & {
   deliveryFulfilmentMethod?: _FulfilmentMethodTypeHidden;
-  deliveryOriginAddress?: _AddressTypeHidden,
   users?: Array<_UserTypeHidden>;
 };
 

@@ -1,4 +1,4 @@
-import { SailsModelType, sailsVegi } from "../../api/interfaces/iSails";
+import { sailsModelKVP, SailsModelType, sailsVegi } from "../../api/interfaces/iSails";
 import { AddressType, DeliveryPartnerType, FulfilmentMethodType, OpeningHoursType, VendorType } from "../../scripts/utils";
 
 declare var sails: sailsVegi;
@@ -55,6 +55,32 @@ module.exports = {
     // Add FulfilmentMethods to Vendor/DeliveryPartner
     if(inputs.vendor){
       const vendor = await Vendor.findOne(inputs.vendor).populate('pickupAddress');
+      let newAddress: sailsModelKVP<AddressType> | AddressType;
+      if(vendor.pickupAddress){
+        newAddress = await Address.create({
+          label: 'Fulfilment Origin',
+          addressLineOne: vendor.pickupAddress.addressLineOne,
+          addressLineTwo: vendor.pickupAddress.addressLineTwo,
+          addressTownCity: vendor.pickupAddress.addressTownCity,
+          addressPostCode: vendor.pickupAddress.addressPostCode,
+          addressCountryCode: vendor.pickupAddress.addressCountryCode,
+          latitude: vendor.pickupAddress.latitude,
+          longitude: vendor.pickupAddress.longitude,
+          vendor: inputs.vendor,
+        }).fetch();
+      }else{
+        newAddress = await Address.create({
+          label: 'Fulfilment Origin',
+          addressLineOne: '',
+          addressLineTwo: '',
+          addressTownCity: '',
+          addressPostCode: '',
+          addressCountryCode: 'UK',
+          latitude: 0.0,
+          longitude: 0.0,
+          vendor: inputs.vendor,
+        }).fetch();
+      }
       
       delv = await FulfilmentMethod.create({
         vendor: inputs.vendor,
@@ -69,11 +95,22 @@ module.exports = {
         collectionFulfilmentMethod: col.id
       });
     } else if (inputs.deliveryPartner){
-      const deliveryPartner = await DeliveryPartner.findOne(inputs.deliveryPartner).populate('deliveryOriginAddress');
+      const newEmptyAddress = await Address.create({
+        label: 'Fulfilment Origin',
+        addressLineOne: '',
+        addressLineTwo: '',
+        addressTownCity: '',
+        addressPostCode: '',
+        addressCountryCode: 'UK',
+        latitude: 0.0,
+        longitude: 0.0,
+        deliveryPartner: inputs.deliveryPartner,
+      }).fetch();
+      // const deliveryPartner = await DeliveryPartner.findOne(inputs.deliveryPartner).populate('deliveryOriginAddress');
       delv = await FulfilmentMethod.create({
         deliveryPartner: inputs.deliveryPartner,
         methodType: 'delivery',
-        fulfilmentOrigin: deliveryPartner.deliveryOriginAddress && deliveryPartner.deliveryOriginAddress.id,
+        fulfilmentOrigin: newEmptyAddress.id,
       }).fetch();
 
       await DeliveryPartner.updateOne(inputs.deliveryPartner).set({

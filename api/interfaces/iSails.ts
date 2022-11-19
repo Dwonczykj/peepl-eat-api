@@ -32,8 +32,14 @@ export type OptionalKeys<T> = Exclude<keyof T, RequiredKeys<T>>;
 type ValueType = string | number | boolean;
 
 type WaterlineQueryKeys<T> = {
-  or: Array<{ [key in keyof T]?: T[key] }>;
-  and: Array<{ [key in keyof T]?: T[key] }>;
+  or?: Array<{
+    [key in keyof T]?: T[key] extends ValueType
+      ? T[key] | Array<T[key]>
+      : number | number[];
+  }>;
+  and?: Array<{ [key in keyof T]?: T[key] extends ValueType
+            ? T[key] | Array<T[key]>
+            : number | number[] }>;
 };
 
 type WaterlineValueComparisonKeys<T extends number | string | boolean> = T extends number ? {
@@ -66,7 +72,7 @@ type SailsFetchType<T> = {
 type SailsUpdateSetType<T> = {
   set: (unusedArg: {
     [key in Exclude<keyof T, 'id'>]?: T[key] | number | Array<number>;
-  }) => Promise<void>;
+  }) => Promise<T>;
 };
 
 // type SailsFindPopulateType<T> = Promise<
