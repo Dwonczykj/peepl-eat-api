@@ -3,6 +3,7 @@ module.exports = function () {
     {
       id: 101,
       deliveryPartner: 1, //Agile
+      fulfilmentOrigin: 2,
       methodType: 'delivery',
       name: 'Agile delivery Fulfilment Slot',
       priceModifier: 300,
@@ -10,6 +11,7 @@ module.exports = function () {
     {
       id: 102,
       vendor: 1, //Delifonseca
+      fulfilmentOrigin: 1,
       methodType: 'delivery',
       name: "Delifonseca's delivery Fulfilment Slot",
       priceModifier: 0,

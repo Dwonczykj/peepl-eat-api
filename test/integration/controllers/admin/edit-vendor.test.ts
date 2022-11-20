@@ -1,14 +1,19 @@
 const { expect, assert } = require("chai"); // ~ https://www.chaijs.com/api/bdd/
 const util = require("util");
 const fs = require("fs");
-declare var Vendor: any;
 
 const { fixtures } = require("../../../../scripts/build_db");
 
 import { v4 as uuidv4 } from "uuid";
+import { SailsModelType } from "../../../../api/interfaces/iSails";
+import { AddressType, VendorType } from "../../../../scripts/utils";
+
+declare var Vendor: SailsModelType<VendorType>;
+declare var Address: SailsModelType<AddressType>;
 
 const {
   DEFAULT_NEW_VENDOR_OBJECT,
+  DEFAULT_NEW_ADDRESS_OBJECT,
   ExpectResponseVendor,
   HttpAuthTestSenderVendor
 } = require('../vendors/defaultVendor');
@@ -38,9 +43,14 @@ describe(`${CAN_EDIT_VENDORS(fixtures).ACTION_NAME}`, () => {
       const testImage = process.cwd() + `/test/assets/images/${imgName}.jpg`;
       // const imgStream = fs.editReadStream(testImage);
 
+      const newAddress = await Address.create(
+        DEFAULT_NEW_ADDRESS_OBJECT(fixtures, {})
+      ).fetch();
+
       const existingObj = await Vendor.create(
         DEFAULT_NEW_VENDOR_OBJECT(fixtures, {
           name: `TEST_${uuidv4()}`,
+          pickupAddress: newAddress.id
         })
       ).fetch();
       assert.isDefined(existingObj);
@@ -51,6 +61,7 @@ describe(`${CAN_EDIT_VENDORS(fixtures).ACTION_NAME}`, () => {
         name: newName,
         // image: imgStream,
         id: existingObj.id,
+        pickupAddress: newAddress.id,
       });
       delete vendorCall.imageUrl;
       

@@ -13,7 +13,7 @@ parasails.registerComponent('openingHours', {
   //  ╔═╗╦═╗╔═╗╔═╗╔═╗
   //  ╠═╝╠╦╝║ ║╠═╝╚═╗
   //  ╩  ╩╚═╚═╝╩  ╚═╝
-  props: ['fulfilment-method'],
+  props: ['fulfilment-method', 'google-api-key'],
   //  ╦╔╗╔╦╔╦╗╦╔═╗╦    ╔═╗╔╦╗╔═╗╔╦╗╔═╗
   //  ║║║║║ ║ ║╠═╣║    ╚═╗ ║ ╠═╣ ║ ║╣
   //  ╩╝╚╝╩ ╩ ╩╩ ╩╩═╝  ╚═╝ ╩ ╩ ╩ ╩ ╚═╝
@@ -93,9 +93,18 @@ parasails.registerComponent('openingHours', {
             <div v-if="cloudError === 'badPostalCode'" class="alert alert-danger mt-4" role="alert">
               Bad PostalCode
             </div>
-
-            <label for="pickupAddressGeocoordinate">Address Geocoordinate</label>
+          </div>
+          <div class="form-group">
+            <span style="display: flex; flex-direction: column;"> 
+              <!-- ~ https://developers.google.com/maps/documentation/maps-static/start -->
+              <!-- ~ https://developers.google.com/maps/documentation/maps-static/start#Markers -->
+              <!-- NOTE markers=markerStyles|markerLocation1| markerLocation2|... etc. -->
+              <img
+                style="align-self: center;"
+                v-if="fulfilmentMethod.fulfilmentOrigin && fulfilmentMethod.fulfilmentOrigin.latitude && fulfilmentMethod.fulfilmentOrigin.longitude" 
+                :src="'https://maps.googleapis.com/maps/api/staticmap?size=800x400&key=' + googleApiKey + '&zoom=15&markers=|' + fulfilmentMethod.fulfilmentOrigin.latitude + ',' + fulfilmentMethod.fulfilmentOrigin.longitude"/>
             <p>Latitude: {{fulfilmentMethod.fulfilmentOrigin.latitude}}, Longitude: {{fulfilmentMethod.fulfilmentOrigin.longitude}}</p>
+            </span>
           </div>
         </div>
 

@@ -15,10 +15,7 @@ module.exports = function () {
       productCategories: [],
       fulfilmentPostalDistricts: [1, 2, 3],
       deliveryPartner: 1,
-      pickupAddressLineOne: null,
-      pickupAddressLineTwo: null,
-      pickupAddressCity: null,
-      pickupAddressPostCode: null,
+      pickupAddress: 1,
     },
     // {
     // "name": 'Delifonseca',

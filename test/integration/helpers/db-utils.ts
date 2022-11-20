@@ -1,5 +1,8 @@
 import { v4 as uuidv4 } from "uuid";
-import { DEFAULT_NEW_VENDOR_OBJECT } from "../controllers/vendors/defaultVendor";
+import {
+  DEFAULT_NEW_VENDOR_OBJECT,
+  DEFAULT_NEW_ADDRESS_OBJECT,
+} from '../controllers/vendors/defaultVendor';
 import { DEFAULT_NEW_DELIVERY_PARTNER_OBJECT } from "../controllers/deliveryPartners/defaultDeliveryPartner";
 import { DEFAULT_NEW_ORDER_OBJECT } from "../controllers/orders/defaultOrder.js";
 import {
@@ -14,15 +17,18 @@ import {
   DeliveryPartnerType,
   OrderType,
   DateString,
+  AddressType,
 } from "../../../scripts/utils";
 import {
   TimeWindow,
 } from "../../../api/interfaces/vendors/slot";
 import { DaysOfWeek } from "../../../scripts/DaysOfWeek";
+import { SailsModelType } from "../../../api/interfaces/iSails";
 
 declare var Order: any;
 declare var DeliveryPartner: any;
 declare var Vendor: any;
+declare var Address: SailsModelType<AddressType>;
 declare var FulfilmentMethod: any;
 declare var OpeningHours: any;
 declare var sails: any;
@@ -117,10 +123,14 @@ export const createVendorWithOpeningHours = async (
   withDeliveryPartnerId: number = null,
   specialDates: Array<{ [dt: DateString]: TimeWindow[] }> = []
 ) => {
+  const newAddress = await Address.create(
+    DEFAULT_NEW_ADDRESS_OBJECT(fixtures, {})
+  ).fetch();
   const vendor: VendorType = await Vendor.create(
     DEFAULT_NEW_VENDOR_OBJECT(fixtures, {
       name: 'TEST_VENDOR_' + uuidv4(),
       deliveryPartner: withDeliveryPartnerId,
+      pickupAddress: newAddress.id,
     })
   );
   let vendorsDelvFulfMethod: FulfilmentMethodType =

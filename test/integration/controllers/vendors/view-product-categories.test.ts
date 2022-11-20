@@ -2,12 +2,13 @@ import { expect, assert } from 'chai'; // ~ https://www.chaijs.com/api/bdd/
 import { v4 as uuidv4 } from 'uuid';
 import { SailsModelType } from '../../../../api/interfaces/iSails';
 import { GetProductCategoriesSuccess } from '../../../../api/controllers/vendors/view-product-categories';
-import { CategoryGroupType, VendorType } from '../../../../scripts/utils';
+import { AddressType, CategoryGroupType, VendorType } from '../../../../scripts/utils';
 const { fixtures } = require('../../../../scripts/build_db.js');
-import { DEFAULT_NEW_VENDOR_OBJECT, HttpAuthTestSenderVendor } from './defaultVendor';
+import { DEFAULT_NEW_VENDOR_OBJECT, DEFAULT_NEW_ADDRESS_OBJECT, HttpAuthTestSenderVendor } from './defaultVendor';
 import { createProductCategories } from '../admin/defaultProductCategory';
 
 declare var Vendor: SailsModelType<VendorType>;
+declare var Address: SailsModelType<AddressType>;
 declare var CategoryGroup: SailsModelType<CategoryGroupType>;
 
 class CAN_GET_VENDORS_PRODUCT_CATEGORIES {
@@ -21,9 +22,13 @@ class CAN_GET_VENDORS_PRODUCT_CATEGORIES {
   constructor() {}
 
   async init(fixtures) {
+    const newAddress = await Address.create(
+      DEFAULT_NEW_ADDRESS_OBJECT(fixtures, {})
+    ).fetch();
     const vendor = await Vendor.create(
       DEFAULT_NEW_VENDOR_OBJECT(fixtures, {
         name: 'TEST_VENDOR_' + uuidv4(),
+        pickupAddress: newAddress.id
       })
     ).fetch();
 

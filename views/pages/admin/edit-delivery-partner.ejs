@@ -47,7 +47,7 @@
     <fieldset v-if="deliveryPartner.id">
       <h2 class="h5 mt-3">Operating Hours</h2>
       
-      <opening-hours :fulfilment-method="deliveryPartner.deliveryFulfilmentMethod"></opening-hours>
+      <opening-hours :fulfilment-method="deliveryPartner.deliveryFulfilmentMethod" :google-api-key="googleApiKey"></opening-hours>
     </fieldset>
     <!-- </ajax-form> -->
 

@@ -1,4 +1,7 @@
+import { sailsVegi } from "../../../api/interfaces/iSails";
+
 declare var DeliveryPartner: any;
+declare var sails: sailsVegi;
 module.exports = {
 
 
@@ -61,11 +64,15 @@ module.exports = {
 
     // Respond with view or JSON.
     if(this.req.wantsJSON) {
-      return exits.successJSON(
-        {deliveryPartner}
-      );
+      return exits.successJSON({
+        deliveryPartner,
+        googleApiKey: sails.config.custom.distancesApiKey,
+      });
     } else {
-      return exits.success({deliveryPartner});
+      return exits.success({
+        deliveryPartner,
+        googleApiKey: sails.config.custom.distancesApiKey,
+      });
     }
 
   }

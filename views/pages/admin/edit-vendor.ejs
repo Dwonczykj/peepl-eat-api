@@ -58,10 +58,19 @@
           Bad PostalCode
         </div>
 
-        <label for="pickupAddressGeocoordinate">Vendor Address Geocoordinate</label>
-        <p>Latitude: {{vendor.pickupAddress.latitude}}, Longitude: {{vendor.pickupAddress.longitude}}</p>
       </div>
-
+      <div class="form-group">
+        <span style="display: flex; flex-direction: column;"> 
+          <!-- ~ https://developers.google.com/maps/documentation/maps-static/start -->
+          <!-- ~ https://developers.google.com/maps/documentation/maps-static/start#Markers -->
+          <!-- NOTE markers=markerStyles|markerLocation1| markerLocation2|... etc. -->
+          <img
+            style="align-self: center;"
+            v-if="vendor.pickupAddress && vendor.pickupAddress.latitude && vendor.pickupAddress.longitude" 
+            :src="'https://maps.googleapis.com/maps/api/staticmap?size=800x400&key=' + googleApiKey + '&zoom=15&markers=|' + vendor.pickupAddress.latitude + ',' + vendor.pickupAddress.longitude"/>
+        <p>Latitude: {{vendor.pickupAddress.latitude}}, Longitude: {{vendor.pickupAddress.longitude}}</p>
+        </span>
+      </div>
       <div class="form-group">
         <label for="vendorType">Vendor Type</label>
         <select class="form-control" id="vendorType" v-model="vendor.type" :disabled="vendor.id">
@@ -183,7 +192,7 @@
       <input type="radio" id="delivery" value="del" v-model="fulfilmethod">
       <label for="delivery">Delivery</label>
       
-      <opening-hours :fulfilment-method="(fulfilmethod=='del') ? delFul : colFul"></opening-hours>
+      <opening-hours :fulfilment-method="(fulfilmethod=='del') ? delFul : colFul" :google-api-key="googleApiKey"></opening-hours>
     </fieldset>
 
   </div>

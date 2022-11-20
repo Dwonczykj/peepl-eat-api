@@ -4,6 +4,18 @@ import {
 } from '../../../httpTestSender';
 import { assert, expect } from 'chai'; // ~ https://www.chaijs.com/api/bdd/
 
+export const DEFAULT_NEW_ADDRESS_OBJECT = (fixtures, overrides = {}) => {
+  return {
+    label: 'test',
+    addressLineOne: 'Random Street',
+    addressLineTwo: 'Baltic',
+    addressTownCity: 'Liverpool',
+    addressPostCode: 'L1 0FT',
+    latitude: 0.0,
+    longitude: 0.0,
+  };
+};
+
 export const DEFAULT_NEW_VENDOR_OBJECT = (fixtures, overrides = {}) => {
   const vendor = fixtures.vendors[0];
   const fulfilmentMethodVendor = fixtures.fulfilmentMethods.filter(
@@ -34,10 +46,7 @@ export const DEFAULT_NEW_VENDOR_OBJECT = (fixtures, overrides = {}) => {
       fulfilmentPostalDistricts: fixtures.postalDistricts.map(pd => pd.id),
       fulfilmentMethod: fulfilmentMethodVendor.id,
       deliveryPartner: fixtures.deliveryPartners[0].id,
-      pickupAddressLineOne: 'Random Street',
-      pickupAddressLineTwo: 'Baltic',
-      pickupAddressCity: 'Liverpool',
-      pickupAddressPostCode: 'L1 0FT',
+      pickupAddress: null,
     },
     ...overrides,
   };

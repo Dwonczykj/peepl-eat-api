@@ -1,7 +1,10 @@
+import { sailsVegi } from "../../../api/interfaces/iSails";
+
 declare var Vendor: any;
 declare var PostalDistrict: any;
 declare var DeliveryPartner: any;
 declare var CategoryGroup: any;
+declare var sails: sailsVegi;
 module.exports = {
 
 
@@ -108,11 +111,25 @@ module.exports = {
 
     // Respond with view or JSON.
     if(this.req.wantsJSON) {
-      return exits.successJSON(
-        { vendor, delFul, colFul, postalDistricts, deliveryPartners, categoryGroups }
-      );
+      return exits.successJSON({
+        vendor,
+        delFul,
+        colFul,
+        postalDistricts,
+        deliveryPartners,
+        categoryGroups,
+        googleApiKey: sails.config.custom.distancesApiKey,
+      });
     } else {
-      return exits.success({ vendor, delFul, colFul, postalDistricts, deliveryPartners, categoryGroups });
+      return exits.success({
+        vendor,
+        delFul,
+        colFul,
+        postalDistricts,
+        deliveryPartners,
+        categoryGroups,
+        googleApiKey: sails.config.custom.distancesApiKey,
+      });
     }
 
   }

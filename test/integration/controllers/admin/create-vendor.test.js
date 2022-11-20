@@ -39,6 +39,15 @@ describe(`${CAN_CREATE_VENDORS(fixtures).ACTION_NAME}`, () => {
       let vendorCall = DEFAULT_NEW_VENDOR_OBJECT(fixtures, {
         name: 'TEST CAN_CREATE_VENDORS TEST VENDOR',
         image: imgStream,
+        address: {
+          label: 'test',
+          addressLineOne: 'Random Street',
+          addressLineTwo: 'Baltic',
+          addressTownCity: 'Liverpool',
+          addressPostCode: 'L1 0FT',
+          latitude: 0.0,
+          longitude: 0.0,
+        },
       });
       delete vendorCall.imageUrl;
 
