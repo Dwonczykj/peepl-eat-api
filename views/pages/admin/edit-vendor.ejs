@@ -60,14 +60,14 @@
 
       </div>
       <div class="form-group">
-        <span style="display: flex; flex-direction: column;"> 
+        <span style="display: flex; flex-direction: column; align-items:center;"> 
           <!-- ~ https://developers.google.com/maps/documentation/maps-static/start -->
           <!-- ~ https://developers.google.com/maps/documentation/maps-static/start#Markers -->
           <!-- NOTE markers=markerStyles|markerLocation1| markerLocation2|... etc. -->
           <img
             style="align-self: center;"
             v-if="vendor.pickupAddress && vendor.pickupAddress.latitude && vendor.pickupAddress.longitude" 
-            :src="'https://maps.googleapis.com/maps/api/staticmap?size=800x400&key=' + googleApiKey + '&zoom=15&markers=|' + vendor.pickupAddress.latitude + ',' + vendor.pickupAddress.longitude"/>
+            :src="'https://maps.googleapis.com/maps/api/staticmap?size=800x400&key=' + googleApiKey + '&zoom=15&markers=size:mid|color:' + (vendor.pickupAddress.label === 'Store' ? 'green' : 'red') + '|label:' + vendor.pickupAddress.label.substring(0,1).toUpperCase() + '|' + vendor.pickupAddress.latitude + ',' + vendor.pickupAddress.longitude"/>
         <p>Latitude: {{vendor.pickupAddress.latitude}}, Longitude: {{vendor.pickupAddress.longitude}}</p>
         </span>
       </div>

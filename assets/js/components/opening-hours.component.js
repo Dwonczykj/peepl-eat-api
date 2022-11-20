@@ -95,14 +95,14 @@ parasails.registerComponent('openingHours', {
             </div>
           </div>
           <div class="form-group">
-            <span style="display: flex; flex-direction: column;"> 
+            <span style="display: flex; flex-direction: column; align-items:center;"> 
               <!-- ~ https://developers.google.com/maps/documentation/maps-static/start -->
               <!-- ~ https://developers.google.com/maps/documentation/maps-static/start#Markers -->
               <!-- NOTE markers=markerStyles|markerLocation1| markerLocation2|... etc. -->
               <img
                 style="align-self: center;"
                 v-if="fulfilmentMethod.fulfilmentOrigin && fulfilmentMethod.fulfilmentOrigin.latitude && fulfilmentMethod.fulfilmentOrigin.longitude" 
-                :src="'https://maps.googleapis.com/maps/api/staticmap?size=800x400&key=' + googleApiKey + '&zoom=15&markers=|' + fulfilmentMethod.fulfilmentOrigin.latitude + ',' + fulfilmentMethod.fulfilmentOrigin.longitude"/>
+                :src="'https://maps.googleapis.com/maps/api/staticmap?size=800x400&key=' + googleApiKey + '&zoom=15&markers=size:mid|color:' + (fulfilmentMethod.fulfilmentOrigin.label === 'Store' ? 'green' : 'red') + '|label:' + fulfilmentMethod.fulfilmentOrigin.label.substring(0,1).toUpperCase() + '|' + fulfilmentMethod.fulfilmentOrigin.latitude + ',' + fulfilmentMethod.fulfilmentOrigin.longitude"/>
             <p>Latitude: {{fulfilmentMethod.fulfilmentOrigin.latitude}}, Longitude: {{fulfilmentMethod.fulfilmentOrigin.longitude}}</p>
             </span>
           </div>
