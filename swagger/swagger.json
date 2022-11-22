@@ -2930,7 +2930,7 @@
         }
       }
     },
-    "/api/v1/vendors/view-product-categories": {
+    "/api/v1/vendors/product-categories": {
       "get": {
         "summary": "view vendor product categories",
         "tags": [
@@ -4548,6 +4548,63 @@
           },
           "404": {
             "description": "There is no user with that ID!"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/home/nearest-vendors": {
+      "get": {
+        "summary": "View dashboard",
+        "description": "Display Dashboard page.",
+        "tags": [
+          "View dashboard"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "location",
+            "required": true,
+            "schema": {},
+            "description": "coordinate: {lat,lng} of the user"
+          },
+          {
+            "in": "query",
+            "name": "distance",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
           },
           "500": {
             "description": "Internal server error"
@@ -6650,14 +6707,15 @@
                     {
                       "type": "string",
                       "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
                     }
                   ]
                 }
               }
             }
-          },
-          "401": {
-            "description": "Success"
           },
           "404": {
             "description": "Order not found"

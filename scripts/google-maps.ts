@@ -12,7 +12,7 @@ type GoogleMapsGetLocationInput = {
   addressCountryCode: string;
 };
 
-type Coordinate = {
+export type Coordinate = {
   lat: number;
   lng: number;
 };

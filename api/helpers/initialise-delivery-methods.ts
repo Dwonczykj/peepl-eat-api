@@ -95,22 +95,22 @@ module.exports = {
         collectionFulfilmentMethod: col.id
       });
     } else if (inputs.deliveryPartner){
-      const newEmptyAddress = await Address.create({
-        label: 'Fulfilment Origin',
-        addressLineOne: '',
-        addressLineTwo: '',
-        addressTownCity: '',
-        addressPostCode: '',
-        addressCountryCode: 'UK',
-        latitude: 0.0,
-        longitude: 0.0,
-        deliveryPartner: inputs.deliveryPartner,
-      }).fetch();
+      // const newEmptyAddress = await Address.create({
+      //   label: 'Fulfilment Origin',
+      //   addressLineOne: '',
+      //   addressLineTwo: '',
+      //   addressTownCity: '',
+      //   addressPostCode: '',
+      //   addressCountryCode: 'UK',
+      //   latitude: 0.0,
+      //   longitude: 0.0,
+      //   deliveryPartner: inputs.deliveryPartner,
+      // }).fetch();
       // const deliveryPartner = await DeliveryPartner.findOne(inputs.deliveryPartner).populate('deliveryOriginAddress');
       delv = await FulfilmentMethod.create({
         deliveryPartner: inputs.deliveryPartner,
         methodType: 'delivery',
-        fulfilmentOrigin: newEmptyAddress.id,
+        // fulfilmentOrigin: newEmptyAddress.id,
       }).fetch();
 
       await DeliveryPartner.updateOne(inputs.deliveryPartner).set({

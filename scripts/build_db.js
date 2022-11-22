@@ -42,6 +42,8 @@ async function buildDb(sails, test) {
 
     // await FulfilmentMethod.createEach(fixtures.fulfilmentMethods);
 
+    await Address.createEach(fixtures.addresses).fetch();
+    console.info(`Finished populating Addresses for ${_envRT}`);
     const vendors = await Vendor.createEach(fixtures.vendors).fetch();
     console.info(`Finished populating Vendors for ${_envRT}`);
 

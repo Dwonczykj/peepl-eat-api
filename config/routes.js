@@ -31,7 +31,7 @@ module.exports.routes = {
   'GET /api/v1/vendors/get-fulfilment-slots': {
     action: 'vendors/get-fulfilment-slots',
   },
-  'GET /api/v1/vendors/view-product-categories': {
+  'GET /api/v1/vendors/product-categories': {
     action: 'vendors/view-product-categories',
   },
   'GET /api/v1/vendors/get-next-fulfilment-slot': {
@@ -127,6 +127,8 @@ module.exports.routes = {
 
   'ALL /': { action: 'home/view-dashboard' },
   'GET /home': { action: 'home/view-dashboard' },
+  'GET /api/v1/home/nearest-vendors': { action: 'home/view-nearest-vendors' },
+
   'GET /admin': { action: 'admin/view-vendors' },
   'GET /admin/vendors': { action: 'admin/view-vendors' },
   'GET /admin/vendors/new': { action: 'admin/view-create-vendor' },

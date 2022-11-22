@@ -12,6 +12,9 @@ import { InitialiseDeliveryMethodsInput, InitialiseDeliveryMethodsResult } from 
 import { GetCoordinatesForAddressInput, GetCoordinatesForAddressResult } from "../../api/helpers/get-coordinates-for-address";
 import { CheckAddressIsValidInput, CheckAddressIsValidResult } from "../../api/helpers/check-address-is-valid";
 import { FulfilmentMethodDeliversToAddressInput, FulfilmentMethodDeliversToAddressResult } from "../../api/helpers/fulfilment-method-delivers-to-address";
+import { DistanceHaversineInputs, DistanceHaversineResult } from "../../api/helpers/distance-haversine";
+import { DistanceViaBearingInputs, DistanceViaBearingResult } from "../../api/helpers/distance-via-bearing";
+import { GetVendorsInSphereInputs, GetVendorsInSphereResult } from "api/helpers/get-vendors-in-sphere";
 
 export type UploadImageInfoType = {
   fd: string;
@@ -31,28 +34,63 @@ export type OptionalKeys<T> = Exclude<keyof T, RequiredKeys<T>>;
 
 type ValueType = string | number | boolean;
 
+type WaterlineValueComparisonKeys<T extends number | string | boolean> =
+  T extends number
+    ? {
+        '>'?: T; // ~ https://sailsjs.com/documentation/concepts/models-and-orm/query-language#?criteria-modifiers
+        '>='?: T;
+        '<'?: T;
+        '<='?: T;
+        '=='?: T;
+        '!='?: T;
+      }
+    : T extends string
+    ? {
+        '=='?: T;
+        '!='?: T;
+        nin?: T;
+        in?: T;
+        contains?: T;
+        startsWith?: T;
+        endsWith?: T;
+      }
+    : T extends Array<ValueType>
+    ? {
+        nin?: T;
+        in?: T;
+        contains?: T;
+      }
+    : {
+        '=='?: T;
+        '!='?: T;
+      };
+
 type WaterlineQueryKeys<T> = {
   or?: Array<{
     [key in keyof T]?: T[key] extends ValueType
       ? T[key] | Array<T[key]>
       : number | number[];
   }>;
-  and?: Array<{ [key in keyof T]?: T[key] extends ValueType
-            ? T[key] | Array<T[key]>
-            : number | number[] }>;
+  and?: Array<{
+    [key in keyof T]?: T[key] extends ValueType
+      ?
+          | T[key]
+          | Array<T[key]>
+          | {
+              [qryComparitor in keyof WaterlineValueComparisonKeys<
+                T[key]
+              >]: T[key];
+            }
+      :
+          | number
+          | number[]
+          | {
+              [qryComparitor in keyof WaterlineValueComparisonKeys<
+                number
+              >]: number |number[] | null;
+            };
+  }>;
 };
-
-type WaterlineValueComparisonKeys<T extends number | string | boolean> = T extends number ? {
-  '>'?: T,
-  '>='?: T,
-  '<'?: T,
-  '<='?: T,
-  '=='?: T,
-  '!='?: T,
-} : {
-  '=='?: T,
-  '!='?: T,
-}
 
 /**
  * Exclude SailsModel types from find queries
@@ -143,7 +181,7 @@ export type SailsModelType<T> = {
       | {
           [key in keyof T]?: T[key] extends ValueType
             ? T[key] | Array<T[key]> | WaterlineValueComparisonKeys<T[key]>
-            : number | number[];
+            : number | number[] | WaterlineValueComparisonKeys<number>;
         }
       | WaterlineQueryKeys<T>
   ) => SailsFindPopulateType<T>;
@@ -206,6 +244,12 @@ export type NewPaymentIntent = {
   paymentIntentId: string;
 };
 
+type _helperFunction<T,R> = {
+  with: (
+    unusedArgs: T
+  ) => Promise<R> & ((arg: T extends ValueType ? T : T[keyof T][]) => Promise<R>);
+}
+
 export type sailsVegi = {
   getDatastore: () => any;
   helpers: {
@@ -253,6 +297,18 @@ export type sailsVegi = {
         unusedArgs: InitialiseDeliveryMethodsInput
       ) => Promise<InitialiseDeliveryMethodsResult>;
     };
+    distanceHaversine: _helperFunction<
+      DistanceHaversineInputs,
+      DistanceHaversineResult
+    >;
+    distanceViaBearing: _helperFunction<
+      DistanceViaBearingInputs,
+      DistanceViaBearingResult
+    >;
+    getVendorsInSphere: _helperFunction<
+      GetVendorsInSphereInputs,
+      GetVendorsInSphereResult
+    >;
 
     validateOrder: {
       with: (unusedArgs: CreateOrderInputs) => Promise<ValidateOrderResult>;

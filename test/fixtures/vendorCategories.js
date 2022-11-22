@@ -12,5 +12,9 @@ module.exports = function () {
       id: 3,
       name: 'Groceries',
     },
+    {
+      id: 4,
+      name: 'Takeaway Restaurant',
+    },
   ];
 };
