@@ -71,7 +71,7 @@ module.exports = {
       data: null,
     },
     orderHasNoItems: {
-      statusCode: 401,
+      statusCode: 400,
     },
   },
 

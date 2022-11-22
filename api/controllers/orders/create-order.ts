@@ -314,7 +314,11 @@ module.exports = {
           } catch (err) {
             sails.log.error(err);
             exits.badItemsRequest();
-            return;
+            return {
+              orderId: null,
+              paymentIntentID: null,
+              orderCreationStatus: 'failed',
+            };
           }
 
           // Get array of IDs from array of newOrderItemOptionValues
@@ -354,7 +358,11 @@ module.exports = {
         } catch (error) {
           sails.log.error(`Error on Order.create(...) -> ${error}`);
           exits.error(error);
-          return;
+          return {
+            orderId: null,
+            paymentIntentID: null,
+            orderCreationStatus: 'failed',
+          };
         }
 
         // Strip unneccesary data from order items
@@ -392,20 +400,36 @@ module.exports = {
             `Order total is ${order.total} but is calculated to be total ${calculatedOrderTotal.finalAmount}`
           );
 
-          // Update with correct amount
-          await wrapWithDb(db, () =>
-            Order.updateOne(order.id).set({
-              subtotal: calculatedOrderTotal.withoutFees,
-              total: calculatedOrderTotal.finalAmount,
-            })
-          );
+          if (calculatedOrderTotal.withoutFees <= 0){
+            sails.log.warn(
+              `New Order #${order.id} has a ${calculatedOrderTotal.withoutFees} subtotal with a total of ${calculatedOrderTotal.finalAmount}`
+            );
+            exits.error(`Could not calculate subtotal for order.`);
+            return {
+              orderId: null,
+              paymentIntentID: null,
+              orderCreationStatus: 'failed',
+            };
+          }
+
         }
+        // Update with correct amount
+        await wrapWithDb(db, () =>
+          Order.updateOne(order.id).set({
+            subtotal: calculatedOrderTotal.withoutFees,
+            total: calculatedOrderTotal.finalAmount,
+          })
+        );
 
         // Return error if vendor minimum order value not met
         if (calculatedOrderTotal.withoutFees < vendor.minimumOrderAmount) {
           sails.log.info('Vendor minimum order value not met');
           exits.minimumOrderAmount('Vendor minimum order value not met');
-          return;
+          return {
+            orderId: null,
+            paymentIntentID: null,
+            orderCreationStatus: 'failed',
+          };
         }
 
         // Create PaymentIntent on Peepl Pay
@@ -417,12 +441,20 @@ module.exports = {
           )
           .catch(() => {
             exits.error(new Error('Error creating payment intent'));
-            return;
+            return {
+              orderId: null,
+              paymentIntentID: null,
+              orderCreationStatus: 'failed',
+            };
           });
 
         if (!newPaymentIntent) {
           exits.error(new Error('Error creating payment intent'));
-          return;
+          return {
+            orderId: null,
+            paymentIntentID: null,
+            orderCreationStatus: 'failed'
+          };
         }
 
         // Update order with payment intent
@@ -436,6 +468,7 @@ module.exports = {
         return {
           orderId: order.id,
           paymentIntentID: newPaymentIntent.paymentIntentId,
+          orderCreationStatus: 'confirmed',
         };
       };
 
