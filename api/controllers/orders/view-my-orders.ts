@@ -44,21 +44,21 @@ const _exports = {
       return {
         ...order,
         ...{
-          items: order.items.map(orderItem => {
+          items: order.items.map((orderItem) => {
             return {
               id: orderItem.id,
               unfulfilled: orderItem.unfulfilled,
               product: {
                 name: orderItem.product.name,
                 basePrice: orderItem.product.basePrice,
-                options: orderItem.optionValues.map(optionValue => {
+                options: orderItem.optionValues.map((optionValue) => {
                   return {
                     name: optionValue.option.name,
                     chosenOption: optionValue.optionValue.name,
                     priceModifier: optionValue.optionValue.priceModifier,
                   };
                 }),
-              }
+              },
             };
           }),
           deliveryPartner: order.deliveryPartner && {
@@ -72,7 +72,9 @@ const _exports = {
           fulfilmentMethod: {
             id: order.fulfilmentMethod.id,
             methodType: order.fulfilmentMethod.methodType,
+            priceModifier: order.fulfilmentMethod.priceModifier,
           },
+          // todo: gbpxUsed, didUsePPL, pplUsed, pplRewardsEarned, pplRewardsEarnedValue;
         },
       };
     });
@@ -90,5 +92,16 @@ const _exports = {
 };
 
 export type ViewMyOrdersResponseType = Awaited<ReturnType<typeof _exports.fn>>;
+export type testInputs = {
+  [key in keyof typeof _exports.inputs]: typeof _exports.inputs[key]['type'] extends 'string'
+    ? string
+    : typeof _exports.inputs[key]['type'] extends 'number'
+    ? number
+    : typeof _exports.inputs[key]['type'] extends 'boolean'
+    ? boolean
+    : any;
+} & {
+  // ... type overrides here
+};
 
 module.exports = _exports;

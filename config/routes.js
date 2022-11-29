@@ -229,6 +229,15 @@ module.exports.routes = {
   'POST /api/v1/admin/approve-or-decline-order': {
     action: 'admin/approve-or-decline-order',
   },
+  'POST /api/v1/admin/register-email-to-waiting-list': {
+    action: 'admin/register-email-to-waiting-list',
+  },
+  'GET /api/v1/admin/get-survey-questions': {
+    action: 'admin/get-survey-questions',
+  },
+  'POST /api/v1/admin/submit-survey-response': {
+    action: 'admin/submit-survey-response',
+  },
   'POST /api/v1/admin/create-postal-district': {
     action: 'admin/create-postal-district',
   },
@@ -244,5 +253,9 @@ module.exports.routes = {
   },
   'GET /admin/bulk-update-data': {
     action: 'admin/view-bulk-update-data',
+  },
+
+  'POST /api/v1/admin/update-stock-count': {
+    action: 'admin/update-stock-count',
   },
 };

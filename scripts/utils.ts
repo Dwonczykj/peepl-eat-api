@@ -221,6 +221,7 @@ type _DeliveryPartnerTypeHidden = {
   // deliveryFulfilmentMethod?: FulfilmentMethodType,
 };
 
+
 export type UserType = _UserTypeHidden & {
   vendor: _VendorTypeHidden;
   deliveryPartner: _DeliveryPartnerTypeHidden;
@@ -326,6 +327,14 @@ export type _ProductOptionValueTypeHidden = {
   description: string;
   priceModifier: number;
   isAvailable: boolean;
+  stockCount: number;
+  stockUnitsPerProduct: number;
+  sizeInnerUnitValue: number;
+  sizeInnerUnitType: string;
+  productBarCode: string;
+  supplier: string;
+  brandName: string;
+  taxGroup: string;
 };
 export type _ProductOptionTypeHidden = {
   id: number;
@@ -341,7 +350,7 @@ export type ProductOptionType = {
   id: number;
   name: string;
   isRequired: boolean;
-  product: _ProductTypeHidden;
+  product: _ProductTypeHidden & {vendor: number};
   values: Array<ProductOptionValueType>;
 };
 export type _OrderItemTypeHidden = {
@@ -443,6 +452,29 @@ export type _OrderTypeHidden = {
   deliveryPunctuality: RatingType;
   orderCondition: RatingType;
   discount: DiscountType;
+};
+
+export type NotificationType = {
+  id: number;
+  recipient: string;
+  type: 'sms' | 'email' | 'push';
+  sentAt: number;
+  publicId: string;
+  title: string;
+  metadata: string;
+  order: _OrderTypeHidden;
+};
+
+export type SurveyType = {
+  id: number;
+  email: string;
+  question: string;
+  answer: string | null;
+};
+
+export type WaitingListEntryType = {
+  id: number;
+  email: string;
 };
 
 export type OrderItemType = _OrderItemTypeHidden & {

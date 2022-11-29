@@ -6,7 +6,7 @@ import { GetAvailableDeliveryPartnerFromPoolInputs } from "../../api/helpers/get
 import { CreateOrderInputs, ValidateOrderResult } from "../../api/controllers/orders/create-order";
 import { iFulfilmentSlot, iSlot } from "./vendors/slot";
 import { CreateProductCategoriesInput } from "../helpers/create-product-categories";
-import { DiscountType, ProductCategoryType, walletAddressString } from '../../scripts/utils';
+import { DeliveryPartnerType, DiscountType, NotificationType, OrderType, ProductCategoryType, walletAddressString } from '../../scripts/utils';
 import { EditProductCategoriesInput } from "../helpers/edit-product-categories";
 import { InitialiseDeliveryMethodsInput, InitialiseDeliveryMethodsResult } from "../../api/helpers/initialise-delivery-methods";
 import { GetCoordinatesForAddressInput, GetCoordinatesForAddressResult } from "../../api/helpers/get-coordinates-for-address";
@@ -244,10 +244,10 @@ export type NewPaymentIntent = {
   paymentIntentId: string;
 };
 
-type _helperFunction<T,R> = {
+type _helperFunction<TIN,TOUT> = {
   with: (
-    unusedArgs: T
-  ) => Promise<R> & ((arg: T extends ValueType ? T : T[keyof T][]) => Promise<R>);
+    unusedArgs: TIN
+  ) => Promise<TOUT> & ((arg: TIN extends ValueType ? TIN : TIN[keyof TIN][]) => Promise<TOUT>);
 }
 
 export type sailsVegi = {
@@ -418,6 +418,90 @@ export type sailsVegi = {
     ) => Promise<NewPaymentIntent>;
 
     uploadOneS3: (image: any) => Promise<UploadImageInfoType>;
+
+    sendFirebaseNotification: _helperFunction<
+      {
+        topic: string;
+        title: string;
+        body: string;
+        data:
+          | any
+          | {
+              orderId: string;
+            };
+      },
+      {
+        notification: NotificationType;
+      }
+    >;
+    sendEmailTemplate: _helperFunction<
+      {
+        to: string;
+        toName?: string;
+        from?: string;
+        fromName?: string;
+        subject: string;
+        layout: false | string;
+      } & (
+        | {
+            template: 'email-logistics-notification';
+            templateData: {
+              orders: Array<OrderType>;
+              deliveryPartner: DeliveryPartnerType;
+            };
+          }
+        | {
+            template:
+              | 'email-request-courier-availability'
+              | 'email-request-courier-confirmation'
+              | 'email-request-courier-cancellation'
+              | 'email-request-courier-delivery-update';
+            templateData?: {
+              vegiOrderId: string;
+              pickup: any;
+              dropoff: any;
+            };
+          }
+        | {
+            template: 'email-order-confirmation-new';
+            templateData: {
+              order: OrderType;
+            };
+          }
+        | {
+            template: 'email-support-request';
+            templateData: {
+              orderId: number;
+              message: string;
+            };
+          }
+        | {
+            template: 'email-registration-waiting-list';
+            templateData: {
+              message: string;
+            };
+          }
+      ),
+      {
+        loggedInsteadOfSending: boolean;
+      }
+    >;
+    sendSmsNotification: _helperFunction<
+      {
+        body: string;
+        to: string;
+        data: any;
+      },
+      {
+        notification: NotificationType;
+      }
+    >;
+    sendSlackNotification: _helperFunction<
+      {
+        order: OrderType;
+      },
+      void
+    >;
   };
   log: any;
   config: {

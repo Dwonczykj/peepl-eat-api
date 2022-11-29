@@ -496,7 +496,7 @@ export class EmailDeliveryPartner extends DeliveryPartnerObject {
     // Send the delivery information to DeliveryPartner
     await sails.helpers.sendTemplateEmail
       .with({
-        template: "email-request-deliveryPartner-availability",
+        template: "email-request-courier-availability",
         templateData: {
           vegiOrderId: requestBody.vegiOrderId,
           pickup: requestBody.pickup,
@@ -556,7 +556,7 @@ export class EmailDeliveryPartner extends DeliveryPartnerObject {
     // Send the delivery information to DeliveryPartner
     await sails.helpers.sendTemplateEmail
       .with({
-        template: "email-request-deliveryPartner-confirmation",
+        template: 'email-request-courier-confirmation',
         templateData: {
           vegiOrderId: requestBody.vegiOrderId,
           pickup: requestBody.pickup,
@@ -566,11 +566,11 @@ export class EmailDeliveryPartner extends DeliveryPartnerObject {
         subject: requestBody.subject,
         layout: false,
       })
-      .intercept("", (err) => {
+      .intercept('', (err) => {
         sails.log.info(
-          "Error requesting delivery availability from " +
+          'Error requesting delivery availability from ' +
             this.deliveryPartnerName +
-            "."
+            '.'
         );
         sails.log.warn(err);
       });
@@ -614,7 +614,7 @@ export class EmailDeliveryPartner extends DeliveryPartnerObject {
     // Send the delivery information to DeliveryPartner
     await sails.helpers.sendTemplateEmail
       .with({
-        template: "email-request-deliveryPartner-cancellation",
+        template: 'email-request-courier-cancellation',
         templateData: {
           vegiOrderId: requestBody.vegiOrderId,
           pickup: requestBody.pickup,
@@ -624,11 +624,11 @@ export class EmailDeliveryPartner extends DeliveryPartnerObject {
         subject: requestBody.subject,
         layout: false,
       })
-      .intercept("", (err) => {
+      .intercept('', (err) => {
         sails.log.info(
-          "Error requesting delivery availability from " +
+          'Error requesting delivery availability from ' +
             this.deliveryPartnerName +
-            "."
+            '.'
         );
         sails.log.warn(err);
         return RequestReceived.failed;
@@ -671,7 +671,7 @@ export class EmailDeliveryPartner extends DeliveryPartnerObject {
     // Send the delivery information to DeliveryPartner
     await sails.helpers.sendTemplateEmail
       .with({
-        template: "email-request-deliveryPartner-cancellation",
+        template: 'email-request-courier-cancellation',
         templateData: {
           vegiOrderId: requestBody.vegiOrderId,
           pickup: requestBody.pickup,
@@ -681,11 +681,11 @@ export class EmailDeliveryPartner extends DeliveryPartnerObject {
         subject: requestBody.subject,
         layout: false,
       })
-      .intercept("", (err) => {
+      .intercept('', (err) => {
         sails.log.info(
-          "Error requesting delivery availability from " +
+          'Error requesting delivery availability from ' +
             this.deliveryPartnerName +
-            "."
+            '.'
         );
         sails.log.warn(err);
         return RequestReceived.failed;

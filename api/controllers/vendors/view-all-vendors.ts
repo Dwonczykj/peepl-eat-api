@@ -1,4 +1,7 @@
-declare var PostalDistrict: any;
+import { SailsModelType } from "api/interfaces/iSails";
+import { PostalDistrictType } from "scripts/utils";
+
+declare var PostalDistrict: SailsModelType<PostalDistrictType>;
 
 module.exports = {
 
@@ -28,9 +31,15 @@ module.exports = {
   },
 
   fn: async function (inputs, exits) {
-    var postalDistrict = await PostalDistrict.findOne({
-      outcode: inputs.outcode,
-    }).populate("vendors&vendors.fulfilmentPostalDistricts");
+    let postalDistrict: PostalDistrictType;
+    try {
+      postalDistrict = await PostalDistrict.findOne({
+        outcode: inputs.outcode,
+      }).populate("vendors&vendors.fulfilmentPostalDistricts");
+
+    } catch (unusedErr) {
+      return exits.notFound('OutCode not found');
+    }
 
     if(postalDistrict){
       // Respond with view or JSON.

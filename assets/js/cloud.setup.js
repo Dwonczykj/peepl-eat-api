@@ -374,6 +374,11 @@ Cloud.setup({
       url: '/api/v1/admin/approve-or-decline-order',
       args: ['orderId', 'orderFulfilled', 'retainItems', 'removeItems'],
     },
+    registerEmailToWaitingList: {
+      verb: 'POST',
+      url: '/api/v1/admin/register-email-to-waiting-list',
+      args: ['emailAddress', 'origin', 'sendVerificationCode'],
+    },
     customerUpdatePaidOrder: {
       verb: 'POST',
       url: '/api/v1/admin/customer-update-paid-order',
@@ -417,6 +422,11 @@ Cloud.setup({
       verb: 'POST',
       url: '/api/v1/admin/edit-vendor-postal-districts',
       args: ['districts', 'vendorId'],
+    },
+    updateStockCount: {
+      verb: 'POST',
+      url: '/api/v1/admin/update-stock-count',
+      args: ['productOptionValueId', 'remainingStockCount'],
     },
   },
   /* eslint-enable */
