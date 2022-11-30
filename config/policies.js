@@ -16,6 +16,7 @@ module.exports.policies = {
    *                                                                          *
    ***************************************************************************/
   'home/view-dashboard': ['is-logged-in'],
+  'home/view-nearest-vendors': true,
   'admin/view-login': true,
   'admin/login-with-firebase': true,
   'admin/view-login-with-password': true,
@@ -33,6 +34,9 @@ module.exports.policies = {
   'admin/user-exists-for-email': true,
   'admin/user-exists-for-phone': true,
   'admin/signup': true,
+  'admin/get-survey-questions': true,
+  'admin/submit-survey-response': true,
+  'admin/register-email-to-waiting-list': true,
   'admin/signup-with-password': ['firebase'],
   'admin/view-signup': true,
   'admin/view-create-vendor': 'is-super-admin',
@@ -45,6 +49,7 @@ module.exports.policies = {
   'admin/create-postal-district': 'is-super-admin',
   'admin/edit-postal-district': 'is-super-admin',
   'admin/view-postal-districts': 'is-super-admin',
+  'admin/update-stock-count': ['is-logged-in'],
   'admin/view-approve-order': true, //TODO: add 'is-logged-in' and 'is-vendor' poligices to this
   'admin/approve-or-decline-order': true, //TODO: add 'is-logged-in' and 'is-vendor' poligices to this
   'admin/customer-update-paid-order': true, //TODO: add 'is-logged-in' and 'is-vendor' poligices to this

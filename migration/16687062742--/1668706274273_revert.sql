@@ -8,6 +8,12 @@ DROP COLUMN `deliveryOriginAddress`,
 
 ALTER TABLE `vegi`.`vendor` 
 DROP COLUMN `pickupAddress`,
+ADD COLUMN `pickupAddressLineOne` varchar(255) NULL DEFAULT '' AFTER `phoneNumber`,
+ADD COLUMN `pickupAddressLineTwo` varchar(255) NULL DEFAULT '' AFTER `pickupAddressLineOne`,
+ADD COLUMN `pickupAddressCity` varchar(255) NULL DEFAULT '' AFTER `pickupAddressLineTwo`,
+ADD COLUMN `pickupAddressPostCode` varchar(255) NULL DEFAULT '' AFTER `pickupAddressCity`,
+ADD COLUMN `pickupAddressLatitude` DOUBLE NULL DEFAULT 0.0 AFTER `pickupAddressPostCode`,
+ADD COLUMN `pickupAddressLongitude` DOUBLE NULL DEFAULT 0.0 AFTER `pickupAddressLatitude`
 ;
 
 ALTER TABLE `vegi`.`fulfilmentmethod` 
@@ -21,3 +27,17 @@ DROP COLUMN `deliveryAddressLongitude`
 ;
 
 DROP TABLE `vegi`.`address`;
+
+ALTER TABLE `vegi`.`productoptionvalue`
+DROP COLUMN `stockCount`,
+DROP COLUMN `supplier`,
+DROP COLUMN `brandName`,
+DROP COLUMN `taxGroup`,
+DROP COLUMN `stockUnitsPerProduct`,
+DROP COLUMN `sizeInnerUnitValue`,
+DROP COLUMN `sizeInnerUnitType`,
+DROP COLUMN `productBarCode`
+;
+
+DROP TABLE `vegi`.`survey`;
+DROP TABLE `vegi`.`waitinglist`;

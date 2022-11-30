@@ -70,7 +70,7 @@ module.exports = {
     },
     productBarCode: {
       type: 'string',
-      descripion: 'A stringified long number, potentially GUID in future, that maps to the UPC (barcode) on the product',
+      description: 'A stringified long number, potentially GUID in future, that maps to the UPC (barcode) on the product',
       defaultsTo: '',
     },
 

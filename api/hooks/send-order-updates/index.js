@@ -66,32 +66,40 @@ module.exports = function defineSendOrderUpdatesHook(sails) {
           return unixtime;
         };
 
-        recentOrders.forEach(order => {
-          var ds = formatDeliverySlot(order.fulfilmentSlotFrom);
-          var delivColln = order.fulfilmentMethod.methodType === 'delivery' ? 'delivery' : 'collection';
-          var completed = order.completedFlag === 'completed' ? 'complete' : 'in progress';
-          // No need to await result of this
-          sails.helpers.sendFirebaseNotification.with({
-            topic: 'order-' + order.publicId,
-            title: `Order update - ${completed}`,
-            body: `Your recent order scheduled for ${delivColln} at ${ds} is ${completed}.`
-          });
-        });
-
-        var recentOrderIds = recentOrders.map(order => order.id);
-
-        upcomingOrders.forEach(order => {
-          if (!recentOrderIds.includes(order.id)) {
+        const recentOrderPromises = recentOrders.map(order => {
+          return async () => {
             var ds = formatDeliverySlot(order.fulfilmentSlotFrom);
             var delivColln = order.fulfilmentMethod.methodType === 'delivery' ? 'delivery' : 'collection';
+            var completed = order.completedFlag === 'completed' ? 'complete' : 'in progress';
             // No need to await result of this
-            sails.helpers.sendFirebaseNotification.with({
+            await sails.helpers.sendFirebaseNotification.with({
               topic: 'order-' + order.publicId,
-              title: 'Order update',
-              body: `You have an upcoming order at ${ds} scheduled for ${delivColln} 😎.`
+              title: `Order update - ${completed}`,
+              body: `Your recent order scheduled for ${delivColln} at ${ds} is ${completed}.`
             });
           }
         });
+
+        await Promise.all(recentOrderPromises);
+
+        var recentOrderIds = recentOrders.map(order => order.id);
+
+        const upcomingOrderPromises = upcomingOrders.map((order) => {
+          return async () => {
+            if (!recentOrderIds.includes(order.id)) {
+              var ds = formatDeliverySlot(order.fulfilmentSlotFrom);
+              var delivColln = order.fulfilmentMethod.methodType === 'delivery' ? 'delivery' : 'collection';
+              // No need to await result of this
+              await sails.helpers.sendFirebaseNotification.with({
+                topic: 'order-' + order.publicId,
+                title: 'Order update',
+                body: `You have an upcoming order at ${ds} scheduled for ${delivColln} 😎.`
+              });
+            }
+          };
+        });
+
+        await Promise.all(upcomingOrderPromises);
       });
     }
   };

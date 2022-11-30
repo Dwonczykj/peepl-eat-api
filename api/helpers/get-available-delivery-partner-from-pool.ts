@@ -6,6 +6,7 @@ import {
 } from "../interfaces/orders/deliveryPartnerHelperObjects";
 import { iSlot, TimeWindow } from "../interfaces/vendors/slot";
 import { sailsVegi } from '../../api/interfaces/iSails';
+import { dateStrFormat, datetimeStrFormatExact } from '../../scripts/utils';
 
 declare var FulfilmentMethod: any;
 declare var sails: sailsVegi;
@@ -108,8 +109,8 @@ module.exports = {
   ) {
     var validSlotsForDeliveryPartner: iSlot[] = [];
     var date = moment
-      .utc(inputs.fulfilmentSlotFrom, 'YYYY-MM-DD HH:mm:ss')
-      .format('YYYY-MM-DD');
+      .utc(inputs.fulfilmentSlotFrom, datetimeStrFormatExact)
+      .format(dateStrFormat);
 
     const vendor = await Vendor.findOne({ id: inputs.pickupFromVendor }).populate('deliveryPartner');
 

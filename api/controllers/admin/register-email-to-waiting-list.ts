@@ -61,7 +61,7 @@ module.exports = {
     }
   ) {
     try {
-      sails.helpers.sendEmailTemplate.with({
+      await sails.helpers.sendTemplateEmail.with({
         template: 'email-registration-waiting-list',
         templateData: {
           message: `Thank you for signing up to vegi. We will be in touch as soon as vegi is ready to transform the future.`,
@@ -77,7 +77,7 @@ module.exports = {
     }  
 
     try {
-      sails.helpers.sendEmailTemplate.with({
+      await sails.helpers.sendTemplateEmail.with({
         template: 'email-registration-waiting-list',
         templateData: {
           message: `${inputs.emailAddress} has signed up to vegi via ${inputs.origin}`,

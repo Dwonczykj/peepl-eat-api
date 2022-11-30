@@ -226,6 +226,12 @@
       "name": "Approve or decline order"
     },
     {
+      "name": "Register Email to Waiting List"
+    },
+    {
+      "name": "Get Survey Questions"
+    },
+    {
       "name": "Create postal district"
     },
     {
@@ -233,6 +239,9 @@
     },
     {
       "name": "Edit vendor postal districts"
+    },
+    {
+      "name": "Update stock count"
     },
     {
       "name": "Get product options"
@@ -1556,6 +1565,51 @@
             "type": "boolean",
             "description": "Represents whether or not the option value is available."
           },
+          "stockCount": {
+            "type": "integer",
+            "format": "int64",
+            "default": 0,
+            "description": "The remaining stock count for this product SKU",
+            "minimum": 0
+          },
+          "supplier": {
+            "type": "string",
+            "default": "",
+            "description": "The name of the supplier i.e. Suma"
+          },
+          "brandName": {
+            "type": "string",
+            "default": "",
+            "description": "The name of the brand i.e. Jelly Bears"
+          },
+          "taxGroup": {
+            "type": "string",
+            "default": "",
+            "description": "An optional tax grouping such as STD VAT"
+          },
+          "stockUnitsPerProduct": {
+            "type": "number",
+            "format": "double",
+            "default": 1,
+            "description": "Number of units per pack, i.e. a pack of 6 would have value of 6",
+            "example": 1
+          },
+          "sizeInnerUnitValue": {
+            "type": "number",
+            "format": "double",
+            "default": 0,
+            "description": "i.e. 450 if 1 inner unit in the package is 450ml"
+          },
+          "sizeInnerUnitType": {
+            "type": "string",
+            "default": "",
+            "description": "A measure of the units used to describe the value of the size of 1 unit i.e. ml"
+          },
+          "productBarCode": {
+            "type": "string",
+            "default": "",
+            "description": "A stringified long number, potentially GUID in future, that maps to the UPC (barcode) on the product"
+          },
           "option": {
             "description": "The option to which this value can apply. JSON dictionary representing the **productoption** instance or FK when creating / updating / not populated",
             "oneOf": [
@@ -1638,6 +1692,51 @@
                 "$ref": "#/components/schemas/order"
               }
             ]
+          }
+        }
+      },
+      "survey": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/survey-without-required-constraint"
+          },
+          {
+            "required": [
+              "email",
+              "question"
+            ]
+          }
+        ]
+      },
+      "survey-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **Survey**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "email": {
+            "type": "string"
+          },
+          "question": {
+            "type": "string"
+          },
+          "answer": {
+            "type": "string",
+            "nullable": true,
+            "default": ""
           }
         }
       },
@@ -1991,6 +2090,42 @@
             "items": {
               "$ref": "#/components/schemas/vendor"
             }
+          }
+        }
+      },
+      "waitinglist": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/waitinglist-without-required-constraint"
+          },
+          {
+            "required": [
+              "email"
+            ]
+          }
+        ]
+      },
+      "waitinglist-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **WaitingList**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "email": {
+            "type": "string"
           }
         }
       }
@@ -2949,6 +3084,9 @@
         ],
         "responses": {
           "200": {
+            "description": "Success"
+          },
+          "400": {
             "description": "Success"
           },
           "404": {
@@ -6726,6 +6864,178 @@
         }
       }
     },
+    "/api/v1/admin/register-email-to-waiting-list": {
+      "post": {
+        "summary": "Register Email to Waiting List",
+        "tags": [
+          "Register Email to Waiting List"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "emailAddress",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          },
+          {
+            "in": "query",
+            "name": "origin",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "enum": [
+                "mobile",
+                "vegiapp.co.uk",
+                "guide",
+                "leaflet",
+                "instagram",
+                ""
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "sendVerificationCode",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "A user is already registered to the details requested"
+                    },
+                    {
+                      "example": {},
+                      "type": "object",
+                      "properties": {},
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Server error"
+          },
+          "401": {
+            "description": "firebase errored on verifying the user token"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/get-survey-questions": {
+      "get": {
+        "summary": "Get Survey Questions",
+        "tags": [
+          "Get Survey Questions"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {},
+                  "type": "object",
+                  "properties": {},
+                  "description": "Success"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Server error"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/submit-survey-response": {
+      "post": {
+        "summary": "Register Email to Waiting List",
+        "tags": [
+          "Register Email to Waiting List"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "emailAddress",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          },
+          {
+            "in": "query",
+            "name": "question",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "answer",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {},
+                  "type": "object",
+                  "properties": {},
+                  "description": "Success"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Server error"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/api/v1/admin/create-postal-district": {
       "post": {
         "summary": "Create postal district",
@@ -6911,6 +7221,68 @@
           },
           "404": {
             "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/update-stock-count": {
+      "post": {
+        "summary": "Update stock count",
+        "description": "Post an update to update the remaining stock count for an item",
+        "tags": [
+          "Update stock count"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "productOptionValueId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "remainingStockCount",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "New product category created."
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
           },
           "500": {
             "description": "Internal server error"

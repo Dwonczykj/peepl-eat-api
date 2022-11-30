@@ -14,7 +14,43 @@ import { CheckAddressIsValidInput, CheckAddressIsValidResult } from "../../api/h
 import { FulfilmentMethodDeliversToAddressInput, FulfilmentMethodDeliversToAddressResult } from "../../api/helpers/fulfilment-method-delivers-to-address";
 import { DistanceHaversineInputs, DistanceHaversineResult } from "../../api/helpers/distance-haversine";
 import { DistanceViaBearingInputs, DistanceViaBearingResult } from "../../api/helpers/distance-via-bearing";
-import { GetVendorsInSphereInputs, GetVendorsInSphereResult } from "api/helpers/get-vendors-in-sphere";
+import {
+  GetVendorsInSphereInputs,
+  GetVendorsInSphereResult,
+} from '../../api/helpers/get-vendors-in-sphere';
+
+export type SailsActionInput =
+  | {
+      type: 'string' | 'boolean' | 'ref' | 'json';
+      description?: string;
+      defaultsTo?: any;
+      model?: string;
+      isIn?: Array<string>;
+      required?: boolean;
+    }
+  | {
+      type: 'number';
+      max?: number;
+      min?: number;
+      description?: string;
+      defaultsTo?: any;
+      isIn?: Array<number>;
+      required?: boolean;
+    };
+
+export type SailsActionInputs<
+  T extends { [unusedAttrName: string]: SailsActionInput }
+> = {
+  [key in keyof T]: T[key]['type'] extends 'string'
+    ? string
+    : T[key]['type'] extends 'number'
+    ? number
+    : T[key]['type'] extends 'boolean'
+    ? boolean
+    : any;
+} & {
+  // ... type overrides here
+};
 
 export type UploadImageInfoType = {
   fd: string;
@@ -32,10 +68,19 @@ export type RequiredKeys<T> = Exclude<
 >;
 export type OptionalKeys<T> = Exclude<keyof T, RequiredKeys<T>>;
 
-type ValueType = string | number | boolean;
+type ValueType = Date | string | number | boolean;
 
-type WaterlineValueComparisonKeys<T extends number | string | boolean> =
-  T extends number
+type WaterlineValueComparisonKeys<T extends Date | number | string | boolean> =
+  T extends Date
+    ? {
+        '>'?: string; // ~ https://sailsjs.com/documentation/concepts/models-and-orm/query-language#?criteria-modifiers
+        '>='?: string;
+        '<'?: string;
+        '<='?: string;
+        '=='?: string;
+        '!='?: string;
+      }
+    : T extends number
     ? {
         '>'?: T; // ~ https://sailsjs.com/documentation/concepts/models-and-orm/query-language#?criteria-modifiers
         '>='?: T;
@@ -434,7 +479,7 @@ export type sailsVegi = {
         notification: NotificationType;
       }
     >;
-    sendEmailTemplate: _helperFunction<
+    sendTemplateEmail: _helperFunction<
       {
         to: string;
         toName?: string;

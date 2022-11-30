@@ -1,5 +1,5 @@
-import { SailsModelType } from "api/interfaces/iSails";
-import { PostalDistrictType } from "scripts/utils";
+import { SailsModelType } from '../../../api/interfaces/iSails';
+import { PostalDistrictType } from "../../../scripts/utils";
 
 declare var PostalDistrict: SailsModelType<PostalDistrictType>;
 

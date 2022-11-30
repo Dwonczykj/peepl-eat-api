@@ -32,7 +32,10 @@ module.exports = {
       statusCode: 404,
       responseType: 'notFound',
       description: 'vendor not found'
-    }
+    },
+    badVendorProductCategories: {
+      statusCode: 400,
+    },
   },
 
   fn: async function (
@@ -41,15 +44,19 @@ module.exports = {
       success: (
         unused: GetProductCategoriesSuccess
       ) => GetProductCategoriesSuccess;
-      notFound: () => void;
+      notFound: (unusedMessage?:string) => void;
+      badVendorProductCategories: (unusedMessage?:string) => void;
     }
   ) {
     var vendor = await Vendor.findOne(inputs.vendor).populate(
       'productCategories'
     );
 
-    if(!vendor){
+    if (!vendor) {
       return exits.notFound();
+    }
+    if (!Array.isArray(vendor.productCategories)) {
+      return exits.badVendorProductCategories(`Vendor{${inputs.vendor}} doesnt have productCategories set`);
     }
 
     const productCategories = vendor.productCategories.map(pc => {

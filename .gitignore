@@ -143,3 +143,5 @@ config/local.js
 
 cloneDb.sh
 cloneLocalDb.sh
+executeLocalDbScript.sh
+executeDbScript.sh
