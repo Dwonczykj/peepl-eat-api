@@ -1,4 +1,5 @@
 const twilio = require('twilio');
+const plivo = require('plivo');
 
 module.exports = {
   friendlyName: 'Send sms notification',
@@ -56,23 +57,46 @@ module.exports = {
       Message would have been send to ${inputs.to} with body: ${inputs.body}`);
       return exits.success();
     }
-    const twilioClient = new twilio(
-      sails.config.custom.twilioSID,
-      sails.config.custom.twilioAuthToken
-    );
 
-    twilioClient.messages
-      .create({
-        body: inputs.body,
-        to: inputs.to,
-        from: 'VegiApp',
-      })
-      .then((message) => {
-        return message.sid;
-      })
-      .catch((err) => {
-        throw new Error(err.message);
-      });
+    if(sails.config.custom.plivoAuthId && sails.config.custom.plivoAuthToken){
+      const plivoClient = new plivo.Client(
+        sails.config.custom.plivoAuthId,
+        sails.config.custom.plivoAuthToken
+      );
+
+      plivoClient.messages
+        .create({
+          text: inputs.body,
+          src: 'vegi',
+          dst: inputs.to,
+        })
+        .then((message) => {
+          return message.sid;
+        })
+        .catch((err) => {
+          throw new Error(err.message);
+        });
+    } else if(sails.config.custom.twilioSID && sails.config.custom.twilioAuthToken){
+      const twilioClient = new twilio(
+        sails.config.custom.twilioSID,
+        sails.config.custom.twilioAuthToken
+      );
+
+      twilioClient.messages
+        .create({
+          body: inputs.body,
+          to: inputs.to,
+          from: 'vegi',
+        })
+        .then((message) => {
+          return message.sid;
+        })
+        .catch((err) => {
+          throw new Error(err.message);
+        });
+    } else {
+      sails.log.warn('SMS Helper has no client libraries with secrets configured to send SMS messages');
+    }
 
     return exits.success({notification: newNotification});
   },

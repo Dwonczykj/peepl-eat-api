@@ -31,6 +31,7 @@
     "md5": "^2.3.0",
     "moment": "^2.29.1",
     "node-cron": "^3.0.2",
+    "plivo": "^4.35.0",
     "request-json": "^0.6.5",
     "sails": "^1.5.2",
     "sails-hook-deep-orm": "^1.0.2",
