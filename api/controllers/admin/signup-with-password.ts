@@ -1,6 +1,5 @@
 import { UserRecord } from 'firebase-admin/auth';
 import { UserType } from '../../../scripts/utils';
-import { SailsModelType } from '../../../api/interfaces/iSails';
 import * as firebase from '../../../config/firebaseAdmin';
 declare var User: any;
 // const bcrypt = require('bcrypt');

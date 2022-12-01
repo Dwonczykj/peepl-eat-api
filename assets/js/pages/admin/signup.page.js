@@ -206,7 +206,12 @@ parasails.registerPage('signup', {
       const setFormErrors = {};
       var argins = this.getSubmissionArgs();
 
-      const firebasePhoneRegex = /^\+\d{1,2}\d{3}-\d{3}-\d{4}$/;
+      const countryCodeLength = argins.phoneCountryCode.toString().length;
+      const numberTrailingLength = 6 - countryCodeLength;
+
+      const firebasePhoneRegex = new RegExp(
+        `^\\+\\d{${countryCodeLength}}\\d{3}-\\d{3}-\\d{${numberTrailingLength}}$`
+      );
 
       if (!this.phoneNumberFormatted.match(firebasePhoneRegex)) {
         setFormErrors.phoneNumber = true;
