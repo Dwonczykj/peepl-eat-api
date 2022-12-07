@@ -495,8 +495,7 @@ module.exports = {
         try {
           await sails.helpers.sendSmsNotification.with({
             to: inputs.address.phoneNumber,
-            body: `New vegi order created! Details of your order can be found in the 'My Orders' section of the app.
-Thank you 💚`,
+            body: `Order accepted! Details of your order can be found in the My Orders section of the vegi app. Thank you!`,
             data: {
               orderId: result.orderId,
             },
