@@ -8,6 +8,19 @@ declare var OrderItemOptionValue: SailsModelType<OrderItemOptionValueType>;
 declare var OrderItem: SailsModelType<OrderItemType>;
 declare var Order: SailsModelType<OrderType>;
 
+export const cleanPersonalDetails = <T extends {
+  email?: string;
+  name?: string;
+  phoneNumber?: string;
+}>(details: T):T => {
+  return {
+    ...details,
+    email: details.email && details.email.trim().toLowerCase(),
+    name: details.name && details.name.trim(),
+    phoneNumber: details.phoneNumber && details.phoneNumber.trim(),
+  };
+};
+
 export type CreateOrderInputs = {
   items: Array<{
     id: number;
@@ -163,6 +176,8 @@ module.exports = {
     }
   ) {
     try {
+      const cleanAddress = cleanPersonalDetails(inputs.address);
+      inputs.address = cleanAddress;
       const validateOrderResult = await sails.helpers.validateOrder.with(inputs);
       if(validateOrderResult.orderIsValid){
         inputs = validateOrderResult.orderInputs;
