@@ -1,6 +1,9 @@
-import { sailsVegi } from "../../../api/interfaces/iSails";
+import { WaitingListEntryType } from "../../../scripts/utils";
+import { SailsModelType, sailsVegi } from "../../../api/interfaces/iSails";
 
 declare var sails: sailsVegi;
+
+declare var WaitingList: SailsModelType<WaitingListEntryType>;
 
 module.exports = {
   friendlyName: 'Register Email to Waiting List',
@@ -10,6 +13,11 @@ module.exports = {
       type: 'string',
       required: true,
       isEmail: true,
+    },
+    userType: {
+      type: 'string',
+      required: false,
+      defaultsTo: 'unknown',
     },
     origin: {
       type: 'string',
@@ -50,7 +58,8 @@ module.exports = {
   fn: async function (
     inputs: {
       emailAddress: string;
-      origin: 'mobile'| 'vegiapp.co.uk'| 'guide'| 'leaflet'| 'instagram'| '';
+      userType: WaitingListEntryType['userType'];
+      origin: WaitingListEntryType['origin'];
       sendVerificationCode: boolean;
     },
     exits: {
@@ -60,6 +69,18 @@ module.exports = {
       error;
     }
   ) {
+    try {
+      await WaitingList.create({
+        email: inputs.emailAddress,
+        type: inputs.userType,
+        origin: inputs.origin,
+      });
+    } catch (error) {
+      sails.log.warn(
+        `There was an issue registering [${inputs.userType}] user: ${inputs.emailAddress} with error: ${error}`
+      );
+    }
+
     try {
       await sails.helpers.sendTemplateEmail.with({
         template: 'email-registration-waiting-list',
@@ -74,7 +95,7 @@ module.exports = {
       sails.log.error(
         `There was an error sending a confirmation of waiting list registration email to the user: ${error}`
       );
-    }  
+    }
 
     try {
       await sails.helpers.sendTemplateEmail.with({

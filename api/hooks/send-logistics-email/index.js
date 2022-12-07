@@ -49,8 +49,8 @@ module.exports = function defineSendLogisticsEmailsHook(sails) {
               to: deliveryPartner.email,
               toName: deliveryPartner.name,
               from: sails.config.custom.internalEmailAddress,
-              fromName: 'Vegi',
-              subject: 'Your Vegi orders for collection',
+              fromName: 'vegi',
+              subject: 'Your vegi orders for collection',
               template: 'email-logistics-notification',
               templateData: {
                 orders: orders,

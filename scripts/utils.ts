@@ -475,6 +475,8 @@ export type SurveyType = {
 export type WaitingListEntryType = {
   id: number;
   email: string;
+  origin: 'mobile' | 'vegiapp.co.uk' | 'guide' | 'leaflet' | 'instagram' | '',
+  userType: 'business' | 'unknown' | 'customer',
 };
 
 export type OrderItemType = _OrderItemTypeHidden & {

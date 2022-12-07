@@ -13,7 +13,18 @@ module.exports = {
 
     email: {
       type: 'string',
+      isEmail: true,
       required: true,
+    },
+    userType: {
+      type: 'string',
+      required: false,
+      defaultsTo: 'unknown',
+    },
+    origin: {
+      type: 'string',
+      required: false,
+      defaultsTo: '',
     },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗

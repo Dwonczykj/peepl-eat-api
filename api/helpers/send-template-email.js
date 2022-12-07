@@ -239,7 +239,7 @@ module.exports = {
               Data: subjectLinePrefix + subject,
             },
           },
-          Source: 'Peepl Eat <support@itsaboutpeepl.com>',
+          Source: 'vegi <help@vegiapp.co.uk>',
         };
 
         try {

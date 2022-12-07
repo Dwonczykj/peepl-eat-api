@@ -17,7 +17,7 @@ module.exports.custom = {
    * Any other custom config this Sails app should use during development.    *
    *                                                                          *
    ***************************************************************************/
-  internalEmailAddress: 'support@itsaboutpeepl.com',
+  internalEmailAddress: 'help@vegiapp.co.uk',
   internalPhoneNumber: '+1 000 0000000', // For support requests
   buildNumber: 1,
   baseUrl: BASE_URL,
