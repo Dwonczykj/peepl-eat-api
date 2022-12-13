@@ -1,3 +1,4 @@
+/* eslint-disable prefer-arrow-callback */
 module.exports = {
   friendlyName: 'Upload One S3',
 
@@ -23,17 +24,44 @@ module.exports = {
       sails.config.custom.FIREBASE_AUTH_EMULATOR_HOST;
 
     let imageInfo;
-    if (!inTestEnv) {
-      if(!inputs.image){
-        return exits.success(undefined);
-      } 
-      else if(typeof(inputs.image) === 'string'){
+    if(!inputs.image){
+      return exits.success(undefined);
+    } 
+    else if(typeof(inputs.image) === 'string'){
+      const verifiedImageDomain = sails.config.custom.storageDomains.map(
+        function (domain) {
+          var subDomain = /(.*)/;
+          var flags =
+            domain.flags !== subDomain.flags
+              ? (domain.flags + subDomain.flags)
+                  .split('')
+                  .sort()
+                  .join('')
+                  .replace(/(.)(?=.*\1)/, '')
+              : domain.flags;
+          var urlPattern = new RegExp(
+            domain.source + subDomain.source,
+            flags
+          );
+          const matches = inputs.image.match(urlPattern);
+          if (matches && matches.length >= 2){
+            return matches[1];
+          } else {
+            return null;
+          }
+        }
+      ).filter(function(match){
+        return match !== null;
+      });
+      if (verifiedImageDomain.length){
         imageInfo = {
-          fd: inputs.image,
+          fd: verifiedImageDomain[0],
         };
         return exits.success(imageInfo);
       }
+    }
       
+    if (!inTestEnv) {
       try {
 	      imageInfo = await sails
 	        .uploadOne(inputs.image, {
