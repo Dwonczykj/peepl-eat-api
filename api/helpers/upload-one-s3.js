@@ -26,7 +26,14 @@ module.exports = {
     if (!inTestEnv) {
       if(!inputs.image){
         return exits.success(undefined);
+      } 
+      else if(typeof(inputs.image) === 'string'){
+        imageInfo = {
+          fd: inputs.image,
+        };
+        return exits.success(imageInfo);
       }
+      
       try {
 	      imageInfo = await sails
 	        .uploadOne(inputs.image, {
