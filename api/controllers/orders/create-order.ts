@@ -487,25 +487,25 @@ module.exports = {
         };
       };
 
-      const sendSMSOrder = async (result: {
-        orderId: any;
-        paymentIntentID: any;
-        orderCreationStatus: string;
-      }) => {
-        try {
-          await sails.helpers.sendSmsNotification.with({
-            to: inputs.address.phoneNumber,
-            body: `Order accepted! Details of your order can be found in the My Orders section of the vegi app. Thank you!`,
-            data: {
-              orderId: result.orderId,
-            },
-          });
-        } catch (error) {
-          sails.log.error(
-            `peepl-pay-webhook errored sending sms notification to vendor for paid order: ${error}`
-          );
-        }
-      };
+      // const sendSMSOrder = async (result: {
+      //   orderId: any;
+      //   paymentIntentID: any;
+      //   orderCreationStatus: string;
+      // }) => {
+      //   try {
+      //     await sails.helpers.sendSmsNotification.with({
+      //       to: inputs.address.phoneNumber,
+      //       body: `Order accepted! Details of your order can be found in the My Orders section of the vegi app. Thank you!`,
+      //       data: {
+      //         orderId: result.orderId,
+      //       },
+      //     });
+      //   } catch (error) {
+      //     sails.log.error(
+      //       `peepl-pay-webhook errored sending sms notification to vendor for paid order: ${error}`
+      //     );
+      //   }
+      // };
 
       if (datastore.config.adapter === 'sails-disk') {
         const result = await createOrderTransactionDB(null);
@@ -518,7 +518,7 @@ module.exports = {
           );
         }
         if (result) {
-          await sendSMSOrder(result);
+          // await sendSMSOrder(result);
           return exits.success(result);
         }
       } else {
@@ -535,7 +535,7 @@ module.exports = {
         if(process.env.NODE_ENV && ! process.env.NODE_ENV.toLowerCase().startsWith('prod')){
           sails.log(`create-order -> order created -> ${util.inspect(result, { depth: 0 })}`);
         }
-        await sendSMSOrder(result);
+        // await sendSMSOrder(result);
         return exits.success(result);
       }
     } catch (error) {

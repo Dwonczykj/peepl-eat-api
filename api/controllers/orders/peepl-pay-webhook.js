@@ -85,6 +85,13 @@ Delivery/Collection on ${order.fulfilmentSlotFrom} - ${order.fulfilmentSlotTo}`,
             orderId: order.id,
           },
 	      });
+	      await sails.helpers.sendSmsNotification.with({
+          to: order.deliveryPhoneNumber,
+          body: `Order accepted! Details of your order can be found in the My Orders section of the vegi app. Thank you!`,
+          data: {
+            orderId: order.id,
+          },
+        });
 	    } else {
 	      await sails.helpers.sendSmsNotification.with({
 	        to: order.deliveryPhoneNumber,

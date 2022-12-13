@@ -156,6 +156,13 @@ module.exports = {
         title: 'Order update',
         body: 'Your order has been accepted 😎.',
       });
+      await sails.helpers.sendSmsNotification.with({
+        to: order.deliveryPhoneNumber,
+        body: `Order confirmed with vendor! Details of your order can be found in the My Orders section of the vegi app. Thank you!`,
+        data: {
+          orderId: order.id,
+        },
+      });
     } else if (inputs.orderFulfilled === 'reject') {
       await Order.updateOne(order.id).set({
         restaurantAcceptanceStatus: 'rejected',
