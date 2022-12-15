@@ -145,3 +145,4 @@ cloneDb.sh
 cloneLocalDb.sh
 executeLocalDbScript.sh
 executeDbScript.sh
+copyQACodeToProd.sh

@@ -128,6 +128,8 @@ module.exports.routes = {
   'ALL /': { action: 'home/view-dashboard' },
   'GET /home': { action: 'home/view-dashboard' },
   'GET /api/v1/home/nearest-vendors': { action: 'home/view-nearest-vendors' },
+  'POST /api/v1/home/like': { action: 'home/like' },
+  'POST /home/redirect-to-app-store': { action: 'home/redirect-to-app-store' },
 
   'GET /admin': { action: 'admin/view-vendors' },
   'GET /admin/vendors': { action: 'admin/view-vendors' },

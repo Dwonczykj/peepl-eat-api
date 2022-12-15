@@ -57,6 +57,8 @@ module.exports.policies = {
   'admin/customer-received-order': true, //TODO: add 'is-logged-in' and 'is-vendor' poligices to this
   'admin/bulk-update-data': ['is-super-admin'],
   'admin/*': 'is-logged-in',
+  'home/redirect-to-app-store': true,
+  'home/like': true,
   'home/*': 'is-logged-in',
   'discounts/*': true, // ['localize', 'firebase', 'firebase-auth', 'is-logged-in'],
   'orders/*': true, // ["localize", "firebase", "firebase-auth", "is-logged-in"],

@@ -714,6 +714,44 @@
           }
         }
       },
+      "like": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/like-without-required-constraint"
+          }
+        ]
+      },
+      "like-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **Like**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "headers": {
+            "type": "string",
+            "default": "",
+            "description": "the headers information from the request"
+          },
+          "guid": {
+            "type": "string",
+            "default": "",
+            "description": "An optional guid to be supplied if you wanted to identify an individual like to the original creator who could store the guid that they used to create the like."
+          }
+        }
+      },
       "notification": {
         "type": "object",
         "allOf": [
@@ -2125,7 +2163,17 @@
             "description": "Note Sails special attributes: autoIncrement"
           },
           "email": {
-            "type": "string"
+            "type": "string",
+            "format": "email"
+          },
+          "userType": {
+            "type": "string",
+            "default": "unknown",
+            "example": "unknown"
+          },
+          "origin": {
+            "type": "string",
+            "default": ""
           }
         }
       }
@@ -6878,6 +6926,16 @@
             "schema": {
               "type": "string",
               "format": "email"
+            }
+          },
+          {
+            "in": "query",
+            "name": "userType",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "unknown",
+              "example": "unknown"
             }
           },
           {

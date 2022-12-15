@@ -207,6 +207,11 @@ export type CompletedFlagType =
 
 type PostalOutCode = string;
 
+export type LikeType = {
+  guid:string;
+  headers:string;
+}
+
 type _DeliveryPartnerTypeHidden = {
   id: number;
   name: string;
