@@ -28,37 +28,37 @@ module.exports = {
         return exits.success(undefined);
       }
       else if(typeof(inputs.image) === 'string'){
-	const verifiedImageDomain = sails.config.custom.storageDomains.map(
-        function (domain) {
-          var subDomain = /(.*)/;
-          var flags =
-            domain.flags !== subDomain.flags
-              ? (domain.flags + subDomain.flags)
-                  .split('')
-                  .sort()
-                  .join('')
-                  .replace(/(.)(?=.*\1)/, '')
-              : domain.flags;
-          var urlPattern = new RegExp(
-            domain.source + subDomain.source,
-            flags
-          );
-          const matches = inputs.image.match(urlPattern);
-          if (matches && matches.length >= 2){
-            return matches[1];
-          } else {
-            return null;
+	      const verifiedImageDomain = sails.config.custom.storageDomains.map(
+          (domain) => {
+            var subDomain = /(.*)/;
+            var flags =
+              domain.flags !== subDomain.flags
+                ? (domain.flags + subDomain.flags)
+                    .split('')
+                    .sort()
+                    .join('')
+                    .replace(/(.)(?=.*\1)/, '')
+                : domain.flags;
+            var urlPattern = new RegExp(
+              domain.source + subDomain.source,
+              flags
+            );
+            const matches = inputs.image.match(urlPattern);
+            if (matches && matches.length >= 2){
+              return matches[1];
+            } else {
+              return null;
+            }
           }
+        ).filter((match) => {
+          return match !== null;
+        });
+        if (verifiedImageDomain.length){
+          imageInfo = {
+            fd: verifiedImageDomain[0],
+          };
+          return exits.success(imageInfo);
         }
-      ).filter(function(match){
-        return match !== null;
-      });
-      if (verifiedImageDomain.length){
-        imageInfo = {
-          fd: verifiedImageDomain[0],
-        };
-        return exits.success(imageInfo);
-      }
       }
       try {
 	      imageInfo = await sails
