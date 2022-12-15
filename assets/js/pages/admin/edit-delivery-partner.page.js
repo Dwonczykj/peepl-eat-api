@@ -29,6 +29,11 @@ parasails.registerPage('admin-edit-delivery-partner', {
         required: true,
         maxLength: 20,
       },
+      walletAddress: {
+        required: true,
+        maxLength: 100,
+        regex: /^0x[a-fA-F0-9]{40}$/,
+      },
     },
   },
 
