@@ -87,7 +87,11 @@ parasails.registerPage('admin-edit-delivery-partner', {
       if (id) {
         this.deliveryPartner.id = id;
         this.showToast(`Delivery Partner updated`, () => {
-          window.history.pushState({}, '', '/admin/delivery-partners/' + id);
+          window.history.pushState({}, '', '/admin/delivery-partners/');
+        });
+      }else{
+        this.showToast(`Delivery Partner created`, () => {
+          window.history.pushState({}, '', '/admin/delivery-partners/');
         });
       }
     },

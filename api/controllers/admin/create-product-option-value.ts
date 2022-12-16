@@ -66,9 +66,9 @@ module.exports = {
     }).fetch();
 
     // All done.
-    return {
+    return exits.success({
       id: newProductOptionValue.id
-    };
+    });
 
   }
 

@@ -56,6 +56,7 @@ module.exports = {
         if (verifiedImageDomain.length){
           imageInfo = {
             fd: verifiedImageDomain[0],
+            ffd: inputs.image,
           };
           return exits.success(imageInfo);
         }
@@ -73,6 +74,10 @@ module.exports = {
 	        .intercept(
 	          (err) => new Error('The photo upload failed! ' + err.message)
 	        );
+        imageInfo = {
+          ...imageInfo,
+          ffd: sails.config.custom.amazonS3BucketUrl + imageInfo.fd,
+        };
       } catch (error) {
         sails.log.error(`Error uploading image to s3-bucket: ${error}`);
         return exits.success(undefined);
@@ -83,6 +88,7 @@ module.exports = {
     } else {
       imageInfo = {
         fd: inTestEnv ? 'test-image-fd-' + uuidv4() : null,
+        ffd: null,
       };
     }
     return exits.success(imageInfo);

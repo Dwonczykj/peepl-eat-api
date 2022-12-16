@@ -34,3 +34,7 @@ ADD COLUMN `sizeInnerUnitValue` INT NULL DEFAULT 0 AFTER `stockUnitsPerProduct`,
 ADD COLUMN `sizeInnerUnitType` varchar(255) NULL DEFAULT '' AFTER `sizeInnerUnitValue`,
 ADD COLUMN `productBarCode` varchar(255) NULL DEFAULT '' AFTER `sizeInnerUnitType`
 ;
+
+ALTER TABLE `vegi`.`product` 
+ADD COLUMN `ingredients` LONGTEXT AFTER `status`
+;

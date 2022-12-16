@@ -42,12 +42,19 @@ module.exports = {
     }
 
     var vendor = await Vendor.findOne(vendorid).populate(
-      "pickupAddress&productCategories&products&products.category&products.options&options.values"
+      'pickupAddress&productCategories&products&products.options&options.values'
+      // "pickupAddress&productCategories&products&products.category&products.options&options.values"
     );
 
     if(!vendor) {
       return exits.notFound();
     }
+
+    var products = await Product.find({
+      vendor: vendorid,      
+    }).populate('options&options.values');
+
+    vendor.products = products;
 
     var delFul = await Vendor.findOne(vendorid).populate(
       'deliveryFulfilmentMethod&deliveryFulfilmentMethod.openingHours&fulfilmentOrigin'

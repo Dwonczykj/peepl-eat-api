@@ -24,6 +24,10 @@ module.exports = {
     image: {
       type: 'ref',
     },
+    imageUrl: {
+      type: 'string',
+    },
+
     isAvailable: {
       type: 'boolean'
     },
@@ -70,10 +74,15 @@ module.exports = {
       return exits.error(new Error('You are not authorised to edit this product.'));
     }
 
-    if(inputs.image){
+    if (inputs.image && inputs.image._files && inputs.image._files.length) {
       let imageInfo = await sails.helpers.uploadOneS3(inputs.image);
-      if(imageInfo) {
+      if (imageInfo) {
         inputs.imageUrl = sails.config.custom.amazonS3BucketUrl + imageInfo.fd;
+      }
+    } else if (inputs.imageUrl) {
+      let imageInfo = await sails.helpers.uploadOneS3(inputs.imageUrl);
+      if (imageInfo) {
+        inputs.imageUrl = imageInfo.ffd;
       }
     }
 

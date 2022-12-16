@@ -42,7 +42,9 @@ parasails.registerComponent('editProduct', {
         <span class="action-card__checkbox">
           <input type="checkbox">
         </span>
-        <span :class="{'line-through': !product.isAvailable }">{{ product.name }}</span>
+        <span :class="{'line-through': !product.isAvailable }">
+          {{ product.name }}
+        </span>
       </summary>
       <div class="action-card__content">
         <ajax-form :cloud-error.sync="cloudError" :form-data="product" :form-rules="formRules" :syncing.sync="syncing" :form-errors.sync="formErrors" @submitted="createdProduct" :action="(product.id) ?  'editProduct' : 'createProduct'">
@@ -89,7 +91,9 @@ parasails.registerComponent('editProduct', {
             <h2 class="h5 mt-3">Featured Image</h2>
             <img v-if="previewImageSrc || product.id" :src="(previewImageSrc) ? previewImageSrc : product.imageUrl" />
             <div class="custom-file">
-              <input :class="{ 'is-invalid': formErrors.image }" type="file" class="custom-file-input" accept="image/*" id="customFile" @change="changeProductImageInput($event.target.files)">
+              <input type="file" id="customFile" @change="changeProductImageInput($event.target.files)" :class="{ 'is-invalid': formErrors.image }" class="custom-file-input" accept="image/*">
+              <!--<input type="text" id="imageUrlExplicitInput" @change="changeProductImageBackupUrl()" v-model="product.imageUrl" :class="{ 'is-invalid': formErrors.image }" class="form-control">-->
+              <!--<label for="imageUrlExplicitInput">{{imageName}}</label>-->
               <label class="custom-file-label" for="customFile">{{imageName}}</label>
             </div>
           </fieldset>
@@ -163,6 +167,11 @@ parasails.registerComponent('editProduct', {
     createdProduct: function ({ id }) {
       Vue.set(this.product, 'id', id);
       this.showToast('Product Update Succeeded');
+    },
+    changeProductImageBackupUrl: function () {
+      if (this.product.imageUrl) {
+        this.product.image = this.product.imageUrl;
+      }
     },
     changeProductImageInput: function (files) {
       if (files.length !== 1 && !this.product.image) {

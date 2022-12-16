@@ -52,6 +52,13 @@ module.exports = {
       defaultsTo: 'inactive',
       description: 'string active|inactive to represent whether product is discontinued or not'
     },
+    ingredients: {
+      type: 'string',
+      columnType: 'LONGTEXT',
+      required: false,
+      allowNull: true,
+      description: 'back of the package information',
+    },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗

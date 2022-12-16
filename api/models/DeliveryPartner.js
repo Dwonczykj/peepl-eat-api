@@ -55,7 +55,8 @@ module.exports = {
       type: 'string',
       description:
         'A description of where the featured image file can be found',
-      required: true,
+      required: false,
+      allowNull: true,
     },
     status: {
       type: 'string',

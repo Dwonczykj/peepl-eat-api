@@ -38,3 +38,14 @@ CREATE TABLE `waitinglist` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `like` (
+  `createdAt` bigint DEFAULT NULL,
+  `updatedAt` bigint DEFAULT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `headers` LONGTEXT,
+  `guid` varchar(255) DEFAULT '' 
+  COLLATE utf8mb4_unicode_ci DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -49,6 +49,9 @@
       "name": "Logout"
     },
     {
+      "name": "Post Like"
+    },
+    {
       "name": "View orders"
     },
     {
@@ -428,8 +431,7 @@
               "name",
               "email",
               "phoneNumber",
-              "walletAddress",
-              "imageUrl"
+              "walletAddress"
             ]
           }
         ]
@@ -491,6 +493,7 @@
           },
           "imageUrl": {
             "type": "string",
+            "nullable": true,
             "description": "A description of where the featured image file can be found"
           },
           "status": {
@@ -1406,6 +1409,11 @@
               "inactive"
             ],
             "example": "inactive"
+          },
+          "ingredients": {
+            "type": "string",
+            "nullable": true,
+            "description": "back of the package information"
           },
           "vendor": {
             "description": "The seller of the product. JSON dictionary representing the **vendor** instance or FK when creating / updating / not populated",
@@ -2563,6 +2571,37 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/home/redirect-to-app-store": {
+      "post": {
+        "summary": "Post Like",
+        "description": "Post a like of the vegi platform",
+        "tags": [
+          "Post Like"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "guid",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
           },
           "404": {
             "description": "Resource not found"
@@ -4798,6 +4837,37 @@
         }
       }
     },
+    "/api/v1/home/like": {
+      "post": {
+        "summary": "Post Like",
+        "description": "Post a like of the vegi platform",
+        "tags": [
+          "Post Like"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "guid",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/api/v1/admin/customer-cancel-order": {
       "post": {
         "summary": "Customer cancel order",
@@ -5681,6 +5751,14 @@
             "name": "image",
             "required": false,
             "schema": {}
+          },
+          {
+            "in": "query",
+            "name": "imageUrl",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
           },
           {
             "in": "query",

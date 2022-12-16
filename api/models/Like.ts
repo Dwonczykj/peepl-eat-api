@@ -5,6 +5,8 @@
  * @docs        :: https://sailsjs.com/docs/concepts/models-and-orm/models
  */
 
+import { LikeType } from "../../scripts/utils";
+
 module.exports = {
   attributes: {
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
@@ -30,6 +32,16 @@ module.exports = {
     //  ╠═╣╚═╗╚═╗║ ║║  ║╠═╣ ║ ║║ ║║║║╚═╗
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
     
+  },
+
+  beforeCreate: async function (newRecord: LikeType, proceed) {
+    if(!newRecord.headers){
+      newRecord.headers = '[]';
+    }
+    if(typeof(newRecord.headers) !== 'string'){
+      newRecord.headers = JSON.stringify(newRecord.headers);
+    }
+    proceed();
   },
 
   // afterCreate: async function (newlyCreatedRecord, proceed) {

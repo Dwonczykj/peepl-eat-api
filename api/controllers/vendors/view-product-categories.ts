@@ -61,6 +61,7 @@ module.exports = {
 
     const productCategories = vendor.productCategories.map(pc => {
       return {
+        id: pc.id,
         name: pc.name,
       };
     });
