@@ -6,9 +6,7 @@
  */
 
 module.exports = {
-
   attributes: {
-
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
     //  ╩  ╩╚═╩╩ ╩╩ ╩ ╩ ╚╝ ╚═╝╚═╝
@@ -17,7 +15,7 @@ module.exports = {
       description: 'The outcode for any post codes within this district.',
       required: true,
       unique: true,
-      example: 'L1'
+      example: 'L1',
       // TODO: Add regex for validation
     },
 
@@ -25,16 +23,18 @@ module.exports = {
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
     //  ╚═╝╩ ╩╚═╝╚═╝═╩╝╚═╝
 
-
     //  ╔═╗╔═╗╔═╗╔═╗╔═╗╦╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
     //  ╠═╣╚═╗╚═╗║ ║║  ║╠═╣ ║ ║║ ║║║║╚═╗
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
     vendors: {
       collection: 'vendor',
-      via: 'fulfilmentPostalDistricts'
-    }
-
+      via: 'fulfilmentPostalDistricts',
+    },
   },
 
+  beforeCreate: async function (newRecord, proceed) {
+    newRecord.outcode = newRecord.outcode.toUpperCase();
+    proceed();
+  },
 };
 
