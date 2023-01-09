@@ -38,3 +38,8 @@ ADD COLUMN `productBarCode` varchar(255) NULL DEFAULT '' AFTER `sizeInnerUnitTyp
 ALTER TABLE `vegi`.`product` 
 ADD COLUMN `ingredients` LONGTEXT AFTER `status`
 ;
+
+ALTER TABLE `vegi`.`user` 
+ADD COLUMN `verified` tinyint(1) DEFAULT 0 AFTER `vendorConfirmed`,
+ADD COLUMN `walletAddress` varchar(255) DEFAULT '' AFTER `verified`
+;

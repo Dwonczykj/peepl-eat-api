@@ -146,6 +146,9 @@ module.exports.routes = {
   'GET /api/v1/admin/is-user-vendor-sales-manager/:vendorId': {
     action: 'admin/is-user-vendor-sales-manager',
   },
+  'GET /api/v1/admin/user-for-wallet-address': {
+    action: 'admin/get-user-for-wallet-address',
+  },
   'GET /api/v1/admin/is-user-vendor-owner/:vendorId': {
     action: 'admin/is-user-vendor-owner',
   },

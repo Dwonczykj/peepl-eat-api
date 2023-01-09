@@ -160,6 +160,9 @@
       "name": "Deregister User Vendor Role"
     },
     {
+      "name": "Get user for wallet address"
+    },
+    {
       "name": "Customer cancel order"
     },
     {
@@ -1881,6 +1884,16 @@
           "vendorConfirmed": {
             "type": "boolean",
             "default": false
+          },
+          "verified": {
+            "type": "boolean",
+            "default": false
+          },
+          "walletAddress": {
+            "type": "string",
+            "pattern": "^0x[a-fA-F0-9]{40}$|^$",
+            "default": "",
+            "description": "The blockchain wallet address for the user. Used to distribute payments from customers."
           },
           "fbUid": {
             "type": "string"
@@ -4687,6 +4700,16 @@
                 "none"
               ]
             }
+          },
+          {
+            "in": "query",
+            "name": "walletAddress",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^0x[a-fA-F0-9]{40}$|^$",
+              "default": ""
+            }
           }
         ],
         "responses": {
@@ -4861,6 +4884,73 @@
           },
           "404": {
             "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/user-for-wallet-address": {
+      "get": {
+        "summary": "Get user for wallet address",
+        "tags": [
+          "Get user for wallet address"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "walletAddress",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "example": {
+                        "isOwner": false,
+                        "vendorID": 0
+                      },
+                      "type": "object",
+                      "properties": {
+                        "isOwner": {
+                          "example": false,
+                          "type": "boolean"
+                        },
+                        "vendorID": {
+                          "example": 0,
+                          "type": "integer",
+                          "format": "int64"
+                        }
+                      },
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "You are not authenticated"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
           },
           "500": {
             "description": "Internal server error"

@@ -156,6 +156,8 @@ type _UserTypeHidden = {
   deliveryPartnerRole?: UserDeliveryPartnerRoleLiteral;
   roleConfirmedWithOwner: boolean;
   vendorConfirmed: boolean;
+  verified: boolean;
+  walletAddress: walletAddressString | '';
   fbUid?: string;
   firebaseSessionToken?: string;
 };

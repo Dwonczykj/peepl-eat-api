@@ -6,6 +6,7 @@ import {
   UserVendorRoleLiteral,
   UserType,
   DeliveryPartnerType,
+  walletAddressString,
 } from '../../../scripts/utils';
 import { sailsVegi, SailsModelType } from '../../interfaces/iSails';
 declare var sails: sailsVegi;
@@ -39,7 +40,7 @@ module.exports = {
     password: {
       type: 'string',
       required: false,
-      defaultsTo: ''
+      defaultsTo: '',
     },
     vendorId: {
       type: 'number',
@@ -74,6 +75,12 @@ module.exports = {
         'rider',
         'none',
       ] as Array<UserDeliveryPartnerRoleLiteral>,
+    },
+    walletAddress: {
+      type: 'string',
+      required: false,
+      regex: /^0x[a-fA-F0-9]{40}$|^$/,
+      defaultsTo: '',
     },
   },
 
@@ -116,6 +123,7 @@ module.exports = {
       roleConfirmedWithOwner?: boolean;
       deliveryPartnerId?: number;
       deliveryPartnerRole?: UserDeliveryPartnerRoleLiteral;
+      walletAddress: walletAddressString | "",
     },
     exits: {
       success: (unusedArg?: { updatedUserId: number }) => void;
@@ -136,27 +144,33 @@ module.exports = {
 
     const userToUpdate = await User.findOne({ email: inputs.email });
 
-    if (!userToUpdate){
+    if (!userToUpdate) {
       return exits.notFound();
-    }else if (!userToUpdate.fbUid) {
+    } else if (!userToUpdate.fbUid) {
       sails.log.warn(
         `User with email: ${userToUpdate.email} not linked to firebase account`
       );
       // return exits.notFound();
     }
 
-    if(userToUpdate.id !== myUser.id){
+    if (userToUpdate.id !== myUser.id) {
       const isSuperAdmin = await sails.helpers.isSuperAdmin.with({
-        userId: myUser.id
+        userId: myUser.id,
       });
-      if(!isSuperAdmin.data){
+      if (!isSuperAdmin.data) {
         return exits.unauthorised();
       }
     }
 
-    let updateUserObj: {[key in keyof UserType]?: UserType[key]} = {};
+    let updateUserObj: { [key in keyof UserType]?: UserType[key] } = {};
     if (Object.keys(inputs).includes('name')) {
       updateUserObj['name'] = inputs.name;
+    }
+    if (Object.keys(inputs).includes('walletAddress') && inputs.walletAddress) {
+      const walletAddressPattern = new RegExp(/^0x[a-fA-F0-9]{40}$/);
+      if (inputs.walletAddress.match(walletAddressPattern)) {
+        updateUserObj['walletAddress'] = inputs.walletAddress;
+      }
     }
     if (Object.keys(inputs).includes('role')) {
       updateUserObj['role'] = inputs.role;
@@ -229,20 +243,20 @@ module.exports = {
     await User.updateOne(userToUpdate.id).set(updateUserObj);
     //TODO: Update the user in admin
     var _userRecord: UserRecord;
-    if (userToUpdate.fbUid){
+    if (userToUpdate.fbUid) {
       try {
         _userRecord = await firebase.updateUser(
           userToUpdate.fbUid,
           inputs.password
             ? {
-              email: userToUpdate.email,
-              password: inputs.password,
-              name: inputs.name,
-            }
+                email: userToUpdate.email,
+                password: inputs.password,
+                name: inputs.name,
+              }
             : {
-              email: userToUpdate.email,
-              name: inputs.name,
-            }
+                email: userToUpdate.email,
+                name: inputs.name,
+              }
         );
       } catch (err) {
         sails.log.error(err);
@@ -258,7 +272,7 @@ module.exports = {
       const userRecord = _userRecord;
 
       await User.updateOne(userToUpdate.id).set({
-        fbUid: userRecord.uid
+        fbUid: userRecord.uid,
       });
     }
 
