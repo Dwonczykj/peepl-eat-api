@@ -1,4 +1,6 @@
 -- Run this script and run the migration: safe mode
+SET sql_safe_updates=0;
+SET sql_safe_updates=1;
 
 ALTER TABLE `vegi`.`deliverypartner` 
 ADD COLUMN `type` VARCHAR(255) NULL DEFAULT `bike` AFTER `status`,
