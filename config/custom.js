@@ -21,6 +21,8 @@ module.exports.custom = {
   internalPhoneNumber: '+1 000 0000000', // For support requests
   vegiWebSite: 'https://vegiapp.co.uk',
   vegiWebSiteJoinUs: 'https://vegiapp.co.uk/#join-vegi',
+  AppUriGooglePlayStore: 'https://play.google.com/store/apps/details?id=com.vegi.vegiapp&gl=GB',
+  AppUriAppleStore: 'https://apps.apple.com/app/id1608208174',
   buildNumber: 1,
   baseUrl: BASE_URL,
   peeplWebhookAddress: `${BASE_URL}/api/v1/orders/peepl-pay-webhook`,

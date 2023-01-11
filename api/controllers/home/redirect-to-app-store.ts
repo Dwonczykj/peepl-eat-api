@@ -1,3 +1,7 @@
+import { sailsVegi } from "../../../api/interfaces/iSails";
+
+declare var sails: sailsVegi;
+
 export type RedirectToAppStoreInput = {};
 
 export type RedirectToAppStoreResult = {
@@ -6,22 +10,26 @@ export type RedirectToAppStoreResult = {
     | `https://apps.apple.com/app/${string}`;
 };
 
-export const AppUriGooglePlayStore =
-  'https://play.google.com/store/apps/details?id=com.vegi.vegiapp&gl=GB';
-export const AppUriAppleStore = 'https://apps.apple.com/app/id1608208174';
+export const AppUriGooglePlayStore: 'https://play.google.com/store/apps/details?id=com.vegi.vegiapp&gl=GB' =
+  sails.config.custom.AppUriGooglePlayStore;
+export const AppUriAppleStore: 'https://apps.apple.com/app/id1608208174' =
+  sails.config.custom.AppUriAppleStore;
 
-export const IsMobileDevice = (r: { headers: { 'User-Agent': string } }) => {
-  const userAgent: string = r.headers['User-Agent'];
-  const appleDeviceName = 'iPhone|iPad|iPod';
-  const androidDeviceName = 'Android|webOS|BlackBerry|IEMobile|Opera Mini';
+export const IsMobileDevice = (r: { headers: { 'user-agent': string } }) => {
+  const userAgent: string = r.headers['user-agent'];
+  const appleDeviceName = /iPhone|iPad|iPod/;
+  const macDeviceName = /Mac\s*OS/;
+  const androidDeviceName = /Android|webOS|BlackBerry|IEMobile|Opera Mini/;
   return userAgent.match(androidDeviceName)
     ? 'android'
     : userAgent.match(appleDeviceName)
     ? 'apple'
+    : userAgent.match(macDeviceName)
+    ? 'web'
     : 'web';
 };
 
-export const getAppStoreUri = (r: { headers: { 'User-Agent': string } }) => {
+export const getAppStoreUri = (r: { headers: { 'user-agent': string } }) => {
   const device = IsMobileDevice(r);
   return device === 'android'
     ? AppUriGooglePlayStore
