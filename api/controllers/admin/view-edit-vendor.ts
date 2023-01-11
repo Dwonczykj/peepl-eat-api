@@ -1,9 +1,10 @@
-import { sailsVegi } from "../../../api/interfaces/iSails";
+import { AddressType, CategoryGroupType, DeliveryPartnerType, FulfilmentMethodType, PostalDistrictType, VendorType } from "../../../scripts/utils";
+import { SailsModelType, sailsVegi } from "../../../api/interfaces/iSails";
 
-declare var Vendor: any;
-declare var PostalDistrict: any;
-declare var DeliveryPartner: any;
-declare var CategoryGroup: any;
+declare var Vendor: SailsModelType<VendorType>;
+declare var PostalDistrict: SailsModelType<PostalDistrictType>;
+declare var DeliveryPartner: SailsModelType<DeliveryPartnerType>;
+declare var CategoryGroup: SailsModelType<CategoryGroupType>;
 declare var sails: sailsVegi;
 module.exports = {
 
@@ -51,16 +52,16 @@ module.exports = {
     }
 
     var products = await Product.find({
-      vendor: vendorid,      
-    }).populate('options&options.values');
+      vendor: vendorid,
+    }).populate('category&options&options.values');
 
     vendor.products = products;
 
-    var delFul = await Vendor.findOne(vendorid).populate(
+    var delFulVendor = await Vendor.findOne(vendorid).populate(
       'deliveryFulfilmentMethod&deliveryFulfilmentMethod.openingHours&fulfilmentOrigin'
     );
 
-    var colFul = await Vendor.findOne(vendorid).populate(
+    var colFulVendor = await Vendor.findOne(vendorid).populate(
       'collectionFulfilmentMethod&collectionFulfilmentMethod.openingHours'
     );
 
@@ -79,13 +80,14 @@ module.exports = {
         }
       });
       if(found){
-        postalDistrict.checked = true;
+        (postalDistrict as any).checked = true;
       }
     });
 
-    delFul = delFul.deliveryFulfilmentMethod;
+    var delFul = delFulVendor.deliveryFulfilmentMethod as FulfilmentMethodType;
 
-    colFul = colFul.collectionFulfilmentMethod;
+    var colFul =
+      colFulVendor.collectionFulfilmentMethod as FulfilmentMethodType;
 
     // Get a list of delivery partners
     var deliveryPartners = await DeliveryPartner.find({status: 'active'});
@@ -98,11 +100,11 @@ module.exports = {
         addressLineOne: '',
         addressLineTwo: '',
         addressTownCity: '',
-        addressPostCode: '',
+        addressPostCode: '' as AddressType['addressPostCode'],
         addressCountryCode: '',
         latitude: null,
         longitude: null,
-      };
+      } as AddressType;
     }
     if (!delFul.fulfilmentOrigin) {
       delFul.fulfilmentOrigin = {
@@ -113,7 +115,7 @@ module.exports = {
         addressCountryCode: vendor.pickupAddress.addressCountryCode,
         latitude: vendor.pickupAddress.latitude,
         longitude: vendor.pickupAddress.longitude,
-      };
+      } as AddressType;
     }
 
     // Respond with view or JSON.

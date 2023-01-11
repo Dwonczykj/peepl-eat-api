@@ -36,11 +36,7 @@ module.exports = {
   description: 'Post a like of the vegi platform',
 
   inputs: {
-    guid: {
-      type: 'string',
-      required: false,
-      defaultsTo: '',
-    },
+    
   },
 
   exits: {
@@ -50,10 +46,10 @@ module.exports = {
   },
 
   fn: async function (
-    // inputs: RedirectToAppStoreInput,
-    // exits: {
-    //   success: (unusedArg: RedirectToAppStoreResult) => void;
-    // }
+    inputs: RedirectToAppStoreInput,
+    exits: {
+      success: (unusedArg: RedirectToAppStoreResult) => void;
+    }
   ) {
     const request = this.req;
     const appUri = getAppStoreUri(request);

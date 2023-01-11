@@ -151,12 +151,30 @@
     <fieldset v-if="vendor.id">
       <h2 class="h5 mt-5">Products</h2>
 
-      <edit-product 
-        v-for="product in vendor.products" 
+      <div v-for="category in vendor.productCategories" class="product-category-container">        
+        <div class="my-3 p-3 p-md-4 rounded action-card">
+          <details>
+            <summary class="action-card__summary">
+              <h3>{{category.name}}</h3>
+            </summary>
+            <div class="action-card__content">
+              <edit-product 
+                v-for="product in vendor.products.filter(product => product.category.name === category.name)" 
+                :product="product" 
+                :productcategories="vendor.productCategories" 
+                :vendorid="vendor.id">
+              </edit-product>  
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- <edit-product 
+        v-for="product in vendor.products.filter(product => product.category)" 
         :product="product" 
         :productcategories="vendor.productCategories" 
         :vendorid="vendor.id">
-      </edit-product>
+      </edit-product> -->
 
       <div class="d-md-flex my-3 action-card-actions">
         <!-- <select class="form-control form-control-sm mr-3">

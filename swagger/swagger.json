@@ -2626,23 +2626,13 @@
       }
     },
     "/home/redirect-to-app-store": {
-      "post": {
+      "get": {
         "summary": "Post Like",
         "description": "Post a like of the vegi platform",
         "tags": [
           "Post Like"
         ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "guid",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": ""
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "Success"
