@@ -2594,6 +2594,37 @@
         }
       }
     },
+    "/home/like": {
+      "get": {
+        "summary": "Post Like",
+        "description": "Post a like of the vegi platform",
+        "tags": [
+          "Post Like"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "guid",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/home/redirect-to-app-store": {
       "post": {
         "summary": "Post Like",

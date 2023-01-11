@@ -48,8 +48,10 @@ module.exports = {
       headers: headers
     }).fetch();
 
-    
+    if(this.req.method === 'GET'){
+      await this.res.redirect(sails.config.custom.vegiWebSiteJoinUs);
+    }
     return exits.success({ like: likeInDB });
-    
+
   },
 };
