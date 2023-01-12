@@ -64,18 +64,19 @@ module.exports = {
         sails.config.custom.plivoAuthToken
       );
 
-      plivoClient.messages
-        .create({
-          text: inputs.body,
-          src: 'vegi',
-          dst: inputs.to,
-        })
-        .then((message) => {
-          return message.sid;
-        })
-        .catch((err) => {
-          throw new Error(err.message);
-        });
+      try {
+        await plivoClient.messages
+          .create({
+            text: inputs.body,
+            src: 'vegi',
+            dst: inputs.to, // phone numbers in E.164 format (for example, +12025551234)
+          }).then((response) => {
+            sails.log.info(`Plivo SMS Client [to:${inputs.to}] -> ${response}`);
+            return response;
+          });
+      } catch (err) {
+        sails.log.error(err.message);
+      }
     } else if(sails.config.custom.twilioSID && sails.config.custom.twilioAuthToken){
       const twilioClient = new twilio(
         sails.config.custom.twilioSID,

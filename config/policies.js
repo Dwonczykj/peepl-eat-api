@@ -38,6 +38,7 @@ module.exports.policies = {
   'admin/get-survey-questions': true,
   'admin/submit-survey-response': true,
   'admin/register-email-to-waiting-list': true,
+  'admin/send-sms': 'is-super-admin', // ! only super-admins
   'admin/signup-with-password': ['firebase'],
   'admin/view-signup': true,
   'admin/view-create-vendor': 'is-super-admin',

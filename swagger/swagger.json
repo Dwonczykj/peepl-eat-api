@@ -235,6 +235,9 @@
       "name": "Register Email to Waiting List"
     },
     {
+      "name": "Send SMS"
+    },
+    {
       "name": "Get Survey Questions"
     },
     {
@@ -7151,6 +7154,67 @@
             "schema": {
               "type": "boolean",
               "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "A user is already registered to the details requested"
+                    },
+                    {
+                      "example": {},
+                      "type": "object",
+                      "properties": {},
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Server error"
+          },
+          "401": {
+            "description": "firebase errored on verifying the user token"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/send-sms": {
+      "post": {
+        "summary": "Send SMS",
+        "tags": [
+          "Send SMS"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "toPhone",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "message",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],

@@ -238,6 +238,9 @@ module.exports.routes = {
   'POST /api/v1/admin/register-email-to-waiting-list': {
     action: 'admin/register-email-to-waiting-list',
   },
+  'POST /api/v1/admin/send-sms': {
+    action: 'admin/send-sms',
+  },
   'GET /api/v1/admin/get-survey-questions': {
     action: 'admin/get-survey-questions',
   },
