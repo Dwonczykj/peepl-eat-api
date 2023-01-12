@@ -299,9 +299,10 @@ parasails.registerPage('login', {
         this.preventNextIteration = false;
         return;
       }
-      this.phoneNoCountryNoFormat = this.phoneNoCountry.match(/\d/g)
-        ? this.phoneNoCountry.replace(/-/g, '').match(/([1-9]\d{0,9})/g)[0]
-        : '';
+      
+      const _x = this.phoneNoCountry.replace(/-/g, '').match(/([1-9]\d{0,9})/g);
+      this.phoneNoCountryNoFormat =
+        this.phoneNoCountry.match(/\d/g) && _x ? _x[0] : '';
 
       // Format display value based on calculated currencyValue
       this.phoneNoCountry = this.phoneNoCountryNoFormat
