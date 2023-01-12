@@ -72,7 +72,7 @@ module.exports = {
     try {
       await WaitingList.create({
         email: inputs.emailAddress,
-        type: inputs.userType,
+        userType: inputs.userType,
         origin: inputs.origin,
       });
     } catch (error) {

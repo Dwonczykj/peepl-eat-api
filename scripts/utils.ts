@@ -483,7 +483,7 @@ export type WaitingListEntryType = {
   id: number;
   email: string;
   origin: 'mobile' | 'vegiapp.co.uk' | 'guide' | 'leaflet' | 'instagram' | '',
-  userType: 'business' | 'unknown' | 'customer',
+  userType: 'business' | 'unknown' | 'customer' | 'consumer',
 };
 
 export type OrderItemType = _OrderItemTypeHidden & {

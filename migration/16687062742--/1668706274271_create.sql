@@ -35,6 +35,8 @@ CREATE TABLE `waitinglist` (
   `updatedAt` bigint DEFAULT NULL,
   `id` int NOT NULL AUTO_INCREMENT,
   `email` varchar(255) DEFAULT '',
+  `userType` varchar(50) DEFAULT '',
+  `origin` varchar(50) DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
