@@ -183,10 +183,18 @@ module.exports = {
       // If that's the case, or if we're in the "test" environment, then log
       // the email instead of sending it:
       const newNotification = await Notification.create({
+        // recipient: 'dummy',
+        // title: 'subject',
+        // order: 1,
         recipient: to,
+        title: subject,
+        // order: null,
         type: 'email',
         sentAt: Date.now(),
-        title: subject,
+        metadata: JSON.stringify({
+          model: '',
+          id: null,
+        }),
       }).fetch();
       result.notification = newNotification;
 
@@ -272,7 +280,7 @@ module.exports = {
                   },
                   { depth: null }
                 ) +
-                '\n',
+                '\n Review https://stackoverflow.com/a/37528929 if SES might be in sandbox mode...\n',
               'Error details:\n' + util.inspect(err)
             );
           });

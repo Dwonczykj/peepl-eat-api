@@ -48,6 +48,8 @@ module.exports = {
       model: 'order',
       description:
         'the linked order if there was an order linked to this notification (nullable)',
+      // required: false,
+      // defaultsTo: null,
     },
   },
 
