@@ -52,6 +52,9 @@
       "name": "Post Like"
     },
     {
+      "name": "vegi app link"
+    },
+    {
       "name": "View orders"
     },
     {
@@ -1803,6 +1806,7 @@
               "email",
               "phoneNoCountry",
               "phoneCountryCode",
+              "marketingPushContactAllowed",
               "name",
               "role"
             ]
@@ -1839,6 +1843,24 @@
           "phoneCountryCode": {
             "type": "number",
             "format": "double"
+          },
+          "marketingPushContactAllowed": {
+            "type": "number",
+            "format": "double"
+          },
+          "marketingEmailContactAllowed": {
+            "type": "boolean",
+            "default": false
+          },
+          "marketingPhoneContactAllowed": {
+            "type": "boolean",
+            "default": false
+          },
+          "marketingNotificationUtility": {
+            "type": "integer",
+            "format": "int64",
+            "default": 0,
+            "minimum": -1
           },
           "name": {
             "type": "string"
@@ -2630,12 +2652,22 @@
     },
     "/home/redirect-to-app-store": {
       "get": {
-        "summary": "Post Like",
-        "description": "Post a like of the vegi platform",
+        "summary": "vegi app link",
+        "description": "Redirect to the vegi app link",
         "tags": [
-          "Post Like"
+          "vegi app link"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "forDevice",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success"
@@ -4733,6 +4765,40 @@
               "type": "string",
               "pattern": "^0x[a-fA-F0-9]{40}$|^$",
               "default": ""
+            }
+          },
+          {
+            "in": "query",
+            "name": "marketingEmailContactAllowed",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "marketingPhoneContactAllowed",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "marketingPushContactAllowed",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "marketingNotificationUtility",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "minimum": -1
             }
           }
         ],

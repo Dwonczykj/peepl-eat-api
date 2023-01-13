@@ -22,16 +22,51 @@
                     :class="{ 'is-invalid': formErrors.email }" class="form-control">
             </div>
             <div class="form-group">
-              <label for="name">Update Password for {{user.name}}</label>
+              <label for="password">Update Password for {{user.name}}</label>
               <input
                 type="password" class="form-control"
+                id="password"
                 placeholder="set new password"
                 :class="[formErrors.password ? 'is-invalid' : '']"
                 v-model.trim="user.password">
               <div class="invalid-feedback" v-if="formErrors.password">Please enter your password.</div>
             </div>
+            
+            <h2 class="h5">Marketing Preferences</h2>
+            <div class="form-group">
+              <label for="marketingEmailContactAllowed">Email Communication Allowed</label>
+              <input
+                type="checkbox" class="form-control"
+                id="marketingEmailContactAllowed"
+                v-model="user.marketingEmailContactAllowed">
+            </div>
+            <div class="form-group">
+              <label for="marketingPhoneContactAllowed">Phone Communication Allowed</label>
+              <input
+                type="checkbox" class="form-control"
+                id="marketingPhoneContactAllowed"
+                v-model="user.marketingPhoneContactAllowed">
+            </div>
+            <div class="form-group">
+              <label for="marketingPushContactAllowed">Phone Communication Allowed</label>
+              <input
+                type="checkbox" class="form-control"
+                id="marketingPushContactAllowed"
+                v-model="user.marketingPushContactAllowed">
+            </div>
+            <div class="form-group">
+              <label for="marketingNotificationUtility">Notification Utility</label>
+              <select class="form-control" id="marketingNotificationUtility" v-model="user.marketingNotificationUtility" >
+                  <option value=-1>None</option>
+                  <option value=0>Minimal</option>
+                  <option value=1>Order Updates</option>
+                  <option value=2>All</option>
+              </select>
+            </div>
+
             <ajax-button class="btn btn-peepl mt-4" :class="{ 'is-loading': syncing }" @click="clickUpdateAccountDetails()" type="submit" :syncing="syncing">
                 Update Details</ajax-button>
+                
             <div v-if="cloudError === 'badVerificationCode'" class="alert alert-danger mt-4 hidden" role="alert">
                 Please ensure verification code is 6 digits: '123456'
             </div>
@@ -87,7 +122,7 @@
                                                                     There has been an error updating your account details.
                                                                 </div>
                                                             </ajax-form> -->
-                <div>
+                <div class="m-0">
                     <p>Placeholder for managing users registered to this vendor.</p>
                 </div>
             </div>
@@ -129,7 +164,7 @@
                                                             There has been an error updating your account details.
                                                         </div>
                                                     </ajax-form> -->
-                <div>
+                <div class="mt-4">
                     <p>Placeholder for managing users registered to this delivery partner.</p>
                 </div>
             </div>

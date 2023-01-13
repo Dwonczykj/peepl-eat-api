@@ -179,6 +179,10 @@ Cloud.setup({
         'vendorConfirmed',
         'deliveryPartnerId',
         'deliveryPartnerRole',
+        'marketingEmailContactAllowed',
+        'marketingPhoneContactAllowed',
+        'marketingPushContactAllowed',
+        'marketingNotificationUtility',
       ],
     },
     userExistsForPhone: {

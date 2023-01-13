@@ -82,6 +82,23 @@ module.exports = {
       regex: /^0x[a-fA-F0-9]{40}$|^$/,
       defaultsTo: '',
     },
+    marketingEmailContactAllowed: {
+      type: 'boolean',
+      required: true,
+    },
+    marketingPhoneContactAllowed: {
+      type: 'boolean',
+      required: true,
+    },
+    marketingPushContactAllowed: {
+      type: 'boolean',
+      required: true,
+    },
+    marketingNotificationUtility: {
+      type: 'number',
+      min: -1,
+      required: true,
+    },
   },
 
   exits: {
@@ -123,7 +140,11 @@ module.exports = {
       roleConfirmedWithOwner?: boolean;
       deliveryPartnerId?: number;
       deliveryPartnerRole?: UserDeliveryPartnerRoleLiteral;
-      walletAddress: walletAddressString | "",
+      walletAddress: walletAddressString | '';
+      marketingEmailContactAllowed: boolean;
+      marketingPhoneContactAllowed: boolean;
+      marketingPushContactAllowed: boolean;
+      marketingNotificationUtility: UserType['marketingNotificationUtility'];
     },
     exits: {
       success: (unusedArg?: { updatedUserId: number }) => void;
@@ -175,6 +196,14 @@ module.exports = {
     if (Object.keys(inputs).includes('role')) {
       updateUserObj['role'] = inputs.role;
     }
+    updateUserObj['marketingEmailContactAllowed'] =
+      inputs.marketingEmailContactAllowed || false;
+    updateUserObj['marketingPhoneContactAllowed'] =
+      inputs.marketingPhoneContactAllowed || false;
+    updateUserObj['marketingPushContactAllowed'] =
+      inputs.marketingPushContactAllowed || false;
+    updateUserObj['marketingNotificationUtility'] =
+      inputs.marketingNotificationUtility || -1;
 
     // Set user.vendor
     if (Object.keys(inputs).includes('vendorId')) {

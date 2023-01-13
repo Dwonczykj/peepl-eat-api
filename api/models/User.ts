@@ -21,13 +21,32 @@ module.exports = {
     },
     phoneNoCountry: {
       type: 'number',
-      // unique: true,
       required: true,
     },
     phoneCountryCode: {
       type: 'number',
-      // unique: true,
       required: true,
+    },
+    marketingPushContactAllowed: {
+      type: 'number',
+      required: true,
+    },
+    marketingEmailContactAllowed: {
+      type: 'boolean',
+      required: false,
+      defaultsTo: false,
+    },
+    marketingPhoneContactAllowed: {
+      type: 'boolean',
+      required: false,
+      defaultsTo: false,
+    },
+    marketingNotificationUtility: {
+      type: 'number',
+      required: false,
+      columnType: 'INT',
+      defaultsTo: 0,
+      min: -1,
     },
     // password: {
     //   type: "string",
@@ -148,6 +167,11 @@ module.exports = {
     // } catch (err) {
     //   throw err;
     // }
+
+    userDraft.marketingNotificationUtility = Math.round(Math.max(
+      -1,
+      userDraft.marketingNotificationUtility
+    ));
 
     const existingUser = await User.findOne({
       phoneNoCountry: userDraft.phoneNoCountry,

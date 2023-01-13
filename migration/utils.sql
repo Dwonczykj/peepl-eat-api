@@ -2,6 +2,13 @@ SET @tablename = 'orderitem';
 SET @prod_db_name = 'vegiprod';
 SET @dev_db_name = 'vegidev';
 
+SELECT 
+	FROM_UNIXTIME(ROUND(t.updatedAt / 1000), '%Y %D %M %h:%i:%s %x') as UpdatedAtDate,
+    CURRENT_TIMESTAMP() as ctime, UNIX_TIMESTAMP(CURRENT_TIMESTAMP()) as cUtime, 
+    ROUND(t.updatedAt / 1000) as convTStamp,
+	t.* 
+    from vegi.user as t;
+
 SELECT dev.table_name, dev.column_name, dev.column_type, dev.is_nullable
 FROM information_schema.columns as dev
 WHERE dev.table_name = @tablename and dev.TABLE_SCHEMA = @dev_db_name

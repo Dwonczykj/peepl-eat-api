@@ -160,6 +160,10 @@ type _UserTypeHidden = {
   walletAddress: walletAddressString | '';
   fbUid?: string;
   firebaseSessionToken?: string;
+  marketingEmailContactAllowed: boolean;
+  marketingPhoneContactAllowed: boolean;
+  marketingPushContactAllowed: boolean;
+  marketingNotificationUtility: -1 | 0 | 1 | 2;
 };
 
 export type VendorTypeLiteral = 'restaurant' | 'shop';

@@ -61,7 +61,7 @@ module.exports = {
   inputs: {
     forDevice: {
       type: 'string',
-      required: 'false',
+      required: false,
       defaultsTo: '',
     }
   },
