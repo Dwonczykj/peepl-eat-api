@@ -64,14 +64,14 @@ module.exports = {
       url: sails.config.custom.coopcycleUrl + '/oauth2/token',
       auth: {
         username: 'b8836e8d6ebb19ef277f02da9ec32e58',
-        password: '191f1c9a6593b48b166ae089b661237d3c7137d722edf41aecb070a9b7a6b8a6b73151a8336574440d683c2406f2d9ad7d50951bc9da0c742f17c59ac720b2e8'
+        password:
+          '191f1c9a6593b48b166ae089b661237d3c7137d722edf41aecb070a9b7a6b8a6b73151a8336574440d683c2406f2d9ad7d50951bc9da0c742f17c59ac720b2e8',
       },
       data: {
-        'grant_type': 'client_credentials',
-        'scope': 'deliveries'
-      }
-    })
-    .catch((err)=> {
+        grant_type: 'client_credentials',
+        scope: 'deliveries',
+      },
+    }).catch((err) => {
       sails.log.warn(err);
     });
 
@@ -79,12 +79,43 @@ module.exports = {
     var client = axios.create({
       baseURL: sails.config.custom.coopcycleUrl,
       timeout: 5000,
-      headers: {'Authorization': 'Bearer ' + jwtRequest.data.access_token, 'Content-Type': 'application/ld+json'}
+      headers: {
+        Authorization: 'Bearer ' + jwtRequest.data.access_token,
+        'Content-Type': 'application/ld+json',
+      },
     });
 
     // TODO: Work out the best way to send dates and times.
-    var deliverBefore = moment.unix(inputs.deliverBefore).calendar();
-    var deliverAfter = moment.unix(inputs.deliverAfter).calendar();
+    var deliverBefore = moment.unix(inputs.deliverBefore).calendar(null, {
+      lastDay: '[Yesterday]',
+      // sameDay: '[Today]',
+      sameDay: function (now) {
+        if (this.isBefore(now)) {
+          return '[Will Happen Today]';
+        } else {
+          return '[Happened Today]';
+        }
+      },
+      nextDay: '[Tomorrow]',
+      lastWeek: '[last] dddd',
+      nextWeek: 'dddd',
+      sameElse: 'DD/MM/YYYY', // ~ https://momentjs.com/docs/#/displaying/calendar-time/
+    }); // ~ https://stackoverflow.com/a/41260094
+    var deliverAfter = moment.unix(inputs.deliverAfter).calendar(null, {
+      lastDay: '[Yesterday]',
+      // sameDay: '[Today]',
+      sameDay: function (now) {
+        if (this.isBefore(now)) {
+          return '[Will Happen Today]';
+        } else {
+          return '[Happened Today]';
+        }
+      },
+      nextDay: '[Tomorrow]',
+      lastWeek: '[last] dddd',
+      nextWeek: 'dddd',
+      sameElse: 'DD/MM/YYYY', // ~ https://momentjs.com/docs/#/displaying/calendar-time/
+    }); // ~ https://stackoverflow.com/a/41260094
 
     var requestBody = {
       pickup: {
@@ -97,20 +128,21 @@ module.exports = {
           contactName: inputs.deliveryContactName,
           telephone: inputs.deliveryPhoneNumber,
           comments: inputs.deliveryComments,
-          streetAddress: `${inputs.deliveryAddressLineOne}, ${inputs.deliveryAddressLineTwo}, ${inputs.deliveryAddressCity}, ${inputs.deliveryAddressPostCode}`
+          streetAddress: `${inputs.deliveryAddressLineOne}, ${inputs.deliveryAddressLineTwo}, ${inputs.deliveryAddressCity}, ${inputs.deliveryAddressPostCode}`,
         },
         before: deliverBefore,
-        after: deliverAfter
-      }
+        after: deliverAfter,
+      },
     };
 
     // Send the delivery information to Coopcycle
-    var response = await client.post('/api/deliveries', requestBody)
-    .catch((err) => {
-      sails.log.info('Error creating the delivery.');
-      sails.log.warn(err);
-    });
+    var response = await client
+      .post('/api/deliveries', requestBody)
+      .catch((err) => {
+        sails.log.info('Error creating the delivery.');
+        sails.log.warn(err);
+      });
 
-    return exits.success({id: response.data.id});
+    return exits.success({ id: response.data.id });
   }
 };

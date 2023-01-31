@@ -124,14 +124,44 @@ parasails.registerComponent('order-card', {
       if (!dateTime) {
         return '';
       }
-      dateTime = moment(dateTime).utc().calendar();
+      dateTime = moment(dateTime)
+        .utc()
+        .calendar(null, {
+          lastDay: '[Yesterday]',
+          // sameDay: '[Today]',
+          sameDay: function (now) {
+            if (this.isBefore(now)) {
+              return '[Will Happen Today]';
+            } else {
+              return '[Happened Today]';
+            }
+          },
+          nextDay: '[Tomorrow]',
+          lastWeek: '[last] dddd',
+          nextWeek: 'dddd',
+          sameElse: 'DD/MM/YYYY', // ~ https://momentjs.com/docs/#/displaying/calendar-time/
+        }); // ~ https://stackoverflow.com/a/41260094
       return dateTime;
     },
     formatOrderedTime: function (unixtime) {
       if (!unixtime) {
         return '';
       }
-      unixtime = moment.unix(Math.round(unixtime / 1000)).calendar();
+      unixtime = moment.unix(Math.round(unixtime / 1000)).calendar(null, {
+        lastDay: '[Yesterday]',
+        // sameDay: '[Today]',
+        sameDay: function (now) {
+          if (this.isBefore(now)) {
+            return '[Will Happen Today]';
+          } else {
+            return '[Happened Today]';
+          }
+        },
+        nextDay: '[Tomorrow]',
+        lastWeek: '[last] dddd',
+        nextWeek: 'dddd',
+        sameElse: 'DD/MM/YYYY', // ~ https://momentjs.com/docs/#/displaying/calendar-time/
+      }); // ~ https://stackoverflow.com/a/41260094
       return unixtime;
     },
   },

@@ -1,21 +1,21 @@
 import { sailsModelKVP, SailsModelType } from "../../../api/interfaces/iSails";
-import { UserType, walletAddressString } from "../../../scripts/utils";
+import { AccountType, walletAddressString } from "../../../scripts/utils";
 
-declare var User: SailsModelType<UserType>;
+declare var Account: SailsModelType<AccountType>;
 
-type GetUserForWalletInput = {
+type GetAccountForWalletInput = {
   walletAddress:walletAddressString;
 }
 
-type GetUserForWalletOutput = {
-  success: (unusedUser: sailsModelKVP<UserType> | {}) => void;
+type GetAccountForWalletOutput = {
+  success: (unusedUser: sailsModelKVP<AccountType> | {}) => void;
   badFormat: () => void;
 };
 
 module.exports = {
 
 
-  friendlyName: 'Get user for wallet address',
+  friendlyName: 'Get account for wallet address',
 
 
   description: '',
@@ -31,10 +31,10 @@ module.exports = {
 
   exits: {
     success: {
-      outputDescription: '`User`s vendor role status',
+      
       outputExample: {
-        isOwner: false,
-        vendorID: 0,
+        walletAddress: '0x13948y143adfaerf9r5',
+        verified: false,
       }
     },
     unauthorised: {
@@ -53,21 +53,21 @@ module.exports = {
   },
 
 
-  fn: async function (inputs: GetUserForWalletInput, exits: GetUserForWalletOutput) {
+  fn: async function (inputs: GetAccountForWalletInput, exits: GetAccountForWalletOutput) {
     const walletAddressPattern = new RegExp(/^0x[a-fA-F0-9]{40}$/);
     if(!inputs.walletAddress.match(walletAddressPattern)){
       return exits.badFormat();
     }
     
-    const user = await User.findOne({
+    const account = await Account.findOne({
       walletAddress: inputs.walletAddress,
     });
 
-    if (!user) {
+    if (!account) {
       return exits.success({});
     }
 
-    return exits.success(user);
+    return exits.success(account);
 
   }
 

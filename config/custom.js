@@ -21,7 +21,8 @@ module.exports.custom = {
   internalPhoneNumber: '+1 000 0000000', // For support requests
   vegiWebSite: 'https://vegiapp.co.uk',
   vegiWebSiteJoinUs: 'https://vegiapp.co.uk/#join-vegi',
-  AppUriGooglePlayStore: 'https://play.google.com/store/apps/details?id=com.vegi.vegiapp&gl=GB',
+  AppUriGooglePlayStore:
+    'https://play.google.com/store/apps/details?id=com.vegi.vegiapp&gl=GB',
   AppUriAppleStore: 'https://apps.apple.com/app/id1608208174',
   buildNumber: 1,
   baseUrl: BASE_URL,
@@ -33,6 +34,7 @@ module.exports.custom = {
   pplRewardsPoolAddress: '0x29249e06e8D3e4933cc403AB73136e698a08c38b',
   coopcycleUrl: 'https://agile-delivery.coopcycle.org',
   peeplPayUrl: 'https://pay.itsaboutpeepl.com/api/v1',
+  vegiScoreApi: 'https://api.sustained.com/choice/v1',
   placesApiKey: '', //*in local.js
   googleApiBaseUrl: 'https://maps.googleapis.com/maps/api/',
   placesApiRelUrlFindPlace: 'place/findplacefromtext/json', // ~ https://googlemaps.github.io/google-maps-services-js/modules/_places_findplacefromtext_.html#:~:text=Const-,defaultUrl,-defaultUrl%3A
@@ -48,6 +50,7 @@ module.exports.custom = {
   requestDeliveryAvailability: false, // * This if true, checks if there is a courier available before asking vendor to fulfil. Only works when vendors have automated fulfilment processes.
   ignoreSpecialDatesMoreThanXMonthsAway: 12,
   ongoingOrdersHoursCutoff: 5,
+  escRatingsTTLDays: 14, 
   storageDomains: [],
 
   /**************************************************************************

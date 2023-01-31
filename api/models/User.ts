@@ -87,21 +87,6 @@ module.exports = {
       type: 'boolean',
       defaultsTo: false,
     },
-    verified: {
-      type: 'boolean',
-      defaultsTo: false,
-    },
-    walletAddress: {
-      type: 'string',
-      description:
-        'The blockchain wallet address for the user. Used to distribute payments from customers.',
-      required: false,
-      regex: /^0x[a-fA-F0-9]{40}$|^$/,
-      defaultsTo: '',
-    },
-    // firebaseUser: { // https://sailsjs.com/documentation/concepts/models-and-orm/attributes#:~:text=%23-,Type,-%23
-    //   type: 'json', // https://sailsjs.com/documentation/concepts/models-and-orm/associations
-    // }
     fbUid: {
       type: 'string',
     },

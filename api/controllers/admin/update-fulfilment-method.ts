@@ -1,7 +1,8 @@
 import { sailsModelKVP, SailsModelType } from '../../../api/interfaces/iSails';
-import { AddressType, FulfilmentMethodType, OpeningHoursType, TimeHourString } from "../../../scripts/utils";
+import { AddressType, FulfilmentMethodType, OpeningHoursType, TimeHourString, VendorType } from "../../../scripts/utils";
 
 declare var Address: SailsModelType<AddressType>;
+declare var Vendor: SailsModelType<VendorType>;
 declare var FulfilmentMethod: SailsModelType<FulfilmentMethodType>;
 
 export type UpdateFulfilmentMethodInputs = {
@@ -14,6 +15,8 @@ export type UpdateFulfilmentMethodInputs = {
   maxOrders: number;
   maxDeliveryDistance: number;
   fulfilmentOrigin: AddressType;
+  vendor?: number | null;
+  deliveryPartner?: number | null;
 };
 
 export type UpdateFulfilmentMethodResult = {
@@ -69,12 +72,25 @@ module.exports = {
       description:
         'The fulfilment origin address to calculate max distance from.',
     },
+    deliveryPartner: {
+      type: 'number',
+      required: false,
+      allowNull: true,
+    },
+    vendor: {
+      type: 'number',
+      required: false,
+      allowNull: true,
+    },
   },
 
   exits: {
     success: {
       outputDescription: 'The updated opening hours',
       outputExample: {},
+    },
+    badInput: {
+      statusCode: 400,
     },
   },
 
@@ -84,6 +100,7 @@ module.exports = {
       success: (
         unusedArg: UpdateFulfilmentMethodResult
       ) => UpdateFulfilmentMethodResult;
+      badInput: (unusedArg: string) => void;
     }
   ) {
     // Todo: Authorise this request
@@ -92,6 +109,8 @@ module.exports = {
       lat: 0, //inputs.fulfilmentOriginLatitude,
       lng: 0, //inputs.fulfilmentOriginLongitude,
     };
+
+    const _fm = await FulfilmentMethod.findOne(inputs.id);
 
     if (
       inputs.fulfilmentOrigin &&
@@ -112,9 +131,25 @@ module.exports = {
       } catch (error) {
         sails.log.error(error);
       }
+    } else if(inputs.vendor){
+      
+      const populateMethod = `${_fm.methodType}FulfilmentMethod&${_fm.methodType}FulfilmentMethod.fulfilmentOrigin`;
+      const vendor = await Vendor.findOne(inputs.vendor).populate(
+        // populateMethod
+        'pickupAddress'
+      );
+      // const vFm: FulfilmentMethodType = vendor[populateMethod];
+      // assign vendors Pickup address to fulfilmentOrigin as was empty
+      inputs.fulfilmentOrigin = vendor.pickupAddress;
+      coordinates = {
+        lat: vendor.pickupAddress.latitude,
+        lng: vendor.pickupAddress.longitude,
+      };
+    } else {
+      return exits.badInput(`Request failed to include a valid address. Check lineOne and postcode`);
     }
 
-    const _fm = await FulfilmentMethod.findOne(inputs.id);
+    
     let existingAddress: sailsModelKVP<AddressType>;
     if(_fm){
       existingAddress = await Address.findOne(
@@ -144,12 +179,12 @@ module.exports = {
         },
         ...(_fm && _fm.vendor
           ? {
-              vendor: _fm.vendor,
-            }
+            vendor: _fm.vendor,
+          }
           : _fm && _fm.deliveryPartner
           ? {
-              deliveryPartner: _fm.deliveryPartner,
-            } : {}),
+            deliveryPartner: _fm.deliveryPartner,
+          } : {}),
       }).fetch();
     } else {
       await Address.update(existingAddress.id).set({

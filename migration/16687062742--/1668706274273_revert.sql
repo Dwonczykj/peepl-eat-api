@@ -41,3 +41,7 @@ DROP COLUMN `productBarCode`
 
 DROP TABLE `vegi`.`survey`;
 DROP TABLE `vegi`.`waitinglist`;
+DROP TABLE `vegi`.`like`;
+DROP TABLE `vegi`.`escrating`;
+DROP TABLE `vegi`.`escexplanation`;
+DROP TABLE `vegi`.`account`;

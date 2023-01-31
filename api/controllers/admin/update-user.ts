@@ -7,11 +7,13 @@ import {
   UserType,
   DeliveryPartnerType,
   walletAddressString,
+  AccountType,
 } from '../../../scripts/utils';
 import { sailsVegi, SailsModelType } from '../../interfaces/iSails';
 declare var sails: sailsVegi;
 declare var DeliveryPartner: SailsModelType<DeliveryPartnerType>;
 declare var User: SailsModelType<UserType>;
+declare var Account: SailsModelType<AccountType>;
 
 module.exports = {
   friendlyName: 'Update User Vendor Role',
@@ -187,12 +189,7 @@ module.exports = {
     if (Object.keys(inputs).includes('name')) {
       updateUserObj['name'] = inputs.name;
     }
-    if (Object.keys(inputs).includes('walletAddress') && inputs.walletAddress) {
-      const walletAddressPattern = new RegExp(/^0x[a-fA-F0-9]{40}$/);
-      if (inputs.walletAddress.match(walletAddressPattern)) {
-        updateUserObj['walletAddress'] = inputs.walletAddress;
-      }
-    }
+    
     if (Object.keys(inputs).includes('role')) {
       updateUserObj['role'] = inputs.role;
     }
@@ -270,6 +267,18 @@ module.exports = {
     }
 
     await User.updateOne(userToUpdate.id).set(updateUserObj);
+    if (Object.keys(inputs).includes('walletAddress') && inputs.walletAddress) {
+      const walletAddressPattern = new RegExp(/^0x[a-fA-F0-9]{40}$/);
+      if (inputs.walletAddress.match(walletAddressPattern)) {
+        const existingAccount = await Account.findOne({walletAddress: inputs.walletAddress});
+        if (!existingAccount){
+          await Account.create({
+            verified: false,
+            walletAddress: inputs.walletAddress,
+          });
+        }
+      }
+    }
     //TODO: Update the user in admin
     var _userRecord: UserRecord;
     if (userToUpdate.fbUid) {

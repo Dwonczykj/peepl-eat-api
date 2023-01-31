@@ -55,19 +55,19 @@ module.exports = {
     }
     const deliveryPartner = _deliveryPartner;
 
-    const deliveryFMIds: Array<FulfilmentMethodType> = [];
+    const deliveryFMs: Array<FulfilmentMethodType> = [];
     if (vendor.deliveryFulfilmentMethod) {
       // eligibleDeliveryDates = await sails.helpers.getAvailableDates(vendor.deliveryFulfilmentMethod.id);
-      deliveryFMIds.push(vendor.deliveryFulfilmentMethod);
+      deliveryFMs.push(vendor.deliveryFulfilmentMethod);
     }
 
     if (deliveryPartner && deliveryPartner.deliveryFulfilmentMethod) {
-      deliveryFMIds.push(deliveryPartner.deliveryFulfilmentMethod);
+      deliveryFMs.push(deliveryPartner.deliveryFulfilmentMethod);
     }
 
     return exits.success({
       collection: [vendor.collectionFulfilmentMethod],
-      delivery: deliveryFMIds,
+      delivery: deliveryFMs,
     });
   },
 };

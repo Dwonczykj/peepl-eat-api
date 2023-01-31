@@ -45,6 +45,7 @@ module.exports.datastores = {
     *    (See https://sailsjs.com/config/datastores for help.)                 *
     *                                                                          *
     ***************************************************************************/
+    // * add the below to your local.js to use:
     // adapter: 'sails-mysql',
     // url: 'mysql://user:password@host:port/database',
   },

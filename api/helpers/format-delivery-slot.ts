@@ -28,8 +28,24 @@ module.exports = {
   fn: function (inputs, exits) {
     const moment = require('moment');
 
-    if (!inputs.value) {return exits.success('');}
-    inputs.value = moment.unix(inputs.value).calendar();
+    if (!inputs.value) {
+      return exits.success('');
+    }
+    inputs.value = moment.unix(inputs.value).calendar(null, {
+      lastDay: '[Yesterday]',
+      // sameDay: '[Today]',
+      sameDay: function (now) {
+        if (this.isBefore(now)) {
+          return '[Will Happen Today]';
+        } else {
+          return '[Happened Today]';
+        }
+      },
+      nextDay: '[Tomorrow]',
+      lastWeek: '[last] dddd',
+      nextWeek: 'dddd',
+      sameElse: 'DD/MM/YYYY', // ~ https://momentjs.com/docs/#/displaying/calendar-time/
+    }); // ~ https://stackoverflow.com/a/41260094
     return exits.success(inputs.value);
 
     // var start = new Date( inputs.deliverySlot.startTime * 1000 );

@@ -113,6 +113,9 @@ parasails.registerComponent('openingHours', {
           <input type="time" id="orderCutoff" v-model="fulfilmentMethod.orderCutoff">
         </div>
         <ajax-button class="btn btn-peepl mt-4" type="submit" :syncing="syncing" v-bind:class="{ 'is-loading': syncing }">Save changes</ajax-button>
+        <div v-if="cloudError === 'badInput'" class="alert alert-danger mt-4" role="alert">
+          Check Address & other inputs are complete!
+        </div>
     </ajax-form>
     `,
 

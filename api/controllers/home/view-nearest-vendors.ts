@@ -1,16 +1,18 @@
-import { AddressType } from '../../../scripts/utils';
-import { sailsModelKVP, sailsVegi } from "../../../api/interfaces/iSails";
+import { AddressType, FulfilmentMethodType, VendorType } from '../../../scripts/utils';
+import { sailsModelKVP, SailsModelType, sailsVegi } from "../../../api/interfaces/iSails";
 import { Coordinate } from "../../../scripts/google-maps";
 
 declare var sails: sailsVegi;
+declare var FulfilmentMethod: SailsModelType<FulfilmentMethodType>;
 
 export type ViewNearestVendorInput = {
   location: { [unusedKey in keyof Coordinate]: string } | string;
-  distance: number;
+  distance?: number | null;
+  fulfilmentMethodType: FulfilmentMethodType['methodType'];
 };
 
 export type ViewNearestVendorResult = {
-  addresses: Array<sailsModelKVP<AddressType>>;
+  vendors: Array<VendorType>;
 };
 
 module.exports = {
@@ -26,8 +28,15 @@ module.exports = {
     },
     distance: {
       type: 'number',
-      required: true,
+      required: false,
+      description: 'the max distance to search for vendors from location in KM',
+      allowNull: true,
     },
+    fulfilmentMethodType: {
+      type: 'string',
+      isIn: ['delivery', 'collection'],
+      required: true,
+    }
   },
 
   exits: {
@@ -72,15 +81,33 @@ module.exports = {
     } else {
       return exits.badFormat('location arg must be formatted: "number,number"');
     }
-    const addresses = await sails.helpers.getVendorsInSphere.with({
+    const { vendors, distances } = await sails.helpers.getVendorsInSphere.with({
       origin: location,
-      radius: inputs.distance,
+      radiusMeters: inputs.distance && inputs.distance * 1000.0,
     });
+
+    const vendorCanFulfilLambda = async (vendor:VendorType) => {
+      if (inputs.fulfilmentMethodType === 'collection'){
+        return { [vendor.id]: true };
+      }
+      let dFM: { maxDeliveryDistance?: number } = vendor.deliveryFulfilmentMethod;
+      if (typeof(vendor.deliveryFulfilmentMethod) === 'number'){
+        dFM = await FulfilmentMethod.findOne(vendor.deliveryFulfilmentMethod);
+      }
+      if (dFM.maxDeliveryDistance && (dFM.maxDeliveryDistance * 1000.0) < distances[vendor.id]) {
+        return { [vendor.id]: false };
+      }
+      return { [vendor.id]: true };
+    };
+    const vendorsCanFulfilKVPs = await Promise.all(vendors.map(v => vendorCanFulfilLambda(v)));
+    const vendorsCanFulfil: {[x: number]: boolean;} = Object.assign({}, ...vendorsCanFulfilKVPs);
+    const filteredVendors = vendors.filter(v => vendorsCanFulfil[v.id]);
+
     // Respond with view or JSON.
     if (this.req.wantsJSON) {
-      return exits.successJSON({ addresses });
+      return exits.successJSON({ vendors: filteredVendors });
     } else {
-      return exits.success({ addresses });
+      return exits.success({ vendors: filteredVendors });
     }
   },
 };

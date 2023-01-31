@@ -62,7 +62,7 @@ module.exports = {
     );
 
     var colFulVendor = await Vendor.findOne(vendorid).populate(
-      'collectionFulfilmentMethod&collectionFulfilmentMethod.openingHours'
+      'collectionFulfilmentMethod&collectionFulfilmentMethod.openingHours&fulfilmentOrigin'
     );
 
     var vendorFulfilmentPostalDistricts = await Vendor.findOne(vendorid)
@@ -108,6 +108,7 @@ module.exports = {
     }
     if (!delFul.fulfilmentOrigin) {
       delFul.fulfilmentOrigin = {
+        label: vendor.pickupAddress.label,
         addressLineOne: vendor.pickupAddress.addressLineOne,
         addressLineTwo: vendor.pickupAddress.addressLineTwo,
         addressTownCity: vendor.pickupAddress.addressTownCity,

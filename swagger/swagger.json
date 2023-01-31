@@ -163,7 +163,7 @@
       "name": "Deregister User Vendor Role"
     },
     {
-      "name": "Get user for wallet address"
+      "name": "Get account for wallet address"
     },
     {
       "name": "Customer cancel order"
@@ -611,6 +611,121 @@
             "oneOf": [
               {
                 "$ref": "#/components/schemas/vendor"
+              }
+            ]
+          }
+        }
+      },
+      "escexplanation": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/escexplanation-without-required-constraint"
+          },
+          {
+            "required": [
+              "title",
+              "measure",
+              "description"
+            ]
+          }
+        ]
+      },
+      "escexplanation-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **ESCExplanation**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "title": {
+            "type": "string",
+            "description": "The headline for the explanatory reason that contributes to the products aggregated esc measure"
+          },
+          "measure": {
+            "type": "number",
+            "format": "double",
+            "maximum": 5,
+            "minimum": 0
+          },
+          "description": {
+            "type": "string"
+          },
+          "escrating": {
+            "description": "JSON dictionary representing the **escrating** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/escrating"
+              }
+            ]
+          }
+        }
+      },
+      "escrating": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/escrating-without-required-constraint"
+          },
+          {
+            "required": [
+              "productPublicId",
+              "rating",
+              "evidence"
+            ]
+          }
+        ]
+      },
+      "escrating-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **ESCRating**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "productPublicId": {
+            "type": "string",
+            "description": "The public id of the product"
+          },
+          "rating": {
+            "type": "number",
+            "format": "double",
+            "maximum": 5,
+            "minimum": 0
+          },
+          "evidence": {},
+          "calculatedOn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The beginning of the estimated fulfilment slot."
+          },
+          "product": {
+            "description": "JSON dictionary representing the **product** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/product"
               }
             ]
           }
@@ -1909,16 +2024,6 @@
           "vendorConfirmed": {
             "type": "boolean",
             "default": false
-          },
-          "verified": {
-            "type": "boolean",
-            "default": false
-          },
-          "walletAddress": {
-            "type": "string",
-            "pattern": "^0x[a-fA-F0-9]{40}$|^$",
-            "default": "",
-            "description": "The blockchain wallet address for the user. Used to distribute payments from customers."
           },
           "fbUid": {
             "type": "string"
@@ -4911,10 +5016,24 @@
           {
             "in": "query",
             "name": "distance",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "number",
-              "format": "double"
+              "format": "double",
+              "nullable": true
+            },
+            "description": "the max distance to search for vendors from location in KM"
+          },
+          {
+            "in": "query",
+            "name": "fulfilmentMethodType",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "delivery",
+                "collection"
+              ]
             }
           }
         ],
@@ -4983,9 +5102,9 @@
     },
     "/api/v1/admin/user-for-wallet-address": {
       "get": {
-        "summary": "Get user for wallet address",
+        "summary": "Get account for wallet address",
         "tags": [
-          "Get user for wallet address"
+          "Get account for wallet address"
         ],
         "parameters": [
           {
@@ -5006,19 +5125,18 @@
                   "oneOf": [
                     {
                       "example": {
-                        "isOwner": false,
-                        "vendorID": 0
+                        "walletAddress": "0x13948y143adfaerf9r5",
+                        "verified": false
                       },
                       "type": "object",
                       "properties": {
-                        "isOwner": {
+                        "walletAddress": {
+                          "example": "0x13948y143adfaerf9r5",
+                          "type": "string"
+                        },
+                        "verified": {
                           "example": false,
                           "type": "boolean"
-                        },
-                        "vendorID": {
-                          "example": 0,
-                          "type": "integer",
-                          "format": "int64"
                         }
                       },
                       "description": "Success"
@@ -7057,6 +7175,26 @@
             "required": false,
             "schema": {},
             "description": "The fulfilment origin address to calculate max distance from."
+          },
+          {
+            "in": "query",
+            "name": "deliveryPartner",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            }
+          },
+          {
+            "in": "query",
+            "name": "vendor",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            }
           }
         ],
         "responses": {
@@ -7072,6 +7210,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Success"
           },
           "404": {
             "description": "Resource not found"

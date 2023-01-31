@@ -44,6 +44,9 @@ ADD COLUMN `marketingEmailContactAllowed` tinyint(1) DEFAULT 0 AFTER `phoneCount
 ADD COLUMN `marketingPhoneContactAllowed` tinyint(1) DEFAULT 0 AFTER `marketingEmailContactAllowed`,
 ADD COLUMN `marketingPushContactAllowed` tinyint(1) DEFAULT 0 AFTER `marketingPhoneContactAllowed`,
 ADD COLUMN `marketingNotificationUtility` INT DEFAULT 0 AFTER `marketingPushContactAllowed`,
-ADD COLUMN `verified` tinyint(1) DEFAULT 0 AFTER `vendorConfirmed`,
-ADD COLUMN `walletAddress` varchar(255) DEFAULT '' AFTER `verified`
+;
+
+ALTER TABLE `vegi`.`user` 
+DROP COLUMN `verified`,
+DROP COLUMN `walletAddress`
 ;

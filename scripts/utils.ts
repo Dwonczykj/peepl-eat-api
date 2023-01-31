@@ -156,8 +156,6 @@ type _UserTypeHidden = {
   deliveryPartnerRole?: UserDeliveryPartnerRoleLiteral;
   roleConfirmedWithOwner: boolean;
   vendorConfirmed: boolean;
-  verified: boolean;
-  walletAddress: walletAddressString | '';
   fbUid?: string;
   firebaseSessionToken?: string;
   marketingEmailContactAllowed: boolean;
@@ -165,6 +163,12 @@ type _UserTypeHidden = {
   marketingPushContactAllowed: boolean;
   marketingNotificationUtility: -1 | 0 | 1 | 2;
 };
+
+export type AccountType = {
+  id: number;
+  verified: boolean;
+  walletAddress: walletAddressString | '';
+}
 
 export type VendorTypeLiteral = 'restaurant' | 'shop';
 export type StatusLiteral = 'active' | 'inactive';
@@ -248,6 +252,8 @@ type _FulfilmentMethodTypeHidden = {
   maxDeliveryDistance?: number | null;
   priceModifier: number;
 };
+
+export type FulfilmentMethodMethodTypeLiteral = _FulfilmentMethodTypeHidden['methodType'];
 
 export type _OpeningHoursTypeHidden = {
   id: number;
@@ -415,6 +421,81 @@ export type ProductType = _ProductTypeHidden & {
   vendor: VendorType;
   options: Array<ProductOptionType>;
   category: ProductCategoryType;
+};
+
+export type ESCRatingType = {
+  id: number;
+  createdAt: number;
+  productPublicId: string;
+  rating: number;
+  evidence: object;
+  calculatedOn:Date;
+  product: ProductType;
+};
+
+export const SustainedGradeToRatingMap = {
+  A: 5,
+  B: 4,
+  C: 3,
+  D: 2,
+  E: 1,
+  F: 0.5,
+  G: 0,
+};
+
+export type ESCExplanationType = {
+  id: number;
+  title: string;
+  description: string;
+  measure: number;
+  escrating: ESCRatingType;
+}
+
+type SustainedAPIChoiceResponseType = {
+  page: number;
+  page_size: number;
+  next_page_token: string;
+  total_results: number;
+  links: {
+    self: string;
+    next: string;
+    first: string;
+  };
+};
+
+export type SustainedAPIChoiceImpactType = {
+  id: string;
+  title: string;
+  description: string;
+  grade: string;
+  svg_icon: string;
+};
+
+export type SustainedAPIChoiceProductType = {
+  id: string;
+  name: string;
+  gtin: string;
+  image: string;
+  pack: string;
+  grade: 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G';
+  points: {
+    pef: number;
+  };
+  info_icons: string[];
+  category: string;
+  links: {
+    product: string;
+    category: string;
+    impacts: string;
+  };
+};
+
+export type SustainedAPIChoiceGetProductsResponseType = SustainedAPIChoiceResponseType & {
+  products: SustainedAPIChoiceProductType[];
+};
+
+export type SustainedAPIChoiceGetImpactsResponseType = SustainedAPIChoiceResponseType & {
+  impacts: SustainedAPIChoiceImpactType[];
 };
 
 export type RestaurantAcceptedStatusType =

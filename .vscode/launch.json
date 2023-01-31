@@ -34,6 +34,28 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Alter DB & Launch Program",
+            "skipFiles": [
+                "<node_internals>/**/*.js",
+                // "assets/**"
+            ],
+            "program": "${workspaceFolder}/app.js",
+            "env": {
+                "NODE_ENV": "development",
+                "useFirebaseEmulator": "false",
+            },
+            "args": [
+                "--verbose",
+                "--hookTimeout=160000",
+                "--alter"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/out/**/*.js"
+            ],
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Launch Program (Production)",
             "skipFiles": [
                 "<node_internals>/**/*.js",

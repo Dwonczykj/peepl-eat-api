@@ -51,3 +51,39 @@ CREATE TABLE `like` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+CREATE TABLE `escrating` (
+  `createdAt` bigint DEFAULT NULL,
+  `updatedAt` bigint DEFAULT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `productPublicId` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `rating` double DEFAULT NULL,
+  `evidence` longtext COLLATE utf8mb4_general_ci,
+  `calculatedOn` datetime DEFAULT NULL,
+  `product` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `escexplanation` (
+  `createdAt` bigint DEFAULT NULL,
+  `updatedAt` bigint DEFAULT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `description` longtext COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `measure` double DEFAULT NULL,
+  `escrating` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `account` (
+  `createdAt` bigint DEFAULT NULL,
+  `updatedAt` bigint DEFAULT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `walletAddress` varchar(255) DEFAULT '',
+  `verified` tinyint(1) DEFAULT 0,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
