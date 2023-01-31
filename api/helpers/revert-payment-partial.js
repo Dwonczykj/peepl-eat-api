@@ -75,19 +75,21 @@ module.exports = {
     const instance = axios.create({
       baseURL: sails.config.custom.peeplPayUrl,
       timeout: 2000,
-      headers: { 'Authorization': 'Basic ' + sails.config.custom.peeplAPIKey }
+      headers: { Authorization: 'Basic ' + sails.config.custom.peeplAPIKey },
     });
 
     //TODO: request refund for partial amount of order from peeplPay community manager wallet address back to the customer.
     //TODO: Assert that the paymentAmount == the sum of value of the items (+ % of service charge?) - discount
+    // ~ https://stripe.com/docs/refunds?dashboard-or-api=api#:~:text=To%20refund%20a%20payment%20using,.
+    // ~ To refund part of a PaymentIntent, provide an amount parameter as an integer in cents (or the charge currency’s smallest currency unit).
     instance
-      .post('/payment_refunds', {
+      .post('/refunds', {
         amount: inputs.paymentAmount,
-        originalPaymentIntentId: inputs.paymentId,
-        recipientWalletAddress: inputs.refundRecipientWalletAddress,
-        vendorDisplayName: inputs.refundFromName,
+        payment_intent: inputs.paymentId,
         webhookAddress:
           sails.config.custom.peeplWebhookAddressCustomerUpdatePaidOrder,
+        // recipientWalletAddress: inputs.refundRecipientWalletAddress,
+        // vendorDisplayName: inputs.refundFromName,
       })
       .then(async (response) => {
         // TODO: Check whether request for refund was accepted and can be fulfilled by the peeplPay service.
