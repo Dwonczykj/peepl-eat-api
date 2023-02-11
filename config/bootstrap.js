@@ -1,3 +1,4 @@
+/* eslint-disable prefer-arrow-callback */
 /* eslint-disable no-console */
 /* eslint-disable no-undef */
 /**
@@ -17,6 +18,15 @@ const { buildDb } = require('../scripts/build_db');
 
 module.exports.bootstrap = async function () {
   _.extend(sails.hooks.http.app.locals, sails.config.http.locals);
+
+  var Promise = require('bluebird');
+
+  Object.keys(sails.models).forEach(function (key) {
+    if (sails.models[key].query) {
+      sails.models[key].query = Promise.promisify(sails.models[key].query);
+    }
+  });
+
 
   // const { initFirebase } = require(`${process.cwd()}/config/firebase`);
   // initFirebase(sails);

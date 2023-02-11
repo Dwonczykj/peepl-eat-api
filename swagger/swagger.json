@@ -106,6 +106,9 @@
       "name": "Get postal districts"
     },
     {
+      "name": "Get product using qrcode"
+    },
+    {
       "name": "Accept / Reject Delivery Confirmation"
     },
     {
@@ -161,6 +164,9 @@
     },
     {
       "name": "Deregister User Vendor Role"
+    },
+    {
+      "name": "Upload product suggestion"
     },
     {
       "name": "Get account for wallet address"
@@ -1785,6 +1791,106 @@
             "oneOf": [
               {
                 "$ref": "#/components/schemas/productoption"
+              }
+            ]
+          }
+        }
+      },
+      "productsuggestion": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/productsuggestion-without-required-constraint"
+          },
+          {
+            "required": [
+              "name"
+            ]
+          }
+        ]
+      },
+      "productsuggestion-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **ProductSuggestion**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the option value (e.g. Blue)"
+          },
+          "additionalInformation": {
+            "type": "string"
+          },
+          "productProcessed": {
+            "type": "boolean",
+            "default": false
+          },
+          "qrCode": {
+            "type": "string",
+            "default": "",
+            "description": "A stringified long number, potentially GUID in future, that maps to the UPC (barcode) on the product"
+          },
+          "imageUrls": {
+            "description": "Array of **productsuggestionimage**'s or array of FK's when creating / updating / not populated",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/productsuggestionimage"
+            }
+          }
+        }
+      },
+      "productsuggestionimage": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/productsuggestionimage-without-required-constraint"
+          },
+          {
+            "required": [
+              "imageUrl"
+            ]
+          }
+        ]
+      },
+      "productsuggestionimage-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **ProductSuggestionImage**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "imageUrl": {
+            "type": "string"
+          },
+          "productSuggestion": {
+            "description": "The productsuggestion to which this image applies. JSON dictionary representing the **productsuggestion** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/productsuggestion"
               }
             ]
           }
@@ -3480,6 +3586,50 @@
         }
       }
     },
+    "/api/v1/products/get-product-by-qrcode": {
+      "get": {
+        "summary": "Get product using qrcode",
+        "description": "End point to take consumer information for unregistered products on vegi that we should try and capture",
+        "tags": [
+          "Get product using qrcode"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "qrCode",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Barcode or QRCode Identifier for the product"
+          },
+          {
+            "in": "query",
+            "name": "vendor",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/api/v1/couriers/accept-reject-delivery-confirmation": {
       "post": {
         "summary": "Accept / Reject Delivery Confirmation",
@@ -5093,6 +5243,64 @@
           },
           "404": {
             "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/products/upload-product-suggestion": {
+      "post": {
+        "summary": "Upload product suggestion",
+        "description": "End point to take consumer information for unregistered products on vegi that we should try and capture",
+        "tags": [
+          "Upload product suggestion"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "images",
+            "required": true,
+            "schema": {},
+            "description": "list of image byte streams"
+          },
+          {
+            "in": "query",
+            "name": "qrCode",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Barcode or QRCode Identifier for the product"
+          },
+          {
+            "in": "query",
+            "name": "additionalInformation",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
           },
           "500": {
             "description": "Internal server error"

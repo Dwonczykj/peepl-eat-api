@@ -208,6 +208,7 @@ export type sailsModelKVP<T> = ({
 type SailsFindPopulateType<T> = Promise<sailsModelKVP<T>[] | null> & {
   populate: (unusedArg: keyof T | string) => Promise<T[] | null>;
 };
+type SailsQueryType<T> = Promise<T | null>;
 type SailsFindOnePopulateType<T> = Promise<sailsModelKVP<T> | null> & {
   populate: (unusedArg: string) => Promise<T | null>;
 };
@@ -219,6 +220,11 @@ export type SailsModelType<T> = {
   ) => {
     members: (memberIds: Array<number>) => void;
   };
+  query: <V, S>(
+    unusedMySqlStr: string,
+    unusedQueryArgs: Array<any>,
+    unusedCallback: (err: any, result: V) => S | void
+  ) => Promise<Array<S>>;
   find: (
     // ~ https://www.typescriptlang.org/docs/handbook/utility-types.html#extracttype-union
     unusedArg?:
@@ -295,8 +301,35 @@ type _helperFunction<TIN,TOUT> = {
   ) => Promise<TOUT> & ((arg: TIN extends ValueType ? TIN : TIN[keyof TIN][]) => Promise<TOUT>);
 }
 
+type NativeQueryField<T> = {
+  catalog: 'def';
+  charsetNr: 63;
+  db: 'vegi';
+  decimals: number;
+  default: undefined;
+  flags: number;
+  length: number;
+  name: keyof T;
+  orgName: keyof T;
+  orgTable: string; // nameof T;
+  protocol41: true;
+  table: string;
+  type: number;
+  zeroFill: false;
+};
+
+type NativeQueryRow<T> = {
+  [k in keyof T]: T[k];
+};
+
+type NativeQueryResult<T> = {
+  fields: Array<NativeQueryField<T>>;
+  rows: Array<NativeQueryRow<T>>;
+}
+
 export type sailsVegi = {
   getDatastore: () => any;
+  sendNativeQuery: <T extends any>(unused1, unused2) => Promise<NativeQueryResult<T>>;
   helpers: {
     isSuperAdmin: {
       with: (unusedArgs: { userId: number }) => Promise<{ data: boolean }>;

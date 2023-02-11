@@ -423,6 +423,24 @@ export type ProductType = _ProductTypeHidden & {
   category: ProductCategoryType;
 };
 
+type _ProductSuggestionTypeHidden = {
+  id: number;
+  name: string;
+  additionalInformation: string;
+  productProcessed: boolean;
+  qrCode: string;
+};
+
+export type ProductSuggestionImageType = {
+  id: number;
+  imageUrl: string;
+  productSuggestion: _ProductSuggestionTypeHidden;
+};
+
+export type ProductSuggestionType = _ProductSuggestionTypeHidden & {
+  imageUrls: Array<ProductSuggestionImageType>;
+}
+
 export type ESCRatingType = {
   id: number;
   createdAt: number;
@@ -627,5 +645,141 @@ export const openingHoursToMoments = (
     closeTime: closeTime,
     originatingFulfilmentMethod: openingHours.fulfilmentMethod,
     originatingOpeningHours: openingHours,
+  };
+};
+
+type _actionInputType = {
+  type:'ref'|'string'|'number'|'boolean';
+  required?: boolean;
+  description?: string;
+  allowNull?: boolean;
+  defaultsTo?: any;
+  min?: number;
+  max?: number;
+  isIn?: Array<any>;
+};
+export type ActionInputImageDefnType = _actionInputType & {
+  type: 'ref';
+};
+export type ActionInputObjectDefnType = _actionInputType & {
+  type: 'ref';
+};
+export type ActionInputArrayDefnType = _actionInputType & {
+  type: 'ref';
+};
+export type ActionInputStringDefnType = _actionInputType & {
+  type: 'string';
+  defaultsTo?: any;
+  isIn?: Array<any>;
+};
+export type ActionInputNumberDefnType = _actionInputType & {
+  type: 'number';
+  defaultsTo?: any;
+  min?: number;
+  max?: number;
+};
+export type ActionInputBooleanDefnType = _actionInputType & {
+  type: 'boolean';
+  defaultsTo?: any;
+};
+
+
+export type ModelAttributeAssociationModlDefnType = {
+  model: string;
+  description?: string;
+};
+export type ModelAttributeAssociationColnDefnType = {
+  collection: string;
+  via: string;
+  description?: string;
+};
+export type ModelAttributePrimitiveDefnType = _actionInputType & {
+  columnType?: 'INT' | 'TINYINT' | 'DATETIME' | null;
+};
+
+export type ModelAttributeType =
+  | ModelAttributePrimitiveDefnType
+  | ModelAttributeAssociationModlDefnType
+  | ModelAttributeAssociationColnDefnType;
+
+export type ActionInputArgDefnType =
+  | ActionInputImageDefnType
+  | ActionInputObjectDefnType
+  | ActionInputArrayDefnType
+  | ActionInputStringDefnType
+  | ActionInputNumberDefnType
+  | ActionInputBooleanDefnType;
+
+export type ActionInputsDefnType = {
+  [key: string]: ActionInputArgDefnType;
+};
+
+export type ActionInputArgDerivedType<
+  T extends ActionInputArgDefnType
+> = {
+  [key in keyof T]: T extends ActionInputStringDefnType
+    ? string
+    : T extends ActionInputNumberDefnType
+    ? number
+    : T extends ActionInputBooleanDefnType
+    ? boolean
+    : any;
+};
+
+export type ModelInputAttributeDerivedType<T extends ModelAttributeType> = {
+  [key in keyof T]: T extends ActionInputStringDefnType
+    ? string
+    : T extends ActionInputNumberDefnType
+    ? number
+    : T extends ActionInputBooleanDefnType
+    ? boolean
+    : T extends ModelAttributePrimitiveDefnType
+    ? string | boolean | number
+    : T extends ModelAttributeAssociationColnDefnType
+    ? Array<any>
+    : T extends ModelAttributeAssociationModlDefnType
+    ? any
+    : any;
+};
+
+// ~ https://stackoverflow.com/a/57384629
+export type valueOf<T> = T[keyof T];
+export function nameOf<T, V extends T[keyof T]>(
+  f: (x: T) => V
+): valueOf<{ [K in keyof T]: T[K] extends V ? K : never }>;
+export function nameOf(f: (x: any) => any): keyof any {
+  var p = new Proxy(
+    {},
+    {
+      get: (target, key) => key,
+    }
+  );
+  return f(p);
+}
+
+export interface I_$<T> {
+  nameOf<V extends T[keyof T]>(
+    f: (x: T) => V
+  ): valueOf<{ [K in keyof T]: T[K] extends V ? K : never }>;
+}
+export function _$<T>(obj: T) {
+  return {
+    nameOf: (f: (x: any) => any) => {
+      return nameOf(f);
+    },
+  } as I_$<T>;
+}
+
+type xxx<T> = {
+  hello: I_$<T>;
+}
+
+type HeyMan = {NiceOne: 1};
+
+type yyy = xxx<HeyMan>;
+
+export type SailsModelDefnType = {
+  attributes: {
+    [k: string]: ModelAttributeType;
   };
 };

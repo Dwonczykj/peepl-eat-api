@@ -48,6 +48,9 @@ module.exports.routes = {
   'GET /api/v1/products/get-product-options/:productId': {
     action: 'products/get-product-options',
   },
+  'GET /api/v1/products/get-product-by-qrcode': {
+    action: 'products/get-product-by-qrcode',
+  },
 
   // DISCOUNTS
   'GET /api/v1/discounts/check-discount-code/:discountCode': {
@@ -130,8 +133,10 @@ module.exports.routes = {
   'GET /api/v1/home/nearest-vendors': { action: 'home/view-nearest-vendors' },
   'GET /home/like': { action: 'home/like' },
   'POST /api/v1/home/like': { action: 'home/like' },
+  'POST /api/v1/products/upload-product-suggestion': {
+    action: 'products/upload-product-suggestion',
+  },
   'GET /home/redirect-to-app-store': { action: 'home/redirect-to-app-store' },
-
   'GET /admin': { action: 'admin/view-vendors' },
   'GET /admin/vendors': { action: 'admin/view-vendors' },
   'GET /admin/vendors/new': { action: 'admin/view-create-vendor' },

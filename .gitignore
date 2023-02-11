@@ -136,6 +136,10 @@ lib-cov
 *.out
 *.pid
 
+/data/*
+*.csv
+*.xlsx
+
 .sass-cache
 config/aws.json
 config/local.js
