@@ -329,7 +329,10 @@ type NativeQueryResult<T> = {
 
 export type sailsVegi = {
   getDatastore: () => any;
-  sendNativeQuery: <T extends any>(unused1, unused2) => Promise<NativeQueryResult<T>>;
+  sendNativeQuery: <T extends any>(
+    unused1,
+    unused2
+  ) => Promise<NativeQueryResult<T>>;
   helpers: {
     isSuperAdmin: {
       with: (unusedArgs: { userId: number }) => Promise<{ data: boolean }>;
@@ -554,12 +557,29 @@ export type sailsVegi = {
             };
           }
         | {
+            template: 'email-support-internal';
+            templateData: {
+              orderId?: number | null;
+              message: string;
+              additionalInfo?: string | null;
+            };
+          }
+        | {
             template: 'email-registration-waiting-list';
             templateData: {
               message: string;
             };
           }
       ),
+      {
+        loggedInsteadOfSending: boolean;
+      }
+    >;
+    sendEmailToSupport: _helperFunction<
+      {
+        subject: string;
+        message: string;
+      },
       {
         loggedInsteadOfSending: boolean;
       }

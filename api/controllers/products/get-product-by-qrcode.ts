@@ -1,9 +1,8 @@
-import { SailsModelType, sailsVegi } from '../../interfaces/iSails';
+import { sailsVegi } from '../../interfaces/iSails';
 import { ProductType } from '../../../scripts/utils';
 
 
 declare var sails: sailsVegi;
-declare var Product: SailsModelType<ProductType>;
 
 type _GetProductFromQRcode = {
   qrCode: string;
@@ -56,44 +55,40 @@ const _exports = {
       notFound: (unusedMessage: Error | string) => void;
     }
   ) {
-
+    let GET_PRODUCTS_SQL;
     if(inputs.vendor){
-      const GET_PRODUCTS_SQL = `
+      GET_PRODUCTS_SQL = `
 SELECT p.* 
 FROM vegi.productoption po 
 left join vegi.productoptionvalue pov on pov.option = po.id 
 join vegi.product p on p.id = po.product 
 WHERE pov.productBarCode = $1 AND p.vendor = $2`;
-
-      // Send it to the database.
-      const products = await sails.sendNativeQuery<ProductType>(
-        GET_PRODUCTS_SQL,
-        [inputs.qrCode, inputs.vendor]
-      );
-      
-      if (!products || !products.rows || products.rows.length < 1) {
-        return exits.notFound('No Products with matching QRCode found');
-      }
-      return exits.success(products.rows[0]);
     }else{
-      const GET_PRODUCTS_SQL = `
+      GET_PRODUCTS_SQL = `
 SELECT p.* 
 FROM vegi.productoption po 
 left join vegi.productoptionvalue pov on pov.option = po.id 
 join vegi.product p on p.id = po.product 
 WHERE pov.productBarCode = $1`;
-
-      // Send it to the database.
-      const products = await sails.sendNativeQuery<ProductType>(GET_PRODUCTS_SQL, [
-        inputs.qrCode
-      ]);
-
-      if (!products || !products.rows || products.rows.length < 1) {
-        return exits.notFound('No Products with matching QRCode found');
-      }
-      return exits.success(products.rows[0]);
     }
 
+    // Send it to the database.
+    const products = await sails.sendNativeQuery<ProductType>(
+      GET_PRODUCTS_SQL,
+      inputs.vendor ? [inputs.qrCode, inputs.vendor] : [inputs.qrCode]
+    );
+
+    if (!products || !products.rows || products.rows.length < 1) {
+      return exits.notFound('No Products with matching QRCode found');
+    } else if (products.rows.length > 1){
+      const issueMessage = `Multiple (${products.rows.length}) Items have the same QR Code of "${inputs.qrCode}" in the DB (with vendor id: [${inputs.vendor || 'null'}])`; 
+      sails.log.warn(issueMessage);
+      await sails.helpers.sendEmailToSupport.with({
+        message: issueMessage,
+        subject: `Warning - vegi server: Multiple products with same QRCode "${inputs.qrCode}"`,
+      });
+    }
+    return exits.success(products.rows[0]);
   },
 };
 
