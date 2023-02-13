@@ -9,6 +9,8 @@ module.exports = {
 
   description: '',
 
+  files: ['image'],
+
   inputs: {
     id: {
       type: 'number',
@@ -67,10 +69,9 @@ module.exports = {
       notFound: () => void;
     }
   ) {
-    const productCategories =
-      await sails.helpers.editProductCategories.with({
-        productCategories: [inputs],
-      });
+    const productCategories = await sails.helpers.editProductCategories.with({
+      productCategories: [inputs],
+    });
     if (!productCategories || productCategories.length < 1) {
       sails.log(`No product categories updated`);
       return exits.notFound();

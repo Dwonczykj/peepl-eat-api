@@ -10,6 +10,8 @@ module.exports = {
 
   description: '',
 
+  files: ['image'],
+
   inputs: {
     name: {
       type: 'string',

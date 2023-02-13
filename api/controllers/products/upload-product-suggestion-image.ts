@@ -16,6 +16,8 @@ type _UploadProductSuggestionImageResponseType = {
 const _exports = {
   friendlyName: 'Upload product suggestion image',
 
+  files: ['image'],
+
   description:
     'Upload an image for a given uid that refers to a client generated identifier for their product suggestion',
 
