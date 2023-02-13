@@ -169,6 +169,9 @@
       "name": "Upload product suggestion"
     },
     {
+      "name": "Upload product suggestion image"
+    },
+    {
       "name": "Get account for wallet address"
     },
     {
@@ -5301,6 +5304,46 @@
           },
           "404": {
             "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/products/upload-product-suggestion-image": {
+      "post": {
+        "summary": "Upload product suggestion image",
+        "description": "Upload an image for a given uid that refers to a client generated identifier for their product suggestion",
+        "tags": [
+          "Upload product suggestion image"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "uid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "image",
+            "required": true,
+            "schema": {},
+            "description": "image byte stream"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Server error"
+          },
+          "404": {
+            "description": "Resource not found"
           },
           "500": {
             "description": "Internal server error"

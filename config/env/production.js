@@ -232,12 +232,14 @@ module.exports = {
      * > Be sure to use the right protocol!  ("http://" vs. "https://")         *
      *                                                                          *
      ***************************************************************************/
-    onlyAllowOrigins: [
+    onlyAllowOrigins: process.env.NODE_ENV === 'production'
+    ? [
       'https://vegi.vegiapp.co.uk',
       'https://vegi.itsaboutpeepl.com',
       'https://qa-vegi.vegiapp.co.uk',
       'http://localhost',
-    ],
+      'http://localhost:51479',
+    ] : undefined,
 
     /***************************************************************************
      *                                                                          *

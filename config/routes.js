@@ -136,6 +136,9 @@ module.exports.routes = {
   'POST /api/v1/products/upload-product-suggestion': {
     action: 'products/upload-product-suggestion',
   },
+  'POST /api/v1/products/upload-product-suggestion-image': {
+    action: 'products/upload-product-suggestion-image',
+  },
   'GET /home/redirect-to-app-store': { action: 'home/redirect-to-app-store' },
   'GET /admin': { action: 'admin/view-vendors' },
   'GET /admin/vendors': { action: 'admin/view-vendors' },
