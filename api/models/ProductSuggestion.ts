@@ -5,9 +5,9 @@
  * @docs        :: https://sailsjs.com/docs/concepts/models-and-orm/models
  */
 
-import { SailsModelDefnType } from '../../scripts/utils';
+import { ProductSuggestionType, SailsModelDefnType } from '../../scripts/utils';
 
-let _exports: SailsModelDefnType = {
+let _exports: SailsModelDefnType<ProductSuggestionType> = {
   attributes: {
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
@@ -18,6 +18,10 @@ let _exports: SailsModelDefnType = {
       required: true,
     },
     additionalInformation: {
+      type: 'string',
+      required: false,
+    },
+    store: {
       type: 'string',
       required: false,
     },

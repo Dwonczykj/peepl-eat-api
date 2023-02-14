@@ -4,9 +4,10 @@
  * @description :: A model definition represents a database table/collection.
  * @docs        :: https://sailsjs.com/docs/concepts/models-and-orm/models
  */
-import { SailsModelDefnType } from '../../scripts/utils';
+import {v4 as uuidv4} from 'uuid';
+import { ProductSuggestionImageType, SailsModelDefnType } from '../../scripts/utils';
 
-let _exports: SailsModelDefnType = {
+let _exports: SailsModelDefnType<ProductSuggestionImageType> = {
   attributes: {
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
@@ -14,6 +15,10 @@ let _exports: SailsModelDefnType = {
     imageUrl: {
       type: 'string',
       required: true,
+    },
+    publicUid: {
+      type: 'string',
+      required: false,
     },
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
@@ -26,6 +31,11 @@ let _exports: SailsModelDefnType = {
       model: 'productsuggestion',
       description: 'The productsuggestion to which this image applies.',
     },
+  },
+
+  beforeCreate: function (valuesToSet, proceed) {
+    valuesToSet.publicUid = uuidv4();
+    return proceed();
   },
 };
 

@@ -1,8 +1,9 @@
-import { sailsVegi } from '../../interfaces/iSails';
+import { ProductSuggestionImageType } from 'scripts/utils';
+import { SailsModelType, sailsVegi } from '../../interfaces/iSails';
 
 
 declare var sails: sailsVegi;
-
+declare var ProductSuggestionImage: SailsModelType<ProductSuggestionImageType>;
 
 type _UploadProductSuggestionImageInputsType = {
   uid: string;
@@ -10,7 +11,8 @@ type _UploadProductSuggestionImageInputsType = {
 };
 
 type _UploadProductSuggestionImageResponseType = {
-  image: string;
+  url: string;
+  uid: string;
 }
 
 const _exports = {
@@ -59,16 +61,13 @@ const _exports = {
       }
     }
 
-    // const outKeys: Array<
-    //   keyof Exclude<_UploadProductSuggestionInputsType, 'images'>
-    // > = ['name', 'imageUrls', 'qrCode', 'additionalInformation'];
-
-    // const productSuggestion = await ProductSuggestion.create(
-    //   _.pick(inputs, outKeys)
-    // ).fetch();
+    const productSuggestionImage = await ProductSuggestionImage.create({
+      imageUrl: imageUrl,
+    }).fetch();
 
     return exits.success({
-      image: imageUrl,
+      url: imageUrl,
+      uid: productSuggestionImage.publicUid,
     });
   },
 };

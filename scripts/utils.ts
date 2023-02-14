@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { DaysOfWeek } from "scripts/DaysOfWeek";
 import moment from 'moment';
 declare var sails: any;
@@ -426,6 +427,7 @@ export type ProductType = _ProductTypeHidden & {
 type _ProductSuggestionTypeHidden = {
   id: number;
   name: string;
+  store: string;
   additionalInformation: string;
   productProcessed: boolean;
   qrCode: string;
@@ -434,6 +436,7 @@ type _ProductSuggestionTypeHidden = {
 export type ProductSuggestionImageType = {
   id: number;
   imageUrl: string;
+  publicUid: string;
   productSuggestion: _ProductSuggestionTypeHidden;
 };
 
@@ -778,8 +781,10 @@ type HeyMan = {NiceOne: 1};
 
 type yyy = xxx<HeyMan>;
 
-export type SailsModelDefnType = {
+export type SailsModelDefnType<T extends { id: number }> = {
   attributes: {
-    [k: string]: ModelAttributeType;
+    [k in keyof Omit<T,'id'>]: ModelAttributeType;
   };
+  beforeCreate?: (valuesToSet: Omit<T, 'id'>, proceed: () => void) => void;
+  afterCreate?: (newRecord: T, proceed: () => void) => void;
 };

@@ -1,8 +1,9 @@
-import { sailsVegi } from '../../interfaces/iSails';
+import { SailsModelType, sailsVegi } from '../../interfaces/iSails';
 import { ProductType } from '../../../scripts/utils';
 
 
 declare var sails: sailsVegi;
+declare var Product: SailsModelType<ProductType>;
 
 type _GetProductFromQRcode = {
   qrCode: string;
@@ -58,14 +59,14 @@ const _exports = {
     let GET_PRODUCTS_SQL;
     if(inputs.vendor){
       GET_PRODUCTS_SQL = `
-SELECT p.* 
+SELECT p.id 
 FROM vegi.productoption po 
 left join vegi.productoptionvalue pov on pov.option = po.id 
 join vegi.product p on p.id = po.product 
 WHERE pov.productBarCode = $1 AND p.vendor = $2`;
     }else{
       GET_PRODUCTS_SQL = `
-SELECT p.* 
+SELECT p.id 
 FROM vegi.productoption po 
 left join vegi.productoptionvalue pov on pov.option = po.id 
 join vegi.product p on p.id = po.product 
@@ -73,22 +74,26 @@ WHERE pov.productBarCode = $1`;
     }
 
     // Send it to the database.
-    const products = await sails.sendNativeQuery<ProductType>(
+    const productIds = await sails.sendNativeQuery<{id: ProductType['id']}>(
       GET_PRODUCTS_SQL,
       inputs.vendor ? [inputs.qrCode, inputs.vendor] : [inputs.qrCode]
     );
 
-    if (!products || !products.rows || products.rows.length < 1) {
+    if (!productIds || !productIds.rows || productIds.rows.length < 1) {
       return exits.notFound('No Products with matching QRCode found');
-    } else if (products.rows.length > 1){
-      const issueMessage = `Multiple (${products.rows.length}) Items have the same QR Code of "${inputs.qrCode}" in the DB (with vendor id: [${inputs.vendor || 'null'}])`; 
+    } else if (productIds.rows.length > 1){
+      const issueMessage = `Multiple (${productIds.rows.length}) Items have the same QR Code of "${inputs.qrCode}" in the DB (with vendor id: [${inputs.vendor || 'null'}])`; 
       sails.log.warn(issueMessage);
       await sails.helpers.sendEmailToSupport.with({
         message: issueMessage,
         subject: `Warning - vegi server: Multiple products with same QRCode "${inputs.qrCode}"`,
       });
     }
-    return exits.success(products.rows[0]);
+    const firstRow = productIds.rows[0];
+    const product = await Product
+      .findOne({'id': firstRow.id})
+      .populate('vendor&category&options'); 
+    return exits.success(product);
   },
 };
 

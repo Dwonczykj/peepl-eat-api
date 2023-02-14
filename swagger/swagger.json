@@ -1837,6 +1837,9 @@
           "additionalInformation": {
             "type": "string"
           },
+          "store": {
+            "type": "string"
+          },
           "productProcessed": {
             "type": "boolean",
             "default": false
@@ -1887,6 +1890,9 @@
             "description": "Note Sails special attributes: autoIncrement"
           },
           "imageUrl": {
+            "type": "string"
+          },
+          "publicUid": {
             "type": "string"
           },
           "productSuggestion": {
@@ -5271,19 +5277,28 @@
           },
           {
             "in": "query",
-            "name": "images",
-            "required": true,
-            "schema": {},
-            "description": "list of image byte streams"
-          },
-          {
-            "in": "query",
             "name": "qrCode",
             "required": true,
             "schema": {
               "type": "string"
             },
             "description": "Barcode or QRCode Identifier for the product"
+          },
+          {
+            "in": "query",
+            "name": "store",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          },
+          {
+            "in": "query",
+            "name": "imageUrls",
+            "required": true,
+            "schema": {},
+            "description": "list of image urls & uids -> Array<{url:string, uid: string}>;"
           },
           {
             "in": "query",

@@ -93,6 +93,7 @@ CREATE TABLE `productsuggestion` (
   `updatedAt` bigint DEFAULT NULL,
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(510) DEFAULT '',
+  `store` varchar(510) DEFAULT '',
   `additionalInformation` longtext DEFAULT '',
   `qrCode` longtext DEFAULT '',
   `productProcessed` tinyint(1) DEFAULT 0,
@@ -106,6 +107,7 @@ CREATE TABLE `productsuggestionimage` (
   `updatedAt` bigint DEFAULT NULL,
   `id` int NOT NULL AUTO_INCREMENT,
   `imageUrl` varchar(510) DEFAULT '',
+  `publicUid` varchar(64) DEFAULT '',
   `productSuggestion` INT DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id` (`id`)

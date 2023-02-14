@@ -209,12 +209,21 @@ type SailsFindPopulateType<T> = Promise<sailsModelKVP<T>[] | null> & {
   populate: (unusedArg: keyof T | string) => Promise<T[] | null>;
 };
 type SailsQueryType<T> = Promise<T | null>;
+
+type _populated<T> = Promise<T | null> & {
+  populate: (
+    unusedArg: string
+  ) => Promise<(T | null) >; // * This can be chained to populate multiple collections.
+};
 type SailsFindOnePopulateType<T> = Promise<sailsModelKVP<T> | null> & {
-  populate: (unusedArg: string) => Promise<T | null>;
+  populate: (
+    unusedArg: string
+  ) => Promise<(T | null) & _populated<T>>; // * This can be chained to populate multiple collections.
 };
 
 export type SailsModelType<T> = {
   addToCollection: (
+    // ~ https://sailsjs.com/documentation/reference/waterline-orm/models/add-to-collection#-addtocollection-
     id: number,
     attribute: keyof T
   ) => {
