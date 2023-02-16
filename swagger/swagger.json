@@ -169,6 +169,9 @@
       "name": "Upload product suggestion"
     },
     {
+      "name": "Edit product category"
+    },
+    {
       "name": "Upload product suggestion image"
     },
     {
@@ -212,9 +215,6 @@
     },
     {
       "name": "Create product category"
-    },
-    {
-      "name": "Edit product category"
     },
     {
       "name": "Create category group"
@@ -278,6 +278,9 @@
     },
     {
       "name": "View vendor menu [DEPRECATED]"
+    },
+    {
+      "name": "View product suggestion"
     },
     {
       "name": "View edit vendor"
@@ -2870,6 +2873,46 @@
         }
       }
     },
+    "/admin/product-suggestions": {
+      "get": {
+        "summary": "View vendors",
+        "description": "Display \"Vendors\" page.",
+        "tags": [
+          "View vendors"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Server error"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/home/redirect-to-app-store": {
       "get": {
         "summary": "vegi app link",
@@ -5316,6 +5359,184 @@
           },
           "400": {
             "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/create-product-suggestion": {
+      "post": {
+        "summary": "Upload product suggestion",
+        "description": "End point to take consumer information for unregistered products on vegi that we should try and capture",
+        "tags": [
+          "Upload product suggestion"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "qrCode",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Barcode or QRCode Identifier for the product"
+          },
+          {
+            "in": "query",
+            "name": "store",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          },
+          {
+            "in": "query",
+            "name": "imageUrls",
+            "required": true,
+            "schema": {},
+            "description": "list of image urls & uids -> Array<{url:string, uid: string}>;"
+          },
+          {
+            "in": "query",
+            "name": "additionalInformation",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/edit-product-suggestion": {
+      "post": {
+        "summary": "Edit product category",
+        "tags": [
+          "Edit product category"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            },
+            "description": "The id of the product"
+          },
+          {
+            "in": "query",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 150
+            },
+            "description": "The name of the product"
+          },
+          {
+            "in": "query",
+            "name": "qrCode",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 50
+            }
+          },
+          {
+            "in": "query",
+            "name": "store",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 150
+            },
+            "description": "The Retailer Name for the product"
+          },
+          {
+            "in": "query",
+            "name": "additionalInformation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "productProcessed",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "New product category created."
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Server error"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Bad request"
+                    }
+                  ]
+                }
+              }
+            }
           },
           "404": {
             "description": "Not found"
@@ -8451,6 +8672,56 @@
         "responses": {
           "200": {
             "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/admin/product-suggestions/{productSuggestionId}": {
+      "get": {
+        "summary": "View product suggestion",
+        "description": "Display \"View Product Suggestion\" page.",
+        "tags": [
+          "View product suggestion"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "productSuggestionId",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Server error"
           },
           "404": {
             "description": "Not found"

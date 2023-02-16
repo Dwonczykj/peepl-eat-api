@@ -353,6 +353,42 @@ Cloud.setup({
         'isEnabled',
       ],
     },
+    createProductSuggestion: {
+      verb: 'POST',
+      url: '/api/v1/products/upload-product-suggestion',
+      args: ['name', 'qrCode', 'store', 'imageUrls', 'additionalInformation'],
+    },
+    uploadProductSuggestion: {
+      verb: 'POST',
+      url: '/api/v1/products/upload-product-suggestion',
+      args: ['name', 'qrCode', 'store', 'imageUrls', 'additionalInformation'],
+    },
+    editProductSuggestion: {
+      verb: 'POST',
+      url: '/api/v1/admin/edit-product-suggestion',
+      args: [
+        'id',
+        'name',
+        'qrCode',
+        'store',
+        'additionalInformation',
+        'productProcessed',
+      ],
+    },
+    viewProductSuggestions: {
+      verb: 'GET',
+      url: '/api/v1/admin/view-product-suggestions',
+      args: [
+        
+      ],
+    },
+    viewProductSuggestion: {
+      verb: 'GET',
+      url: '/api/v1/admin/view-product-suggestion',
+      args: [
+        'productSuggestionId'
+      ],
+    },
     updateFulfilmentMethod: {
       verb: 'POST',
       url: '/api/v1/admin/update-fulfilment-method',

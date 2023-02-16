@@ -1,0 +1,77 @@
+<div id="admin-product-suggestion" class="admin" v-cloak>
+
+  <%- partial('../../partials/admin-navbar.ejs') %>
+
+  <div class="container">
+
+    <div class="mb-3">
+      <h1>{{productSuggestion.name}}</h1>
+      <h3>{{productSuggestion.store}}</h3>
+    </div>
+    
+    <ajax-form 
+      :form-data="productSuggestion" :syncing.sync="syncing" 
+      :form-rules="formRules" :form-errors.sync="formErrors" :cloud-error.sync="cloudError" 
+      @submitted="productSuggestionUpdateSubmitted({'id': productSuggestion.id})" 
+      :action="(productSuggestion.id) ?  'editProductSuggestion' : 'uploadProductSuggestion'">
+      
+      <div class="form-group form-check">
+        <input v-model="productSuggestion.productProcessed" type="checkbox" class="form-check-input" id="productProcessed">
+        <label :class="{ 'is-invalid': formErrors.productProcessed }" class="form-check-label" for="productProcessed">
+          <span style="color:green">Product suggestion completed</span>
+        </label>
+      </div>
+      
+      <div class="form-group">
+        <label for="productSuggestionName">Product Name</label>
+        <input type="text" readonly disabled :class="{ 'is-invalid': formErrors.name }" v-model="productSuggestion.name" class="form-control" id="vendorName">
+      </div>
+
+
+      <div class="form-group">
+        <label for="productSuggestionStore">Store</label>
+        <input type="text" readonly disabled :class="{ 'is-invalid': formErrors.store }" v-model="productSuggestion.store" class="form-control" id="productSuggestionStore">
+      </div>
+
+      <div class="form-group">
+        <label for="productSuggestionQRCode">QR Code</label>
+        <input type="text" :class="{ 'is-invalid': formErrors.qrCode }" v-model="productSuggestion.qrCode" class="form-control" id="productSuggestionQRCode">
+      </div>
+
+      <div class="form-group">
+        <label for="productSuggestionAdditionalInformation">Additional Information about the Product</label>
+        <textarea rows="5" type="text" :class="{ 'is-invalid': formErrors.additionalInformation }" v-model="productSuggestion.additionalInformation" class="form-control" id="productSuggestionAdditionalInformation">></textarea>
+      </div>
+
+      <fieldset>
+        <h2 class="h5 mt-3">Product Images</h2>
+        <div v-bind:key="imageUrl.id" v-for="imageUrl in productSuggestion.imageUrls">
+          <img :src="imageUrl.imageUrl" />
+          <!-- <img v-if="previewImageSrc || imageUrl" :src="(previewImageSrc) ? previewImageSrc : imageUrl" /> -->
+          <!-- <div class="custom-file">
+            <input 
+              type="file" class="custom-file-input" 
+              accept="image/*" id="customFile" 
+              @change="changeVendorImageInput($event.target.files)">
+            <label class="custom-file-label" for="customFile">{{imageName}}</label>
+          </div>   -->
+        </div>
+      </fieldset>
+
+      <ajax-button class="btn btn-peepl mt-4" type="submit" :syncing="syncing" v-bind:class="{ 'is-loading': syncing }">Save changes</ajax-button>
+      <div v-if="cloudError === 'notFound'" class="alert alert-danger mt-4" role="alert">
+        Product Suggestion not found.
+      </div>
+      <div v-else-if="cloudError === 'error'" class="alert alert-danger mt-4" role="alert">
+        Error fetching the product suggestion
+      </div>
+      <div v-else-if="cloudError" class="alert alert-danger mt-4" role="alert">
+        There has been an error updating the productSuggestion. Please try again.
+      </div>
+    </ajax-form>
+
+    
+
+  </div>
+</div>
+<%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>

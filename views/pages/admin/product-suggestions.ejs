@@ -1,0 +1,40 @@
+<div id="admin-product-suggestions" class="admin" v-cloak>
+
+  <%- partial('../../partials/admin-navbar.ejs') %>
+
+  <div class="container">
+    <h1 class="my-5">Product Suggestions</h1>
+
+    <table class="table action-table">
+      <thead>
+        <tr>
+          <th scope="col"><span class="sr-only">Select</span></th>
+          <th scope="col">Name</th>
+          <th scope="col">Product Processed</th>
+          <th scope="col"><span class="sr-only">Edit</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="productSuggestion in productSuggestions">
+          <td class="action-table__shrink">
+            <input type="checkbox" name="productSuggestions">
+          <td>
+            <a :href="'/admin/product-suggestions/' + productSuggestion.id">{{productSuggestion.name}}</a>
+          </td>
+          <td>
+            {{productSuggestion.productProcessed}}
+          </td>
+          <td class="action-table__shrink">
+            <a :href="'/admin/product-suggestions/' + productSuggestion.id">Edit</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- <div class="d-md-flex my-3 action-table-actions">      
+      <a href="/admin/product-suggestions/new" class="btn btn-peepl ml-auto">Add a new Product Suggestion</a>
+    </div> -->
+
+  </div>
+</div>
+<%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>

@@ -1,25 +1,41 @@
-import { sailsModelKVP, SailsModelType, sailsVegi } from '../../interfaces/iSails';
-import { ProductSuggestionImageType, ProductSuggestionType } from '../../../scripts/utils';
-import { Stream } from 'node:stream';
+import { sailsModelKVP, SailsModelType } from '../../interfaces/iSails';
+import { ProductSuggestionImageType, ProductSuggestionType, SailsActionDefnType } from '../../../scripts/utils';
+
 import _ from 'lodash';
 
-
-declare var sails: sailsVegi;
 declare var ProductSuggestion: SailsModelType<ProductSuggestionType>;
 declare var ProductSuggestionImage: SailsModelType<ProductSuggestionImageType>;
 
 
 type _UploadProductSuggestionInputsType = {
-  name: string;
-  qrCode: string;
-  imageUrls: Array<{url:string, uid: string}>;
-  store?: string;
-  additionalInformation?: string;
+  name: ProductSuggestionType['name'];
+  qrCode: ProductSuggestionType['qrCode'];
+  store?: ProductSuggestionType['store'];
+  imageUrls: Array<{ url: string; uid: string }>;
+  additionalInformation?: ProductSuggestionType['additionalInformation'];
+  // productProcessed?: ProductSuggestionType['productProcessed'];
 };
 
 type _UploadProductSuggestionResponseType = ProductSuggestionType;
 
-const _exports = {
+type _UploadProductSuggestionExits = {
+  success: (
+    unusedArg: _UploadProductSuggestionResponseType
+  ) => _UploadProductSuggestionResponseType;
+  // successJSON: (
+  //   unusedResult: _UploadProductSuggestionResponseType
+  // ) => _UploadProductSuggestionResponseType;
+  issue: (unusedErr: Error | String) => void;
+  notFound: () => void;
+  // error: (unusedErr: Error | String) => void;
+  // badRequest: (unusedErr: Error | String) => void;
+};
+
+const _exports: SailsActionDefnType<
+  _UploadProductSuggestionInputsType,
+  _UploadProductSuggestionResponseType,
+  _UploadProductSuggestionExits
+> = {
   friendlyName: 'Upload product suggestion',
 
   description:
@@ -67,16 +83,7 @@ const _exports = {
 
   fn: async function (
     inputs: _UploadProductSuggestionInputsType,
-    exits: {
-      success: (
-        unused: _UploadProductSuggestionResponseType
-      ) => _UploadProductSuggestionResponseType;
-      successJSON: (
-        unused: _UploadProductSuggestionResponseType
-      ) => _UploadProductSuggestionResponseType;
-      issue: (unusedMessage: Error | string) => void;
-      notFound: (unusedMessage: Error | string) => void;
-    }
+    exits: _UploadProductSuggestionExits
   ) {
     // inputs.imageUrls = [];
     // if (inputs.images && inputs.images.length > 0) {
@@ -88,18 +95,19 @@ const _exports = {
     //   }
     // }
 
-    const getImage = async (img: _UploadProductSuggestionInputsType["imageUrls"][0]) => {
-    
+    const getImage = async (
+      img: _UploadProductSuggestionInputsType['imageUrls'][0]
+    ) => {
       const imgObjs = await ProductSuggestionImage.find({
         publicUid: img.uid,
         imageUrl: img.url,
       });
       var imgObj: sailsModelKVP<ProductSuggestionImageType>;
-      if(!imgObjs || imgObjs.length < 1){
-        imgObj = await ProductSuggestionImage.create({
+      if (!imgObjs || imgObjs.length < 1) {
+        imgObj = (await ProductSuggestionImage.create({
           imageUrl: img.url,
-        }).fetch() as any;
-      } else if (imgObjs.length > 1){
+        }).fetch()) as any;
+      } else if (imgObjs.length > 1) {
         imgObj = imgObjs[0];
       } else {
         imgObj = imgObjs[0];
@@ -112,14 +120,15 @@ const _exports = {
     const outKeys: Array<
       keyof Omit<_UploadProductSuggestionInputsType, 'imageUrls'>
     > = ['name', 'store', 'qrCode', 'additionalInformation'];
-    
+
     const productSuggestion = await ProductSuggestion.create(
       _.pick(inputs, outKeys)
     ).fetch();
 
-    await ProductSuggestion
-      .addToCollection(productSuggestion.id, "imageUrls")
-      .members(imageCollection.map((o) => o.id));
+    await ProductSuggestion.addToCollection(
+      productSuggestion.id,
+      'imageUrls'
+    ).members(imageCollection.map((o) => o.id));
 
     return exits.success(productSuggestion);
   },

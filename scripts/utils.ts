@@ -674,6 +674,8 @@ export type ActionInputStringDefnType = _actionInputType & {
   type: 'string';
   defaultsTo?: any;
   isIn?: Array<any>;
+  maxLength?: number;
+  minLength?: number;
 };
 export type ActionInputNumberDefnType = _actionInputType & {
   type: 'number';
@@ -705,6 +707,18 @@ export type ModelAttributeType =
   | ModelAttributeAssociationModlDefnType
   | ModelAttributeAssociationColnDefnType;
 
+export type ActionInputArgDerivedModelType<T> =
+  T extends string
+    ? ActionInputStringDefnType
+    : T extends number
+    ? ActionInputNumberDefnType
+    : T extends boolean
+    ? ActionInputBooleanDefnType
+    : T extends Array<any>
+    ? ActionInputArrayDefnType
+    : ActionInputObjectDefnType;
+
+
 export type ActionInputArgDefnType =
   | ActionInputImageDefnType
   | ActionInputObjectDefnType
@@ -713,8 +727,33 @@ export type ActionInputArgDefnType =
   | ActionInputNumberDefnType
   | ActionInputBooleanDefnType;
 
-export type ActionInputsDefnType = {
-  [key: string]: ActionInputArgDefnType;
+export type ActionInputsDefnType<T extends {}> = {
+  [key in keyof T]: ActionInputArgDerivedModelType<T[key]>;
+};
+
+type ActionExitRequired<T extends any> = {
+  success: (unusedArg:T) => T;
+  successJSON?: (unusedArg:T) => T;
+}
+
+export type ActionExitsDefnType<TExits extends ActionExitRequired<any>> = {
+  [k in keyof TExits]: (k extends 'success'
+    ? {
+        viewTemplatePath?: string;
+        statusCode?: number;
+      }
+    : k extends 'successJSON'
+    ? {
+        statusCode: 200;
+      }
+    : {
+        statusCode?: number;
+        responseType?: 'notFound' | 'error' | 'success';
+      }) & {
+        description?: string;
+        exampleOutput?: any;
+        data?: any;
+      };
 };
 
 export type ActionInputArgDerivedType<
@@ -787,4 +826,19 @@ export type SailsModelDefnType<T extends { id: number }> = {
   };
   beforeCreate?: (valuesToSet: Omit<T, 'id'>, proceed: () => void) => void;
   afterCreate?: (newRecord: T, proceed: () => void) => void;
+};
+
+export type SailsActionDefnType<
+  T extends any,
+  TResponseSuccess extends any,
+  TExits extends ActionExitRequired<TResponseSuccess>
+> = ('image' extends keyof ActionInputsDefnType<T> ? {
+  files: Array<'image'>
+} : {}) & {
+  inputs: ActionInputsDefnType<T>;
+  exits: ActionExitsDefnType<TExits>;
+  fn: (inputs: T, exits: TExits) => any;
+  files?: Array<'image'>
+  friendlyName?: string;
+  description?: string;
 };

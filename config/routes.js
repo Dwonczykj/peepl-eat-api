@@ -133,12 +133,24 @@ module.exports.routes = {
   'GET /api/v1/home/nearest-vendors': { action: 'home/view-nearest-vendors' },
   'GET /home/like': { action: 'home/like' },
   'POST /api/v1/home/like': { action: 'home/like' },
+
+  'GET /admin/product-suggestions': { action: 'admin/view-product-suggestions' },
+  'GET /admin/product-suggestions/:productSuggestionId': {
+    action: 'admin/view-product-suggestion',
+  },
   'POST /api/v1/products/upload-product-suggestion': {
     action: 'products/upload-product-suggestion',
+  },
+  'POST /api/v1/admin/create-product-suggestion': {
+    action: 'products/upload-product-suggestion',
+  },
+  'POST /api/v1/admin/edit-product-suggestion': {
+    action: 'admin/edit-product-suggestion',
   },
   'POST /api/v1/products/upload-product-suggestion-image': {
     action: 'products/upload-product-suggestion-image',
   },
+
   'GET /home/redirect-to-app-store': { action: 'home/redirect-to-app-store' },
   'GET /admin': { action: 'admin/view-vendors' },
   'GET /admin/vendors': { action: 'admin/view-vendors' },
