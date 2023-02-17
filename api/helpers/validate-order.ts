@@ -288,10 +288,10 @@ module.exports = {
         sails.log.warn('helpers.validateOrder: invalidUserAddress lineOne');
         return exits.invalidUserAddress({ data: 'address.lineOne' });
       }
-      if (!inputs.address.postCode) {
-        sails.log.warn('helpers.validateOrder: invalidUserAddress postCode');
-        return exits.invalidUserAddress({ data: 'address.postCode' });
-      }
+      // if (!inputs.address.postCode) {
+      //   sails.log.warn('helpers.validateOrder: invalidUserAddress postCode');
+      //   return exits.invalidUserAddress({ data: 'address.postCode' });
+      // }
     }
 
     // Check if the delivery slots are valid for vendor

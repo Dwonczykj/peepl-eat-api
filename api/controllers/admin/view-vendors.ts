@@ -1,4 +1,7 @@
-declare var Vendor: any;
+import { SailsModelType } from '../../../api/interfaces/iSails';
+import { VendorType } from "../../../scripts/utils";
+
+declare var Vendor: SailsModelType<VendorType>;
 module.exports = {
 
   friendlyName: 'View vendors',
@@ -17,15 +20,21 @@ module.exports = {
   },
 
   fn: async function (inputs, exits) {
-    var vendors = await Vendor.find();
+    var vendorsUnsorted = await Vendor.find();
+
+    const vendors = vendorsUnsorted.sort((a, b) => {
+      const statae: VendorType['status'][] = ['active', 'draft', 'inactive'];
+      return (
+        statae.indexOf(a.status) - statae.indexOf(b.status) ||
+        a.name.localeCompare(b.name)
+      );
+    });
 
     // Respond with view or JSON.
     if(this.req.wantsJSON) {
-      return exits.successJSON(
-        {vendors}
-      );
+      return exits.successJSON({ vendors: vendors });
     } else {
-      return exits.success({vendors});
+      return exits.success({ vendors: vendors });
     }
 
   }
