@@ -104,12 +104,18 @@ module.exports = {
     inputs: CreateOrderInputs,
     exits: {
       success: (unusedArg: ValidateOrderResult) => ValidateOrderResult;
-      noItemsFound: () => void;
-      invalidVendor: () => void;
-      invalidFulfilmentMethod: () => void;
-      invalidProduct: () => void;
-      invalidProductOption: () => void;
-      invalidPostalDistrict: () => void;
+      noItemsFound: (unused?: { data: any } | Error | string | null) => void;
+      invalidVendor: (unused?: { data: any } | Error | string | null) => void;
+      invalidFulfilmentMethod: (
+        unused?: { data: any } | Error | string | null
+      ) => void;
+      invalidProduct: (unused?: { data: any } | Error | string | null) => void;
+      invalidProductOption: (
+        unused?: { data: any } | Error | string | null
+      ) => void;
+      invalidPostalDistrict: (
+        unused?: { data: any } | Error | string | null
+      ) => void;
       invalidSlot: (unusedMsg: string) => void;
       invalidDiscountCode: (unusedMsg: string) => void;
       invalidUserAddress: (unusedArg: { data: string }) => void;
@@ -139,10 +145,9 @@ module.exports = {
       sails.log.warn('helpers.validateOrder: invalidFulfilmentMethod');
       return exits.invalidFulfilmentMethod();
     } else if (
-      (fulfilmentMethod.vendor &&
-      fulfilmentMethod.vendor.id !== vendor.id) ||
+      (fulfilmentMethod.vendor && fulfilmentMethod.vendor.id !== vendor.id) ||
       (fulfilmentMethod.deliveryPartner &&
-      fulfilmentMethod.deliveryPartner.id !== vendor.deliveryPartner.id)
+        fulfilmentMethod.deliveryPartner.id !== vendor.deliveryPartner.id)
     ) {
       sails.log.warn('helpers.validateOrder: invalidFulfilmentMethod');
       return exits.invalidFulfilmentMethod();
@@ -189,7 +194,9 @@ module.exports = {
         // If option is not found
         if (!option) {
           sails.log.warn('helpers.validateOrder: invalidProductOption');
-          return exits.invalidProductOption();
+          return exits.invalidProductOption({
+            data: 'product option not found',
+          });
         }
 
         // If option value for item is not found in product option values
@@ -199,12 +206,17 @@ module.exports = {
           )
         ) {
           sails.log.warn('helpers.validateOrder: invalidProductOption');
-          return exits.invalidProductOption();
+          return exits.invalidProductOption({
+            data: 'product option not found',
+          });
         }
       }
     }
     if (fulfilmentMethod.methodType === 'delivery') {
-      if (fulfilmentMethod.maxDeliveryDistance > 0 && fulfilmentMethod.fulfilmentOrigin) {
+      if (
+        fulfilmentMethod.maxDeliveryDistance > 0 &&
+        fulfilmentMethod.fulfilmentOrigin
+      ) {
         let deliveryCoordinates: GetCoordinatesForAddressResult | null;
         try {
           const _deliveryCoordinates =
@@ -258,7 +270,7 @@ module.exports = {
           sails.log.warn('helpers.validateOrder: invalidPostalDistrict');
           return exits.invalidPostalDistrict();
         }
-      }  
+      }
     }
     if (fulfilmentMethod.methodType === 'collection') {
       // require user to submit their name and address for identification purposes on collection

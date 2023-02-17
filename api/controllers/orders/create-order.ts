@@ -357,7 +357,7 @@ module.exports = {
               deliveryAddressLineOne: inputs.address.lineOne,
               deliveryAddressLineTwo: inputs.address.lineTwo,
               deliveryAddressCity: inputs.address.city,
-              deliveryAddressPostCode: inputs.address.postCode,
+              deliveryAddressPostCode: inputs.address.postCode || '',
               deliveryAddressLatitude: inputs.address.lat,
               deliveryAddressLongitude: inputs.address.lng,
               deliveryAddressInstructions: inputs.address.deliveryInstructions,
