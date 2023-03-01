@@ -84,7 +84,6 @@ CREATE TABLE `account` (
   `id` int NOT NULL AUTO_INCREMENT,
   `walletAddress` varchar(255) DEFAULT '',
   `verified` tinyint(1) DEFAULT 0,
-  `isVendor` tinyint(1) DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

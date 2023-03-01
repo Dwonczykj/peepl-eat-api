@@ -150,3 +150,6 @@ cloneLocalDb.sh
 executeLocalDbScript.sh
 executeDbScript.sh
 copyQACodeToProd.sh
+
+test/**/*jpg
+test/**/*jpeg

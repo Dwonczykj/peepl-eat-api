@@ -134,7 +134,9 @@ module.exports.routes = {
   'GET /home/like': { action: 'home/like' },
   'POST /api/v1/home/like': { action: 'home/like' },
 
-  'GET /admin/product-suggestions': { action: 'admin/view-product-suggestions' },
+  'GET /admin/product-suggestions': {
+    action: 'admin/view-product-suggestions',
+  },
   'GET /admin/product-suggestions/:productSuggestionId': {
     action: 'admin/view-product-suggestion',
   },
@@ -169,6 +171,9 @@ module.exports.routes = {
   },
   'GET /api/v1/admin/user-for-wallet-address': {
     action: 'admin/get-user-for-wallet-address',
+  },
+  'GET /api/v1/admin/account-is-vendor': {
+    action: 'admin/account-is-vendor',
   },
   'GET /api/v1/admin/is-user-vendor-owner/:vendorId': {
     action: 'admin/is-user-vendor-owner',

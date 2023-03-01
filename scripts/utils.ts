@@ -168,7 +168,6 @@ type _UserTypeHidden = {
 export type AccountType = {
   id: number;
   verified: boolean;
-  isVendor: boolean;
   walletAddress: walletAddressString | '';
 };
 

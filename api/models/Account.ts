@@ -23,11 +23,6 @@ let _exports: SailsModelDefnType<AccountType> = {
       required: false,
       defaultsTo: false,
     },
-    isVendor: {
-      type: 'boolean',
-      required: false,
-      defaultsTo: false,
-    },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗

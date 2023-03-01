@@ -34,6 +34,7 @@ module.exports.policies = {
   'admin/user-exists-for-email': true,
   'admin/user-exists-for-phone': true,
   'admin/get-user-for-wallet-address': true,
+  'admin/account-is-vendor': true,
   'admin/signup': true,
   'admin/get-survey-questions': true,
   'admin/submit-survey-response': true,
