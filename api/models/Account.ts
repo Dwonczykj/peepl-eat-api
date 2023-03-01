@@ -1,46 +1,42 @@
 /**
- * ProductOption.js
+ * Account.ts
  *
  * @description :: A model definition represents a database table/collection.
  * @docs        :: https://sailsjs.com/docs/concepts/models-and-orm/models
  */
 
-module.exports = {
+import { AccountType, SailsModelDefnType } from '../../scripts/utils';
 
+let _exports: SailsModelDefnType<AccountType> = {
   attributes: {
-
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
     //  ╩  ╩╚═╩╩ ╩╩ ╩ ╩ ╚╝ ╚═╝╚═╝
-    name: {
+
+    walletAddress: {
       type: 'string',
-      description: 'Name of the product options, for example "colour".'
+      required: true,
+      regex: /^0x[a-fA-F0-9]{40}$|^$/,
     },
-    isRequired: {
+    verified: {
       type: 'boolean',
-      description: 'Whether or not this option is required.',
-      defaultsTo: false
+      required: false,
+      defaultsTo: false,
+    },
+    isVendor: {
+      type: 'boolean',
+      required: false,
+      defaultsTo: false,
     },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
     //  ╚═╝╩ ╩╚═╝╚═╝═╩╝╚═╝
 
-
     //  ╔═╗╔═╗╔═╗╔═╗╔═╗╦╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
     //  ╠═╣╚═╗╚═╗║ ║║  ║╠═╣ ║ ║║ ║║║║╚═╗
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
-    product: {
-      model: 'product',
-      description: 'The product for which the option applies.',
-      required: true
-    },
-    values: {
-      collection: 'productoptionvalue',
-      via: 'option',
-      description: 'The values that can be chosen for this option (i.e. blue, green)'
-    }
-
   },
-
 };
+
+module.exports = _exports;

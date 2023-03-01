@@ -41,7 +41,7 @@ module.exports.custom = {
   distancesApiRelUrlGetDistance: 'distancematrix/json', // ~ https://googlemaps.github.io/google-maps-services-js/modules/_distance_.html#:~:text=Const-,defaultUrl,-defaultUrl%3A
   amazonS3BucketUrl: 'https://vegiapp-1.s3.us-east-1.amazonaws.com/',
   amazonS3Bucket: 'vegiapp-1',
-  amazonS3MaxUploadSizeBytes: 30000000,
+  amazonS3MaxUploadSizeBytes: 1 * 1024 * 1024,
   vegiEatsRewardPcnt: 0.05,
   vegiPayRewardPcnt: 0.005, // TODO v2.0: To be 0 <= x <= 0.01 based on ESC measure value
   PPLTokenValueInPence: 10, // TODO: GET this value from the PeeplPay API @TheAdamGalloway

@@ -62,27 +62,51 @@ module.exports = {
         }
       }
       try {
-	      imageInfo = await sails
-	        .uploadOne(inputs.image, {
-	          adapter: require('skipper-s3'),
-	          key: sails.config.custom.amazonS3AccessKey,
-	          secret: sails.config.custom.amazonS3Secret,
-	          bucket: sails.config.custom.amazonS3Bucket,
-	          maxBytes: sails.config.custom.amazonS3MaxUploadSizeBytes,
-	        })
-	        .intercept('E_EXCEEDS_UPLOAD_LIMIT', 'tooBig')
-	        .intercept(
-	          (err) => new Error('The photo upload failed! ' + err.message)
-	        );
-        imageInfo = {
-          ...imageInfo,
-          ffd: sails.config.custom.amazonS3BucketUrl + imageInfo.fd,
-        };
+        // ~ https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#upload-property
+        await sails.uploadOne(
+          inputs.image,
+          {
+            adapter: require('skipper-s3'),
+            key: sails.config.custom.amazonS3AccessKey,
+            secret: sails.config.custom.amazonS3Secret,
+            bucket: sails.config.custom.amazonS3Bucket,
+            maxBytes: sails.config.custom.amazonS3MaxUploadSizeBytes,
+          },
+          (err, filesUploaded) => {
+            if (err) {
+              sails.log.error(err);
+            }
+            // return res.ok({
+            //   files: filesUploaded,
+            //   textParams: req.allParams()
+            // });
+            imageInfo = filesUploaded;
+            const imageInfoFileName = imageInfo && imageInfo.filename;
+            if (!imageInfoFileName) {
+              sails.log.error(
+                `Error uploading image to s3-bucket: and no files uploaded!`
+              );
+            }
+            imageInfo =
+              imageInfo && imageInfo.fd
+                ? {
+                    ...imageInfo,
+                    ffd: sails.config.custom.amazonS3BucketUrl + imageInfo.fd,
+                  }
+                : null;
+            if (!imageInfo) {
+              return exits.success(undefined);
+            }
+            return exits.success(imageInfo);
+          }
+        );
+        // .intercept('E_EXCEEDS_UPLOAD_LIMIT', 'tooBig')
+        // .intercept(
+        //   (err) => new Error('The photo upload failed! ' + err.message)
+        // );
+        
       } catch (error) {
         sails.log.error(`Error uploading image to s3-bucket: ${error}`);
-        return exits.success(undefined);
-      }
-      if(!imageInfo){
         return exits.success(undefined);
       }
     } else {
@@ -90,7 +114,8 @@ module.exports = {
         fd: inTestEnv ? 'test-image-fd-' + uuidv4() : null,
         ffd: null,
       };
+      return exits.success(imageInfo);
     }
-    return exits.success(imageInfo);
+    
   },
 };

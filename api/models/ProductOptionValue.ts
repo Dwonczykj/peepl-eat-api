@@ -5,7 +5,12 @@
  * @docs        :: https://sailsjs.com/docs/concepts/models-and-orm/models
  */
 
-module.exports = {
+import {
+  ProductOptionValueType,
+  SailsModelDefnType,
+} from '../../scripts/utils';
+
+let _exports: SailsModelDefnType<ProductOptionValueType> = {
   attributes: {
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
@@ -55,7 +60,8 @@ module.exports = {
     },
     stockUnitsPerProduct: {
       type: 'number',
-      description: 'Number of units per pack, i.e. a pack of 6 would have value of 6',
+      description:
+        'Number of units per pack, i.e. a pack of 6 would have value of 6',
       defaultsTo: 1,
     },
     sizeInnerUnitValue: {
@@ -65,12 +71,14 @@ module.exports = {
     },
     sizeInnerUnitType: {
       type: 'string',
-      description: 'A measure of the units used to describe the value of the size of 1 unit i.e. ml',
+      description:
+        'A measure of the units used to describe the value of the size of 1 unit i.e. ml',
       defaultsTo: '',
     },
     productBarCode: {
       type: 'string',
-      description: 'A stringified long number, potentially GUID in future, that maps to the UPC (barcode) on the product',
+      description:
+        'A stringified long number, potentially GUID in future, that maps to the UPC (barcode) on the product',
       defaultsTo: '',
     },
 
@@ -88,3 +96,5 @@ module.exports = {
     },
   },
 };
+
+module.exports = _exports;

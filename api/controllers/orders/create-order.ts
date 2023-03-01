@@ -188,9 +188,9 @@ module.exports = {
       return exits.badRequest(err);
     }
 
-    let vendor = await Vendor.findOne({ id: inputs.vendor }).populate(
-      'deliveryPartner'
-    );
+    let vendor = await Vendor.findOne({ id: inputs.vendor })
+      .populate('deliveryPartner')
+      .populate('pickupAddress');
     let discount;
 
     if (inputs.discountCode) {
@@ -357,7 +357,8 @@ module.exports = {
               deliveryAddressLineOne: inputs.address.lineOne,
               deliveryAddressLineTwo: inputs.address.lineTwo,
               deliveryAddressCity: inputs.address.city,
-              deliveryAddressPostCode: inputs.address.postCode || '',
+              deliveryAddressPostCode:
+                inputs.address.postCode || vendor.pickupAddress.postCode || 'NA11 1AA',
               deliveryAddressLatitude: inputs.address.lat,
               deliveryAddressLongitude: inputs.address.lng,
               deliveryAddressInstructions: inputs.address.deliveryInstructions,

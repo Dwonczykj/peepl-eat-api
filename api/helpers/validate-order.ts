@@ -167,9 +167,11 @@ module.exports = {
       let product = products.find((product) => product.id === item.id);
       if (!product) {
         sails.log.warn(
-          'helpers.validateOrder: invalidProduct. Check products given are registered to the correct vendor.'
+          `helpers.validateOrder: invalidProduct [id: ${item.id}. ${item}]. Check products given are registered to the correct vendor.`
         );
-        return exits.invalidProduct();
+        return exits.invalidProduct(
+          `No product was found in DB matching item with id: ${item.id}. ${item}`
+        );
       }
 
       // Check that the item has all required options

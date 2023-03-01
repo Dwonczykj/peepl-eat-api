@@ -1,4 +1,5 @@
-const bcrypt = require('bcrypt');
+import _ from 'lodash-es';
+import bcrypt from 'bcrypt';
 /**
  * User.js
  *
@@ -6,9 +7,9 @@ const bcrypt = require('bcrypt');
  * @docs        :: https://sailsjs.com/docs/concepts/models-and-orm/models
  */
 
-// import userModel = require('./UserModel');
+import { UserType, SailsModelDefnType } from '../../scripts/utils';
 
-module.exports = {
+let _exports: SailsModelDefnType<UserType> & { formatPhoneNumber?: (unusedOpts:{id: UserType["id"]}) => any; } = {
   attributes: {
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
@@ -153,10 +154,9 @@ module.exports = {
     //   throw err;
     // }
 
-    userDraft.marketingNotificationUtility = Math.round(Math.max(
-      -1,
-      userDraft.marketingNotificationUtility
-    ));
+    userDraft.marketingNotificationUtility = Math.round(
+      Math.max(-1, userDraft.marketingNotificationUtility)
+    ) as UserType['marketingNotificationUtility'];
 
     const existingUser = await User.findOne({
       phoneNoCountry: userDraft.phoneNoCountry,
@@ -232,3 +232,5 @@ module.exports = {
     return proceed();
   },
 };
+
+module.exports = _exports;

@@ -5,10 +5,13 @@
  * @docs        :: https://sailsjs.com/docs/concepts/models-and-orm/models
  */
 
-module.exports = {
+import {
+  ProductType,
+  SailsModelDefnType,
+} from '../../scripts/utils';
 
+let _exports: SailsModelDefnType<ProductType> = {
   attributes: {
-
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
     //  ╩  ╩╚═╩╩ ╩╩ ╩ ╩ ╚╝ ╚═╝╚═╝
@@ -16,11 +19,11 @@ module.exports = {
     name: {
       type: 'string',
       required: true,
-      maxLength: 50
+      maxLength: 50,
     },
     description: {
       type: 'string',
-      required: false
+      required: false,
     },
     shortDescription: {
       type: 'string',
@@ -28,29 +31,33 @@ module.exports = {
     },
     basePrice: {
       type: 'number',
-      description: 'Base product price in pence. This can be modified by product options or delivery methods.',
-      required: true
+      description:
+        'Base product price in pence. This can be modified by product options or delivery methods.',
+      required: true,
     },
     imageUrl: {
       type: 'string',
     },
     isAvailable: {
       type: 'boolean',
-      description: 'Boolean to represent whether the product is available or not.'
+      description:
+        'Boolean to represent whether the product is available or not.',
     },
     priority: {
       type: 'number',
-      description: 'Temporary way to store priority of products'
+      description: 'Temporary way to store priority of products',
     },
     isFeatured: {
       type: 'boolean',
-      description: 'Boolean to represent whether the product is featured or not.'
+      description:
+        'Boolean to represent whether the product is featured or not.',
     },
     status: {
       type: 'string',
       isIn: ['active', 'inactive'],
       defaultsTo: 'inactive',
-      description: 'string active|inactive to represent whether product is discontinued or not'
+      description:
+        'string active|inactive to represent whether product is discontinued or not',
     },
     ingredients: {
       type: 'string',
@@ -64,26 +71,26 @@ module.exports = {
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
     //  ╚═╝╩ ╩╚═╝╚═╝═╩╝╚═╝
 
-
     //  ╔═╗╔═╗╔═╗╔═╗╔═╗╦╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
     //  ╠═╣╚═╗╚═╗║ ║║  ║╠═╣ ║ ║║ ║║║║╚═╗
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
     vendor: {
       model: 'vendor',
       description: 'The seller of the product.',
-      required: true
+      required: true,
     },
     options: {
       collection: 'productoption',
       via: 'product',
-      description: 'A collection of options that apply to the product (i.e. colour).'
+      description:
+        'A collection of options that apply to the product (i.e. colour).',
     },
     category: {
       model: 'productcategory',
       description: 'The category of the product.',
     },
-
   },
-
 };
+
+module.exports = _exports;
 

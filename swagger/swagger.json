@@ -5576,13 +5576,13 @@
             "description": "Success"
           },
           "400": {
-            "description": "Server error"
+            "description": "Success"
           },
           "404": {
             "description": "Resource not found"
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Server error"
           }
         }
       }

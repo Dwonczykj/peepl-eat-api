@@ -168,8 +168,9 @@ type _UserTypeHidden = {
 export type AccountType = {
   id: number;
   verified: boolean;
+  isVendor: boolean;
   walletAddress: walletAddressString | '';
-}
+};
 
 export type VendorTypeLiteral = 'restaurant' | 'shop';
 export type StatusLiteral = 'active' | 'inactive';
@@ -241,6 +242,7 @@ type _DeliveryPartnerTypeHidden = {
 export type UserType = _UserTypeHidden & {
   vendor: _VendorTypeHidden;
   deliveryPartner: _DeliveryPartnerTypeHidden;
+  secret?: string | null;
 };
 
 type _FulfilmentMethodTypeHidden = {
@@ -332,6 +334,7 @@ export type _ProductTypeHidden = {
   priority: number;
   isFeatured: boolean;
   status: StatusLiteral;
+  ingredients?: string | null;
 };
 export type _ProductCategoryTypeHidden = {
   id: number;
@@ -676,17 +679,30 @@ export type ActionInputStringDefnType = _actionInputType & {
   isIn?: Array<any>;
   maxLength?: number;
   minLength?: number;
+  isEmail?: boolean;
+  unique?: boolean;
+  protect?: boolean;
+  example?: string;
+  regex?: RegExp;
 };
 export type ActionInputNumberDefnType = _actionInputType & {
   type: 'number';
   defaultsTo?: any;
   min?: number;
   max?: number;
+  unique?: boolean;
+  required?: boolean;
 };
 export type ActionInputBooleanDefnType = _actionInputType & {
   type: 'boolean';
   defaultsTo?: any;
+  required?: boolean;
 };
+
+type _actionPrimitiveDefnType =
+  | ActionInputStringDefnType
+  | ActionInputBooleanDefnType
+  | ActionInputNumberDefnType;
 
 
 export type ModelAttributeAssociationModlDefnType = {
@@ -698,8 +714,8 @@ export type ModelAttributeAssociationColnDefnType = {
   via: string;
   description?: string;
 };
-export type ModelAttributePrimitiveDefnType = _actionInputType & {
-  columnType?: 'INT' | 'TINYINT' | 'DATETIME' | null;
+export type ModelAttributePrimitiveDefnType = _actionPrimitiveDefnType & {
+  columnType?: 'INT' | 'TINYINT' | 'DATETIME' | 'LONGTEXT' | null;
 };
 
 export type ModelAttributeType =
@@ -822,10 +838,12 @@ type yyy = xxx<HeyMan>;
 
 export type SailsModelDefnType<T extends { id: number }> = {
   attributes: {
-    [k in keyof Omit<T,'id'>]: ModelAttributeType;
+    [k in keyof Omit<T, 'id'>]: ModelAttributeType;
   };
   beforeCreate?: (valuesToSet: Omit<T, 'id'>, proceed: () => void) => void;
   afterCreate?: (newRecord: T, proceed: () => void) => void;
+  customToJSON?: () => any;
+
 };
 
 export type SailsActionDefnType<

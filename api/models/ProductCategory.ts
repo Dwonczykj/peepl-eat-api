@@ -4,8 +4,9 @@
  * @description :: A model definition represents a database table/collection.
  * @docs        :: https://sailsjs.com/docs/concepts/models-and-orm/models
  */
+import { ProductCategoryType, SailsModelDefnType } from '../../scripts/utils';
 
-module.exports = {
+let _exports: SailsModelDefnType<ProductCategoryType> = {
   attributes: {
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
@@ -44,17 +45,17 @@ module.exports = {
   },
 
   afterCreate: async function (newlyCreatedRecord, proceed) {
-    if(newlyCreatedRecord.vendor){
+    if (newlyCreatedRecord.vendor) {
       await Vendor.addToCollection(
         newlyCreatedRecord.vendor,
         'productCategories',
-        [
-          newlyCreatedRecord.id,
-        ]
+        [newlyCreatedRecord.id]
       );
     }
 
     return proceed();
   },
 };
+
+module.exports = _exports;
 

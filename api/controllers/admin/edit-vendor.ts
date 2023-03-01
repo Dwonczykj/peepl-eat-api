@@ -175,6 +175,13 @@ module.exports = {
     });
     let newAddress: AddressType | sailsModelKVP<AddressType>;
     if (!existingAddress) {
+      if (
+        !inputs.pickupAddress.addressLineOne ||
+        !inputs.pickupAddress.addressTownCity ||
+        !inputs.pickupAddress.addressPostCode
+      ){
+        return exits.badPostalCode();
+      }
       newAddress = await Address.create({
         vendor: inputs.id,
         label: 'Store',

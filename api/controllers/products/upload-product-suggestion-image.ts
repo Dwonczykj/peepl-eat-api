@@ -40,6 +40,9 @@ const _exports = {
       data: null,
     },
     error: {
+      statusCode: 500,
+    },
+    uploadFailed: {
       statusCode: 400,
     },
   },
@@ -51,6 +54,7 @@ const _exports = {
         unused: _UploadProductSuggestionImageResponseType
       ) => _UploadProductSuggestionImageResponseType;
       error: (unusedMessage: Error | string) => void;
+      uploadFailed: (unusedMessage: Error | string) => void;
     }
   ) {
     let imageUrl = '';
@@ -59,6 +63,9 @@ const _exports = {
       if (imageInfo) {
         imageUrl = sails.config.custom.amazonS3BucketUrl + imageInfo.fd;
       }
+    }
+    if (!imageUrl) {
+      return exits.uploadFailed('Unable to upload image to S3');
     }
 
     const productSuggestionImage = await ProductSuggestionImage.create({
