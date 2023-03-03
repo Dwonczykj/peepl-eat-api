@@ -51,7 +51,7 @@ module.exports = {
     fromName: {
       description: 'An override for the default "from" name.',
       example: 'Anne Martin',
-      defaultsTo: 'Peepl Eat'
+      defaultsTo: 'vegi'
     },
     layout: {
       description: 'Set to `false` to disable layouts altogether, or provide the path (relative '+

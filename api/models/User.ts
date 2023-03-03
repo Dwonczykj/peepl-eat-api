@@ -1,5 +1,5 @@
-import _ from 'lodash-es';
-import bcrypt from 'bcrypt';
+import _ from 'lodash';
+// import bcrypt from 'bcrypt';
 /**
  * User.js
  *

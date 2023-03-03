@@ -178,6 +178,9 @@
       "name": "Get account for wallet address"
     },
     {
+      "name": "Account is vendor"
+    },
+    {
       "name": "Customer cancel order"
     },
     {
@@ -300,6 +303,47 @@
   ],
   "components": {
     "schemas": {
+      "account": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/account-without-required-constraint"
+          },
+          {
+            "required": [
+              "walletAddress"
+            ]
+          }
+        ]
+      },
+      "account-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **Account**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "walletAddress": {
+            "type": "string",
+            "pattern": "^0x[a-fA-F0-9]{40}$|^$"
+          },
+          "verified": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
       "address": {
         "type": "object",
         "allOf": [
@@ -5646,6 +5690,37 @@
           },
           "404": {
             "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/account-is-vendor": {
+      "get": {
+        "summary": "Account is vendor",
+        "description": "Check if a wallet address belongs to a vendor",
+        "tags": [
+          "Account is vendor"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "walletAddress",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
           },
           "500": {
             "description": "Internal server error"

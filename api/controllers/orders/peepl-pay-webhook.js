@@ -114,7 +114,7 @@ Delivery/Collection on ${order.fulfilmentSlotFrom} - ${order.fulfilmentSlotTo}`,
     //   template: 'email-order-confirmation-new',
     //   templateData: {order: orderDetails},
     //   to: orderDetails.deliveryEmail,
-    //   subject: 'Peepl Eat Order Confirmed - #' + orderDetails.id ,
+    //   subject: 'vegi Order Confirmed - #' + orderDetails.id ,
     //   layout: false,
     // });
 

@@ -64,7 +64,11 @@ module.exports = {
     });
 
     if (!account) {
-      return exits.success({});
+      const newAccount = await Account.create({
+        walletAddress: inputs.walletAddress,
+        verified: false,
+      }).fetch();
+      return exits.success({account: newAccount});
     }
 
     return exits.success(account);
