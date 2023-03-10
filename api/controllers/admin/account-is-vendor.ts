@@ -41,7 +41,7 @@ const _exports: SailsActionDefnType<
 
   exits: {
     success: {
-      
+      data: {}
     },
   },
 
