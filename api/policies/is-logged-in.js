@@ -14,7 +14,8 @@ module.exports = async function (req, res, proceed) {
     if (req.wantsJSON) {
       return res.forbidden();
     } else {
-      return res.redirect('/admin/login-with-password');
+      // ~ https://sailsjs.com/documentation/reference/request-req/req-original-url
+      return res.redirect('/admin/login-with-password?next=' + encodeURIComponent(req.originalUrl));
     }
   }
 

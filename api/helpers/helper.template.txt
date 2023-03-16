@@ -1,0 +1,70 @@
+import axios from 'axios';
+import moment from 'moment';
+
+import { SailsActionDefnType } from '../../scripts/utils';
+import {
+  sailsModelKVP,
+  SailsModelType,
+  sailsVegi,
+} from '../interfaces/iSails';
+import {
+  UserType
+} from '../../scripts/utils';
+
+declare var sails: sailsVegi;
+declare var User: SailsModelType<UserType>;
+
+
+export type ${1:${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}}Inputs = {
+  ${2:firstInputName}:${3:firstInputType},
+  $4,
+};
+
+export type ${1:${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}}Result = {
+    [barcode: string]: {
+  id: number;
+  createdAt: number;
+  productPublicId: string;
+  rating: number;
+  evidence: object;
+  calculatedOn: Date;
+  product: ProductType;
+  explanations: sailsModelKVP<ESCExplanationType>[];
+} | null};
+
+export type ${1:${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}}Exits = {
+  success: (unusedData: ${1:${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}}Result|false) => any;
+};
+
+const _exports: SailsActionDefnType<
+  ${1:${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}}Inputs,
+  ${1:${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}}Result,
+  ${1:${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}}Exits
+> = {
+  friendlyName: '${1:${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}}',
+
+  inputs: {
+    $2: {
+      type: $3$5,
+      required: true,
+    },
+    $4
+  },
+
+  exits: {
+    success: {
+      data: false,
+    },
+  },
+
+  fn: async function (
+    inputs: ${1:${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}}Inputs,
+    exits: ${1:${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}}Exits
+  ) {
+    
+
+    return exits.success(resultFinal);
+  },
+};
+
+module.exports = _exports;

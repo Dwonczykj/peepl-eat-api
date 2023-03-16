@@ -8,6 +8,7 @@ import {
   DeliveryPartnerType,
   walletAddressString,
   AccountType,
+  SailsActionDefnType,
 } from '../../../scripts/utils';
 import { sailsVegi, SailsModelType } from '../../interfaces/iSails';
 declare var sails: sailsVegi;
@@ -15,7 +16,38 @@ declare var DeliveryPartner: SailsModelType<DeliveryPartnerType>;
 declare var User: SailsModelType<UserType>;
 declare var Account: SailsModelType<AccountType>;
 
-module.exports = {
+type UpdateUserInputs = {
+  name: string;
+  role: UserRoleLiteral;
+  email: string;
+  password?: string;
+  vendorId?: number;
+  vendorRole?: UserVendorRoleLiteral;
+  vendorConfirmed?: boolean;
+  roleConfirmedWithOwner?: boolean;
+  deliveryPartnerId?: number;
+  deliveryPartnerRole?: UserDeliveryPartnerRoleLiteral;
+  walletAddress: walletAddressString | '';
+  marketingEmailContactAllowed: boolean;
+  marketingPhoneContactAllowed: boolean;
+  marketingPushContactAllowed: boolean;
+  marketingNotificationUtility: UserType['marketingNotificationUtility'];
+};
+
+type UpdateUserResult = { updatedUserId: number } | null | undefined;
+type UpdateUserExits = {
+  success: (unusedArg?: UpdateUserResult) => any;
+  badRequest: (unusedArg?: any) => void;
+  notFound: () => void;
+  unauthorised: () => void;
+  firebaseErrored: (unusedArg?: any) => void;
+};
+
+const _exports: SailsActionDefnType<
+  UpdateUserInputs,
+  UpdateUserResult,
+  UpdateUserExits
+> = {
   friendlyName: 'Update User Vendor Role',
 
   description:
@@ -131,30 +163,8 @@ module.exports = {
   },
 
   fn: async function (
-    inputs: {
-      name: string;
-      role: UserRoleLiteral;
-      email: string;
-      password?: string;
-      vendorId?: number;
-      vendorRole?: UserVendorRoleLiteral;
-      vendorConfirmed?: boolean;
-      roleConfirmedWithOwner?: boolean;
-      deliveryPartnerId?: number;
-      deliveryPartnerRole?: UserDeliveryPartnerRoleLiteral;
-      walletAddress: walletAddressString | '';
-      marketingEmailContactAllowed: boolean;
-      marketingPhoneContactAllowed: boolean;
-      marketingPushContactAllowed: boolean;
-      marketingNotificationUtility: UserType['marketingNotificationUtility'];
-    },
-    exits: {
-      success: (unusedArg?: { updatedUserId: number }) => void;
-      badRequest: (unusedArg?: any) => void;
-      notFound: () => void;
-      unauthorised: () => void;
-      firebaseErrored: (unusedArg?: any) => void;
-    }
+    inputs,
+    exits,
   ) {
     // TODO: Integration Test this
     const myUser = await User.findOne({
@@ -189,7 +199,7 @@ module.exports = {
     if (Object.keys(inputs).includes('name')) {
       updateUserObj['name'] = inputs.name;
     }
-    
+
     if (Object.keys(inputs).includes('role')) {
       updateUserObj['role'] = inputs.role;
     }
@@ -270,8 +280,10 @@ module.exports = {
     if (Object.keys(inputs).includes('walletAddress') && inputs.walletAddress) {
       const walletAddressPattern = new RegExp(/^0x[a-fA-F0-9]{40}$/);
       if (inputs.walletAddress.match(walletAddressPattern)) {
-        const existingAccount = await Account.findOne({walletAddress: inputs.walletAddress});
-        if (!existingAccount){
+        const existingAccount = await Account.findOne({
+          walletAddress: inputs.walletAddress,
+        });
+        if (!existingAccount) {
           await Account.create({
             verified: false,
             walletAddress: inputs.walletAddress,
@@ -320,3 +332,5 @@ module.exports = {
     });
   },
 };
+
+module.exports = _exports;

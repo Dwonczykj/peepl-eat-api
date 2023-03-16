@@ -1,5 +1,5 @@
 import { SailsModelType } from '../../../api/interfaces/iSails';
-import { PostalDistrictType } from "../../../scripts/utils";
+import { PostalDistrictType, VendorType } from "../../../scripts/utils";
 
 declare var PostalDistrict: SailsModelType<PostalDistrictType>;
 
@@ -42,13 +42,22 @@ module.exports = {
     }
 
     if(postalDistrict){
+      var vendorsUnsorted = postalDistrict.vendors;
+
+      const vendors = vendorsUnsorted.sort((a, b) => {
+        const statae: VendorType['status'][] = ['active', 'draft', 'inactive'];
+        return (
+          statae.indexOf(a.status) - statae.indexOf(b.status) ||
+          a.name.localeCompare(b.name)
+        );
+      });
       // Respond with view or JSON.
       if(this.req.wantsJSON) {
         return exits.successJSON(
-          {vendors: postalDistrict.vendors}
+          {vendors: vendors}
         );
       } else {
-        return exits.success({vendors: postalDistrict.vendors});
+        return exits.success({ vendors: vendors });
       }
     } else {
       return exits.notFound();

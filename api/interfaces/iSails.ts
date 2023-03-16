@@ -6,7 +6,7 @@ import { GetAvailableDeliveryPartnerFromPoolInputs } from "../../api/helpers/get
 import { CreateOrderInputs, ValidateOrderResult } from "../../api/controllers/orders/create-order";
 import { iFulfilmentSlot, iSlot } from "./vendors/slot";
 import { CreateProductCategoriesInput } from "../helpers/create-product-categories";
-import { DeliveryPartnerType, DiscountType, NotificationType, OrderType, ProductCategoryType, walletAddressString } from '../../scripts/utils';
+import { DeliveryPartnerType, DiscountType, NotificationType, OmitId, OrderType, ProductCategoryType, walletAddressString } from '../../scripts/utils';
 import { EditProductCategoriesInput } from "../helpers/edit-product-categories";
 import { InitialiseDeliveryMethodsInput, InitialiseDeliveryMethodsResult } from "../../api/helpers/initialise-delivery-methods";
 import { GetCoordinatesForAddressInput, GetCoordinatesForAddressResult } from "../../api/helpers/get-coordinates-for-address";
@@ -18,6 +18,9 @@ import {
   GetVendorsInSphereInputs,
   GetVendorsInSphereResult,
 } from '../../api/helpers/get-vendors-in-sphere';
+import { GetProductRatingInputs, GetProductRatingResult } from "../helpers/get-product-rating-by-barcodes";
+import { SelectVendorProductsInputs, SelectVendorProductsResult } from "../../api/helpers/select-vendor-products";
+import { ParseBarcodesUploadInputs, ParseBarcodesUploadResult } from "api/helpers/parse-barcodes-upload";
 
 export type SailsActionInput =
   | {
@@ -62,11 +65,34 @@ export type OrderTypeEnumLiteral = 'vegiEats' | 'vegiPays'
 export type KeysOfType<T, U> = {
   [K in keyof T]: T[K] extends U ? K : never;
 }[keyof T];
-export type RequiredKeys<T> = Exclude<
-  KeysOfType<T, Exclude<T[keyof T], undefined>>,
-  undefined
->;
+export type KeysNotOfType<T, U> = {
+  [K in keyof T]: T[K] extends U ? never: K;
+}[keyof T];
+export type RequiredKeys<T> = KeysNotOfType<T,undefined>;
+// export type RequiredKeys<T> = Exclude<
+//   KeysOfType<T, Exclude<T[keyof T], undefined>>,
+//   undefined
+// >;
+export type RequiredObj<T> = {
+  [K in RequiredKeys<T>]: T[K]
+}
 export type OptionalKeys<T> = Exclude<keyof T, RequiredKeys<T>>;
+export type OptionalObj<T> = {
+  [K in OptionalKeys<T>]: T[K]
+}
+export type ValueKeys<T> = KeysOfType<T,ValueType>;
+export type RequiredValueKeys<T> = KeysOfType<RequiredObj<T>,ValueType>;
+export type OptionalValueKeys<T> = KeysOfType<OptionalObj<T>,ValueType>;
+export type NonValueKeys<T> = Exclude<keyof T, ValueKeys<T>>;
+
+// type TT = {
+//   id: number;
+//   ingredients?: string & undefined;
+// }
+// type y = TT['ingredients'];
+// type x = {
+//   [K in keyof TT]: TT[K] extends undefined ? never: K;
+// }[keyof TT];
 
 type ValueType = Date | string | number | boolean;
 
@@ -210,16 +236,69 @@ type SailsFindPopulateType<T> = Promise<sailsModelKVP<T>[] | null> & {
 };
 type SailsQueryType<T> = Promise<T | null>;
 
+type _populateStr = `${string}.${string}`;
+
 type _populated<T> = Promise<T | null> & {
-  populate: (
-    unusedArg: string
-  ) => Promise<(T | null) >; // * This can be chained to populate multiple collections.
+  populate: <S extends string>(unusedArg: S) => S extends _populateStr ? Promise<T | null> : Promise<T | null> & _populated<T>; // * This can be chained to populate multiple collections if non-deep population.
 };
 type SailsFindOnePopulateType<T> = Promise<sailsModelKVP<T> | null> & {
-  populate: (
-    unusedArg: string
-  ) => Promise<(T | null) & _populated<T>>; // * This can be chained to populate multiple collections.
+  populate: (unusedArg: string) => Promise<T | null> & _populated<T>; // * This can be chained to populate multiple collections.
 };
+
+export type CreateSailsModelType<T extends { id: number }> = {
+  [key in keyof OmitId<T>]: T[key] extends ValueType
+    ? T[key]
+    : T[key] extends Array<ValueType> 
+    ? Array<T[key][0]>
+    : T[key] extends Array<{ id: number }>
+    ? number[]
+    : number;
+};
+export type CreateSailsModelType2<T extends { id: number }> = ({
+  [key in RequiredKeys<OmitId<T>>]: T[key] extends ValueType
+    ? T[key]
+    : T[key] extends Array<ValueType> 
+    ? Array<T[key][0]>
+    : T[key] extends Array<{ id: number }>
+    ?
+        // | Array<CreateSailsModelType3<T[key][0]>>
+        | Array<CreateSailsModelType2<T[key][0]>>
+    : T[key] extends { id: number }
+    ? 
+      // | CreateSailsModelType3<T[key]> 
+      | CreateSailsModelType2<T[key]>
+    : number;
+} & {
+  [key in OptionalKeys<OmitId<T>>]?: T[key] extends ValueType | null
+    ? T[key]
+    : T[key] extends Array<ValueType> 
+    ? Array<T[key][0]>
+    : T[key] extends Array<{ id: number }>
+    ?
+        // | Array<CreateSailsModelType3<T[key][0]>>
+        | Array<CreateSailsModelType2<T[key][0]>>
+    : T[key] extends { id: number }
+    ? 
+      // | CreateSailsModelType3<T[key]> 
+      | CreateSailsModelType2<T[key]>
+    : number;
+});
+
+export type CreateSailsModelType3<T extends { id: number }> = OmitId<T> & (
+  {
+    [key in RequiredValueKeys<OmitId<T>>]: T[key] extends Array<any> ? Array<T[key][0]> : T[key];
+  }
+  &
+  {
+    [key in OptionalValueKeys<OmitId<T>>]?: T[key] extends Array<any> ? Array<T[key][0]> : T[key];
+  }
+  & 
+  {
+    [key in NonValueKeys<OmitId<T>>]?: T[key] extends Array<any>
+      ? number[]
+      : number;
+  } 
+);
 
 export type SailsModelType<T> = {
   addToCollection: (
@@ -398,6 +477,21 @@ export type sailsVegi = {
     getVendorsInSphere: _helperFunction<
       GetVendorsInSphereInputs,
       GetVendorsInSphereResult
+    >;
+
+    getProductRatingByBarcodes: _helperFunction<
+      GetProductRatingInputs,
+      GetProductRatingResult
+    >;
+
+    selectVendorProducts: _helperFunction<
+      SelectVendorProductsInputs,
+      SelectVendorProductsResult
+    >;
+    
+    parseBarcodesUpload: _helperFunction<
+      ParseBarcodesUploadInputs,
+      ParseBarcodesUploadResult
     >;
 
     validateOrder: {
@@ -611,7 +705,14 @@ export type sailsVegi = {
     >;
   };
   log: any;
+  // ~ https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#upload-property
+  uploadOne: (
+    body: Buffer | Blob | string | ReadableStream,
+    config: { [configKey: string]: any },
+    errHandler: (err: Error, filesUploaded: any) => any
+  ) => any;
   config: {
+    appPath: string;
     custom: { [configKey: string]: any };
     uploads: {
       adapter: any;

@@ -375,6 +375,15 @@ Cloud.setup({
         'productProcessed',
       ],
     },
+    uploadProducts: {
+      verb: 'POST',
+      url: '/api/v1/admin/upload-products',
+      args: [
+          'vendorId',
+          'supplierName',
+          'upload',
+      ],
+    },
     viewProductSuggestions: {
       verb: 'GET',
       url: '/api/v1/admin/view-product-suggestions',
@@ -387,6 +396,14 @@ Cloud.setup({
       url: '/api/v1/admin/view-product-suggestion',
       args: [
         'productSuggestionId'
+      ],
+    },
+    verifyWalletAccount: {
+      verb: 'POST',
+      url: '/api/v1/admin/verify-wallet-account',
+      args: [
+        'walletAddress',
+        'verified',
       ],
     },
     updateFulfilmentMethod: {

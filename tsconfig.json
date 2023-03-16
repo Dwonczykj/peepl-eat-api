@@ -29,5 +29,5 @@
     "include": [
         "./**/*.ts",
         "./**/*.tsx"
-    ],
+, "api/helpers/helper.template.ts", "scripts/export-db-json.js"    ],
 }

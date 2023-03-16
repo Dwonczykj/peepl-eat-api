@@ -55,6 +55,9 @@
       "name": "vegi app link"
     },
     {
+      "name": "ParseBarcodesUpload"
+    },
+    {
       "name": "View orders"
     },
     {
@@ -62,6 +65,9 @@
     },
     {
       "name": "View postal districts"
+    },
+    {
+      "name": "View white list"
     },
     {
       "name": "View delivery partners"
@@ -2626,7 +2632,17 @@
         "tags": [
           "View login with password"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "next",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success"
@@ -3025,6 +3041,29 @@
         }
       }
     },
+    "/admin/upload-products": {
+      "get": {
+        "summary": "ParseBarcodesUpload",
+        "tags": [
+          "ParseBarcodesUpload"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Server error"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/admin/orders": {
       "get": {
         "summary": "View orders",
@@ -3168,6 +3207,43 @@
           },
           "404": {
             "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/admin/white-list": {
+      "get": {
+        "summary": "View white list",
+        "description": "Display white listed wallet addressed accounts management page.",
+        "tags": [
+          "View white list"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
           },
           "500": {
             "description": "Internal server error"
@@ -5631,6 +5707,53 @@
         }
       }
     },
+    "/api/v1/admin/upload-products": {
+      "post": {
+        "summary": "ParseBarcodesUpload",
+        "tags": [
+          "ParseBarcodesUpload"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "vendorId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "supplierName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "upload",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Server error"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/api/v1/admin/user-for-wallet-address": {
       "get": {
         "summary": "Get account for wallet address",
@@ -5690,6 +5813,65 @@
           },
           "404": {
             "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/verify-wallet-account": {
+      "post": {
+        "summary": "Update User Vendor Role",
+        "description": "Update the role of the user at the vendor they are registered to",
+        "tags": [
+          "Update User Vendor Role"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "walletAddress",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^0x[a-fA-F0-9]{40}$|^$",
+              "default": ""
+            }
+          },
+          {
+            "in": "query",
+            "name": "verified",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad wallet addressed"
+          },
+          "404": {
+            "description": "There is no account with that wallet address"
           },
           "500": {
             "description": "Internal server error"

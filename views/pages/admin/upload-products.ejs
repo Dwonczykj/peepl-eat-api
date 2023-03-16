@@ -1,0 +1,72 @@
+<div id="upload-products" class="admin" v-cloak>
+
+  <%- partial('../../partials/admin-navbar.ejs') %>
+
+  <div class="container">
+    <h1 class="my-5">Upload Products</h1>
+
+    
+    <ajax-form 
+      :syncing.sync="syncing" 
+      :cloud-error.sync="cloudError" 
+      :handle-parsing="prepareFormForUpload"
+      @submitted="csvUploadSubmitted(true)" 
+      :action="'uploadProducts'"
+    >
+      
+      <div class="form-group">
+        <label for="vendorId">Vendor</label>
+        <select class="form-control" id="vendorId" v-model="vendorId">
+          <option v-for="vendor in vendors"
+            :value="vendor.id">{{vendor.name}} [{{vendor.type}}]</option>
+        </select>
+      </div>
+      <div v-if="cloudError === 'badBusinessName'" class="alert alert-danger mt-4" role="alert">
+        <p>Please ensure business name is correct. Alternatively submit a blank value and ask to be added by <a href="https://vegiapp.co.uk/">hello@vegiapp.co.uk</a></p>
+      </div>
+
+      <div class="form-group">
+        <label for="supplierName">Supplier Name</label>
+        <input type="text" v-model="supplierName" class="form-control" id="supplierName">
+      </div>
+
+      <fieldset>
+        <h2 class="h5 mt-3">CSV Upload</h2>
+        <div class="custom-file">
+          <input 
+            id="upload"
+            @change="changeFileInput($event.target.files)"
+            type="file" 
+            class="custom-file-input" 
+            accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" 
+            >
+          <!-- <label class="custom-file-label" for="customFile">{{uploadName}}</label> -->
+        </div>
+      </fieldset>
+
+      <ajax-button 
+        class="btn btn-peepl mt-4" 
+        type="submit" 
+        :syncing="syncing" 
+        v-bind:class="{ 'is-loading': syncing }"
+      >
+        Upload CSV
+      </ajax-button>
+      <div v-if="cloudError === 'notFound'" class="alert alert-danger mt-4" role="alert">
+        Selected vendor not found.
+      </div>
+      <div v-else-if="cloudError === 'error'" class="alert alert-danger mt-4" role="alert">
+        Error parsing the barcodes csv
+      </div>
+      <div v-else-if="cloudError" class="alert alert-danger mt-4" role="alert">
+        There has been an error uploading the barcodes csv. Please try again.
+      </div>
+    </ajax-form>
+
+    
+
+  
+
+  </div>
+</div>
+<%- /* Expose server-rendered data as window.SAILS_LOCALS :: */ exposeLocalsToBrowser() %>

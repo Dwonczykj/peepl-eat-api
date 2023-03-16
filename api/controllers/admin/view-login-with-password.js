@@ -6,6 +6,14 @@ module.exports = {
 
   description: 'Display "Login" page.',
 
+  inputs: {
+    next: {
+      required: false,
+      type: 'string',
+      allowNull: true,
+    },
+  },
+
 
   exits: {
 
@@ -26,6 +34,7 @@ module.exports = {
     return exits.success({
       useEmulator: sails.config.custom.FIREBASE_AUTH_EMULATOR_HOST,
       firebaseAPIKey: sails.config.custom.firebaseAPIKey,
+      nextUrl: inputs.next,
     });
 
   }

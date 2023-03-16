@@ -64,7 +64,7 @@ module.exports = {
       try {
         // ~ https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#upload-property
         await sails.uploadOne(
-          inputs.image,
+          inputs.image, // : Buffer, Typed Array, Blob, String, ReadableStream
           {
             adapter: require('skipper-s3'),
             key: sails.config.custom.amazonS3AccessKey,

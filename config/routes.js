@@ -158,6 +158,8 @@ module.exports.routes = {
   'GET /admin/vendors': { action: 'admin/view-vendors' },
   'GET /admin/vendors/new': { action: 'admin/view-create-vendor' },
   'GET /admin/vendors/:vendorid': { action: 'admin/view-edit-vendor' },
+  'GET /admin/upload-products': { action: 'admin/view-upload-products' },
+  'POST /api/v1/admin/upload-products': { action: 'admin/upload-products' },
   'GET /admin/orders': { action: 'admin/view-all-orders' },
   'GET /admin/discount-codes': { action: 'admin/view-discount-codes' },
   'GET /admin/approve-order/:orderId': { action: 'admin/view-approve-order' },
@@ -171,6 +173,12 @@ module.exports.routes = {
   },
   'GET /api/v1/admin/user-for-wallet-address': {
     action: 'admin/get-user-for-wallet-address',
+  },
+  'GET /admin/white-list': {
+    action: 'admin/view-white-list',
+  },
+  'POST /api/v1/admin/verify-wallet-account': {
+    action: 'admin/verify-wallet-account',
   },
   'GET /api/v1/admin/account-is-vendor': {
     action: 'admin/account-is-vendor',

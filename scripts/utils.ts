@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
-import { DaysOfWeek } from "scripts/DaysOfWeek";
+import { DaysOfWeek } from "./DaysOfWeek";
 import moment from 'moment';
+import { NonValueKeys, OptionalValueKeys, RequiredValueKeys } from "../api/interfaces/iSails";
 declare var sails: any;
 
 export function getTodayDayName(offset: number = 0): DaysOfWeek {
@@ -28,6 +29,19 @@ export function getTodayDayName(offset: number = 0): DaysOfWeek {
 }
 
 export type OmitId<T extends {id: number}> = Omit<T,'id'>;
+export type OmitIdRecursive<T extends {id: number}> = (
+  {
+    [key in RequiredValueKeys<OmitId<T>>]: T[key] extends Array<any> ? Array<T[key][0]> : T[key];
+  }
+  &
+  {
+    [key in OptionalValueKeys<OmitId<T>>]?: T[key] extends Array<any> ? Array<T[key][0]> : T[key];
+  }
+  & 
+  {
+    [key in NonValueKeys<OmitId<T>>]?: T[key] extends Array<{id: number}> ? Array<OmitId<T[key][0]>> : T[key] extends {id: number} ? OmitId<T[key]> : T[key];
+  } 
+);
 
 const prependLeadingZero = (val: number, prependIfValLessThan: number = 10) =>
   Math.abs(val) < Math.abs(prependIfValLessThan)
@@ -180,10 +194,6 @@ type _VendorTypeHidden = {
   name: string;
   type: VendorTypeLiteral;
   phoneNumber: string;
-  // pickupAddressLineOne?: string;
-  // pickupAddressLineTwo?: string;
-  // pickupAddressCity?: string;
-  // pickupAddressPostCode?: string;
   costLevel?: number;
   rating: number;
   isVegan: boolean;
@@ -335,6 +345,10 @@ export type _ProductTypeHidden = {
   status: StatusLiteral;
   ingredients?: string | null;
 };
+export type testTYPE = {
+  id: number;
+  ingredients?: string;
+};
 export type _ProductCategoryTypeHidden = {
   id: number;
   name: string;
@@ -405,14 +419,31 @@ export type PostalDistrictType = {
 };
 
 export type VendorType = _VendorTypeHidden & {
-  deliveryPartner?: _DeliveryPartnerTypeHidden;
-  deliveryFulfilmentMethod?: _FulfilmentMethodTypeHidden;
+  /// Address of the vendor
   pickupAddress?: _AddressTypeHidden;
+
+  /// vendor's preferred delivery partner if they have one
+  deliveryPartner?: _DeliveryPartnerTypeHidden;
+
+  /// fulfilment method config for deliveries from the vendor
+  deliveryFulfilmentMethod?: _FulfilmentMethodTypeHidden;
+
+  /// fulfilment method config for collections from the vendor
   collectionFulfilmentMethod?: _FulfilmentMethodTypeHidden;
+
+  /// the list of products in the vendor's inventory
   products: Array<_ProductTypeHidden>;
+
+  /// The categoric type of the vendor (i.e. a cafe).
   vendorCategories: Array<VendorCategoryType>; // Cafes
+
+  /// vendor specific categories to assign each of their products into
   productCategories: Array<_ProductCategoryTypeHidden>;
+
+  /// Postal Districts (Post Code Areas) that the vendor will allow customers from
   fulfilmentPostalDistricts: Array<PostalDistrictType>;
+
+  /// users registered to the vendor's organisation
   users: [];
 };
 export type ProductCategoryType = _ProductCategoryTypeHidden & {
@@ -761,14 +792,30 @@ export type ActionExitsDefnType<TExits extends ActionExitRequired<any>> = {
     ? {
         statusCode: 200;
       }
+    : k extends 'firebaseErrored'
+    ? {
+        statusCode?: 401;
+        code?: null | number | string;
+        responseType?: 'firebaseError';
+      }
     : {
         statusCode?: number;
-        responseType?: 'notFound' | 'error' | 'success';
+        responseType?:
+          | 'notFound'
+          | 'error'
+          | 'success'
+          | 'firebaseError'
+          | 'unauthorised'
+          | 'badRequest';
       }) & {
-        description?: string;
-        exampleOutput?: any;
-        data?: any;
-      };
+    description?: string;
+    message?: string;
+    error?: null | undefined | Error | string;
+    exampleOutput?: any;
+    outputDescription?: any;
+    outputExample?: any;
+    data?: any;
+  };
 };
 
 export type ActionInputArgDerivedType<
@@ -846,16 +893,18 @@ export type SailsModelDefnType<T extends { id: number }> = {
 };
 
 export type SailsActionDefnType<
-  T extends any,
+  TInputs extends any,
   TResponseSuccess extends any,
   TExits extends ActionExitRequired<TResponseSuccess>
-> = ('image' extends keyof ActionInputsDefnType<T> ? {
-  files: Array<'image'>
-} : {}) & {
-  inputs: ActionInputsDefnType<T>;
+> = ('image' extends keyof ActionInputsDefnType<TInputs>
+  ? {
+      files: Array<keyof TInputs & 'image'>;
+    }
+  : {}) & {
+  inputs: ActionInputsDefnType<TInputs>;
   exits: ActionExitsDefnType<TExits>;
-  fn: (inputs: T, exits: TExits) => any;
-  files?: Array<'image'>
+  fn: (inputs: TInputs, exits: TExits) => any;
+  files?: Array<keyof TInputs>;
   friendlyName?: string;
   description?: string;
 };

@@ -33,7 +33,7 @@ const _exports: SailsActionDefnType<
 
   exits: {
     success: {
-      viewTemplatePath: 'pages/admin/product-suggestions',
+      viewTemplatePath: 'pages/admin/suggestions',
     },
     successJSON: {
       statusCode: 200,

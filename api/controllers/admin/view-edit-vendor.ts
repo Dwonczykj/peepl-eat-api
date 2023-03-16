@@ -1,4 +1,4 @@
-import { AddressType, CategoryGroupType, DeliveryPartnerType, FulfilmentMethodType, PostalDistrictType, VendorType } from "../../../scripts/utils";
+import { AddressType, CategoryGroupType, DeliveryPartnerType, ESCExplanationType, ESCRatingType, FulfilmentMethodType, PostalDistrictType, ProductCategoryType, ProductOptionType, ProductOptionValueType, ProductType, VendorCategoryType, VendorType } from "../../../scripts/utils";
 import { SailsModelType, sailsVegi } from "../../../api/interfaces/iSails";
 
 declare var Vendor: SailsModelType<VendorType>;
@@ -34,28 +34,21 @@ module.exports = {
 
   fn: async function (inputs, exits) {
     var vendorid;
-    let user = await User.findOne({id: this.req.session.userId});
+    let user = await User.findOne({ id: this.req.session.userId });
 
-    if(user.isSuperAdmin && inputs.vendorid) {
+    if (user.isSuperAdmin && inputs.vendorid) {
       vendorid = inputs.vendorid;
     } else {
       vendorid = user.vendor;
     }
 
-    var vendor = await Vendor.findOne(vendorid).populate(
-      'pickupAddress&productCategories&products&products.options&options.values'
-      // "pickupAddress&productCategories&products&products.category&products.options&options.values"
-    );
-
-    if(!vendor) {
-      return exits.notFound();
+    const vendorHelperResult = await sails.helpers.selectVendorProducts.with({
+      vendorId: vendorid,
+    });
+    if(!vendorHelperResult){
+      return exits.notFound('Vendor not found');
     }
-
-    var products = await Product.find({
-      vendor: vendorid,
-    }).populate('category&options&options.values');
-
-    vendor.products = products;
+    const vendor = vendorHelperResult.vendor;
 
     var delFulVendor = await Vendor.findOne(vendorid).populate(
       'deliveryFulfilmentMethod&deliveryFulfilmentMethod.openingHours&fulfilmentOrigin'
@@ -65,8 +58,9 @@ module.exports = {
       'collectionFulfilmentMethod&collectionFulfilmentMethod.openingHours&fulfilmentOrigin'
     );
 
-    var vendorFulfilmentPostalDistricts = await Vendor.findOne(vendorid)
-    .populate('fulfilmentPostalDistricts');
+    var vendorFulfilmentPostalDistricts = await Vendor.findOne(
+      vendorid
+    ).populate('fulfilmentPostalDistricts');
 
     // Get all postal districts
     var postalDistricts = await PostalDistrict.find();
@@ -74,12 +68,14 @@ module.exports = {
     // set checked to true on postalDistricts that are also in vendorFulfilmentPostalDistricts
     postalDistricts.forEach((postalDistrict) => {
       var found = false;
-      vendorFulfilmentPostalDistricts.fulfilmentPostalDistricts.forEach((vendorPostalDistrict) => {
-        if(vendorPostalDistrict.id === postalDistrict.id){
-          found = true;
+      vendorFulfilmentPostalDistricts.fulfilmentPostalDistricts.forEach(
+        (vendorPostalDistrict) => {
+          if (vendorPostalDistrict.id === postalDistrict.id) {
+            found = true;
+          }
         }
-      });
-      if(found){
+      );
+      if (found) {
         (postalDistrict as any).checked = true;
       }
     });
@@ -90,11 +86,11 @@ module.exports = {
       colFulVendor.collectionFulfilmentMethod as FulfilmentMethodType;
 
     // Get a list of delivery partners
-    var deliveryPartners = await DeliveryPartner.find({status: 'active'});
+    var deliveryPartners = await DeliveryPartner.find({ status: 'active' });
 
     var categoryGroups = await CategoryGroup.find();
 
-    if(!vendor.pickupAddress){
+    if (!vendor.pickupAddress) {
       vendor.pickupAddress = {
         label: '',
         addressLineOne: '',
@@ -120,7 +116,7 @@ module.exports = {
     }
 
     // Respond with view or JSON.
-    if(this.req.wantsJSON) {
+    if (this.req.wantsJSON) {
       return exits.successJSON({
         vendor,
         delFul,
@@ -141,7 +137,6 @@ module.exports = {
         googleApiKey: sails.config.custom.distancesApiKey,
       });
     }
-
   }
 
 
