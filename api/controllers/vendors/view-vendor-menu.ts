@@ -38,7 +38,9 @@ module.exports = {
     
     try {
       const productRatings = await sails.helpers.getProductRatingByBarcodes.with({
-        productBarcodes: (vendor.products as ProductType[]).flatMap(product => product.options.flatMap(option => option.values.map(productOptionValue => productOptionValue.productBarCode)))
+        allowFetch: false,
+        productIds: vendor.products.map(p=>p.id),
+        // productBarcodes: (vendor.products as ProductType[]).flatMap(product => product.options.flatMap(option => option.values.map(productOptionValue => productOptionValue.productBarCode)))
       });
   
       //todo: Each ProductOptionValue within a Product needs to be returned with ESCRating
@@ -47,7 +49,7 @@ module.exports = {
         (product) =>
           product.options.flatMap((option) =>
             option.values.map(
-              (productOptionValue) => Object.assign(productOptionValue, productRatings[productOptionValue.productBarCode] || {})
+              (productOptionValue) => Object.assign(productOptionValue, productRatings[product.productBarCode] || {})
             )
           )
       );

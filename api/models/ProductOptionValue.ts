@@ -36,51 +36,7 @@ let _exports: SailsModelDefnType<ProductOptionValueType> = {
       type: 'boolean',
       description: 'Represents whether or not the option value is available.',
     },
-    stockCount: {
-      type: 'number',
-      description: 'The remaining stock count for this product SKU',
-      min: 0,
-      columnType: 'INT',
-      defaultsTo: 0,
-    },
-    supplier: {
-      type: 'string',
-      description: 'The name of the supplier i.e. Suma',
-      defaultsTo: '',
-    },
-    brandName: {
-      type: 'string',
-      description: 'The name of the brand i.e. Jelly Bears',
-      defaultsTo: '',
-    },
-    taxGroup: {
-      type: 'string',
-      description: 'An optional tax grouping such as STD VAT',
-      defaultsTo: '',
-    },
-    stockUnitsPerProduct: {
-      type: 'number',
-      description:
-        'Number of units per pack, i.e. a pack of 6 would have value of 6',
-      defaultsTo: 1,
-    },
-    sizeInnerUnitValue: {
-      type: 'number',
-      description: 'i.e. 450 if 1 inner unit in the package is 450ml',
-      defaultsTo: 0,
-    },
-    sizeInnerUnitType: {
-      type: 'string',
-      description:
-        'A measure of the units used to describe the value of the size of 1 unit i.e. ml',
-      defaultsTo: '',
-    },
-    productBarCode: {
-      type: 'string',
-      description:
-        'A stringified long number, potentially GUID in future, that maps to the UPC (barcode) on the product',
-      defaultsTo: '',
-    },
+    
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗

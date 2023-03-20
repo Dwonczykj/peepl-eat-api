@@ -12,6 +12,7 @@ module.exports = {
       },
       env_development: {
         NODE_ENV: 'development',
+        NODE_OPTIONS: '--max-old-space-size=2048',
       },
     },
   ],
@@ -30,11 +31,12 @@ module.exports = {
       'pre-setup': '',
       env: {
         NODE_ENV: 'production',
+        NODE_OPTIONS: '--max-old-space-size=2048',
       },
     },
     QA: {
       user: 'ubuntu',
-      host: '54.80.225.99',
+      host: '3.95.65.212',
       key: '~/.ssh/vegi-server-keyvaluepair.pem',
       repo: 'https://github.com/Dwonczykj/peepl-eat-api.git',
       ref: 'origin/QA',
@@ -45,6 +47,7 @@ module.exports = {
       'pre-setup': '',
       env: {
         NODE_ENV: 'production',
+        NODE_OPTIONS: '--max-old-space-size=2048',
       },
     },
   },

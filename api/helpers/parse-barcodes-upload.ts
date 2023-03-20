@@ -1,30 +1,22 @@
 import { OmitId, ProductCategoryType, ProductOptionType, ProductOptionValueType, ProductType, SailsActionDefnType, VendorType } from '../../scripts/utils';
 import {
-  CreateSailsModelType,
-  CreateSailsModelType2,
-  CreateSailsModelType3,
-  KeysOfType,
-  RequiredKeys,
-  RequiredObj,
-  sailsModelKVP,
   SailsModelType,
   sailsVegi,
 } from '../interfaces/iSails';
 import { PassThrough, Readable, Stream } from 'node:stream';
-import { parse } from 'csv-parse';
+// import { parse } from 'csv-parse';
 import * as fs from 'fs';
 import * as dataForge from 'data-forge';
-import { values } from 'lodash-es';
 
 const dropKey = <T,K extends keyof T>(object: T, dropKey:K) => {
-  let state: Omit<T,K> = Object.assign({},...Object.keys(object).filter(k => k !== dropKey).map(k => ({[k]: object[k]})))
+  let state: Omit<T,K> = Object.assign({},...Object.keys(object).filter(k => k !== dropKey).map(k => ({[k]: object[k]})));
   return state;
   // {[dropKey], ...state} = object;
   // const initialState: Omit<T,TKey> = {
   //   ...state,
   // };
   // return initialState;
-}
+};
 // const dropKeys = <T,K extends keyof T>(object: T, dropKeys:K[]) => {
 //   let state: { [P in Exclude<keyof T, K>]: T[P]; } = Object.assign(Object.keys(object).filter(k => !dropKeys.includes(k as keyof T)).map(k => ({[k]: object[k]})))
 //   return state;
@@ -64,8 +56,8 @@ const parseUnit: (unitsDescriptor:string) => unit = (unitsDescriptor:string) => 
     amount: Number.parseFloat(m[1]),
     type: m[2],
   };
-  
-}
+
+};
 
 
 export type ParseBarcodesUploadInputs = {
@@ -85,6 +77,7 @@ export type ParseBarcodesUploadResult =
     // products: CreateSailsModelType3<ProductType>[];
     // productOptions: CreateSailsModelType3<ProductOptionType>[];
     // productOptionValues: CreateSailsModelType3<ProductOptionValueType>[];
+    productCategories: string[];
     products: OmitId<ProductType>[];
   }
   // | CreateSailsModelType<ProductOptionValueType>[]
@@ -138,6 +131,11 @@ const _exports: SailsActionDefnType<
     }
     const defaultProductCategory = vendor.productCategories[0] as ProductCategoryType;
 
+    const productCategories = Object.assign(
+      {},
+      ...vendor.productCategories.map((x) => ({ [x.name]: x }))
+    );
+
     // const defaultProductCategoriesForVendor = await ProductCategory.find({
     //   vendor: inputs.vendorId,
     // });
@@ -152,17 +150,22 @@ const _exports: SailsActionDefnType<
       const _products = await Product.find({
         vendor: inputs.vendorId,
       }).populate('options&options.values');
-      
+
       const predicate: RowPredicate = (row) => {
-        if(row['Product Key'] && row['Product Key'] !== 'Product Key' 
-          && row['Outer barcode'] 
-          && row['Description'] 
+        if(row['Product Key'] && row['Product Key'] !== 'Product Key'
+          && row['Outer barcode']
+          && row['Description']
           && (row['RRP'] || row['RRP'] === 0)
           && (row['Size - Units per case'] || row['Size - Units per case'] === 0)
-          && _products.filter(p => p.options.filter(po => po.values.filter(pov => pov.productBarCode.trim() === row['Outer barcode'].trim()).length > 0).length > 0).length < 1){
+          && _products.filter(p => p.productBarCode.trim() === row['Outer barcode'].trim()).length < 1){
+          // && _products.filter(p => p.options.filter(po => po.values.filter(pov => pov.productBarCode.trim() === row['Outer barcode'].trim()).length > 0).length > 0).length < 1){
           return true;
         }
         return false;
+      };
+
+      const getProductCategoriesTransform: RowTransformer<string> = (row) => {
+        return row['Pricelist Category'];
       };
 
       const transform: RowTransformer<OmitId<ProductType>> = (row) => {
@@ -179,23 +182,8 @@ const _exports: SailsActionDefnType<
           isAvailable: false,
           priority: 0,
           isFeatured: false,
-          options: [],
-          category: defaultProductCategory,
           ingredients: null,
-        };
-        const poDeep: OmitId<ProductOptionType> = {
-          name: 'Default',
-          isRequired: false,
-          product: productDeep as any,
-          values: [],
-        };
-        
-
-        const povDeep:OmitId<ProductOptionValueType> = {
-          name: row['Description'],
-          description: row['Pricelist Description'],
-          priceModifier: 0,
-          isAvailable: false,
+          vendorInternalId: row['Product Key'],
           stockCount: 0,
           stockUnitsPerProduct: row['Size - Units per case'],
           sizeInnerUnitValue: unit.amount || 0,
@@ -204,6 +192,22 @@ const _exports: SailsActionDefnType<
           supplier: inputs.supplierName,
           brandName: row['Brand name'],
           taxGroup: row['FGOSV categories'],
+          options: [],
+          category: Object.assign({},defaultProductCategory,{name: row['Pricelist Category']}),
+        };
+        const poDeep: OmitId<ProductOptionType> = {
+          name: 'Default',
+          isRequired: false,
+          product: productDeep as any,
+          values: [],
+        };
+
+
+        const povDeep:OmitId<ProductOptionValueType> = {
+          name: row['Description'],
+          description: row['Pricelist Description'],
+          priceModifier: 0,
+          isAvailable: false,
           option: poDeep as any,
         };
         poDeep.values.push(povDeep as any);
@@ -271,21 +275,21 @@ const _exports: SailsActionDefnType<
         skipEmptyLines: true,
         dynamicTyping: false, //DONT PARSE BARCODES AS WE STORE AS STRINGS
       });
-      
+
       df = df  // .parseDates(["Column B"]) // Parse date columns.
         .parseInts([
           'Size - Units per case', //DONT PARSE BARCODES AS WE STORE AS STRINGS
         ]) // Parse integer columns.
         .parseFloats([
-          'RRP'  
+          'RRP'
         ]) // Parse float columns.
         // .dropSeries([
         //   "Column F"
         // ]) // Drop certain columns.
         .where(row => predicate(row)); // Filter rows.
-        // .select(row => transform(row)); // Transform the data.
-        // .asCSV()
-        // .writeFileSync("./output-data-file.csv"); // Write to output CSV file (or JSON!)
+      // .select(row => transform(row)); // Transform the data.
+      // .asCSV()
+      // .writeFileSync("./output-data-file.csv"); // Write to output CSV file (or JSON!)
       //todo: parse and map to ProductOptionValue type for each row and then upload to DB if there is not already an item with matching barcode? or some sort of vendorItemId
 
       // (dataForge as any).readFileSync('./input-data-file.csv') // Read CSV file (or JSON!)
@@ -296,9 +300,13 @@ const _exports: SailsActionDefnType<
       //   .dropSeries(["Column F"]) // Drop certain columns.
       //   .where(row => predicate(row)) // Filter rows.
       //   .select(row => transform(row)) // Transform the data.
-      //   .asCSV() 
+      //   .asCSV()
       //   .writeFileSync("./output-data-file.csv"); // Write to output CSV file (or JSON!)
 
+      const _newProductCategories = df
+        .toArray()
+        .map(getProductCategoriesTransform);
+      const newProductCategories = [...new Set(_newProductCategories)];
       const uploadPovs = df.toArray().map(transform);
 
       // const products: CreateSailsModelType3<ProductType>[] = [];
@@ -346,11 +354,11 @@ const _exports: SailsActionDefnType<
         // products: products,
         // productOptions: productOptions,
         // productOptionValues: productOptionValues,
+        productCategories: newProductCategories,
         products: uploadPovs,
       });
     };
 
-    
 
     let uploadedFile: {
       fd: string;
@@ -372,7 +380,7 @@ const _exports: SailsActionDefnType<
       {
         dirname: require('path').resolve(sails.config.appPath, uploadDir)
       }, // ~ https://www.notion.so/gember/Sails-js-b949611a98654dd091c3a0758b170db3?pvs=4#f5f1bfb659094541a9583d90c1f4887c
-      async function (err, uploadedFiles){
+      async (err, uploadedFiles) => {
         if (err) {
           sails.log.error(err);
         }
@@ -384,25 +392,29 @@ const _exports: SailsActionDefnType<
             `Error uploading image to s3-bucket: and no files uploaded!`
           );
         }
-        
+
         uploadedFile =
           uploadedFile && uploadedFile.fd
             ? {
-                ...uploadedFile,
-                ffd: uploadedFile.fd,
-              }
+              ...uploadedFile,
+              ffd: uploadedFile.fd,
+            }
             : null;
         if (!uploadedFile) {
           return exits.success(undefined);
         }
 
         const fs = require('fs');
-        
-        fs.readFile(uploadedFile.fd, 'utf8', async function (err, data) {
-          // return res.json(200, {message: 'Ok', data: data});
-          csvData = data;
-          // sails.log.info(csvData);
-          await parseData(csvData);
+
+        fs.readFile(uploadedFile.fd, 'utf8', async (err, data) => {
+          if(err){
+            sails.log.error(err);
+          }else{
+            // return res.json(200, {message: 'Ok', data: data});
+            csvData = data;
+            // sails.log.info(csvData);
+            await parseData(csvData);
+          }
 
           //delete file from .tmp
 
@@ -414,8 +426,7 @@ const _exports: SailsActionDefnType<
       },
     );
 
-    
-    
+
   },
 };
 

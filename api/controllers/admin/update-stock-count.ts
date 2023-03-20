@@ -17,7 +17,7 @@ module.exports = {
   description: 'Post an update to update the remaining stock count for an item',
 
   inputs: {
-    productOptionValueId: {
+    productId: {
       type: 'number',
       required: true,
     },
@@ -48,7 +48,7 @@ module.exports = {
 
   fn: async function (
     inputs: {
-      productOptionValueId: number;
+      productId: number;
       remainingStockCount: number;
     },
     exits: {
@@ -63,21 +63,15 @@ module.exports = {
       unauthorised: (unusedMessage?: string) => void;
     }
   ) {
-    const productOptionValue = await ProductOptionValue.findOne(
-      inputs.productOptionValueId
-    );
-    if (!productOptionValue) {
-      return exits.notFound('Product Option Value Not Found');
+    const product = await Product.findOne(inputs.productId);
+    if (!product) {
+      return exits.notFound('Product not found');
     }
-
-    const productOption = await ProductOption.findOne({
-      id: productOptionValue.option,
-    }).populate('product');
 
     // Check that user is authorised to modify products for this vendor.
     var isAuthorisedForVendor = await sails.helpers.isAuthorisedForVendor.with({
       userId: this.req.session.userId,
-      vendorId: productOption.product.vendor,
+      vendorId: product.vendor,
     });
 
     if (!isAuthorisedForVendor) {
@@ -88,8 +82,8 @@ module.exports = {
       return exits.badFormat();
     }
 
-    await ProductOptionValue.update({
-      id: productOptionValue.id,
+    await Product.update({
+      id: product.id,
     }).set({
       stockCount: inputs.remainingStockCount,
     });

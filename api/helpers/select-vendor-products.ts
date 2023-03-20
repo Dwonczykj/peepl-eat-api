@@ -102,6 +102,15 @@ with products as (
   \`product\`.\`isFeatured\` AS product_isFeatured,
   \`product\`.\`status\` AS product_status,
   \`product\`.\`ingredients\` AS product_ingredients,
+  \`product\`.\`vendorInternalId\` AS product_vendorInternalId,
+  \`product\`.\`stockCount\` AS product_stockCount,
+  \`product\`.\`brandName\` AS product_brandName,
+  \`product\`.\`taxGroup\` AS product_taxGroup,
+  \`product\`.\`stockUnitsPerProduct\` AS product_stockUnitsPerProduct,
+  \`product\`.\`sizeInnerUnitValue\` AS product_sizeInnerUnitValue,
+  \`product\`.\`sizeInnerUnitType\` AS product_sizeInnerUnitType,
+  \`product\`.\`productBarCode\` AS product_productBarCode,
+  \`product\`.\`supplier\` AS product_supplier,
   \`productcategory\`.\`createdAt\` AS productcategory_createdAt,
   \`productcategory\`.\`updatedAt\` AS productcategory_updatedAt,
   \`productcategory\`.\`id\` AS productcategory_id,
@@ -126,14 +135,6 @@ with products as (
   \`productoptionvalue\`.\`description\` AS productoptionvalue_description,
   \`productoptionvalue\`.\`priceModifier\` AS productoptionvalue_priceModifier,
   \`productoptionvalue\`.\`isAvailable\` AS productoptionvalue_isAvailable,
-  \`productoptionvalue\`.\`stockCount\` AS productoptionvalue_stockCount,
-  \`productoptionvalue\`.\`brandName\` AS productoptionvalue_brandName,
-  \`productoptionvalue\`.\`taxGroup\` AS productoptionvalue_taxGroup,
-  \`productoptionvalue\`.\`stockUnitsPerProduct\` AS productoptionvalue_stockUnitsPerProduct,
-  \`productoptionvalue\`.\`sizeInnerUnitValue\` AS productoptionvalue_sizeInnerUnitValue,
-  \`productoptionvalue\`.\`sizeInnerUnitType\` AS productoptionvalue_sizeInnerUnitType,
-  \`productoptionvalue\`.\`productBarCode\` AS productoptionvalue_productBarCode,
-  \`productoptionvalue\`.\`supplier\` AS productoptionvalue_supplier,
   \`productoptionvalue\`.\`option\` AS productoptionvalue_option
   FROM \`vegi\`.\`vendor\` vendor
 	left join \`vegi\`.\`product\` product on vendor.id = product.vendor
@@ -210,6 +211,16 @@ select * from esc order by esc.product_id, esc.escrating_createdAt DESC
           status: row.product_status,
           ingredients: row.product_ingredients,
 
+          vendorInternalId: row.product_vendorInternalId,
+          stockCount: row.product_stockCount,
+          brandName: row.product_brandName,
+          taxGroup: row.product_taxGroup,
+          stockUnitsPerProduct: row.product_stockUnitsPerProduct,
+          sizeInnerUnitValue: row.product_sizeInnerUnitValue,
+          sizeInnerUnitType: row.product_sizeInnerUnitType,
+          productBarCode: row.product_productBarCode,
+          supplier: row.product_supplier,
+
           vendor: row.product_vendor,
 
           category: {
@@ -237,14 +248,6 @@ select * from esc order by esc.product_id, esc.escrating_createdAt DESC
           description: row.productoptionvalue_description,
           priceModifier: row.productoptionvalue_priceModifier,
           isAvailable: Boolean(row.productoptionvalue_isAvailable),
-          stockCount: row.productoptionvalue_stockCount,
-          brandName: row.productoptionvalue_brandName,
-          taxGroup: row.productoptionvalue_taxGroup,
-          stockUnitsPerProduct: row.productoptionvalue_stockUnitsPerProduct,
-          sizeInnerUnitValue: row.productoptionvalue_sizeInnerUnitValue,
-          sizeInnerUnitType: row.productoptionvalue_sizeInnerUnitType,
-          productBarCode: row.productoptionvalue_productBarCode,
-          supplier: row.productoptionvalue_supplier,
           option: row.productoptionvalue_option,
         };
         if (
@@ -420,14 +423,16 @@ select * from esc order by esc.product_id, esc.escrating_createdAt DESC
     try {
       const productRatings =
         await sails.helpers.getProductRatingByBarcodes.with({
-          productBarcodes: (vendor.products as ProductType[]).flatMap(
-            (product) =>
-              product.options.flatMap((option) =>
-                option.values.map(
-                  (productOptionValue) => productOptionValue.productBarCode
-                )
-              )
-          ),
+          allowFetch: false,
+          // productBarcodes: (vendor.products as ProductType[]).flatMap(
+          //   (product) =>
+          //     product.options.flatMap((option) =>
+          //       option.values.map(
+          //         (productOptionValue) => productOptionValue.productBarCode
+          //       )
+          //     )
+          // ),
+          productIds: vendor.products.map(p=>p.id),
         });
 
       //todo: Each ProductOptionValue within a Product needs to be returned with ESCRating
@@ -438,7 +443,7 @@ select * from esc order by esc.product_id, esc.escrating_createdAt DESC
             option.values.map((productOptionValue) =>
               Object.assign(
                 productOptionValue,
-                productRatings[productOptionValue.productBarCode] || {}
+                productRatings[product.productBarCode] || {}
               )
             )
           )

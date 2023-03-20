@@ -34,7 +34,8 @@ declare var ESCExplanation: SailsModelType<ESCExplanationType>;
 declare var sails: sailsVegi;
 
 export type GetProductRatingInputs = {
-  productBarcodes: ESCRatingType['productPublicId'][];
+  // productBarcodes: ESCRatingType['productPublicId'][];
+  productIds: ProductType['id'][];
 };
 
 export type GetProductRatingResult = {
@@ -66,10 +67,14 @@ const _exports: SailsActionDefnType<
     'Get the options for the product as well as the relevant options.',
 
   inputs: {
-    productBarcodes: {
+    // productBarcodes: {
+    //   type: 'ref',
+    //   description: 'The barcodes of the products to get ratings for',
+    //   required: true,
+    // },
+    productIds: {
       type: 'ref',
-      description:
-        'The barcodes of the products to get ratings for',
+      description: 'The array of product ids',
       required: true,
     },
   },
@@ -81,15 +86,19 @@ const _exports: SailsActionDefnType<
     notFound: {
       // message: 'Product not found for public id',
       statusCode: 404,
-    }
+    },
   },
 
   fn: async function (
     inputs: GetProductRatingInputs,
     exits: GetProductRatingExits
   ) {
-    const result = await sails.helpers.getProductRatingByBarcodes.with({productBarcodes: inputs.productBarcodes});
-    if(!result){
+    const result = await sails.helpers.getProductRatingByBarcodes.with({
+      // productBarcodes: inputs.productBarcodes,
+      productIds: inputs.productIds,
+      allowFetch: true,
+    });
+    if (!result) {
       return exits.notFound('No Products found for barcodes');
     }
     return exits.success(result);

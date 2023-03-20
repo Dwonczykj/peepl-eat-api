@@ -34,7 +34,9 @@ declare var ESCExplanation: SailsModelType<ESCExplanationType>;
 declare var sails: sailsVegi;
 
 export type GetProductRatingInputs = {
-  productBarcodes: ESCRatingType['productPublicId'][];
+  // productBarcodes: ESCRatingType['productPublicId'][];
+  productIds: ProductType['id'][]
+  allowFetch:boolean;
 };
 
 export type GetProductRatingResult = {
@@ -61,11 +63,21 @@ const _exports: SailsActionDefnType<
   friendlyName: 'Get product rating',
 
   inputs: {
-    productBarcodes: {
+    // productBarcodes: {
+    //   type: 'ref',
+    //   description: 'The array of product barcodes',
+    //   required: true,
+    // },
+    productIds: {
       type: 'ref',
-      description:
-        'The array of product barcodes',
+      description: 'The array of product ids',
       required: true,
+    },
+    allowFetch: {
+      type: 'boolean',
+      defaultsTo: true,
+      description:
+        'If true and no rating exists in last 24 hours for a product, it will go and calculate / fetch a rating',
     },
   },
 
@@ -82,9 +94,9 @@ const _exports: SailsActionDefnType<
     const getResult = <
       T extends sailsModelKVP<ESCExplanationType> | ESCExplanationType
     >(
-        rating: ESCRatingType,
-        explanations: T[]
-      ) => {
+      rating: ESCRatingType,
+      explanations: T[]
+    ) => {
       return {
         ...rating,
         ...{
@@ -94,6 +106,9 @@ const _exports: SailsActionDefnType<
     };
 
     const findMatchInVegiScoreApi = async (name: string, category: string) => {
+      if (!inputs.allowFetch) {
+        return false;
+      }
       const instance = axios.create({
         baseURL: sails.config.custom.vegiScoreApi,
         timeout: 2000,
@@ -102,8 +117,8 @@ const _exports: SailsActionDefnType<
 
       // ~ https://developer.sustained.com/reference/getproducts
       var queryParameters = {
-        name: name,
-        category: category,
+        name: name, //TODO: Can we use our word2vec search endpoint to find similar words here?
+        // category: category, // DONT include category unless returned in https://api.sustained.com/choice/v1/categories
         // grade: 'A'
         // pageInt: 0
       };
@@ -129,7 +144,9 @@ const _exports: SailsActionDefnType<
             response.data['products'].length < 1
           ) {
             // no similar products found
-            sails.log.warn(`No products found on sustained api for string: "${name}". Try a simpler name`);
+            sails.log.warn(
+              `No products found on sustained api for string: "${name}". Try a simpler name`
+            );
             return null;
           }
           // * Default to first result?
@@ -148,11 +165,10 @@ const _exports: SailsActionDefnType<
             impacts: responseImpacts.data.impacts,
             ...m,
           };
-        } else{
+        } else {
           sails.log.warn(
             `${sails.config.custom.vegiScoreApi} returned a ${response.status}`
           );
-
         }
       } catch (err) {
         sails.log.error(err);
@@ -160,7 +176,9 @@ const _exports: SailsActionDefnType<
       }
     };
 
-    inputs.productBarcodes = inputs.productBarcodes.filter(barcode => barcode !== '');
+    // inputs.productBarcodes = inputs.productBarcodes.filter(
+    //   (barcode) => barcode !== ''
+    // );
 
     // todo: check ESCRatings table for RECENT result information
     let ttl = moment
@@ -169,18 +187,22 @@ const _exports: SailsActionDefnType<
       .format(datetimeStrFormat); // e.g. 25/12/2022 17:00
 
     const ratingsEntriesForAllBarcodes = await ESCRating.find({
-      productPublicId: inputs.productBarcodes,
+      // productPublicId: inputs.productBarcodes,
+      product: inputs.productIds,
       calculatedOn: {
         '>': ttl,
       },
     }).populate('evidence');
 
     // Get rating from DB if exists
-    const getRatingsForBarcodeFromDb = async (barcode:string) => {
-      if(!barcode){
-        return { ['NO_BARCODE']: null };
-      }
-      const ratingsEntries = ratingsEntriesForAllBarcodes.filter(re => re.productPublicId === barcode);
+    const getRatingsForBarcodeFromDb = async (id: number) => {
+      // if (!barcode) {
+      //   return { ['NO_BARCODE']: null };
+      // }
+      const barcode = id;
+      const ratingsEntries = ratingsEntriesForAllBarcodes.filter(
+        (re) => (re.product as any) === id
+      );
       if (ratingsEntries && ratingsEntries.length > 0) {
         // todo use most recent entry for each product barcode
         const rating = ratingsEntries.sort((a, b) =>
@@ -191,92 +213,158 @@ const _exports: SailsActionDefnType<
         const explanations = await ESCExplanation.find({
           escrating: rating.id,
         });
-        return {[barcode]: getResult(rating, explanations)};
+        return { [barcode]: getResult(rating, explanations) };
         // return exits.success(getResult(rating, explanations));
       } else {
-        return {[barcode]: null};
+        return { [barcode]: null };
       }
     };
-    
-    const ratingsFromDb = await Promise.all(inputs.productBarcodes.map((barcode) => getRatingsForBarcodeFromDb(barcode)));
+
+    const ratingsFromDb = await Promise.all(
+      inputs.productIds.map((id) =>
+        getRatingsForBarcodeFromDb(id)
+      )
+      // inputs.productBarcodes.map((barcode) =>
+      //   getRatingsForBarcodeFromDb(barcode)
+      // )
+    );
     const resultDict: GetProductRatingResult = Object.assign(
       {},
       ...ratingsFromDb
     );
 
-    const barcodesToSearchFor = inputs.productBarcodes.filter(barcode => !resultDict[barcode]);
+    const productsToSearchFor = inputs.productIds.filter(
+      (id) => !resultDict[id]
+    );
+    // const barcodesToSearchFor = inputs.productBarcodes.filter(
+    //   (barcode) => !resultDict[barcode]
+    // );
 
     sails.log.info(
-      `SEARCHING VEGI SCORING API FOR ${barcodesToSearchFor.length} PRODUCTS as resultDict is ${resultDict}`
+      `SEARCHING VEGI SCORING API FOR ${productsToSearchFor.length} PRODUCTS from vegi ESC api`
     );
 
-    const getRatingsForBarcodeFromWeb = async (barcode:string) => {
-      if(!barcode){
-        return { ['NO_BARCODE']: null };
+    const lazyScheduleRatingsForProductsFromVegiESCApi = async (ids: number[]) => {
+      // if (!barcode) {
+      //   return { ['NO_BARCODE']: null };
+      // }
+      // const _productOptionValuess = await ProductOptionValue.find({
+      //   productBarCode: barcode,
+      // }).populate('option&option.product');
+
+      // if (!_productOptionValuess || _productOptionValuess.length < 1) {
+      //   sails.log.warn(
+      //     `FOUND no matching productoptionvalue for barcode: ${barcode}`
+      //   );
+      //   return { ['NO_BARCODE']: null };
+      // }
+      // const productOptionValues = _productOptionValuess[0];
+
+      const products = await Product.find({
+        id: ids
+      });
+      
+      const createRating = async (p:sailsModelKVP<ProductType>) => {
+        const newRating = await ESCRating.create({
+          calculatedOn: moment.utc().toISOString(),
+          productPublicId: p.productBarCode,
+          rating: 0,
+          evidence: 'No Information',
+          product: p.id,
+        }).fetch();
+
+        const explanation = await ESCExplanation.create({
+          title: 'No Information',
+          description: 'Default zero rating for new products with no rating',
+          measure: 0,
+          escrating: newRating.id,
+        }).fetch();
+        
+        const result = getResult(newRating, [explanation]);
+        return { [p.id]: result };
       }
-      const _productOptionValuess = await ProductOptionValue.find({
-        productBarCode: barcode,
-      }).populate('option&option.product');
-
-      if (
-        !_productOptionValuess ||
-        _productOptionValuess.length < 1){
-        sails.log.warn(`FOUND no matching productoptionvalue for barcode: ${barcode}`);
-        return { ['NO_BARCODE']: null };
-      }
-      const productOptionValues = _productOptionValuess[0];
-
-      const productOptionName = productOptionValues.option.product.name;
-      const product = await Product.findOne(
-        productOptionValues.option.product.id
-      ).populate('category');
-      const productCategory = product.category.name;
-
-      const productNameVal = `${productOptionName} ${productOptionValues.name} ${productOptionValues.brandName}`;
-      sails.log.info(
-        `Run matching api get for product named: ${productNameVal} with category: ${productCategory}`
-      );
-      let match = await findMatchInVegiScoreApi(productNameVal, productCategory);
-      if (!match) {
-        match = await findMatchInVegiScoreApi(product.name, productCategory);
-      }
-      // todo: populate ESCRatings table with result information
-      if (!match) {
-        return {[barcode]: null};
-        // return exits.success(null);
-      }
-
-      const newRating = await ESCRating.create({
-        calculatedOn: moment.utc().toISOString(),
-        productPublicId: barcode,
-        rating: SustainedGradeToRatingMap[match.grade],
-        // explanation: explanation,
-        evidence: JSON.stringify(match.result),
-      }).fetch();
-
-      const impacts = match.impacts.map((impact) => ({
-        title: impact.title,
-        description: impact.description,
-        measure: SustainedGradeToRatingMap[impact.grade],
-        escrating: newRating.id,
-      }));
-
-      const explanations = await ESCExplanation.createEach(impacts).fetch();
+      const results = await Promise.all(products.map(p => createRating(p)));
+      const resultsDict = Object.assign({},...results);
 
       // await ESCRating.addToCollection(newRating.id, 'explanation').members(explanations.map(e => e.id));
 
-      const result = getResult(newRating, explanations);
-      return {[barcode]: result};
-    };
-    
-    const ratingsFromWeb = await Promise.all(
-      barcodesToSearchFor.map((barcode) => getRatingsForBarcodeFromWeb(barcode))
-    );
-    const resultDictFromWeb: GetProductRatingResult = Object.assign(
-      {},
-      ...ratingsFromWeb
-    );
-    const resultFinal = Object.assign(resultDict, resultDictFromWeb);
+      // const search_terms = products.map((product) => {
+      //   const productNameVal =
+      //     product.description ||
+      //     product.name;
+      //   return productNameVal;
+      // });
+      
+      // todo: impleent below line
+      // let match = await findMatchInVegiScoreApi(ids);
+      
+      
+      // let match = await findMatchInVegiScoreApi(
+      //   productNameVal,
+      //   productCategory
+      // );
+      // if (!match) {
+      //   match = await findMatchInVegiScoreApi(
+      //     product.description,
+      //     productCategory
+      //   );
+      // }
+
+      // // todo: populate ESCRatings table with result information
+      // if (!match) {
+      //   const newRating = await ESCRating.create({
+      //     calculatedOn: moment.utc().toISOString(),
+      //     productPublicId: barcode,
+      //     rating: 0,
+      //     evidence: 'No Information',
+      //   }).fetch();
+
+      //   const explanation = await ESCExplanation.create({
+      //     title: 'No Information',
+      //     description: 'Default zero rating for new products with no rating',
+      //     measure: 0,
+      //     escrating: newRating.id,
+      //   }).fetch();
+
+      //   // await ESCRating.addToCollection(newRating.id, 'explanation').members(explanations.map(e => e.id));
+
+      //   const result = getResult(newRating, [explanation]);
+      //   return { [barcode]: result };
+        // return exits.success(null);
+      };
+
+    //   const newRating = await ESCRating.create({
+    //     calculatedOn: moment.utc().toISOString(),
+    //     productPublicId: barcode,
+    //     rating: SustainedGradeToRatingMap[match.grade],
+    //     // explanation: explanation,
+    //     evidence: JSON.stringify(match.result),
+    //   }).fetch();
+
+    //   const impacts = match.impacts.map((impact) => ({
+    //     title: impact.title,
+    //     description: impact.description,
+    //     measure: SustainedGradeToRatingMap[impact.grade],
+    //     escrating: newRating.id,
+    //   }));
+
+    //   const explanations = await ESCExplanation.createEach(impacts).fetch();
+
+    //   // await ESCRating.addToCollection(newRating.id, 'explanation').members(explanations.map(e => e.id));
+
+    //   const result = getResult(newRating, explanations);
+    //   return { [barcode]: result };
+    // };
+
+    // const ratingsJobsFromWeb = await lazyScheduleRatingsForProductsFromVegiESCApi(inputs.productIds);
+    // todo: this needs to request all the barcodes in one go from the esc-api
+    // todo: for now return defautl object ratings where ratings objects are stored against product ids..., pass product ids to the helper
+    // const resultDictFromWeb: GetProductRatingResult = Object.assign(
+    //   {},
+    //   ...ratingsJobsFromWeb
+    // );
+    // const resultFinal = Object.assign(resultDict, resultDictFromWeb);
+    const resultFinal = resultDict;
 
     return exits.success(resultFinal);
   },

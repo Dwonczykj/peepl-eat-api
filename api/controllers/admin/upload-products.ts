@@ -6,6 +6,7 @@ import {
   ProductCategoryType,
   ProductOptionType,
   ProductOptionValueType,
+  CategoryGroupType,
   ProductType,
   SailsActionDefnType,
   VendorType,
@@ -20,6 +21,7 @@ import {
 declare var sails: sailsVegi;
 declare var Vendor: SailsModelType<VendorType>;
 declare var Product: SailsModelType<ProductType>;
+declare var CategoryGroup: SailsModelType<CategoryGroupType>;
 declare var ProductCategory: SailsModelType<ProductCategoryType>;
 declare var ProductOption: SailsModelType<ProductOptionType>;
 declare var ProductOptionValue: SailsModelType<ProductOptionValueType>;
@@ -101,7 +103,28 @@ const _exports: SailsActionDefnType<
       //todo: make into a DB transaction
       // await Product.createEach(uploadPovs.products);
 
-      const createProduct = async (product:OmitId<ProductType>) => {
+      const defaultCategoryGroups = await CategoryGroup.find();
+      const defaultCategoryGroup = defaultCategoryGroups[0];
+
+      const createProductCategory = async (name: string) => {
+        const createProductCategory: CreateSailsModelType<ProductCategoryType> = {
+          products: [],
+          name: name,
+          imageUrl: '',
+          vendor: inputs.vendorId,
+          categoryGroup: defaultCategoryGroup.id,
+        };
+        const newProductCategory = await ProductCategory.create(
+          createProductCategory
+        ).fetch();
+        return newProductCategory;
+      };
+      const createProduct = async (product:OmitId<ProductType>, newProductCategories: ProductCategoryType[]) => {
+        let _catId = product.category.id;
+        const _newCats = newProductCategories.filter(pc => pc.name === product.category.name);
+        if(_newCats && _newCats.length){
+          _catId = _newCats[0].id;
+        }
         const createProduct: CreateSailsModelType<ProductType> = {
           name: product.name,
           status: product.status,
@@ -112,9 +135,17 @@ const _exports: SailsActionDefnType<
           isAvailable: product.isAvailable,
           priority: product.priority,
           isFeatured: product.isFeatured,
-          
+          vendorInternalId: product.vendorInternalId,
+          stockCount: product.stockCount,
+          stockUnitsPerProduct: product.stockUnitsPerProduct,
+          sizeInnerUnitValue: product.sizeInnerUnitValue,
+          sizeInnerUnitType: product.sizeInnerUnitType,
+          productBarCode: product.productBarCode,
+          supplier: product.supplier,
+          brandName: product.brandName,
+          taxGroup: product.taxGroup,
           vendor: inputs.vendorId,
-          category: product.category.id,
+          category: _catId,
           options: [],
         };
         const newProduct = await Product.create(createProduct).fetch();
@@ -141,14 +172,6 @@ const _exports: SailsActionDefnType<
               description: pov.description,
               isAvailable: pov.isAvailable,
               priceModifier: pov.priceModifier,
-              stockCount: pov.stockCount,
-              stockUnitsPerProduct: pov.stockUnitsPerProduct,
-              sizeInnerUnitValue: pov.sizeInnerUnitValue,
-              sizeInnerUnitType: pov.sizeInnerUnitType,
-              productBarCode: pov.productBarCode,
-              supplier: pov.supplier,
-              brandName: pov.brandName,
-              taxGroup: pov.taxGroup,
               option: newProductOption.id,
             };
             return createProductOptionValue;
@@ -157,10 +180,15 @@ const _exports: SailsActionDefnType<
         };
         const createProductOptionPromises = product.options.map((po) => createProductOptionPromise(po));
         await Promise.all(createProductOptionPromises);
-      }
+      };
 
       // await Product.createEach(uploadPovs.products);
-      await Promise.all(uploadPovs.products.map((product) => createProduct(product)));
+      const newProductCategories = await Promise.all(uploadPovs.productCategories.map((product) => createProductCategory(product)));
+      await Promise.all(
+        uploadPovs.products.map((product) =>
+          createProduct(product, newProductCategories)
+        )
+      );
 
       // BUG! Issue here is that we then need each product id to then map to productOption.product to create htem
       // BUG: UsageError: Invalid initial data for new records.\n' +

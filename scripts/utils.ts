@@ -344,6 +344,15 @@ export type _ProductTypeHidden = {
   isFeatured: boolean;
   status: StatusLiteral;
   ingredients?: string | null;
+  vendorInternalId: string;
+  stockCount: number;
+  stockUnitsPerProduct: number;
+  sizeInnerUnitValue: number;
+  sizeInnerUnitType: string;
+  productBarCode: string;
+  supplier: string;
+  brandName: string;
+  taxGroup: string;
 };
 export type testTYPE = {
   id: number;
@@ -361,14 +370,6 @@ export type _ProductOptionValueTypeHidden = {
   description: string;
   priceModifier: number;
   isAvailable: boolean;
-  stockCount: number;
-  stockUnitsPerProduct: number;
-  sizeInnerUnitValue: number;
-  sizeInnerUnitType: string;
-  productBarCode: string;
-  supplier: string;
-  brandName: string;
-  taxGroup: string;
 };
 export type _ProductOptionTypeHidden = {
   id: number;
@@ -499,11 +500,17 @@ export const SustainedGradeToRatingMap = {
 
 export type ESCExplanationType = {
   id: number;
+
+  /// 'The headline for the explanatory reason that contributes to the products aggregated esc measure'
   title: string;
+  
   description: string;
+  
+  /// 'The esc measure / 5 thaat is attributed only from this explanation that feeds into the aggregation of the products rating'
   measure: number;
+
   escrating: ESCRatingType;
-}
+};
 
 type SustainedAPIChoiceResponseType = {
   page: number;

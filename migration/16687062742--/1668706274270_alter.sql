@@ -24,8 +24,10 @@ ADD COLUMN `deliveryAddressLatitude` DOUBLE NULL DEFAULT NULL AFTER `deliveryAdd
 ADD COLUMN `deliveryAddressLongitude` DOUBLE NULL DEFAULT NULL AFTER `deliveryAddressLatitude`
 ;
 
-ALTER TABLE `vegi`.`productoptionvalue` 
-ADD COLUMN `stockCount` INT NULL DEFAULT 0 AFTER `isAvailable`,
+ALTER TABLE `vegi`.`product` 
+ADD COLUMN `ingredients` LONGTEXT AFTER `status`,
+ADD COLUMN `vendorInternalId` varchar(255) NULL DEFAULT '' AFTER `isAvailable`,
+ADD COLUMN `stockCount` INT NULL DEFAULT 0 AFTER `vendorInternalId`,
 ADD COLUMN `supplier` varchar(255) NULL DEFAULT '' AFTER `stockCount`,
 ADD COLUMN `brandName` varchar(255) NULL DEFAULT '' AFTER `stockCount`,
 ADD COLUMN `taxGroup` varchar(255) NULL DEFAULT '' AFTER `brandName`,
@@ -35,10 +37,6 @@ ADD COLUMN `sizeInnerUnitType` varchar(255) NULL DEFAULT '' AFTER `sizeInnerUnit
 ADD COLUMN `productBarCode` varchar(255) NULL DEFAULT '' AFTER `sizeInnerUnitType`
 ;
 
-ALTER TABLE `vegi`.`product` 
-ADD COLUMN `ingredients` LONGTEXT AFTER `status`
-;
-
 ALTER TABLE `vegi`.`user` 
 ADD COLUMN `marketingEmailContactAllowed` tinyint(1) DEFAULT 0 AFTER `phoneCountryCode`,
 ADD COLUMN `marketingPhoneContactAllowed` tinyint(1) DEFAULT 0 AFTER `marketingEmailContactAllowed`,
@@ -46,7 +44,7 @@ ADD COLUMN `marketingPushContactAllowed` tinyint(1) DEFAULT 0 AFTER `marketingPh
 ADD COLUMN `marketingNotificationUtility` INT DEFAULT 0 AFTER `marketingPushContactAllowed`,
 ;
 
-ALTER TABLE `vegi`.`user` 
-DROP COLUMN `verified`,
-DROP COLUMN `walletAddress`
-;
+-- ALTER TABLE `vegi`.`user` 
+-- DROP COLUMN `verified`,
+-- DROP COLUMN `walletAddress`
+-- ;

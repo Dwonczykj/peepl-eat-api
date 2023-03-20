@@ -69,6 +69,7 @@ export type KeysNotOfType<T, U> = {
   [K in keyof T]: T[K] extends U ? never: K;
 }[keyof T];
 export type RequiredKeys<T> = KeysNotOfType<T,undefined>;
+type ValueType = Date | string | number | boolean;
 // export type RequiredKeys<T> = Exclude<
 //   KeysOfType<T, Exclude<T[keyof T], undefined>>,
 //   undefined
@@ -94,7 +95,7 @@ export type NonValueKeys<T> = Exclude<keyof T, ValueKeys<T>>;
 //   [K in keyof TT]: TT[K] extends undefined ? never: K;
 // }[keyof TT];
 
-type ValueType = Date | string | number | boolean;
+
 
 type WaterlineValueComparisonKeys<T extends Date | number | string | boolean> =
   T extends Date

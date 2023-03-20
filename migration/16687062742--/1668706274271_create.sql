@@ -36,7 +36,7 @@ CREATE TABLE `waitinglist` (
   `id` int NOT NULL AUTO_INCREMENT,
   `email` varchar(255) DEFAULT '',
   `userType` varchar(50) DEFAULT '',
-  `origin` varchar(50) DEFAULT '',
+  `origin` varchar(255) DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -52,7 +52,7 @@ CREATE TABLE `like` (
   UNIQUE KEY `id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
+-- PROD up to here
 CREATE TABLE `escrating` (
   `createdAt` bigint DEFAULT NULL,
   `updatedAt` bigint DEFAULT NULL,
@@ -93,10 +93,10 @@ CREATE TABLE `productsuggestion` (
   `updatedAt` bigint DEFAULT NULL,
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(510) DEFAULT '',
-  `store` varchar(510) DEFAULT '',
   `additionalInformation` longtext DEFAULT '',
-  `qrCode` longtext DEFAULT '',
+  `store` varchar(510) DEFAULT '',
   `productProcessed` tinyint(1) DEFAULT 0,
+  `qrCode` longtext DEFAULT '',
   `user` INT DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id` (`id`)

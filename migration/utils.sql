@@ -3,6 +3,15 @@ SET @prod_db_name = 'vegiprod';
 SET @dev_db_name = 'vegidev';
 
 SELECT 
+	-- NOW() - INTERVAL 20 DAY as BEFORE_DATE, 
+    FROM_UNIXTIME(ROUND(product.createdAt / 1000), '%Y-%m-%d %h:%i:%s') as CreatedAtDate,
+    product.* 
+    FROM vegi.product product 
+    WHERE -- product.createdAt <= (NOW() - INTERVAL 20 DAY)
+    ROUND(product.createdAt / 1000) >= UNIX_TIMESTAMP('2022-05-01')
+    ORDER BY product.createdAt asc;
+	
+SELECT 
 	FROM_UNIXTIME(ROUND(t.updatedAt / 1000), '%Y %D %M %h:%i:%s %x') as UpdatedAtDate,
     CURRENT_TIMESTAMP() as ctime, UNIX_TIMESTAMP(CURRENT_TIMESTAMP()) as cUtime, 
     ROUND(t.updatedAt / 1000) as convTStamp,

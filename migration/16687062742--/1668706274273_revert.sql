@@ -28,7 +28,9 @@ DROP COLUMN `deliveryAddressLongitude`
 
 DROP TABLE `vegi`.`address`;
 
-ALTER TABLE `vegi`.`productoptionvalue`
+ALTER TABLE `vegi`.`product`
+DROP COLUMN `ingredients`,
+DROP COLUMN `vendorInternalId`,
 DROP COLUMN `stockCount`,
 DROP COLUMN `supplier`,
 DROP COLUMN `brandName`,
