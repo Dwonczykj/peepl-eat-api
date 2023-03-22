@@ -32,7 +32,7 @@ module.exports = {
     var vendor = await Vendor.findOne(inputs.vendorid).populate(
       'fulfilmentPostalDistricts&productCategories'
     ).populate(
-      'products&products.category&products.category.categoryGroup'
+      'products&products.category&categoryGroup'
     );
 
     
@@ -45,14 +45,21 @@ module.exports = {
   
       //todo: Each ProductOptionValue within a Product needs to be returned with ESCRating
   
-      (vendor.products as any) = (vendor.products as ProductType[]).flatMap(
+      // (vendor.products as any) = (vendor.products as ProductType[]).flatMap(
+      //   (product) =>
+      //     product.options.flatMap((option) =>
+      //       option.values.map(
+      //         (productOptionValue) => Object.assign(productOptionValue, productRatings[product.productBarCode] || {})
+      //       )
+      //     )
+      // );
+      (vendor.products as any) = (vendor.products as ProductType[]).map(
         (product) =>
-          product.options.flatMap((option) =>
-            option.values.map(
-              (productOptionValue) => Object.assign(productOptionValue, productRatings[product.productBarCode] || {})
-            )
-          )
+          Object.assign(product, {
+            rating: productRatings[product.productBarCode] || {},
+          })
       );
+      
     } catch (error) {
       sails.log.error(error);
     }

@@ -32,8 +32,6 @@ module.exports = {
     },
   },
 
-  // inputs: sails.helpers.generateSchema('orders/iGetEligibleOrderUpdates', 'GetEligibleOrderUpdates'),
-
   exits: {
     success: {
       statusCode: 200,

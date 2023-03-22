@@ -11,7 +11,8 @@ firebaseConfig="vegiliverpool-firebase-adminsdk-4dfpz-8f01f888b3.json"
 
 
 prod=ec2-54-235-19-123
-QA=ec2-3-95-65-212
+QA=ec2-54-162-132-10
+# QA=ec2-3-95-65-212
 serverIP=$QA
 
 cp $local $sharedResourcesDir

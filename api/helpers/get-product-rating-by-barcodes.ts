@@ -40,7 +40,7 @@ export type GetProductRatingInputs = {
 };
 
 export type GetProductRatingResult = {
-    [barcode: string]: {
+    [productId: string]: {
   id: number;
   createdAt: number;
   productPublicId: string;
@@ -91,18 +91,21 @@ const _exports: SailsActionDefnType<
     inputs: GetProductRatingInputs,
     exits: GetProductRatingExits
   ) {
-    const getResult = <
-      T extends sailsModelKVP<ESCExplanationType> | ESCExplanationType
-    >(
+    const getResult = (
       rating: ESCRatingType,
-      explanations: T[]
+      explanations: sailsModelKVP<ESCExplanationType>[]
     ) => {
-      return {
-        ...rating,
-        ...{
-          explanations: explanations,
-        },
-      } as GetProductRatingResult[''];
+      const x: GetProductRatingResult[''] = {
+        id: rating.id,
+        createdAt: rating.createdAt,
+        productPublicId: rating.productPublicId,
+        rating: rating.rating,
+        evidence: rating.evidence,
+        calculatedOn: rating.calculatedOn,
+        product: rating.product,
+        explanations: explanations,
+      };
+      return x;
     };
 
     const findMatchInVegiScoreApi = async (name: string, category: string) => {
@@ -199,7 +202,7 @@ const _exports: SailsActionDefnType<
       // if (!barcode) {
       //   return { ['NO_BARCODE']: null };
       // }
-      const barcode = id;
+      
       const ratingsEntries = ratingsEntriesForAllBarcodes.filter(
         (re) => (re.product as any) === id
       );
@@ -213,10 +216,9 @@ const _exports: SailsActionDefnType<
         const explanations = await ESCExplanation.find({
           escrating: rating.id,
         });
-        return { [barcode]: getResult(rating, explanations) };
-        // return exits.success(getResult(rating, explanations));
+        return { [id]: getResult(rating, explanations) };
       } else {
-        return { [barcode]: null };
+        return { [id]: null };
       }
     };
 
@@ -279,8 +281,18 @@ const _exports: SailsActionDefnType<
           measure: 0,
           escrating: newRating.id,
         }).fetch();
+
+
         
-        const result = getResult(newRating, [explanation]);
+        const result = getResult(newRating, [
+          {
+            id: explanation.id,
+            title: explanation.title,
+            description: explanation.description,
+            measure: explanation.measure,
+            escrating: newRating.id,
+          },
+        ]);
         return { [p.id]: result };
       }
       const results = await Promise.all(products.map(p => createRating(p)));
@@ -364,7 +376,7 @@ const _exports: SailsActionDefnType<
     //   ...ratingsJobsFromWeb
     // );
     // const resultFinal = Object.assign(resultDict, resultDictFromWeb);
-    const resultFinal = resultDict;
+    const resultFinal = resultDict; // * ignore output of lazyFetch function for now and just fetch ratings that are already calculated in the db
 
     return exits.success(resultFinal);
   },

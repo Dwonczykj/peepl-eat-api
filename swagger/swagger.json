@@ -1556,7 +1556,7 @@
           },
           "name": {
             "type": "string",
-            "maxLength": 50
+            "maxLength": 255
           },
           "description": {
             "type": "string"
@@ -1600,6 +1600,56 @@
             "type": "string",
             "nullable": true,
             "description": "back of the package information"
+          },
+          "vendorInternalId": {
+            "type": "string",
+            "default": "",
+            "description": "The Internal ID from the vendor"
+          },
+          "stockCount": {
+            "type": "integer",
+            "format": "int64",
+            "default": 0,
+            "description": "The remaining stock count for this product SKU",
+            "minimum": 0
+          },
+          "supplier": {
+            "type": "string",
+            "default": "",
+            "description": "The name of the supplier i.e. Suma"
+          },
+          "brandName": {
+            "type": "string",
+            "default": "",
+            "description": "The name of the brand i.e. Jelly Bears"
+          },
+          "taxGroup": {
+            "type": "string",
+            "default": "",
+            "description": "An optional tax grouping such as STD VAT"
+          },
+          "stockUnitsPerProduct": {
+            "type": "number",
+            "format": "double",
+            "default": 1,
+            "description": "Number of units per pack, i.e. a pack of 6 would have value of 6",
+            "example": 1
+          },
+          "sizeInnerUnitValue": {
+            "type": "number",
+            "format": "double",
+            "default": 0,
+            "description": "i.e. 450 if 1 inner unit in the package is 450ml"
+          },
+          "sizeInnerUnitType": {
+            "type": "string",
+            "default": "",
+            "description": "A measure of the units used to describe the value of the size of 1 unit i.e. ml"
+          },
+          "productBarCode": {
+            "type": "string",
+            "default": "",
+            "description": "A stringified long number, potentially GUID in future, that maps to the UPC (barcode) on the product"
           },
           "vendor": {
             "description": "The seller of the product. JSON dictionary representing the **vendor** instance or FK when creating / updating / not populated",
@@ -1796,51 +1846,6 @@
           "isAvailable": {
             "type": "boolean",
             "description": "Represents whether or not the option value is available."
-          },
-          "stockCount": {
-            "type": "integer",
-            "format": "int64",
-            "default": 0,
-            "description": "The remaining stock count for this product SKU",
-            "minimum": 0
-          },
-          "supplier": {
-            "type": "string",
-            "default": "",
-            "description": "The name of the supplier i.e. Suma"
-          },
-          "brandName": {
-            "type": "string",
-            "default": "",
-            "description": "The name of the brand i.e. Jelly Bears"
-          },
-          "taxGroup": {
-            "type": "string",
-            "default": "",
-            "description": "An optional tax grouping such as STD VAT"
-          },
-          "stockUnitsPerProduct": {
-            "type": "number",
-            "format": "double",
-            "default": 1,
-            "description": "Number of units per pack, i.e. a pack of 6 would have value of 6",
-            "example": 1
-          },
-          "sizeInnerUnitValue": {
-            "type": "number",
-            "format": "double",
-            "default": 0,
-            "description": "i.e. 450 if 1 inner unit in the package is 450ml"
-          },
-          "sizeInnerUnitType": {
-            "type": "string",
-            "default": "",
-            "description": "A measure of the units used to describe the value of the size of 1 unit i.e. ml"
-          },
-          "productBarCode": {
-            "type": "string",
-            "default": "",
-            "description": "A stringified long number, potentially GUID in future, that maps to the UPC (barcode) on the product"
           },
           "option": {
             "description": "The option to which this value can apply. JSON dictionary representing the **productoption** instance or FK when creating / updating / not populated",
@@ -8500,7 +8505,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "productOptionValueId",
+            "name": "productId",
             "required": true,
             "schema": {
               "type": "number",

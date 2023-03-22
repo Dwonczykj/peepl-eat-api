@@ -3,6 +3,7 @@ import { CategoryGroupType, ProductCategoryType, ProductOptionType, ProductOptio
 import {
   sailsVegi,
 } from '../interfaces/iSails';
+import { GetProductRatingResult } from './get-product-rating-by-barcodes';
 
 declare var sails: sailsVegi;
 
@@ -11,8 +12,14 @@ export type SelectVendorProductsInputs = {
   vendorId: number;
 };
 
+export type RatedProductType = ProductType & {
+  rating: GetProductRatingResult['']
+};
+
 export type SelectVendorProductsResult = {
-  vendor: VendorType
+  vendor: VendorType & {
+    products:RatedProductType[];
+  }
 } | false;
 
 export type SelectVendorProductsExits = {
@@ -437,17 +444,24 @@ select * from esc order by esc.product_id, esc.escrating_createdAt DESC
 
       //todo: Each ProductOptionValue within a Product needs to be returned with ESCRating
 
-      (vendor.products as any) = (vendor.products as ProductType[]).flatMap(
+      (vendor.products as any) = (vendor.products as ProductType[]).map(
         (product) =>
-          product.options.flatMap((option) =>
-            option.values.map((productOptionValue) =>
-              Object.assign(
-                productOptionValue,
-                productRatings[product.productBarCode] || {}
-              )
-            )
+          Object.assign(
+            product,
+            {rating: productRatings[product.productBarCode] || {}}
           )
       );
+      // (vendor.products as any) = (vendor.products as ProductType[]).flatMap(
+      //   (product) =>
+      //     product.options.flatMap((option) =>
+      //       option.values.map((productOptionValue) =>
+      //         Object.assign(
+      //           productOptionValue,
+      //           productRatings[product.productBarCode] || {}
+      //         )
+      //       )
+      //     )
+      // );
     } catch (error) {
       sails.log.error(error);
     }

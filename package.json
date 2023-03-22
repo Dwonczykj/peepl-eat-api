@@ -82,10 +82,14 @@
     "typescript": "^4.7.4",
     "webpack": "^5.74.0"
   },
+  "nsolid": {
+    "command": "127.0.0.1:9001"
+  },
   "scripts": {
     "dev": "NODE_ENV=development useFirebaseEmulator=false node app.js --hookTimeout=160000",
     "dev-emulator": "NODE_ENV=development useFirebaseEmulator=true node app.js --hookTimeout=160000",
     "start": "NODE_ENV=production node app.js --verbose --hookTimeout=160000",
+    "start_profile": "source /usr/local/nsolid/nsolid-env && NODE_ENV=production node app.js --verbose --hookTimeout=160000",
     "tsc": "tsc ./assets/js",
     "sails": "$(npm bin)/sails",
     "lift": "$(npm bin)/sails lift",
@@ -98,11 +102,11 @@
   "main": "app.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/itsaboutpeepl/peepl-eat-api"
+    "url": "https://github.com/vegiapp/peepl-eat-api"
   },
-  "author": "Peepl Ltd",
+  "author": "vegi ltd",
   "license": "",
   "engines": {
-    "node": "^12.16"
+    "node": "^18.14"
   }
 }

@@ -9,10 +9,11 @@ module.exports = {
       args: '--hookTimeout 160000 --verbose',
       env_production: {
         NODE_ENV: 'production',
+        NODE_OPTIONS: '--max-old-space-size=1024',
       },
       env_development: {
         NODE_ENV: 'development',
-        NODE_OPTIONS: '--max-old-space-size=2048',
+        NODE_OPTIONS: '--max-old-space-size=1024',
       },
     },
   ],
@@ -31,7 +32,7 @@ module.exports = {
       'pre-setup': '',
       env: {
         NODE_ENV: 'production',
-        NODE_OPTIONS: '--max-old-space-size=2048',
+        NODE_OPTIONS: '--max-old-space-size=1024',
       },
     },
     QA: {
@@ -39,7 +40,7 @@ module.exports = {
       host: '3.95.65.212',
       key: '~/.ssh/vegi-server-keyvaluepair.pem',
       repo: 'https://github.com/Dwonczykj/peepl-eat-api.git',
-      ref: 'origin/QA',
+      ref: 'origin/qa',
       path: '/home/ubuntu/peepl-eat-api',
       'pre-deploy-local': 'sails run rebuild-cloud-sdk.js',
       'post-deploy':
@@ -47,7 +48,23 @@ module.exports = {
       'pre-setup': '',
       env: {
         NODE_ENV: 'production',
-        NODE_OPTIONS: '--max-old-space-size=2048',
+        NODE_OPTIONS: '--max-old-space-size=1024',
+      },
+    },
+    local: {
+      user: 'ubuntu',
+      host: '127.0.0.1',
+      // key: '~/.ssh/vegi-server-keyvaluepair.pem',
+      repo: 'https://github.com/Dwonczykj/peepl-eat-api.git',
+      ref: 'origin/qa',
+      path: '/Users/joey/Github_Keep/vegi-backend-jd',
+      // 'pre-deploy-local': 'sails run rebuild-cloud-sdk.js',
+      // 'post-deploy':
+      //   'npm install && pm2 reload ecosystem.config.js --env production',
+      // 'pre-setup': '',
+      env: {
+        NODE_ENV: 'production',
+        NODE_OPTIONS: '--max-old-space-size=1024',
       },
     },
   },

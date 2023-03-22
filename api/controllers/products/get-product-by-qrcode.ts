@@ -60,17 +60,13 @@ const _exports = {
     if(inputs.vendor){
       GET_PRODUCTS_SQL = `
 SELECT p.id 
-FROM vegi.productoption po 
-left join vegi.productoptionvalue pov on pov.option = po.id 
-join vegi.product p on p.id = po.product 
-WHERE pov.productBarCode = $1 AND p.vendor = $2`;
+FROM vegi.product p
+WHERE p.productBarCode = $1 AND p.vendor = $2`;
     }else{
       GET_PRODUCTS_SQL = `
 SELECT p.id 
-FROM vegi.productoption po 
-left join vegi.productoptionvalue pov on pov.option = po.id 
-join vegi.product p on p.id = po.product 
-WHERE pov.productBarCode = $1`;
+FROM vegi.product p
+WHERE p.productBarCode = $1`;
     }
 
     // Send it to the database.

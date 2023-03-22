@@ -8,5 +8,8 @@
         "moduleResolution": "node",
         "target": "ES6"
         // "target": "ES5"
+    },
+    "ts-node": {
+        "transpileOnly": true
     }
 }

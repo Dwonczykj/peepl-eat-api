@@ -13,7 +13,7 @@
         {
             // "type": "",
             "request": "launch",
-            "name": "sails run Current File",
+            "name": "sails run script $CurrentFile",
             "env": {
                 "NODE_ENV": "development",
                 "useFirebaseEmulator": "false",

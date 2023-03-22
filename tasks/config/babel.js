@@ -42,10 +42,7 @@ module.exports = function(grunt) {
     dist: {
       // * should for now do the same as dev
       options: {
-        presets: [
-          '@babel/preset-env',
-          'minify'
-        ],
+        presets: ['@babel/preset-env', 'minify'],
         // presets: [require('sails-hook-grunt/accessible/babel-preset-env')] // ! Do not use for now
       },
       files: [
@@ -85,6 +82,7 @@ module.exports = function(grunt) {
           expand: true,
           cwd: 'assets/js/',
           src: ['**/*.page.js', '!dependencies/**/*.js'],
+          exclude: [/node_modules/],
           dest: '.assets_babel/js/',
           // dest: '.tmp/public/js/',
           ext: '.page.js',
@@ -93,6 +91,7 @@ module.exports = function(grunt) {
           expand: true,
           cwd: 'assets/js/',
           src: ['**/*.component.js', '!dependencies/**/*.js'],
+          exclude: [/node_modules/],
           dest: '.assets_babel/js/',
           // dest: '.tmp/public/js/',
           ext: '.component.js',
