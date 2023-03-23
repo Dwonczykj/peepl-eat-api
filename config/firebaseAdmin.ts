@@ -3,16 +3,28 @@ import * as admin from 'firebase-admin';
 import { DecodedIdToken, getAuth, UserRecord } from 'firebase-admin/auth';
 import fs from 'fs';
 
+const kebabize = (str, forceJoinerStr = '-') =>
+  str.replace(
+    /[A-Z]+(?![a-z])|[A-Z]/g,
+    ($, ofs) => (ofs ? forceJoinerStr || '-' : '') + $.toLowerCase()
+  );
+
+function strToEnvKey(str) {
+  return kebabize(str.replace(/\.[^/.]+$/, '')).replace(/-/g, '_');
+}
+
 if(process.env.NODE_ENV === 'test' || process.env.useFirebaseEmulator === 'true'){
   admin.initializeApp({ projectId: 'vegiliverpool' });
 } else {
   const fpath = 'vegiliverpool-firebase-adminsdk-4dfpz-8f01f888b3.json';
   if (!fs.existsSync(`./${fpath}`)) {
-    if (process.env[fpath.replace('.json', '').replace('-','_')] || process.env[fpath]) {
+    if (
+      process.env[strToEnvKey(fpath)] ||
+      process.env[fpath]
+    ) {
       const serviceAccount = JSON.parse(
         Buffer.from(
-          process.env[fpath.replace('.json', '').replace('-', '_')] ||
-            process.env[fpath],
+          process.env[strToEnvKey(fpath)] || process.env[fpath],
           'base64'
         ).toString()
       );
@@ -21,7 +33,9 @@ if(process.env.NODE_ENV === 'test' || process.env.useFirebaseEmulator === 'true'
       });
     } else {
       const envVariables = JSON.stringify(Object.keys(process.env).sort());
-      throw Error(`No env variable is set for "firebase-adminsdk". process.env="${envVariables}"`);
+      throw Error(
+        `No env variable is set for "firebase-adminsdk". process.env="${envVariables}"`
+      );
     }
   } else {
     const serviceAccount = require(`./${fpath}`);
