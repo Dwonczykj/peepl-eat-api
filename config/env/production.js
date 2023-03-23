@@ -21,7 +21,7 @@
 const BASE_URL =
   process.env.NODE_ENV === 'production'
     ? 'https://qa-vegi.vegiapp.co.uk'
-    : 'http://localhost:1337';
+    : `http://localhost:${process.env.PORT}`;
 module.exports = {
   hookTimeout: 40000,
 
@@ -318,7 +318,7 @@ module.exports = {
    * this, just try deploying without setting it and see if it works.)       *
    *                                                                         *
    ***************************************************************************/
-  port: 1337,
+  port: process.env.PORT,
 
   /**************************************************************************
    *                                                                         *

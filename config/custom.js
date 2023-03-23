@@ -13,7 +13,7 @@ const { config } = require('dotenv');
 const BASE_URL =
   process.env.NODE_ENV === 'production'
     ? 'https://qa-vegi.vegiapp.co.uk'
-    : 'http://localhost:1337';
+    : `http://localhost:${process.env.PORT}`;
 
 config(); // load config from local .env if exists into process.env
 
