@@ -16,7 +16,8 @@ if(process.env.NODE_ENV === 'test' || process.env.useFirebaseEmulator === 'true'
         credential: admin.credential.cert(serviceAccount),
       });
     } else {
-      throw Error(`No env variables is set for "firebase-adminsdk"`);
+      const envVariables = JSON.stringify(Object.keys(process.env));
+      throw Error(`No env variable is set for "firebase-adminsdk". process.env="${envVariables}"`);
     }
   } else {
     const serviceAccount = require(`./${fpath}`);
