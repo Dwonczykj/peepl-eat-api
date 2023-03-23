@@ -173,7 +173,7 @@ module.exports = {
      *                                                                          *
      ***************************************************************************/
     adapter: '@sailshq/connect-redis',
-    url: 'redis://localhost:6379/0',
+    url: process.env.REDIS_URL,
     //--------------------------------------------------------------------------
     // /\   OR, to avoid checking it in to version control, you might opt to
     // ||   set sensitive credentials like this using an environment variable.
@@ -232,14 +232,16 @@ module.exports = {
      * > Be sure to use the right protocol!  ("http://" vs. "https://")         *
      *                                                                          *
      ***************************************************************************/
-    onlyAllowOrigins: process.env.NODE_ENV === 'production'
-    ? [
-      'https://vegi.vegiapp.co.uk',
-      'https://vegi.itsaboutpeepl.com',
-      'https://qa-vegi.vegiapp.co.uk',
-      'http://localhost',
-      'http://localhost:51479',
-    ] : undefined,
+    onlyAllowOrigins:
+      process.env.NODE_ENV === 'production'
+        ? [
+            'https://vegi.vegiapp.co.uk',
+            'https://vegi.itsaboutpeepl.com',
+            'https://qa-vegi.vegiapp.co.uk',
+            'http://localhost',
+            'http://localhost:51479',
+          ]
+        : undefined,
 
     /***************************************************************************
      *                                                                          *
