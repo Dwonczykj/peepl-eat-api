@@ -16,7 +16,7 @@ if(process.env.NODE_ENV === 'test' || process.env.useFirebaseEmulator === 'true'
         credential: admin.credential.cert(serviceAccount),
       });
     } else {
-      sails.warn(`No "${fpath}" config set in node environment`);
+      throw Error(`No env variables is set for "firebase-adminsdk"`);
     }
   } else {
     const serviceAccount = require(`./${fpath}`);
