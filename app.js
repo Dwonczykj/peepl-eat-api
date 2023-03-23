@@ -21,20 +21,6 @@
  *   https://sailsjs.com/anatomy/app.js
  */
 
-console.log('Running app after small delay');
-
-// console.log(v8.getHeapStatistics().heap_size_limit / (1024 * 1024));
-
-function sleep(milliseconds) {
-  const date = Date.now();
-  let currentDate = null;
-  do {
-    currentDate = Date.now();
-  } while (currentDate - date < milliseconds);
-}
-
-sleep(1*1000);
-
 require('ts-node/register');
 
 console.log(`Registered TS-Node`);
@@ -42,7 +28,6 @@ console.log(`Registered TS-Node`);
 // no matter where we actually lift from.
 // > Note: This is not required in order to lift, but it is a convenient default.
 process.chdir(__dirname);
-
 
 // Attempt to import `sails` dependency, as well as `rc` (for loading `.sailsrc` files).
 var sails;

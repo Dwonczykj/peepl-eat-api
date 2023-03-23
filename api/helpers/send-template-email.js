@@ -103,7 +103,7 @@ module.exports = {
     var path = require('path');
     var url = require('url');
     var util = require('util');
-    var AWS = require('aws-sdk');
+    var AWS = require('aws-sdk'); 
     var dontActuallySend = false;
     const result = {
       loggedInsteadOfSending: dontActuallySend,
@@ -251,7 +251,13 @@ module.exports = {
         };
 
         try {
-          AWS.config.loadFromPath('config/aws.json');
+          // ~ https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-environment.html
+          if (
+            !process.env.AWS_ACCESS_KEY_ID ||
+            !process.env.AWS_SECRET_ACCESS_KEY
+          ){
+            AWS.config.loadFromPath('config/aws.json');
+          }
         } catch (error) {
           sails.log.error('AWS email service not configured!!!!');
           return exits.failed(error);

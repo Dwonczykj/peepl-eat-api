@@ -1,14 +1,29 @@
 //~ https://dev-bay.com/firebase-integrate-admin-sdk-with-nodejs-back-end-api/
 import * as admin from 'firebase-admin';
 import { DecodedIdToken, getAuth, UserRecord } from 'firebase-admin/auth';
+import fs from 'fs';
 
 if(process.env.NODE_ENV === 'test' || process.env.useFirebaseEmulator === 'true'){
   admin.initializeApp({ projectId: 'vegiliverpool' });
 } else {
-  const serviceAccount = require('./vegiliverpool-firebase-adminsdk-4dfpz-8f01f888b3.json');
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
+  const fpath = 'vegiliverpool-firebase-adminsdk-4dfpz-8f01f888b3.json';
+  if (!fs.existsSync(`./${fpath}`)) {
+    if (process.env[fpath]) {
+      const serviceAccount = JSON.parse(
+        Buffer.from(process.env[fpath], 'base64').toString()
+      );
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+      });
+    } else {
+      sails.warn(`No "${fpath}" config set in node environment`);
+    }
+  } else {
+    const serviceAccount = require(`./${fpath}`);
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+    });
+  }
 }
 
 export const verifyIdToken = (idToken: string): Promise<DecodedIdToken> => {

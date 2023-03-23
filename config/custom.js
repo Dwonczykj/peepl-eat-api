@@ -7,11 +7,17 @@
  * For more information on custom configuration, visit:
  * https://sailsjs.com/config/custom
  */
+
+const { config } = require('dotenv');
+
 const BASE_URL =
   process.env.NODE_ENV === 'production'
     ? 'https://qa-vegi.vegiapp.co.uk'
     : 'http://localhost:1337';
-module.exports.custom = {
+
+config(); // load config from local .env if exists into process.env
+
+let custom = {
   /***************************************************************************
    *                                                                          *
    * Any other custom config this Sails app should use during development.    *
@@ -69,3 +75,13 @@ module.exports.custom = {
    **************************************************************************/
   rememberMeCookieMaxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
 };
+
+if (process.env['local.js']) {
+  const _ = require(`lodash`);
+  const localConfigFromDotEnv = JSON.parse(
+    Buffer.from(process.env['local.js'], 'base64')
+  );
+  custom = _.merge({}, custom, localConfigFromDotEnv);
+}
+
+module.exports.custom = custom;
