@@ -134,16 +134,19 @@ function convertToEnv(object) {
   }
   return envFile;
 }
+
+
 function convertToEnvBase64(object, envKeyName) {
   let value = '';
   if(isValueType(object)){
     value = object;
-  }else{
+  } else {
     value = Buffer.from(
       JSON.stringify(object)
     ).toString('base64');
   }
-  return `${envKeyName}=${value}\n`;
+  const returnKey = kebabize(envKeyName.replace(/\.[^/.]+$/, ""),'_').replace(/-/g,'_');
+  return `${returnKey}=${value}\n`;
   // for (const key of Object.keys(object)) {
   //   let keyName = key;
   //   let value = object[key];
