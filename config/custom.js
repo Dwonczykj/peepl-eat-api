@@ -76,10 +76,10 @@ let custom = {
   rememberMeCookieMaxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
 };
 
-if (process.env['local.js']) {
+if (process.env['local'] || process.env['local.js']) {
   const _ = require(`lodash`);
   const localConfigFromDotEnv = JSON.parse(
-    Buffer.from(process.env['local.js'], 'base64')
+    Buffer.from(process.env['local'] || process.env['local.js'], 'base64')
   );
   custom = _.merge({}, custom, localConfigFromDotEnv);
 }

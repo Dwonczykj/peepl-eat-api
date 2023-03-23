@@ -8,9 +8,12 @@ if(process.env.NODE_ENV === 'test' || process.env.useFirebaseEmulator === 'true'
 } else {
   const fpath = 'vegiliverpool-firebase-adminsdk-4dfpz-8f01f888b3.json';
   if (!fs.existsSync(`./${fpath}`)) {
-    if (process.env[fpath]) {
+    if (process.env[fpath.replace('.json', '')] || process.env[fpath]) {
       const serviceAccount = JSON.parse(
-        Buffer.from(process.env[fpath], 'base64').toString()
+        Buffer.from(
+          process.env[fpath.replace('.json', '')] || process.env[fpath],
+          'base64'
+        ).toString()
       );
       admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
