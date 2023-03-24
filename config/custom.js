@@ -23,6 +23,15 @@ let custom = {
    * Any other custom config this Sails app should use during development.    *
    *                                                                          *
    ***************************************************************************/
+  dbName: (
+    process.env.JAWSDB_URL ||
+    (process.env.NODE_ENV === 'development'
+      ? 'mysql://vegi:vegi2022!@localhost:3306/vegi' // 'mysql://vegi:vegi2022!@localhost:3306/vegitemp'
+      : process.env.NODE_ENV === 'production' &&
+        'mysql://vegi:vegi2022!@localhost:3306/vegi')
+  )
+    .split('/')
+    .pop(),
   internalEmailAddress: 'support@vegiapp.co.uk',
   internalPhoneNumber: '+1 000 0000000', // For support requests
   vegiWebSite: 'https://vegiapp.co.uk',
@@ -56,7 +65,7 @@ let custom = {
   requestDeliveryAvailability: false, // * This if true, checks if there is a courier available before asking vendor to fulfil. Only works when vendors have automated fulfilment processes.
   ignoreSpecialDatesMoreThanXMonthsAway: 12,
   ongoingOrdersHoursCutoff: 5,
-  escRatingsTTLDays: 14, 
+  escRatingsTTLDays: 14,
   storageDomains: [],
 
   /**************************************************************************

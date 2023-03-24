@@ -72,6 +72,8 @@ const _exports: SailsActionDefnType<
       return exits.success(false);
     }
 
+    const dbName = sails.config.custom.dbName;
+
     const GET_PRODUCTS_SQL = `
 with products as (
 	SELECT 
@@ -143,12 +145,12 @@ with products as (
   \`productoptionvalue\`.\`priceModifier\` AS productoptionvalue_priceModifier,
   \`productoptionvalue\`.\`isAvailable\` AS productoptionvalue_isAvailable,
   \`productoptionvalue\`.\`option\` AS productoptionvalue_option
-  FROM \`vegi\`.\`vendor\` vendor
-	left join \`vegi\`.\`product\` product on vendor.id = product.vendor
-	left join \`vegi\`.\`productoption\` productoption on product.id = productoption.product 
-	left join \`vegi\`.\`productoptionvalue\` productoptionvalue on productoptionvalue.option = productoption.id 
-	left join \`vegi\`.\`productcategory\` productcategory on productcategory.id = product.category 
-	left join \`vegi\`.\`categorygroup\` categorygroup on categorygroup.id = productcategory.categoryGroup
+  FROM \`${dbName}\`.\`vendor\` vendor
+	left join \`${dbName}\`.\`product\` product on vendor.id = product.vendor
+	left join \`${dbName}\`.\`productoption\` productoption on product.id = productoption.product 
+	left join \`${dbName}\`.\`productoptionvalue\` productoptionvalue on productoptionvalue.option = productoption.id 
+	left join \`${dbName}\`.\`productcategory\` productcategory on productcategory.id = product.category 
+	left join \`${dbName}\`.\`categorygroup\` categorygroup on categorygroup.id = productcategory.categoryGroup
 )
 , esc as (
 	select
@@ -169,8 +171,8 @@ with products as (
 	  \`escexplanation\`.\`measure\` AS escexplanation_measure,
 	  \`escexplanation\`.\`escrating\` AS escexplanation_escrating
   FROM products
-    left join \`vegi\`.\`escrating\` escrating on products.product_id = \`escrating\`.\`product\`
-	left join \`vegi\`.\`escexplanation\` escexplanation on escrating.id = escexplanation.escrating
+    left join \`${dbName}\`.\`escrating\` escrating on products.product_id = \`escrating\`.\`product\`
+	left join \`${dbName}\`.\`escexplanation\` escexplanation on escrating.id = escexplanation.escrating
     where (1=1) 
 		and products.vendor_id = $1
         and (TIMESTAMPDIFF(HOUR, FROM_UNIXTIME(\`escrating\`.\`createdAt\`), UNIX_TIMESTAMP(NOW())) <= 24 or \`escrating\`.\`id\` is null) -- escrating created in the last 24 hours

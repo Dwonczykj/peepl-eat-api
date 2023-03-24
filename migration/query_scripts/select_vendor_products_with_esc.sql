@@ -34,6 +34,15 @@ with products as (
   `product`.`isFeatured` AS product_isFeatured,
   `product`.`status` AS product_status,
   `product`.`ingredients` AS product_ingredients,
+  `product`.`vendorInternalId` AS product_vendorInternalId,
+  `product`.`stockCount` AS product_stockCount,
+  `product`.`brandName` AS product_brandName,
+  `product`.`taxGroup` AS product_taxGroup,
+  `product`.`stockUnitsPerProduct` AS product_stockUnitsPerProduct,
+  `product`.`sizeInnerUnitValue` AS product_sizeInnerUnitValue,
+  `product`.`sizeInnerUnitType` AS product_sizeInnerUnitType,
+  `product`.`productBarCode` AS product_productBarCode,
+  `product`.`supplier` AS product_supplier,
   `productcategory`.`createdAt` AS productcategory_createdAt,
   `productcategory`.`updatedAt` AS productcategory_updatedAt,
   `productcategory`.`id` AS productcategory_id,
@@ -58,14 +67,6 @@ with products as (
   `productoptionvalue`.`description` AS productoptionvalue_description,
   `productoptionvalue`.`priceModifier` AS productoptionvalue_priceModifier,
   `productoptionvalue`.`isAvailable` AS productoptionvalue_isAvailable,
-  `productoptionvalue`.`stockCount` AS productoptionvalue_stockCount,
-  `productoptionvalue`.`brandName` AS productoptionvalue_brandName,
-  `productoptionvalue`.`taxGroup` AS productoptionvalue_taxGroup,
-  `productoptionvalue`.`stockUnitsPerProduct` AS productoptionvalue_stockUnitsPerProduct,
-  `productoptionvalue`.`sizeInnerUnitValue` AS productoptionvalue_sizeInnerUnitValue,
-  `productoptionvalue`.`sizeInnerUnitType` AS productoptionvalue_sizeInnerUnitType,
-  `productoptionvalue`.`productBarCode` AS productoptionvalue_productBarCode,
-  `productoptionvalue`.`supplier` AS productoptionvalue_supplier,
   `productoptionvalue`.`option` AS productoptionvalue_option
   FROM `vegi`.`vendor` vendor
 	left join `vegi`.`product` product on vendor.id = product.vendor
@@ -74,7 +75,7 @@ with products as (
 	left join `vegi`.`productcategory` productcategory on productcategory.id = product.category 
 	left join `vegi`.`categorygroup` categorygroup on categorygroup.id = productcategory.categoryGroup
 )
-,esc as (
+, esc as (
 	select
 		products.*,
 	  `escrating`.`createdAt` AS escrating_createdAt,

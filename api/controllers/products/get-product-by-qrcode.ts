@@ -56,16 +56,17 @@ const _exports = {
       notFound: (unusedMessage: Error | string) => void;
     }
   ) {
+    const dbName = sails.config.custom.dbName;
     let GET_PRODUCTS_SQL;
     if(inputs.vendor){
       GET_PRODUCTS_SQL = `
 SELECT p.id 
-FROM vegi.product p
+FROM ${dbName}.product p
 WHERE p.productBarCode = $1 AND p.vendor = $2`;
     }else{
       GET_PRODUCTS_SQL = `
 SELECT p.id 
-FROM vegi.product p
+FROM ${dbName}.product p
 WHERE p.productBarCode = $1`;
     }
 

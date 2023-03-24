@@ -20,9 +20,9 @@ module.exports = {
 
 
   fn: async function () {
-
-
-    sails.log(`Running custom shell script with NODE_ENV [${process.env.NODE_ENV}]: ... (\`NODE_ENV=development sails run export-db-json\`)`);
+    sails.log(
+      `Running custom shell script with NODE_ENV [${process.env.NODE_ENV}]: ... (\`NODE_ENV=development sails run export-db-json\`)`
+    );
 
     // return;
     // process.chdir(__dirname);
@@ -30,29 +30,25 @@ module.exports = {
 
     const Promise = require('bluebird');
 
-
     Object.keys(sails.models).forEach(function (key) {
       if (sails.models[key].query) {
         sails.models[key].query = Promise.promisify(sails.models[key].query);
       }
     });
 
-    const _dir = path.resolve(
-      sails.config.appPath,
-      `.tmp/dump_json`
-    );
-    if(!fs.existsSync(_dir)){
-      await fs.mkdir(_dir,(err) => {
+    const _dir = path.resolve(sails.config.appPath, `.tmp/dump_json`);
+    if (!fs.existsSync(_dir)) {
+      await fs.mkdir(_dir, (err) => {
         if (err) {
-            sails.log.error(err);
-            return;
+          sails.log.error(err);
+          return;
         }
         sails.log('dump_json .tmp directory created successfully!');
       });
     }
 
     let modelData = {};
-    
+
     const findData = async (key) => {
       if (`${key}`.includes('_')) {
         sails.log.info(`Ignoring table with name: ${key} as contains an "_"`);
@@ -64,8 +60,7 @@ module.exports = {
         `.tmp/dump_json/${key}.json`
       );
       // Compare bootstrap version from code base to the version that was last run
-      modelData[key] = await sails.helpers.fs
-        .readJson(saveJsonPathModelNames);
+      modelData[key] = await sails.helpers.fs.readJson(saveJsonPathModelNames);
 
       // const model = sails.models[key];
 
@@ -87,7 +82,7 @@ module.exports = {
       const pos = existingProductOptions.filter(
         (po) => po['product'] === p['id']
       );
-      pos.forEach(po => {
+      pos.forEach((po) => {
         const povs = existingProductOptionValues.filter(
           (pov) => pov['option'] === po['id']
         );
@@ -105,12 +100,12 @@ module.exports = {
       force: true,
     });
 
-
     const deepProductIds = existingProducts
       .filter((p) => p['options'] && p['options'].length > 1)
       .map((p) => p['id']);
-    const flatProducts = existingProducts
-      .filter((p) => !deepProductIds.includes(p['id']));
+    const flatProducts = existingProducts.filter(
+      (p) => !deepProductIds.includes(p['id'])
+    );
     const flatProductIds = flatProducts.map((p) => p['id']);
 
     await sails.helpers.fs.writeJson.with({
@@ -126,27 +121,31 @@ module.exports = {
       `Located ${existingProducts.length} products of which keep ${flatProductIds.length} and ignore ${deepProductIds.length} as they have necessary sub options`
     );
 
-    sails.log(existingProducts.filter(p => deepProductIds.includes(p['id'])).slice(1,6));
+    sails.log(
+      existingProducts
+        .filter((p) => deepProductIds.includes(p['id']))
+        .slice(1, 6)
+    );
 
-  // const deepProductIdsQueryResult = await sails.sendNativeQuery(`
-  // select product.id
-	// FROM vegi.product product
-	// left join vegi.productoption productoption on product.id = productoption.product
-	// where product.name is not null
-	// group by product.id having NumberOfProductOptions > 1
-	// order by NumberOfProductOptions desc;
-  //   `);
+    // const deepProductIdsQueryResult = await sails.sendNativeQuery(`
+    // select product.id
+    // FROM ${dbName}.product product
+    // left join ${dbName}.productoption productoption on product.id = productoption.product
+    // where product.name is not null
+    // group by product.id having NumberOfProductOptions > 1
+    // order by NumberOfProductOptions desc;
+    //   `);
 
-  //   const deepProductIds = deepProductIdsQueryResult.rows();
+    //   const deepProductIds = deepProductIdsQueryResult.rows();
 
     // const filterProductLinesWhichAreFlat = (p) => {
     //   const optionsForProduct = existingProductOptions.filter(po => po['product'] === p['id']);
     //   return optionsForProduct.length === 1;
     // };
     // const existingFlatProducts = flatProducts;
-    const createProductLine = (p,po,pov) => {
+    const createProductLine = (p, po, pov) => {
       //todo: Decide whether to keep the po and povs if not from csv and want to keep that one and then perhaps set supplier name to PC for this row to avoid destroying
-      if(!pov){
+      if (!pov) {
         return {
           name: p['name'],
           description: p['description'],
@@ -205,20 +204,24 @@ module.exports = {
     };
 
     const newProductLines = [];
-    flatProducts.forEach(p => {
-      const pos = existingProductOptions.filter(po => po['product'] === p['id']);
-      const poIds = pos.map(po => po['id']);
+    flatProducts.forEach((p) => {
+      const pos = existingProductOptions.filter(
+        (po) => po['product'] === p['id']
+      );
+      const poIds = pos.map((po) => po['id']);
 
-      const povs = existingProductOptionValues.filter(pov => poIds.includes(pov['option']));
+      const povs = existingProductOptionValues.filter((pov) =>
+        poIds.includes(pov['option'])
+      );
 
       // todo create a product for each product (p,null,null), if it has a po, then foreach po and value associated
-      if(pos.length > 1){
-        for(const po of pos){
-          for (const pov of povs.filter(pov => pov['option'] === po['id'])) {
+      if (pos.length > 1) {
+        for (const po of pos) {
+          for (const pov of povs.filter((pov) => pov['option'] === po['id'])) {
             newProductLines.push(createProductLine(p, po, pov));
-          } 
+          }
         }
-      } else  {
+      } else {
         newProductLines.push(createProductLine(p, false, false));
       }
     });
@@ -258,17 +261,19 @@ module.exports = {
       .filter((pov) => orphanedProductOptionIds.includes(pov['option']))
       .map((pov) => pov['id']);
 
-    const recreateProductOptionsWIds = existingProductOptions
-      .filter((po) => !flatProductIds.includes(po['product']));
-    const recreateProductOptionValues = existingProductOptionValues.filter(
-      (pov) =>
+    const recreateProductOptionsWIds = existingProductOptions.filter(
+      (po) => !flatProductIds.includes(po['product'])
+    );
+    const recreateProductOptionValues = existingProductOptionValues
+      .filter((pov) =>
         recreateProductOptionsWIds.map((po) => po['id']).includes(pov['option'])
-    ).map(pov => {
-      const { id, ...povOmitId } = pov;
-      return povOmitId;
-    });
+      )
+      .map((pov) => {
+        const { id, ...povOmitId } = pov;
+        return povOmitId;
+      });
     const recreateProductOptions = recreateProductOptionsWIds.map((po) => {
-      const {id, ...poOmitId } = po;
+      const { id, ...poOmitId } = po;
       return poOmitId;
     });
 
@@ -448,13 +453,10 @@ module.exports = {
     //   );
     // }
 
-
-    
-  // // Compare bootstrap version from code base to the version that was last run
-  // var lastRunBootstrapInfo = await sails.helpers.fs
-  //   .readJson(bootstrapLastRunInfoPath)
-  //   .tolerate('doesNotExist'); // (it's ok if the file doesn't exist yet-- just keep going.)
-
+    // // Compare bootstrap version from code base to the version that was last run
+    // var lastRunBootstrapInfo = await sails.helpers.fs
+    //   .readJson(bootstrapLastRunInfoPath)
+    //   .tolerate('doesNotExist'); // (it's ok if the file doesn't exist yet-- just keep going.)
   }
 
 };
