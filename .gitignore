@@ -48,6 +48,7 @@
 config/local.js
 *.env
 out_env.json
+www/*
 
 ################################################
 # Dependencies
