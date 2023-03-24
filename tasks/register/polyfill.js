@@ -7,6 +7,13 @@
  *   https://sailsjs.com/anatomy/tasks/register/polyfill.js
  *
  */
+var path = require('path');
+// eslint-disable-next-line no-console
+console.log(
+  `register-"${path.basename(__filename)}" registration of tasks with NODE_ENV="${
+    process.env.NODE_ENV
+  }"`
+);
 module.exports = function(grunt) {
   grunt.registerTask('polyfill:prod', 'Add the polyfill file to the top of the list of files to concatenate', ()=>{
     grunt.config.set('concat.js.src', [require('sails-hook-grunt/accessible/babel-polyfill')].concat(grunt.config.get('concat.js.src')));

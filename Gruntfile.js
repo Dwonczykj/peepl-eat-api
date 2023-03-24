@@ -13,7 +13,13 @@
  *   https://sailsjs.com/anatomy/Gruntfile.js
  */
 module.exports = function(grunt) {
-
+  var path = require('path');
+  // eslint-disable-next-line no-console
+  console.log(
+    `run "${path.basename(__filename)}" with NODE_ENV="${
+      process.env.NODE_ENV
+    }"`
+  );
   var loadGruntTasks = require('sails-hook-grunt/accessible/load-grunt-tasks');
 
   // Load Grunt task configurations (from `tasks/config/`) and Grunt

@@ -52,7 +52,7 @@
 //     //   'size': 'invisible',
 //     //   'callback': (response) => {
 //     //     // reCAPTCHA solved, allow signInWithPhoneNumber.
-//     //     console.debug(response);
+//     //     console.log(response);
 //     //     debugger;
 //     //   }
 //     // }, auth);

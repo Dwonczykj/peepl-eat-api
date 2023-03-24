@@ -88,9 +88,9 @@
   "scripts": {
     "dev": "NODE_ENV=development useFirebaseEmulator=false node app.js --hookTimeout=160000",
     "dev-emulator": "NODE_ENV=development useFirebaseEmulator=true node app.js --hookTimeout=160000",
-    "start_local": "redis-server 2>&1 & NODE_ENV=production node app.js --verbose --hookTimeout=160000",
+    "start_local": "redis-server 2>&1 & NODE_ENV=production node app.js --silly --hookTimeout=160000",
     "start": "NODE_ENV=production node app.js --silly --hookTimeout=160000",
-    "start_profile": "redis-server 2>&1 & source /usr/local/nsolid/nsolid-env && NODE_ENV=production node app.js --verbose --hookTimeout=160000",
+    "start_profile": "redis-server 2>&1 & source /usr/local/nsolid/nsolid-env && NODE_ENV=production node app.js --silly --hookTimeout=160000",
     "tsc": "tsc ./assets/js",
     "sails": "$(npm bin)/sails",
     "lift": "$(npm bin)/sails lift",

@@ -9,6 +9,13 @@
  *   https://sailsjs.com/anatomy/tasks/config/copy.js
  *
  */
+var path = require('path');
+// eslint-disable-next-line no-console
+console.log(
+  `register-"${path.basename(__filename)}" task with NODE_ENV="${
+    process.env.NODE_ENV
+  }"`
+);
 module.exports = function(grunt) {
 
   grunt.config.set('copy', {
