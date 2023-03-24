@@ -238,6 +238,7 @@ module.exports = {
             'https://vegi.vegiapp.co.uk',
             'https://vegi.itsaboutpeepl.com',
             'https://qa-vegi.vegiapp.co.uk',
+            'https://vegi-server.herokuapp.com/',
             'http://localhost',
             'http://localhost:51479',
           ]
