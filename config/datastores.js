@@ -12,8 +12,16 @@
  * For more information on configuring datastores, check out:
  * https://sailsjs.com/config/datastores
  */
+const { config } = require('dotenv');
 
-module.exports.datastores = {
+const BASE_URL =
+  process.env.NODE_ENV === 'production'
+    ? 'https://qa-vegi.vegiapp.co.uk'
+    : `http://localhost:${process.env.PORT}`;
+
+config(); // load config from local .env if exists into process.env
+
+let datastores = {
   /***************************************************************************
   *                                                                          *
   * Your app's default datastore.                                            *
@@ -50,3 +58,15 @@ module.exports.datastores = {
     // url: 'mysql://user:password@host:port/database',
   },
 };
+
+if (process.env['local'] || process.env['local.js']) {
+  // eslint-disable-next-line no-console
+  console.log(`Loading config from local env var`);
+  const _ = require(`lodash`);
+  const localConfigFromDotEnv = JSON.parse(
+    Buffer.from(process.env['local'] || process.env['local.js'], 'base64')
+  );
+  datastores = _.merge({}, datastores, localConfigFromDotEnv.config.datastores);
+}
+
+module.exports.datastores = datastores;

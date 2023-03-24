@@ -19,6 +19,9 @@ module.exports = {
 
     success: {
       viewTemplatePath: 'pages/admin/login-with-password'
+    },
+    error: {
+      responseType: 'error'
     }
 
   },
@@ -28,6 +31,11 @@ module.exports = {
 
     if (this.req.session.userId) {
       return this.res.redirect('/admin');
+    }
+
+    if(!sails.config.custom.firebaseAPIKey){
+      sails.log.error(`Firebase env vars have not been loaded.`);
+      return exits.error('Firebase not initialised. Please contact vegi support');
     }
 
     // Respond with view.

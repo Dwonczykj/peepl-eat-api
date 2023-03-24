@@ -13,7 +13,16 @@
  * https://sailsjs.com/docs/concepts/models-and-orm/model-settings
  */
 
-module.exports.models = {
+const { config } = require('dotenv');
+
+const BASE_URL =
+  process.env.NODE_ENV === 'production'
+    ? 'https://qa-vegi.vegiapp.co.uk'
+    : `http://localhost:${process.env.PORT}`;
+
+config(); // load config from local .env if exists into process.env
+
+let models = {
 
 
   /***************************************************************************
@@ -122,3 +131,17 @@ module.exports.models = {
 
 
 };
+
+
+if (process.env['local'] || process.env['local.js']) {
+  // eslint-disable-next-line no-console
+  console.log(`Loading config from local env var`);
+  const _ = require(`lodash`);
+  const localConfigFromDotEnv = JSON.parse(
+    Buffer.from(process.env['local'] || process.env['local.js'], 'base64')
+  );
+  models = _.merge({}, models, localConfigFromDotEnv.config.models);
+}
+
+module.exports.models = models;
+

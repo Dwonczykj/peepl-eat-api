@@ -77,11 +77,13 @@ let custom = {
 };
 
 if (process.env['local'] || process.env['local.js']) {
+  // eslint-disable-next-line no-console
+  console.log(`Loading config from local env var`);
   const _ = require(`lodash`);
   const localConfigFromDotEnv = JSON.parse(
     Buffer.from(process.env['local'] || process.env['local.js'], 'base64')
   );
-  custom = _.merge({}, custom, localConfigFromDotEnv);
+  custom = _.merge({}, custom, localConfigFromDotEnv.config.custom);
 }
 
 module.exports.custom = custom;
