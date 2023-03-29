@@ -6,10 +6,11 @@
     "compilerOptions": {
         "noImplicitAny": false,
         "moduleResolution": "node",
-        "target": "ES6"
+        "target": "ES6",
+        "sourceMap": false,
         // "target": "ES5"
     },
     "ts-node": {
-        "transpileOnly": true
+        "transpileOnly": true,
     }
 }

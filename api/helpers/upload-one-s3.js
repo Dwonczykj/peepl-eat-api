@@ -31,20 +31,32 @@ module.exports = {
 	      const verifiedImageDomain = sails.config.custom.storageDomains.map(
           (domain) => {
             var subDomain = /(.*)/;
-            var flags =
-              domain.flags !== subDomain.flags
-                ? (domain.flags + subDomain.flags)
-                    .split('')
-                    .sort()
-                    .join('')
-                    .replace(/(.)(?=.*\1)/, '')
-                : domain.flags;
+            var flags = '';
             var urlPattern = new RegExp(
               domain.source + subDomain.source,
               flags
             );
+            
+            // regex3 is now /foobar/gy
+            try {
+              flags =
+                domain.flags !== subDomain.flags
+                  ? (domain.flags + subDomain.flags)
+                      .split('')
+                      .sort()
+                      .join('')
+                      .replace(/(.)(?=.*\1)/g, '')
+                  : domain.flags;
+            } catch (error) {
+              sails.log.warn(`Unable to create regex flags of: "${flags}"`);
+            }
+            try {
+              urlPattern = new RegExp(domain.source + subDomain.source, flags);
+            } catch (error) {
+              sails.log.warn(`Unable to use regex flags of: "${flags}"`);
+            }
             const matches = inputs.image.match(urlPattern);
-            if (matches && matches.length >= 2){
+            if (matches && matches.length >= 2) {
               return matches[1];
             } else {
               return null;
