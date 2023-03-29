@@ -67,7 +67,7 @@ parasails.registerComponent('editProduct', {
           </div>
           <div class="form-group">
             <label for="category">Category</label>
-            <select class="form-control" id="category" v-model="productFlat.category.id" >
+            <select class="form-control" id="category" v-model="productFlat.category" >
               <!-- TODO: Add image urls to dropdown  options as leading icon -->
               <option v-for="productCategory in productcategories" :value="productCategory.id">{{productCategory.name}}</option> 
             </select>
