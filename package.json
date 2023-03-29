@@ -109,6 +109,6 @@
   "author": "vegi ltd",
   "license": "",
   "engines": {
-    "node": "^18.14"
+    "node": "^18.12"
   }
 }
