@@ -1,5 +1,10 @@
 <div id="dashboard" class="bg-white pb-3">
-  <%- partial('../../partials/consumer-navbar.ejs') %>
+  <% if (userRole === 'admin' ) { %>
+    <%- partial('../../partials/admin-navbar.ejs') %>
+    <%- this.req %>
+  <% } else {%>
+    <%- partial('../../partials/consumer-navbar.ejs') %>
+  <% } %>
   <div class="container">
 
     <div class="main">

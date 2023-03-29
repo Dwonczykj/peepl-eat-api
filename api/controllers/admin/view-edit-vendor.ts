@@ -125,6 +125,7 @@ module.exports = {
         deliveryPartners,
         categoryGroups,
         googleApiKey: sails.config.custom.distancesApiKey,
+        userRole: this.req.session.userRole,
       });
     } else {
       return exits.success({
@@ -135,6 +136,7 @@ module.exports = {
         deliveryPartners,
         categoryGroups,
         googleApiKey: sails.config.custom.distancesApiKey,
+        userRole: this.req.session.userRole,
       });
     }
   }

@@ -9,6 +9,7 @@ declare var ProductSuggestion: SailsModelType<ProductSuggestionType>;
 type ViewProductSuggestionInput = {};
 type ViewProductSuggestionResponse = {
   productSuggestions: sailsModelKVP<ProductSuggestionType>[];
+  userRole: any;
 };
 type ViewProductSuggestionExits = {
   success: (
@@ -46,7 +47,10 @@ const _exports: SailsActionDefnType<
   fn: async function (inputs, exits) {
     var productSuggestions = await ProductSuggestion.find();
 
-    const result: ViewProductSuggestionResponse = { productSuggestions };
+    const result: ViewProductSuggestionResponse = {
+      productSuggestions,
+      userRole: this.req.session.userRole,
+    };
 
     // Respond with view or JSON.
     if (this.req.wantsJSON) {

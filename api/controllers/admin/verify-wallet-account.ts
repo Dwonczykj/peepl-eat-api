@@ -84,6 +84,10 @@ const _exports: SailsActionDefnType<
         updatedAccountId: newAccount.id,
       };
     } else {
+      await Account.update({
+        verified: inputs.verified,
+        walletAddress: inputs.walletAddress,
+      });
       result = {
         updatedAccountId: existingAccount.id,
       };

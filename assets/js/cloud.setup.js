@@ -378,33 +378,27 @@ Cloud.setup({
     uploadProducts: {
       verb: 'POST',
       url: '/api/v1/admin/upload-products',
-      args: [
-          'vendorId',
-          'supplierName',
-          'upload',
-      ],
+      args: ['vendorId', 'supplierName', 'upload'],
     },
     viewProductSuggestions: {
       verb: 'GET',
       url: '/api/v1/admin/view-product-suggestions',
-      args: [
-        
-      ],
+      args: [],
     },
     viewProductSuggestion: {
       verb: 'GET',
       url: '/api/v1/admin/view-product-suggestion',
-      args: [
-        'productSuggestionId'
-      ],
+      args: ['productSuggestionId'],
     },
     verifyWalletAccount: {
       verb: 'POST',
       url: '/api/v1/admin/verify-wallet-account',
-      args: [
-        'walletAddress',
-        'verified',
-      ],
+      args: ['walletAddress', 'verified'],
+    },
+    onboardUserEmailFromWaitingList: {
+      verb: 'POST',
+      url: '/api/v1/admin/onboard-user-email-from-waiting-list',
+      args: ['email', 'onboarded'],
     },
     updateFulfilmentMethod: {
       verb: 'POST',

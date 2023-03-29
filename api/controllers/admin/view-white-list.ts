@@ -3,22 +3,22 @@ import { AccountType, SailsActionDefnType } from "../../../scripts/utils";
 
 declare var Account: SailsModelType<AccountType>;
 
-export type GetProductRatingInputs = {};
+export type GetWhiteListInputs = {};
 
-export type GetProductRatingResult = {
+export type GetWhiteListResult = {
   accounts: sailsModelKVP<AccountType>[];
 };
 
-export type GetProductRatingExits = {
-  success: (unusedData: GetProductRatingResult) => any;
-  successJSON: (unusedData: GetProductRatingResult) => any;
+export type GetWhiteListExits = {
+  success: (unusedData: GetWhiteListResult) => any;
+  successJSON: (unusedData: GetWhiteListResult) => any;
   notFound: (unusedErr?: Error | string) => any;
 };
 
 const _exports: SailsActionDefnType<
-  GetProductRatingInputs,
-  GetProductRatingResult,
-  GetProductRatingExits
+  GetWhiteListInputs,
+  GetWhiteListResult,
+  GetWhiteListExits
 > = {
   friendlyName: 'View white list',
 

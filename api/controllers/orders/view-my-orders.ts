@@ -35,6 +35,7 @@ export type FormattedOrderForClients = ({
 export type ViewMyOrdersResponseType = {
   ongoingOrders: Array<FormattedOrderForClients>;
   scheduledOrders: Array<FormattedOrderForClients>;
+  userRole: any;
 }
 
 const _exports = {
@@ -178,9 +179,17 @@ const _exports = {
 
     // Respond with view or JSON.
     if (this.req.wantsJSON) {
-      return exits.successJSON({ ongoingOrders, scheduledOrders });
+      return exits.successJSON({
+        ongoingOrders,
+        scheduledOrders,
+        userRole: this.req.session.userRole,
+      });
     } else {
-      return exits.success({ ongoingOrders, scheduledOrders });
+      return exits.success({
+        ongoingOrders,
+        scheduledOrders,
+        userRole: this.req.session.userRole,
+      });
     }
   },
 };

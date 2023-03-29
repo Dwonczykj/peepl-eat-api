@@ -70,9 +70,7 @@ module.exports = {
 
     sails.log.info(vendor.products);
 
-    return exits.success(
-      {vendor}
-    );
+    return exits.success({ vendor, userRole: this.req.session.userRole });
 
   }
 

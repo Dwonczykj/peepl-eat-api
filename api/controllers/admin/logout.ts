@@ -25,6 +25,7 @@ module.exports = {
 
   fn: async function (inputs, exits) {
     delete this.req.session.userId;
+    delete this.req.session.userRole;
 
     //* Not signed into Firebase on backend, only on vue client -> signout there
     // const auth = getAuth();

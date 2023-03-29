@@ -180,6 +180,12 @@ module.exports.routes = {
   'POST /api/v1/admin/verify-wallet-account': {
     action: 'admin/verify-wallet-account',
   },
+  'GET /admin/waiting-list': {
+    action: 'admin/view-waiting-list',
+  },
+  'POST /api/v1/admin/onboard-user-email-from-waiting-list': {
+    action: 'admin/onboard-user-email-from-waiting-list',
+  },
   'GET /api/v1/admin/account-is-vendor': {
     action: 'admin/account-is-vendor',
   },

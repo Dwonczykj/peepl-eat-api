@@ -70,6 +70,9 @@
       "name": "View white list"
     },
     {
+      "name": "View waiting list"
+    },
+    {
       "name": "View delivery partners"
     },
     {
@@ -182,6 +185,9 @@
     },
     {
       "name": "Get account for wallet address"
+    },
+    {
+      "name": "onboard user email from waitinglist"
     },
     {
       "name": "Account is vendor"
@@ -2498,6 +2504,10 @@
           "origin": {
             "type": "string",
             "default": ""
+          },
+          "onboarded": {
+            "type": "boolean",
+            "default": false
           }
         }
       }
@@ -3225,6 +3235,43 @@
         "description": "Display white listed wallet addressed accounts management page.",
         "tags": [
           "View white list"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/admin/waiting-list": {
+      "get": {
+        "summary": "View waiting list",
+        "description": "Display waiting listed email addresses management page.",
+        "tags": [
+          "View waiting list"
         ],
         "parameters": [],
         "responses": {
@@ -5877,6 +5924,63 @@
           },
           "404": {
             "description": "There is no account with that wallet address"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/onboard-user-email-from-waiting-list": {
+      "post": {
+        "summary": "onboard user email from waitinglist",
+        "description": "Flag a users email as having been onboarded",
+        "tags": [
+          "onboard user email from waitinglist"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "onboarded",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad email addressed"
+          },
+          "404": {
+            "description": "There is no waiting list entry with that email address"
           },
           "500": {
             "description": "Internal server error"

@@ -30,11 +30,9 @@ module.exports = {
 
     // Respond with view or JSON.
     if (this.req.wantsJSON) {
-      return exits.successJSON(
-        { user }
-      );
+      return exits.successJSON({ user, userRole: this.req.session.userRole });
     } else {
-      return exits.success({ user });
+      return exits.success({ user, userRole: this.req.session.userRole });
     }
 
   }

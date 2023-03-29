@@ -53,11 +53,15 @@ module.exports = {
       });
       // Respond with view or JSON.
       if(this.req.wantsJSON) {
-        return exits.successJSON(
-          {vendors: vendors}
-        );
+        return exits.successJSON({
+          vendors: vendors,
+          userRole: this.req.session.userRole,
+        });
       } else {
-        return exits.success({ vendors: vendors });
+        return exits.success({
+          vendors: vendors,
+          userRole: this.req.session.userRole,
+        });
       }
     } else {
       return exits.notFound();

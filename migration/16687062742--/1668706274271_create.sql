@@ -35,6 +35,7 @@ CREATE TABLE `waitinglist` (
   `updatedAt` bigint DEFAULT NULL,
   `id` int NOT NULL AUTO_INCREMENT,
   `email` varchar(255) DEFAULT '',
+  `onboarded` tinyint(1) DEFAULT 0,
   `userType` varchar(50) DEFAULT '',
   `origin` varchar(255) DEFAULT '',
   PRIMARY KEY (`id`),

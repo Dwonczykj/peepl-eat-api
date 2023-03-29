@@ -1,4 +1,8 @@
+import { SailsModelType } from "../../../api/interfaces/iSails";
+import { UserType } from "../../../scripts/utils";
+
 // const bcrypt = require('bcrypt');
+declare var User: SailsModelType<UserType>;
 module.exports = {
 
 
@@ -61,6 +65,7 @@ module.exports = {
     }
 
     this.req.session.userId = userRecord.id;
+    this.req.session.userRole = userRecord.role;
     return exits.success(userRecord);
 
     // const user = await signInWithEmailAndPassword(auth, inputs.email, inputs.password)

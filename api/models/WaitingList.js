@@ -26,6 +26,11 @@ module.exports = {
       required: false,
       defaultsTo: '',
     },
+    onboarded: {
+      type: 'boolean',
+      required: false,
+      defaultsTo: false,
+    },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗

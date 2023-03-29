@@ -112,6 +112,18 @@ module.exports = {
         `There was an error sending a confirmation of waiting list registration email to the user: ${error}`
       );
     }
+
+    try {
+      // redirect back to origin if request not wants json
+      // const origin = encodeURIComponent(req.originalUrl);
+      const origin = this.req.originalUrl;
+      if (origin && !this.req.wantsJSON){
+        return this.res.redirect(origin);
+      }
+    } catch (error) {
+      sails.log.warn(`Unable to find origin url for reqest`);
+    }
+
     return exits.success();
   },
 };

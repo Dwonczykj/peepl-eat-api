@@ -12,6 +12,6 @@ module.exports = {
   fn: async function (inputs: {}, exits: {
     success: (unusedArg:{}) => void;
   }) {
-    return exits.success({});
+    return exits.success({userRole: this.req.session.userRole,});
   },
 };

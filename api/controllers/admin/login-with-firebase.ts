@@ -164,6 +164,7 @@ requests over WebSockets instead of HTTP).`,
         // Modify the active session instance.
         // (This will be persisted when the response is sent.)
         this.req.session.userId = user.id;
+        this.req.session.userRole = user.role;
 
         // In case there was an existing session (e.g. if we allow users to go to the login page
         // when they're already logged in), broadcast a message that we can display in other open tabs.
