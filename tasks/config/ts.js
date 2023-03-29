@@ -3,7 +3,10 @@ module.exports = function (grunt) {
   grunt.config.set('ts', {
     default: {
       src: ['assets/js/**/*.ts', '!node_modules/**'],
-      tsconfig: './assets/js/tsconfig.json',
+      tsconfig:
+        process.env.NODE_ENV === 'production'
+          ? './assets/js/tsconfig.production.json'
+          : './assets/js/tsconfig.json',
     },
     // default: {
     //   src: ['assets/js/**/*.ts', '!node_modules/**'],
