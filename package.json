@@ -45,6 +45,7 @@
     "sails-hook-uploads": "^0.4.3",
     "sails-mongo": "^2.0.1",
     "sails-mysql": "^2.0.0",
+    "sails-postgresql": "5.0.1",
     "sass": "^1.50.0",
     "sharp": "^0.30.7",
     "skipper-s3": "^0.6.0",

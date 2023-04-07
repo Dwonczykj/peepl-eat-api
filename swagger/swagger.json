@@ -805,7 +805,7 @@
           },
           "calculatedOn": {
             "type": "string",
-            "format": "date-time",
+            "format": "date",
             "description": "The beginning of the estimated fulfilment slot."
           },
           "product": {
@@ -1308,12 +1308,12 @@
           },
           "fulfilmentSlotFrom": {
             "type": "string",
-            "format": "date-time",
+            "format": "date",
             "description": "The beginning of the estimated fulfilment slot."
           },
           "fulfilmentSlotTo": {
             "type": "string",
-            "format": "date-time",
+            "format": "date",
             "description": "The end of the estimated fulfilment slot."
           },
           "publicId": {

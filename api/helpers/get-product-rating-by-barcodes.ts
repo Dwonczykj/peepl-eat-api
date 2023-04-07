@@ -45,10 +45,10 @@ export type GetProductRatingResult = {
   createdAt: number;
   productPublicId: string;
   rating: number;
-  evidence: object;
+  // evidence: object;
   calculatedOn: Date;
   product: ProductType;
-  explanations: sailsModelKVP<ESCExplanationType>[];
+  explanations: ESCExplanationType[];
 } | null};
 
 export type GetProductRatingExits = {
@@ -93,14 +93,14 @@ const _exports: SailsActionDefnType<
   ) {
     const getResult = (
       rating: ESCRatingType,
-      explanations: sailsModelKVP<ESCExplanationType>[]
+      explanations: ESCExplanationType[]
     ) => {
       const x: GetProductRatingResult[''] = {
         id: rating.id,
         createdAt: rating.createdAt,
         productPublicId: rating.productPublicId,
         rating: rating.rating,
-        evidence: rating.evidence,
+        // evidence: rating.evidence,
         calculatedOn: rating.calculatedOn,
         product: rating.product,
         explanations: explanations,
@@ -231,7 +231,7 @@ const _exports: SailsActionDefnType<
       calculatedOn: {
         '>': ttl,
       },
-    }).populate('evidence');
+    }).populate('product');
 
     // Get rating from DB if exists
     const getRatingsForBarcodeFromDb = async (id: number) => {
@@ -251,7 +251,7 @@ const _exports: SailsActionDefnType<
         )[0];
         const explanations = await ESCExplanation.find({
           escrating: rating.id,
-        });
+        }).populate('escsource');
         return { [id]: getResult(rating, explanations) };
       } else {
         return { [id]: null };
@@ -329,7 +329,8 @@ const _exports: SailsActionDefnType<
             reasons: explanation.reasons,
             evidence: explanation.evidence, // this is fine, object does not need to be created by ref ID AS json in db
             measure: explanation.measure,
-            escrating: newRating.id,
+            escrating: newRating,
+            escsource: explanation.escsource,
           },
         ]);
         return { [p.id]: result };
@@ -346,9 +347,9 @@ const _exports: SailsActionDefnType<
         return productNameVal;
       });
       
-      let match = await findMatchInVegiScoreApi(
-        productNameVal,
-      );
+      // let match = await findMatchInVegiScoreApi(
+      //   productNameVal,
+      // );
       // todo: impleent below line
       // let match = await findMatchInVegiScoreApi(ids);
       

@@ -26,8 +26,7 @@ module.exports = {
     },
     paidDateTime: {
       type: 'number',
-      description:
-        'The unixtime when the order payment was paid (if at all).',
+      description: 'The unixtime when the order payment was paid (if at all).',
       required: false,
       allowNull: true,
     },
@@ -119,12 +118,14 @@ module.exports = {
     },
     fulfilmentSlotFrom: {
       type: 'ref',
-      columnType: 'datetime',
+      // columnType: 'datetime',
+      columnType: 'date',
       description: 'The beginning of the estimated fulfilment slot.',
     },
     fulfilmentSlotTo: {
       type: 'ref',
-      columnType: 'datetime',
+      // columnType: 'datetime',
+      columnType: 'date',
       description: 'The end of the estimated fulfilment slot.',
     },
     publicId: {
@@ -152,7 +153,14 @@ module.exports = {
     completedFlag: {
       type: 'string',
       defaultsTo: '',
-      isIn: ['', 'completed', 'cancelled', 'refunded', 'partially refunded', 'void'],
+      isIn: [
+        '',
+        'completed',
+        'cancelled',
+        'refunded',
+        'partially refunded',
+        'void',
+      ],
     },
     completedOrderFeedback: {
       type: 'string',

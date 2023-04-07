@@ -111,6 +111,7 @@ with products as (
   \`product\`.\`isFeatured\` AS product_isFeatured,
   \`product\`.\`status\` AS product_status,
   \`product\`.\`ingredients\` AS product_ingredients,
+  \`product\`.\`proxyForVegiProduct\` AS product_proxyForVegiProduct,
   \`product\`.\`vendorInternalId\` AS product_vendorInternalId,
   \`product\`.\`stockCount\` AS product_stockCount,
   \`product\`.\`brandName\` AS product_brandName,
@@ -160,16 +161,17 @@ with products as (
 	  \`escrating\`.\`id\` AS escrating_id,
 	  \`escrating\`.\`productPublicId\` AS escrating_productPublicId,
 	  \`escrating\`.\`rating\` AS escrating_rating,
-	  \`escrating\`.\`evidence\` AS escrating_evidence,
 	  \`escrating\`.\`calculatedOn\` AS escrating_calculatedOn,
 	  \`escrating\`.\`product\` AS escrating_product,
 	  \`escexplanation\`.\`createdAt\` AS escexplanation_createdAt,
 	  \`escexplanation\`.\`updatedAt\` AS escexplanation_updatedAt,
 	  \`escexplanation\`.\`id\` AS escexplanation_id,
 	  \`escexplanation\`.\`title\` AS escexplanation_title,
-	  \`escexplanation\`.\`description\` AS escexplanation_description,
+	  \`escexplanation\`.\`reasons\` AS escexplanation_reasons,
 	  \`escexplanation\`.\`measure\` AS escexplanation_measure,
-	  \`escexplanation\`.\`escrating\` AS escexplanation_escrating
+	  \`escexplanation\`.\`evidence\` AS escexplanation_evidence,
+	  \`escexplanation\`.\`escrating\` AS escexplanation_escrating,
+	  \`escexplanation\`.\`escsource\` AS escexplanation_escsource
   FROM products
     left join \`${dbName}\`.\`escrating\` escrating on products.product_id = \`escrating\`.\`product\`
 	left join \`${dbName}\`.\`escexplanation\` escexplanation on escrating.id = escexplanation.escrating
@@ -219,7 +221,7 @@ select * from esc order by esc.product_id, esc.escrating_createdAt DESC
           priority: row.product_priority,
           status: row.product_status,
           ingredients: row.product_ingredients,
-
+          proxyForVegiProduct: row.product_proxyForVegiProduct,
           vendorInternalId: row.product_vendorInternalId,
           stockCount: row.product_stockCount,
           brandName: row.product_brandName,

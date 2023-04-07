@@ -27,7 +27,8 @@ module.exports = {
     // },
     calculatedOn: {
       type: 'ref',
-      columnType: 'datetime',
+      // columnType: 'datetime',
+      columnType: 'date',
       description: 'The beginning of the estimated fulfilment slot.',
     },
 
