@@ -67,7 +67,7 @@ let _exports: SailsModelDefnType<UserType> & { formatPhoneNumber?: (unusedOpts:{
     },
     role: {
       type: 'string',
-      isIn: ['admin', 'vendor', 'deliveryPartner', 'consumer'],
+      isIn: ['admin', 'vendor', 'deliveryPartner', 'consumer', 'service'],
       required: true,
     },
     vendorRole: {

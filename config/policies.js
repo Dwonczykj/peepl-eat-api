@@ -66,6 +66,7 @@ module.exports.policies = {
   'discounts/*': true, // ['localize', 'firebase', 'firebase-auth', 'is-logged-in'],
   'orders/*': true, // ["localize", "firebase", "firebase-auth", "is-logged-in"],
   'products/upload-product-suggestion': true, // ["localize", "firebase", "firebase-auth", "is-logged-in"],
+  'products/update-product-rating': ['is-logged-in', 'is-vegi-service'], // ["localize", "firebase", "firebase-auth", "is-logged-in"],
   'products/*': true, // ["localize", "firebase", "firebase-auth", "is-logged-in"],
   'vendors/*': true /*[    "localize",
     "firebase",

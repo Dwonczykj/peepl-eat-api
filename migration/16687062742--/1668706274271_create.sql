@@ -60,7 +60,6 @@ CREATE TABLE `escrating` (
   `id` int NOT NULL AUTO_INCREMENT,
   `productPublicId` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `rating` double DEFAULT NULL,
-  `evidence` longtext COLLATE utf8mb4_general_ci,
   `calculatedOn` datetime DEFAULT NULL,
   `product` int DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -72,9 +71,23 @@ CREATE TABLE `escexplanation` (
   `updatedAt` bigint DEFAULT NULL,
   `id` int NOT NULL AUTO_INCREMENT,
   `title` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `description` longtext COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `reasons` longtext COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `evidence` longtext COLLATE utf8mb4_general_ci,
   `measure` double DEFAULT NULL,
   `escrating` int DEFAULT NULL,
+  `escsource` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `escsource` (
+  `createdAt` bigint DEFAULT NULL,
+  `updatedAt` bigint DEFAULT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT '',
+  `type` varchar(255) COLLATE utf8mb4_general_ci DEFAULT '',
+  `domain` varchar(255) COLLATE utf8mb4_general_ci DEFAULT '',
+  `credibility` double COLLATE utf8mb4_general_ci DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

@@ -1,59 +1,50 @@
 /**
- * ESCRating.ts
+ * ProductSuggestion.ts
  *
  * @description :: A model definition represents a database table/collection.
  * @docs        :: https://sailsjs.com/docs/concepts/models-and-orm/models
  */
+import { v4 as uuidv4 } from 'uuid';
+import { ESCSourceType, SailsModelDefnType } from '../../scripts/utils';
 
-import { ESCExplanationType } from "../../scripts/utils";
-import { SailsModelDefnType } from '../../scripts/utils';
-
-let _exports: SailsModelDefnType<ESCExplanationType> = {
+let _exports: SailsModelDefnType<ESCSourceType> = {
   attributes: {
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
     //  ╩  ╩╚═╩╩ ╩╩ ╩ ╩ ╚╝ ╚═╝╚═╝
-    title: {
+    name: {
       type: 'string',
       required: true,
-      description:
-        'The headline for the explanatory reason that contributes to the products aggregated esc measure',
+      unique: true,
     },
-    measure: {
-      type: 'number',
+    type: {
+      type: 'string',
       required: true,
-      min: 0,
-      max: 5,
+      isIn: ['database', 'api', 'webpage'],
     },
-    reasons: {
-      type: 'json',
+    domain: {
+      type: 'string',
       required: false,
-      defaultsTo: [],
+      defaultsTo: '',
     },
-
+    credibility: {
+      type: 'number',
+      required: false,
+      min: 0,
+      max: 1,
+      defaultsTo: 0,
+    },
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
     //  ╚═╝╩ ╩╚═╝╚═╝═╩╝╚═╝
-    evidence: {
-      type: 'json',
-      required: true,
-    },
 
     //  ╔═╗╔═╗╔═╗╔═╗╔═╗╦╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
     //  ╠═╣╚═╗╚═╗║ ║║  ║╠═╣ ║ ║║ ║║║║╚═╗
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
-    escrating: {
-      model: 'escrating',
-    },
-    escsource: {
-      model: 'escsource',
-    },
   },
 
-  // afterCreate: async function (newlyCreatedRecord, proceed) {
-  //   await DeliveryPartner.updateOne(newlyCreatedRecord.deliveryPartner).set({
-  //     deliveryFulfilmentMethod: newlyCreatedRecord.id,
-  //   });
+  // beforeCreate: function (valuesToSet, proceed) {
+  //   valuesToSet.publicUid = uuidv4();
   //   return proceed();
   // },
 };

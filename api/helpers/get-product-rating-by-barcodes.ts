@@ -108,7 +108,7 @@ const _exports: SailsActionDefnType<
       return x;
     };
 
-    const findMatchInVegiScoreApi = async (name: string, category: string) => {
+    const findMatchInVegiScoreApi = async (name: string) => {
       if (!inputs.allowFetch) {
         return false;
       }
@@ -118,22 +118,15 @@ const _exports: SailsActionDefnType<
         // headers: { Authorization: 'Basic ' + sails.config.custom.peeplAPIKey },
       });
 
-      // ~ https://developer.sustained.com/reference/getproducts
+      // ~ connect this to localhost:5002/sustained_similar_product
       var queryParameters = {
-        name: name, //TODO: Can we use our word2vec search endpoint to find similar words here?
-        // category: category, // DONT include category unless returned in https://api.sustained.com/choice/v1/categories
-        // grade: 'A'
-        // pageInt: 0
+        s1: name,
       };
-
-      sails.log.info(
-        `GET https://api.sustained.com/choice/v1/products?name=${name}&category=${category}`
-      );
 
       try {
         const response =
           await instance.get<SustainedAPIChoiceGetProductsResponseType>(
-            'products',
+            'sustained/most-similar-product',
             {
               params: queryParameters,
             }
@@ -141,43 +134,86 @@ const _exports: SailsActionDefnType<
 
         sails.log.info(response.request);
 
-        if (response.status === 200) {
-          if (
-            !Array.isArray(response.data['products']) ||
-            response.data['products'].length < 1
-          ) {
-            // no similar products found
-            sails.log.warn(
-              `No products found on sustained api for string: "${name}". Try a simpler name`
-            );
-            return null;
-          }
-          // * Default to first result?
-          const m = response.data.products[0];
-          const impactsRelUrl = m.links.impacts.replace(
-            sails.config.custom.vegiScoreApi,
-            ''
-          );
-          const responseImpacts =
-            await instance.get<SustainedAPIChoiceGetImpactsResponseType>(
-              impactsRelUrl
-            );
-
-          return {
-            result: m,
-            impacts: responseImpacts.data.impacts,
-            ...m,
-          };
-        } else {
-          sails.log.warn(
-            `${sails.config.custom.vegiScoreApi} returned a ${response.status}`
-          );
-        }
+        return {
+          result: response.data,
+        };
       } catch (err) {
         sails.log.error(err);
         return null;
       }
     };
+
+    // const findMatchInSustainedApi = async (name: string, category: string) => {
+    //   if (!inputs.allowFetch) {
+    //     return false;
+    //   }
+    //   const instance = axios.create({
+    //     baseURL: sails.config.custom.vegiScoreApi,
+    //     timeout: 2000,
+    //     // headers: { Authorization: 'Basic ' + sails.config.custom.peeplAPIKey },
+    //   });
+
+    //   // ~ https://developer.sustained.com/reference/getproducts
+    //   // ~ connect this to localhost:5002/sustained_similar_product
+    //   var queryParameters = {
+    //     name: name, //TODO: Can we use our word2vec search endpoint to find similar words here?
+    //     // category: category, // DONT include category unless returned in https://api.sustained.com/choice/v1/categories
+    //     // grade: 'A'
+    //     // pageInt: 0
+    //   };
+
+    //   sails.log.info(
+    //     `GET https://api.sustained.com/choice/v1/products?name=${name}&category=${category}`
+    //   );
+
+    //   try {
+    //     const response =
+    //       await instance.get<SustainedAPIChoiceGetProductsResponseType>(
+    //         'products',
+    //         {
+    //           params: queryParameters,
+    //         }
+    //       );
+
+    //     sails.log.info(response.request);
+
+    //     if (response.status === 200) {
+    //       if (
+    //         !Array.isArray(response.data['products']) ||
+    //         response.data['products'].length < 1
+    //       ) {
+    //         // no similar products found
+    //         sails.log.warn(
+    //           `No products found on sustained api for string: "${name}". Try a simpler name`
+    //         );
+    //         return null;
+    //       }
+    //       // * Default to first result?
+    //       const m = response.data.products[0];
+    //       const impactsRelUrl = m.links.impacts.replace(
+    //         sails.config.custom.vegiScoreApi,
+    //         ''
+    //       );
+    //       const responseImpacts =
+    //         await instance.get<SustainedAPIChoiceGetImpactsResponseType>(
+    //           impactsRelUrl
+    //         );
+
+    //       return {
+    //         result: m,
+    //         impacts: responseImpacts.data.impacts,
+    //         ...m,
+    //       };
+    //     } else {
+    //       sails.log.warn(
+    //         `${sails.config.custom.vegiScoreApi} returned a ${response.status}`
+    //       );
+    //     }
+    //   } catch (err) {
+    //     sails.log.error(err);
+    //     return null;
+    //   }
+    // };
 
     // inputs.productBarcodes = inputs.productBarcodes.filter(
     //   (barcode) => barcode !== ''
@@ -246,6 +282,8 @@ const _exports: SailsActionDefnType<
       `SEARCHING VEGI SCORING API FOR ${productsToSearchFor.length} PRODUCTS from vegi ESC api`
     );
 
+
+    //TODO: rewrite this entire function and get python backend to return escrating structure data with {rating,explanations}
     const lazyScheduleRatingsForProductsFromVegiESCApi = async (ids: number[]) => {
       // if (!barcode) {
       //   return { ['NO_BARCODE']: null };
@@ -288,7 +326,8 @@ const _exports: SailsActionDefnType<
           {
             id: explanation.id,
             title: explanation.title,
-            description: explanation.description,
+            reasons: explanation.reasons,
+            evidence: explanation.evidence, // this is fine, object does not need to be created by ref ID AS json in db
             measure: explanation.measure,
             escrating: newRating.id,
           },
@@ -300,13 +339,16 @@ const _exports: SailsActionDefnType<
 
       // await ESCRating.addToCollection(newRating.id, 'explanation').members(explanations.map(e => e.id));
 
-      // const search_terms = products.map((product) => {
-      //   const productNameVal =
-      //     product.description ||
-      //     product.name;
-      //   return productNameVal;
-      // });
+      const search_terms = products.map((product) => {
+        const productNameVal =
+          product.description ||
+          product.name;
+        return productNameVal;
+      });
       
+      let match = await findMatchInVegiScoreApi(
+        productNameVal,
+      );
       // todo: impleent below line
       // let match = await findMatchInVegiScoreApi(ids);
       

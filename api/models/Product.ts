@@ -126,7 +126,7 @@ let _exports: SailsModelDefnType<ProductType> = {
     vendor: {
       model: 'vendor',
       description: 'The seller of the product.',
-      required: true,
+      required: false,
     },
     options: {
       collection: 'productoption',
@@ -137,6 +137,10 @@ let _exports: SailsModelDefnType<ProductType> = {
     category: {
       model: 'productcategory',
       description: 'The category of the product.',
+    },
+    proxyForVegiProduct: {
+      model: 'product',
+      description: 'A proxy product used to provide ratings for a vegi product from a similar product not on vegi. This field is Foreign Keyed to product.id in the DB',
     },
   },
 };

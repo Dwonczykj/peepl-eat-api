@@ -44,17 +44,15 @@ parasails.registerPage('white-list', {
       }).showToast();
     },
     toggleVerifyAccount: function (walletAddress: string) {
-      return function(event){
-        var that = this;
-        const verified = event.target.value;
-        Cloud.verifyWalletAccount(walletAddress, verified).then(() => {
-          if (verified) {
-            this.showToast(`Account added to whitelist`);
-          } else {
-            that.showToast(`Account removed from whitelist`);
-          }
-        });
-      };
+      var that = this;
+      const verified = (event.target as any).value === "on";
+      Cloud.verifyWalletAccount(walletAddress, verified).then(() => {
+        if (verified) {
+          this.showToast(`Account added to whitelist`);
+        } else {
+          that.showToast(`Account removed from whitelist`);
+        }
+      });
     },
   },
 });

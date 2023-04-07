@@ -85,6 +85,8 @@ const _exports: SailsActionDefnType<
       };
     } else {
       await Account.update({
+        walletAddress: inputs.walletAddress,
+      }).set({
         verified: inputs.verified,
         walletAddress: inputs.walletAddress,
       });

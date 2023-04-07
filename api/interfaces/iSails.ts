@@ -319,8 +319,10 @@ export type SailsModelType<T> = {
     unusedArg?:
       | number
       | {
-          [key in keyof T]?: T[key] extends ValueType
+          [key in keyof T]?: T[key] extends number | boolean | Date
             ? T[key] | Array<T[key]> | WaterlineValueComparisonKeys<T[key]>
+            : T[key] extends string
+            ? T[key] | Array<T[key]>
             : number | number[] | WaterlineValueComparisonKeys<number>;
         }
       | WaterlineQueryKeys<T>

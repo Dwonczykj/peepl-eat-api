@@ -145,6 +145,7 @@ export type UserRoleLiteral =
   | 'consumer'
   | 'admin'
   | 'vendor'
+  | 'service'
   | 'deliveryPartner';
 export type UserVendorRoleLiteral =
   | 'admin'
@@ -456,6 +457,7 @@ export type ProductType = _ProductTypeHidden & {
   vendor: VendorType;
   options: Array<ProductOptionType>;
   category: ProductCategoryType;
+  proxyForVegiProduct: ProductType;
 };
 
 type _ProductSuggestionTypeHidden = {
@@ -478,12 +480,20 @@ export type ProductSuggestionType = _ProductSuggestionTypeHidden & {
   imageUrls: Array<ProductSuggestionImageType>;
 }
 
+export type ESCSourceType = {
+  id: number;
+  createdAt: number;
+  name: string;
+  type: 'database' | 'api' | 'webpage';
+  domain: string;
+  credibility: number;
+};
+
 export type ESCRatingType = {
   id: number;
   createdAt: number;
   productPublicId: string;
   rating: number;
-  evidence: object;
   calculatedOn:Date;
   product: ProductType;
 };
@@ -503,13 +513,20 @@ export type ESCExplanationType = {
 
   /// 'The headline for the explanatory reason that contributes to the products aggregated esc measure'
   title: string;
-  
-  description: string;
-  
+
+  reasons: string[];
+
   /// 'The esc measure / 5 thaat is attributed only from this explanation that feeds into the aggregation of the products rating'
   measure: number;
 
+  /// A json object containing unstructured evidential information
+  evidence: object;
+
   escrating: ESCRatingType;
+  escsource: ESCSourceType;
+  
+  // /// An ESCexplanation that `this` explanation fees
+  // parentESCExplanation: ESCExplanationType;
 };
 
 type SustainedAPIChoiceResponseType = {
@@ -693,7 +710,7 @@ export const openingHoursToMoments = (
 };
 
 type _actionInputType = {
-  type:'ref'|'string'|'number'|'boolean';
+  type:'ref'|'string'|'number'|'boolean'|'json';
   required?: boolean;
   description?: string;
   allowNull?: boolean;
@@ -755,9 +772,16 @@ export type ModelAttributeAssociationColnDefnType = {
 export type ModelAttributePrimitiveDefnType = _actionPrimitiveDefnType & {
   columnType?: 'INT' | 'TINYINT' | 'DATETIME' | 'LONGTEXT' | null;
 };
+export type ModelAttributeRefDefnType =
+  // | ActionInputArrayDefnType
+  // | ActionInputObjectDefnType
+  | (_actionInputType & {
+      type: 'json';
+    });
 
 export type ModelAttributeType =
   | ModelAttributePrimitiveDefnType
+  | ModelAttributeRefDefnType
   | ModelAttributeAssociationModlDefnType
   | ModelAttributeAssociationColnDefnType;
 
@@ -845,6 +869,8 @@ export type ModelInputAttributeDerivedType<T extends ModelAttributeType> = {
     ? number
     : T extends ActionInputBooleanDefnType
     ? boolean
+    : T extends ModelAttributeRefDefnType
+    ? Array<any> | object
     : T extends ModelAttributePrimitiveDefnType
     ? string | boolean | number
     : T extends ModelAttributeAssociationColnDefnType
@@ -892,7 +918,7 @@ type yyy = xxx<HeyMan>;
 
 export type SailsModelDefnType<T extends { id: number }> = {
   attributes: {
-    [k in keyof Omit<T, 'id'>]: ModelAttributeType;
+    [k in keyof Omit<T, 'id'|'createdAt'>]: ModelAttributeType;
   };
   beforeCreate?: (valuesToSet: Omit<T, 'id'>, proceed: () => void) => void;
   afterCreate?: (newRecord: T, proceed: () => void) => void;

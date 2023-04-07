@@ -280,6 +280,15 @@
       "name": "Update stock count"
     },
     {
+      "name": "Get product rating"
+    },
+    {
+      "name": "Get esc source"
+    },
+    {
+      "name": "UpdateEscSource"
+    },
+    {
       "name": "Get product options"
     },
     {
@@ -694,7 +703,7 @@
             "required": [
               "title",
               "measure",
-              "description"
+              "evidence"
             ]
           }
         ]
@@ -727,14 +736,26 @@
             "maximum": 5,
             "minimum": 0
           },
-          "description": {
-            "type": "string"
+          "reasons": {
+            "type": "array",
+            "items": {},
+            "default": [],
+            "example": []
           },
+          "evidence": {},
           "escrating": {
             "description": "JSON dictionary representing the **escrating** instance or FK when creating / updating / not populated",
             "oneOf": [
               {
                 "$ref": "#/components/schemas/escrating"
+              }
+            ]
+          },
+          "escsource": {
+            "description": "JSON dictionary representing the **escsource** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/escsource"
               }
             ]
           }
@@ -749,8 +770,7 @@
           {
             "required": [
               "productPublicId",
-              "rating",
-              "evidence"
+              "rating"
             ]
           }
         ]
@@ -783,7 +803,6 @@
             "maximum": 5,
             "minimum": 0
           },
-          "evidence": {},
           "calculatedOn": {
             "type": "string",
             "format": "date-time",
@@ -796,6 +815,63 @@
                 "$ref": "#/components/schemas/product"
               }
             ]
+          }
+        }
+      },
+      "escsource": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/escsource-without-required-constraint"
+          },
+          {
+            "required": [
+              "name",
+              "type"
+            ]
+          }
+        ]
+      },
+      "escsource-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **ESCSource**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "name": {
+            "type": "string",
+            "uniqueItems": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "database",
+              "api",
+              "webpage"
+            ]
+          },
+          "domain": {
+            "type": "string",
+            "default": ""
+          },
+          "credibility": {
+            "type": "number",
+            "format": "double",
+            "default": 0,
+            "maximum": 1,
+            "minimum": 0
           }
         }
       },
@@ -1536,8 +1612,7 @@
           {
             "required": [
               "name",
-              "basePrice",
-              "vendor"
+              "basePrice"
             ]
           }
         ]
@@ -1677,6 +1752,14 @@
             "oneOf": [
               {
                 "$ref": "#/components/schemas/productcategory"
+              }
+            ]
+          },
+          "proxyForVegiProduct": {
+            "description": "A proxy product used to provide ratings for a vegi product from a similar product not on vegi. This field is Foreign Keyed to product.id in the DB JSON dictionary representing the **product** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/product"
               }
             ]
           }
@@ -2169,7 +2252,8 @@
               "admin",
               "vendor",
               "deliveryPartner",
-              "consumer"
+              "consumer",
+              "service"
             ]
           },
           "vendorRole": {
@@ -8657,6 +8741,143 @@
           },
           "500": {
             "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/products/get-product-rating": {
+      "get": {
+        "summary": "Get product rating",
+        "description": "Get the options for the product as well as the relevant options.",
+        "tags": [
+          "Get product rating"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "productIds",
+            "required": true,
+            "schema": {},
+            "description": "The array of product ids"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/products/get-esc-sources": {
+      "get": {
+        "summary": "Get esc source",
+        "description": "Get the options for the source as well as the relevant options.",
+        "tags": [
+          "Get esc source"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The type of sources to filter for"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/update-esc-source": {
+      "post": {
+        "summary": "UpdateEscSource",
+        "tags": [
+          "UpdateEscSource"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "credibility",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "domain",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "403": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Server error"
           }
         }
       }

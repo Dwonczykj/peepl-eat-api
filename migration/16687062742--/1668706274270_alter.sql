@@ -26,6 +26,7 @@ ADD COLUMN `deliveryAddressLongitude` DOUBLE NULL DEFAULT NULL AFTER `deliveryAd
 
 ALTER TABLE `vegi`.`product` 
 ADD COLUMN `ingredients` LONGTEXT AFTER `status`,
+ADD COLUMN `proxyForVegiProduct` INT NULL DEFAULT NULL AFTER `ingredients`,
 ADD COLUMN `vendorInternalId` varchar(255) NULL DEFAULT '' AFTER `isAvailable`,
 ADD COLUMN `stockCount` INT NULL DEFAULT 0 AFTER `vendorInternalId`,
 ADD COLUMN `supplier` varchar(255) NULL DEFAULT '' AFTER `stockCount`,
@@ -36,6 +37,16 @@ ADD COLUMN `sizeInnerUnitValue` INT NULL DEFAULT 0 AFTER `stockUnitsPerProduct`,
 ADD COLUMN `sizeInnerUnitType` varchar(255) NULL DEFAULT '' AFTER `sizeInnerUnitValue`,
 ADD COLUMN `productBarCode` varchar(255) NULL DEFAULT '' AFTER `sizeInnerUnitType`
 ;
+
+ALTER TABLE `vegi`.`product` 
+ADD INDEX `proxyForVegiProductFK_idx` (`proxyForVegiProduct` ASC) VISIBLE;
+;
+ALTER TABLE `vegi`.`product` 
+ADD CONSTRAINT `proxyForVegiProductFK`
+  FOREIGN KEY (`proxyForVegiProduct`)
+  REFERENCES `vegi`.`product` (`id`)
+  ON DELETE SET NULL
+  ON UPDATE NO ACTION;
 
 ALTER TABLE `vegi`.`user` 
 ADD COLUMN `marketingEmailContactAllowed` tinyint(1) DEFAULT 0 AFTER `phoneCountryCode`,

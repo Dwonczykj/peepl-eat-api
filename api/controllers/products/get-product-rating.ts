@@ -44,7 +44,6 @@ export type GetProductRatingResult = {
     createdAt: number;
     productPublicId: string;
     rating: number;
-    evidence: object;
     calculatedOn: Date;
     product: ProductType;
     explanations: sailsModelKVP<ESCExplanationType>[];

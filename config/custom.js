@@ -49,7 +49,8 @@ let custom = {
   pplRewardsPoolAddress: '0x29249e06e8D3e4933cc403AB73136e698a08c38b',
   coopcycleUrl: 'https://agile-delivery.coopcycle.org',
   peeplPayUrl: 'https://pay.itsaboutpeepl.com/api/v1',
-  vegiScoreApi: 'https://api.sustained.com/choice/v1',
+  vegiScoreApi: 'http://localhost:5002',
+  sustainedScoreApi: 'https://api.sustained.com/choice/v1',
   placesApiKey: '', //*in local.js
   googleApiBaseUrl: 'https://maps.googleapis.com/maps/api/',
   placesApiRelUrlFindPlace: 'place/findplacefromtext/json', // ~ https://googlemaps.github.io/google-maps-services-js/modules/_places_findplacefromtext_.html#:~:text=Const-,defaultUrl,-defaultUrl%3A

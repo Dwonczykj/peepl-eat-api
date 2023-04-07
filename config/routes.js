@@ -306,4 +306,20 @@ module.exports.routes = {
   'POST /api/v1/admin/update-stock-count': {
     action: 'admin/update-stock-count',
   },
+
+  'GET /api/v1/products/get-product-rating': {
+    action: 'products/get-product-rating',
+  },
+  'GET /api/v1/products/get-esc-sources': {
+    action: 'products/get-esc-sources',
+  },
+  // 'POST /api/v1/admin/update-esc-rating': {
+  //   action: 'admin/update-esc-rating',
+  // },
+  'POST /api/v1/admin/update-esc-source': {
+    action: 'admin/update-esc-source',
+  },
+  // 'POST /api/v1/admin/update-esc-explanation': {
+  //   action: 'admin/update-esc-explanation',
+  // },
 };

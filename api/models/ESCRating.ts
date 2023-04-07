@@ -25,10 +25,6 @@ module.exports = {
     //   type: 'string',
     //   required: true,
     // },
-    evidence: {
-      type: 'json',
-      required: true,
-    },
     calculatedOn: {
       type: 'ref',
       columnType: 'datetime',
