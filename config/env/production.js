@@ -49,10 +49,13 @@ module.exports = {
      *                                                                          *
      ***************************************************************************/
     default: {
-      adapter: 'sails-mysql',
-      url: process.env.JAWSDB_URL || 'mysql://vegi:vegi2022!@localhost:3306/vegi',
-      charset: 'utf8mb4',
-      collation: 'utf8mb4_unicode_ci',
+      // adapter: 'sails-mysql',
+      // url: process.env.JAWSDB_URL || 'mysql://vegi:vegi2022!@localhost:3306/vegi',
+      // charset: 'utf8mb4',
+      // collation: 'utf8mb4_unicode_ci',
+      adapter: 'sails-postgresql',
+      url: process.env.DATABASE_URL,
+      ssl: true,
       //--------------------------------------------------------------------------
       //  /\   To avoid checking it in to version control, you might opt to set
       //  ||   sensitive credentials like `url` using an environment variable.
