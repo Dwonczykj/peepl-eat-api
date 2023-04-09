@@ -60,14 +60,14 @@ const _exports = {
     let GET_PRODUCTS_SQL;
     if(inputs.vendor){
       GET_PRODUCTS_SQL = `
-SELECT p.id 
-FROM ${dbName}.product p
-WHERE p.productBarCode = $1 AND p.vendor = $2`;
+SELECT "p"."id" 
+FROM "product" p
+WHERE "p"."productBarCode" = $1 AND "p"."vendor" = $2`;
     }else{
       GET_PRODUCTS_SQL = `
-SELECT p.id 
-FROM ${dbName}.product p
-WHERE p.productBarCode = $1`;
+SELECT "p"."id" 
+FROM "product" p
+WHERE "p"."productBarCode" = $1`;
     }
 
     // Send it to the database.
