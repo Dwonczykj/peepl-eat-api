@@ -64,6 +64,14 @@ module.exports = {
       defaultsTo: 'inactive',
     },
     deliversToPostCodes: {
+      // type:
+      //   sails.config.datastores.default.adapter === 'sails-postgresql'
+      //     ? 'string'
+      //     : 'json',
+      // defaultsTo:
+      //   sails.config.datastores.default.adapter === 'sails-postgresql'
+      //     ? ''
+      //     : [],
       type: 'json',
       defaultsTo: [],
     },
@@ -97,7 +105,7 @@ module.exports = {
   // },
 
   afterCreate: async function (newlyCreatedRecord, proceed) {
-    if(!newlyCreatedRecord.deliveryFulfilmentMethod){
+    if (!newlyCreatedRecord.deliveryFulfilmentMethod) {
       try {
         await sails.helpers.initialiseDeliveryMethods.with({
           deliveryPartner: newlyCreatedRecord.id,
@@ -106,12 +114,14 @@ module.exports = {
         sails.log.error(error);
         return proceed(error);
       }
-    }else{
+    } else {
       const fm = await FulfilmentMethod.findOne(
         newlyCreatedRecord.deliveryFulfilmentMethod
       );
-      if(!fm){
-        const error = new Error('Bad Fulfilment Method Passed to DeliveryPartner.create');
+      if (!fm) {
+        const error = new Error(
+          'Bad Fulfilment Method Passed to DeliveryPartner.create'
+        );
         sails.log.error(error);
         return proceed(error);
       }

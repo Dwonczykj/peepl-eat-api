@@ -61,7 +61,7 @@ let _exports: SailsModelDefnType<ProductType> = {
     },
     ingredients: {
       type: 'string',
-      columnType: 'LONGTEXT',
+      columnType:  sails.config.datastores.default.adapter === 'sails-postgresql' ? 'TEXT' : 'LONGTEXT',
       required: false,
       allowNull: true,
       description: 'back of the package information',

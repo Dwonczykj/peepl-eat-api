@@ -26,15 +26,28 @@ let _exports: SailsModelDefnType<ESCExplanationType> = {
       max: 5,
     },
     reasons: {
+      // type:
+      //   sails.config.datastores.default.adapter === 'sails-postgresql'
+      //     ? 'string'
+      //     : 'json',
+      // defaultsTo:
+      //   sails.config.datastores.default.adapter === 'sails-postgresql'
+      //     ? ''
+      //     : [],
       type: 'json',
-      required: false,
       defaultsTo: [],
+      required: false,
     },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
     //  ╚═╝╩ ╩╚═╝╚═╝═╩╝╚═╝
     evidence: {
+      //TODO: we need to replace json with string for postgres, not ref, ref is an int and postgres strings are long enough, maybe we check sails.getDataStore().config.adaptor === 'sails-postgres' ?
+      // type:
+      //   sails.config.datastores.default.adapter === 'sails-postgresql'
+      //     ? 'string'
+      //     : 'json',
       type: 'json',
       required: true,
     },

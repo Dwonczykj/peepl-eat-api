@@ -10,6 +10,10 @@ module.exports = {
 
     var path = require('path');
 
+
+    const cloudSetupJsPath = 'assets/js/cloud-staged.setup.js';
+    const cloudSDKMethodsJSONPath = 'test/private/CLOUD_SDK_METHODS.json';
+
     var endpointsByMethodName = {};
     var extraEndpointsOnlyForTestsByMethodName = {};
 
@@ -89,10 +93,11 @@ module.exports = {
     // reflect the latest set of available cloud actions exposed by this Sails
     // app (as determined by its routes above)
     await sails.helpers.fs.write.with({
-      destination: path.resolve(sails.config.appPath, 'assets/js/cloud.setup.js'),
+      destination: path.resolve(sails.config.appPath, cloudSetupJsPath),
       force: true,
-      string: ``+
-`/**
+      string:
+        `` +
+        `/**
  * cloud.setup.js
  *
  * Configuration for this Sails app's generated browser SDK ("Cloud").
@@ -110,19 +115,32 @@ Cloud.setup({
   methods: ${JSON.stringify(endpointsByMethodName, null, 2)}
   /* eslint-enable */
 
-});`+
-      `\n`
+});` +
+        `\n`,
     });
+
+    sails.log.verbose(`Wrote cloudSetupJsPath to "${cloudSetupJsPath}"`);
 
     // Also, if a `test/` folder exists, set up a barebones bounce of this data
     // as a JSON file inside of it, for testing purposes:
     var hasTestFolder = await sails.helpers.fs.exists(path.resolve(sails.config.appPath, 'test/'));
     if (hasTestFolder) {
       await sails.helpers.fs.write.with({
-        destination: path.resolve(sails.config.appPath, 'test/private/CLOUD_SDK_METHODS.json'),
-        string: JSON.stringify(_.extend(endpointsByMethodName, extraEndpointsOnlyForTestsByMethodName)),
-        force: true
+        destination: path.resolve(
+          sails.config.appPath,
+          cloudSDKMethodsJSONPath
+        ),
+        string: JSON.stringify(
+          _.extend(
+            endpointsByMethodName,
+            extraEndpointsOnlyForTestsByMethodName
+          )
+        ),
+        force: true,
       });
+      sails.log.verbose(
+        `Wrote CLOUD_SDK_METHODS to "${cloudSDKMethodsJSONPath}"`
+      );
     }
 
     sails.log.info('--');

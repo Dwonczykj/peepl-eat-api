@@ -88,7 +88,7 @@ let custom = {
 
 if (process.env['local'] || process.env['local.js']) {
   // eslint-disable-next-line no-console
-  console.log(`Loading config from local env var`);
+  console.log(`Loading config from local env vars for config/custom.js`);
   const _ = require(`lodash`);
   const localConfigFromDotEnv = JSON.parse(
     Buffer.from(process.env['local'] || process.env['local.js'], 'base64')

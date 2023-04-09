@@ -54,7 +54,7 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Drop DB & Launch Program",
+            "name": "Alter DB & Launch Program",
             "skipFiles": [
                 "<node_internals>/**/*.js",
                 // "assets/**"
@@ -67,8 +67,8 @@
             "args": [
                 "--verbose",
                 "--hookTimeout=160000",
-                "--drop"
-                // "--alter"
+                // "--drop"
+                "--alter"
             ],
             "outFiles": [
                 "${workspaceFolder}/out/**/*.js"

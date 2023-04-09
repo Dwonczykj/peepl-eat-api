@@ -175,9 +175,15 @@ type WaterlineQueryType<T> = T extends
   ? T
   : number | number[];
 
-type SailsFetchType<T> = {
+type SailsUsingConnectionType<T> = {
+  usingConnection: (unusedDb:any) => Promise<T>;
+}
+
+type _SailsFetchType<T> = {
   fetch: () => Promise<T>;
 }
+type SailsFetchType<T> = _SailsFetchType<T> &
+  SailsUsingConnectionType<_SailsFetchType<T>>;
 
 type SailsUpdateSetType<T> = {
   set: (unusedArg: {
@@ -349,6 +355,12 @@ export type SailsModelType<T> = {
       | { [key in keyof T]?: T[key] | number | Array<T[key] | number> }
       | WaterlineQueryKeys<T>
   ) => SailsUpdateSetType<T>;
+  destroy: (
+    unusedArg:
+      | number
+      | { [key in keyof T]?: T[key] | number | Array<T[key] | number> }
+      | WaterlineQueryKeys<T>
+  ) => SailsFetchType<T>;
   create: (
     unusedArg:
       | {

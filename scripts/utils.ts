@@ -770,7 +770,7 @@ export type ModelAttributeAssociationColnDefnType = {
   description?: string;
 };
 export type ModelAttributePrimitiveDefnType = _actionPrimitiveDefnType & {
-  columnType?: 'INT' | 'TINYINT' | 'DATETIME' | 'LONGTEXT' | null;
+  columnType?: 'INT' | 'TINYINT' | 'DATETIME' | 'LONGTEXT' | 'TEXT' | null;
 };
 export type ModelAttributeRefDefnType =
   // | ActionInputArrayDefnType

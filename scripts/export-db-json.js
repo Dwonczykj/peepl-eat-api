@@ -8,8 +8,6 @@ console.log(`Running custom shell script with NODE_ENV [${process.env.NODE_ENV}]
 require('ts-node/register');
 
 
-
-
 module.exports = {
 
 
@@ -31,7 +29,7 @@ module.exports = {
     const Promise = require('bluebird');
 
 
-    Object.keys(sails.models).forEach(function (key) {
+    Object.keys(sails.models).forEach((key) => {
       if (sails.models[key].query) {
         sails.models[key].query = Promise.promisify(sails.models[key].query);
       }
@@ -44,7 +42,7 @@ module.exports = {
     if(!fs.existsSync(_dir)){
       await fs.mkdir(_dir,(err) => {
         if (err) {
-            return console.error(err);
+          return console.error(err);
         }
         console.log('Directory created successfully!');
       });
@@ -53,7 +51,7 @@ module.exports = {
     const findData = async (key) => {
       sails.log(key);
       const modelData = await sails.models[key].find();
-      
+
       const saveJsonPath = path.resolve(
         sails.config.appPath,
         `.tmp/dump_json/${key}.json`
@@ -80,9 +78,9 @@ module.exports = {
           );
         });
 
-        sails.log(`Wrote ${modelData.length} rows for model: "${key}" to "${saveJsonPath}"`);
+      sails.log(`Wrote ${modelData.length} rows for model: "${key}" to "${saveJsonPath}"`);
 
-      };
+    };
 
     const promises = Object.keys(sails.models).map((key) => findData(key));
 
@@ -109,11 +107,11 @@ module.exports = {
 
     sails.log(`Models written to ${saveJsonDir}`);
 
-    
-  // // Compare bootstrap version from code base to the version that was last run
-  // var lastRunBootstrapInfo = await sails.helpers.fs
-  //   .readJson(bootstrapLastRunInfoPath)
-  //   .tolerate('doesNotExist'); // (it's ok if the file doesn't exist yet-- just keep going.)
+
+    // // Compare bootstrap version from code base to the version that was last run
+    // var lastRunBootstrapInfo = await sails.helpers.fs
+    //   .readJson(bootstrapLastRunInfoPath)
+    //   .tolerate('doesNotExist'); // (it's ok if the file doesn't exist yet-- just keep going.)
 
   }
 
