@@ -12,7 +12,9 @@ const { config } = require('dotenv');
 
 const BASE_URL =
   process.env.NODE_ENV === 'production'
-    ? 'https://qa-vegi.vegiapp.co.uk'
+    ? process.env.STAGE_ENV === 'QA'
+      ? 'https://qa-vegi.vegiapp.co.uk'
+      : 'https://vegi.vegiapp.co.uk'
     : `http://localhost:${process.env.PORT}`;
 
 config(); // load config from local .env if exists into process.env
@@ -23,15 +25,7 @@ let custom = {
    * Any other custom config this Sails app should use during development.    *
    *                                                                          *
    ***************************************************************************/
-  dbName: (
-    process.env.JAWSDB_URL ||
-    (process.env.NODE_ENV === 'development'
-      ? 'mysql://vegi:vegi2022!@localhost:3306/vegi' // 'mysql://vegi:vegi2022!@localhost:3306/vegitemp'
-      : process.env.NODE_ENV === 'production' &&
-        'mysql://vegi:vegi2022!@localhost:3306/vegi')
-  )
-    .split('/')
-    .pop(),
+  dbName: 'postgres',
   internalEmailAddress: 'support@vegiapp.co.uk',
   internalPhoneNumber: '+1 000 0000000', // For support requests
   vegiWebSite: 'https://vegiapp.co.uk',

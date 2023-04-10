@@ -16,7 +16,9 @@ const { config } = require('dotenv');
 
 const BASE_URL =
   process.env.NODE_ENV === 'production'
-    ? 'https://qa-vegi.vegiapp.co.uk'
+    ? process.env.STAGE_ENV === 'QA'
+      ? 'https://qa-vegi.vegiapp.co.uk'
+      : 'https://vegi.vegiapp.co.uk'
     : `http://localhost:${process.env.PORT}`;
 
 config(); // load config from local .env if exists into process.env
@@ -38,28 +40,36 @@ let datastores = {
    *                                                                          *
    ***************************************************************************/
 
-  default: {
-    /***************************************************************************
-     *                                                                          *
-     * Want to use a different database during development?                     *
-     *                                                                          *
-     * 1. Choose an adapter:                                                    *
-     *    https://sailsjs.com/plugins/databases                                 *
-     *                                                                          *
-     * 2. Install it as a dependency of your Sails app.                         *
-     *    (For example:  npm install sails-mysql --save)                        *
-     *                                                                          *
-     * 3. Then pass it in, along with a connection URL.                         *
-     *    (See https://sailsjs.com/config/datastores for help.)                 *
-     *                                                                          *
-     ***************************************************************************/
-    // * add the below to your local.js to use:
-    // adapter: 'sails-mysql',
-    // url: 'mysql://user:password@host:port/database',
-    adapter: 'sails-postgresql',
-    url: process.env.DATABASE_URL,
-    ssl: true,
-  },
+  default:
+    process.env.STAGE_ENV === 'development' ||
+    process.env.STAGE_ENV === 'script'
+      ? {
+          adapter: 'sails-postgresql',
+          url: process.env.LOCAL_DATABASE_URL,
+          ssl: false,
+        }
+      : {
+          /***************************************************************************
+           *                                                                          *
+           * Want to use a different database during development?                     *
+           *                                                                          *
+           * 1. Choose an adapter:                                                    *
+           *    https://sailsjs.com/plugins/databases                                 *
+           *                                                                          *
+           * 2. Install it as a dependency of your Sails app.                         *
+           *    (For example:  npm install sails-mysql --save)                        *
+           *                                                                          *
+           * 3. Then pass it in, along with a connection URL.                         *
+           *    (See https://sailsjs.com/config/datastores for help.)                 *
+           *                                                                          *
+           ***************************************************************************/
+          // * add the below to your local.js to use:
+          // adapter: 'sails-mysql',
+          // url: 'mysql://user:password@host:port/database',
+          adapter: 'sails-postgresql',
+          url: process.env.DATABASE_URL,
+          ssl: true,
+        },
 };
 
 if (process.env['local'] || process.env['local.js']) {

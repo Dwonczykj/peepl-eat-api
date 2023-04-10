@@ -20,7 +20,7 @@
  */
 const BASE_URL =
   process.env.NODE_ENV === 'production'
-    ? 'https://qa-vegi.vegiapp.co.uk'
+    ? process.env.STAGE_ENV === 'QA' ? 'https://qa-vegi.vegiapp.co.uk' : 'https://vegi.vegiapp.co.uk'
     : `http://localhost:${process.env.PORT}`;
 module.exports = {
   hookTimeout: 40000,
@@ -48,7 +48,7 @@ module.exports = {
      *    (See https://sailsjs.com/config/datastores for help.)                 *
      *                                                                          *
      ***************************************************************************/
-    default: {
+    default: process.env.STAGE_ENV !== 'development' && {
       // adapter: 'sails-mysql',
       // url: process.env.JAWSDB_URL || 'mysql://vegi:vegi2022!@localhost:3306/vegi',
       // charset: 'utf8mb4',
@@ -175,8 +175,16 @@ module.exports = {
      * > (For a full list, see https://sailsjs.com/plugins/sessions)            *
      *                                                                          *
      ***************************************************************************/
-    adapter: '@sailshq/connect-redis',
-    url: process.env.REDIS_URL,
+    adapter:
+      process.env.STAGE_ENV &&
+      (process.env.STAGE_ENV === 'production' ||
+        process.env.STAGE_ENV === 'qa') &&
+      '@sailshq/connect-redis',
+    url:
+      process.env.STAGE_ENV &&
+      (process.env.STAGE_ENV === 'production' ||
+        process.env.STAGE_ENV === 'qa') &&
+      process.env.REDIS_URL,
     //--------------------------------------------------------------------------
     // /\   OR, to avoid checking it in to version control, you might opt to
     // ||   set sensitive credentials like this using an environment variable.

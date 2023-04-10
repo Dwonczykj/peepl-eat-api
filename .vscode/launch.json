@@ -10,12 +10,15 @@
         }
     ],
     "configurations": [
+
         {
             // "type": "",
+            "type": "node",
             "request": "launch",
             "name": "sails run script $CurrentFile",
             "env": {
                 "NODE_ENV": "development",
+                "STAGE_ENV": "development",
                 "useFirebaseEmulator": "false",
             },
             "program": "${workspaceFolder}/node_modules/sails/bin/sails",
@@ -24,6 +27,28 @@
                 "${fileBasenameNoExtension}",
                 "--verbose",
                 "--hookTimeout=160000"
+            ],
+            "skipFiles": [
+                "<node_internals>/**/*.js",
+                // "assets/**"
+            ],
+        },
+        {
+            // "type": "",
+            "type": "node",
+            "request": "launch",
+            "name": "sails run script $CurrentFile in production",
+            "env": {
+                //Uncomment when running secrets-to-env.js
+                "secrets_relative_paths": "config/local.js,config/aws.json,config/vegiliverpool-firebase-adminsdk-4dfpz-8f01f888b3.json",
+                "NODE_ENV": "production",
+                "STAGE_ENV": "script",
+                "useFirebaseEmulator": "false",
+            },
+            "program": "${workspaceFolder}/node_modules/sails/bin/sails",
+            "args": [
+                "run",
+                "${fileBasenameNoExtension}",
             ],
             "skipFiles": [
                 "<node_internals>/**/*.js",
@@ -41,6 +66,7 @@
             "program": "${workspaceFolder}/app.js",
             "env": {
                 "NODE_ENV": "development",
+                "STAGE_ENV": "development",
                 "useFirebaseEmulator": "false",
             },
             "args": [
@@ -62,6 +88,7 @@
             "program": "${workspaceFolder}/app.js",
             "env": {
                 "NODE_ENV": "development",
+                "STAGE_ENV": "development",
                 "useFirebaseEmulator": "false",
             },
             "args": [
@@ -85,6 +112,29 @@
             "program": "${workspaceFolder}/app.js",
             "env": {
                 "NODE_ENV": "production",
+                "STAGE_ENV": "production",
+                "useFirebaseEmulator": "false",
+            },
+            "args": [
+                "--verbose",
+                "--hookTimeout=160000"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/out/**/*.js"
+            ],
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Program (qa)",
+            "skipFiles": [
+                "<node_internals>/**/*.js",
+                // "assets/**"
+            ],
+            "program": "${workspaceFolder}/app.js",
+            "env": {
+                "NODE_ENV": "production",
+                "STAGE_ENV": "qa",
                 "useFirebaseEmulator": "false",
             },
             "args": [
@@ -102,6 +152,7 @@
             "program": "${workspaceFolder}/node_modules/mocha/bin/mocha",
             "env": {
                 "NODE_ENV": "test",
+                "STAGE_ENV": "test",
                 "test": "true",
                 "useFirebaseEmulator": "true",
             },
@@ -138,6 +189,7 @@
             "program": "${workspaceFolder}/node_modules/mocha/bin/mocha",
             "env": {
                 "NODE_ENV": "test",
+                "STAGE_ENV": "test",
                 "test": "true",
                 "useFirebaseEmulator": "true",
             },
@@ -175,6 +227,7 @@
             "program": "${workspaceFolder}/node_modules/mocha/bin/mocha",
             "env": {
                 "NODE_ENV": "test",
+                "STAGE_ENV": "test",
                 "test": "true",
                 "useFirebaseEmulator": "true",
             },
@@ -212,6 +265,7 @@
             "program": "${workspaceFolder}/node_modules/mocha/bin/mocha",
             "env": {
                 "NODE_ENV": "test",
+                "STAGE_ENV": "test",
                 "test": "true",
                 "useFirebaseEmulator": "true",
             },
@@ -253,6 +307,7 @@
             "program": "${workspaceFolder}/node_modules/mocha/bin/mocha",
             "env": {
                 "NODE_ENV": "test",
+                "STAGE_ENV": "test",
                 "test": "true",
                 "useFirebaseEmulator": "true",
             },
@@ -286,6 +341,7 @@
             "program": "${workspaceFolder}/node_modules/mocha/bin/mocha",
             "env": {
                 "NODE_ENV": "test",
+                "STAGE_ENV": "test",
                 "test": "true",
                 "useFirebaseEmulator": "true",
             },

@@ -25,19 +25,19 @@ const kebabize = (str, forceJoinerStr = '-') =>
     ($, ofs) => (ofs ? (forceJoinerStr || '-') : '') + $.toLowerCase()
   );
 
-const words = [
-  'StackOverflow',
-  'camelCase',
-  'alllowercase',
-  'ALLCAPITALLETTERS',
-  'CustomXMLParser',
-  'APIFinder',
-  'JSONResponseData',
-  'Person20Address',
-  'UserAPI20Endpoint',
-];
+// const words = [
+//   'StackOverflow',
+//   'camelCase',
+//   'alllowercase',
+//   'ALLCAPITALLETTERS',
+//   'CustomXMLParser',
+//   'APIFinder',
+//   'JSONResponseData',
+//   'Person20Address',
+//   'UserAPI20Endpoint',
+// ];
 
-console.log(words.map((w) => kebabize(w,'-')));
+// console.log(words.map((w) => kebabize(w,'-')));
 
 function isValueType(o) {
   return ['string','boolean','number'].indexOf(typeof(o))>-1;
@@ -53,7 +53,7 @@ function isValidJson(o) {
 }
 
 if(process.env.NODE_ENV !== 'production'){
-  console.warn(`The NODE_ENV of \`${process.env.NODE_ENV}\` is used in secret javascript modules to build the connection strings. Are you sure you are running with the correct build environment?`);
+  console.warn(`The NODE_ENV of \`${process.env.NODE_ENV}\` will be referenced in secret javascript modules such as local.js to predicate which whether to use production or development config variables. Are you sure you are running with the correct build environment? This will not encode production configuration.`);
   sleep(5,1000);
 }
 
@@ -218,6 +218,8 @@ module.exports = {
 
     const output = {};
     let outputSimpleEnv = '';
+    const currentdate = new Date();
+    outputSimpleEnv += `date_run="${currentdate.toLocaleString()}"\n`;
     for (const sp of secret_paths){
       let bSp = sp;
       try {
@@ -244,7 +246,7 @@ module.exports = {
               config: mod,
             };
             outputSimpleEnv += convertToEnvBase64(jsonObj, bSp);
-            output['sails'] = JSON.stringify(jsonObj);
+            output['sails'] = JSON.stringify(jsonObj, null, 4);
           }else{
             outputSimpleEnv += convertToEnvBase64(mod, bSp);
             output[bSp] = convertToEnv(mod);
@@ -271,6 +273,8 @@ module.exports = {
     });
     let savePathEnv = path.resolve(sails.config.appPath, `.env`);
     
+    sails.log(`Writing entire env output to "${savePathEnv}"`);
+    sails.log(`First 300 chars are: \n` + outputSimpleEnv.slice(0,300));
     fs.writeFileSync(
       savePathEnv,
       outputSimpleEnv,
@@ -292,6 +296,7 @@ module.exports = {
         savePathEnvSp = path.resolve(sails.config.appPath, `${bSp}.env`);
       }
 
+      sails.log(`Writing output to "${savePathEnvSp}"`);
       fs.writeFileSync(
         savePathEnvSp,
         output[bSp],
