@@ -47,6 +47,7 @@
 
 config/local.js
 *.env
+*.*env
 out_env.json
 www/*
 

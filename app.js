@@ -60,6 +60,14 @@ try {
 } catch (error) {
   if (`${error.message}`.includes('ECONNREFUSED 127.0.0.1:6379')) {
     console.error('Error connecting to redis service, Please check that redis is running on localhost:6379');
+    return;
   }
+  try {
+    sails.log(JSON.stringify(sails.config.datastores,null,4));
+  } catch (_err) {
+    //ignore
+    
+  }
+  
   throw error;
 }
