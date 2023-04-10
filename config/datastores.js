@@ -46,7 +46,7 @@ let datastores = {
       ? {
           adapter: 'sails-postgresql',
           url: process.env.LOCAL_DATABASE_URL,
-          ssl: false,
+          // ssl: false,
         }
       : {
           /***************************************************************************
@@ -66,9 +66,9 @@ let datastores = {
           // * add the below to your local.js to use:
           // adapter: 'sails-mysql',
           // url: 'mysql://user:password@host:port/database',
-          adapter: 'sails-postgresql',
-          url: process.env.DATABASE_URL,
-          ssl: true,
+          // adapter: 'sails-postgresql',
+          // url: process.env.DATABASE_URL,
+          // ssl: true,
         },
 };
 
