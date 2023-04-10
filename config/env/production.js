@@ -55,7 +55,10 @@ module.exports = {
       // collation: 'utf8mb4_unicode_ci',
       adapter: 'sails-postgresql',
       url: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false }, //comment out as required automatically by heroku
+      ssl: {
+        sslmode: 'require',
+        rejectUnauthorized: false,
+      }, // ~ https://stackoverflow.com/a/66913689 FROM "./node_modules/sails-postgres/helpers/private/connection/spawn-connection.js:106"
       //--------------------------------------------------------------------------
       //  /\   To avoid checking it in to version control, you might opt to set
       //  ||   sensitive credentials like `url` using an environment variable.
