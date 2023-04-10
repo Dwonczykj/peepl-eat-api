@@ -55,7 +55,7 @@ module.exports = {
       // collation: 'utf8mb4_unicode_ci',
       adapter: 'sails-postgresql',
       url: process.env.DATABASE_URL,
-      // ssl: true, //comment out as required automatically by heroku
+      ssl: true, //comment out as required automatically by heroku
       //--------------------------------------------------------------------------
       //  /\   To avoid checking it in to version control, you might opt to set
       //  ||   sensitive credentials like `url` using an environment variable.
