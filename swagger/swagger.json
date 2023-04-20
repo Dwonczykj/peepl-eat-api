@@ -250,7 +250,7 @@
       "name": "Create discount"
     },
     {
-      "name": "Edit discount"
+      "name": "EditDiscount"
     },
     {
       "name": "Update Fulfilment Method"
@@ -631,7 +631,7 @@
           {
             "required": [
               "code",
-              "percentage"
+              "value"
             ]
           }
         ]
@@ -660,11 +660,19 @@
             "minLength": 3,
             "uniqueItems": true
           },
-          "percentage": {
+          "value": {
             "type": "number",
             "format": "double",
-            "maximum": 100,
             "minimum": 0
+          },
+          "discountType": {
+            "type": "string",
+            "default": "fixed",
+            "enum": [
+              "percentage",
+              "fixed"
+            ],
+            "example": "fixed"
           },
           "expiryDateTime": {
             "type": "number",
@@ -682,6 +690,11 @@
           "isEnabled": {
             "type": "boolean",
             "default": false
+          },
+          "linkedWalletAddress": {
+            "type": "string",
+            "pattern": "^0x[a-fA-F0-9]{40}$|^$",
+            "default": ""
           },
           "vendor": {
             "description": "Optional vendor for this discount JSON dictionary representing the **vendor** instance or FK when creating / updating / not populated",
@@ -2169,6 +2182,52 @@
             "type": "string",
             "nullable": true,
             "default": ""
+          }
+        }
+      },
+      "surveyquestion": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/surveyquestion-without-required-constraint"
+          },
+          {
+            "required": [
+              "question",
+              "responseType"
+            ]
+          }
+        ]
+      },
+      "surveyquestion-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **SurveyQuestion**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "question": {
+            "type": "string"
+          },
+          "responseType": {
+            "type": "string",
+            "enum": [
+              "boolean",
+              " string",
+              "multiline",
+              "number"
+            ]
           }
         }
       },
@@ -7947,9 +8006,9 @@
     },
     "/api/v1/admin/edit-discount": {
       "post": {
-        "summary": "Edit discount",
+        "summary": "EditDiscount",
         "tags": [
-          "Edit discount"
+          "EditDiscount"
         ],
         "parameters": [
           {
@@ -7971,7 +8030,28 @@
           },
           {
             "in": "query",
-            "name": "percentage",
+            "name": "discountType",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "percentage",
+                "fixed"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "linkedWalletAddress",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^0x[a-fA-F0-9]{40}$|^$"
+            }
+          },
+          {
+            "in": "query",
+            "name": "value",
             "required": false,
             "schema": {
               "type": "number",
@@ -8009,7 +8089,10 @@
         ],
         "responses": {
           "200": {
-            "description": "The requested resource"
+            "description": "Success"
+          },
+          "403": {
+            "description": "Server error"
           },
           "404": {
             "description": "Resource not found"

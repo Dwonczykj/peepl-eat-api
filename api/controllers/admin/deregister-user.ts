@@ -18,7 +18,7 @@ module.exports = {
   exits: {
     success: {
       outputDescription:
-        '`User`s vendor role has been successfully deregisterd.',
+        '`User`s vendor role has been successfully deregistered.',
       outputExample: {},
     },
     badRequest: {

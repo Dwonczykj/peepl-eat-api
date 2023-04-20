@@ -1,0 +1,79 @@
+import axios from 'axios';
+import {v4 as uuidv4} from 'uuid'; // const { v4: uuidv4 } = require('uuid');
+import moment from 'moment';
+
+import {
+  sailsModelKVP,
+  SailsModelType,
+  sailsVegi,
+} from '../../interfaces/iSails';
+import {
+  SailsActionDefnType,
+  ${2:${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}}Type
+} from '../../../scripts/utils';
+
+declare var sails: sailsVegi;
+declare var ${2:${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}}: SailsModelType<${2:${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}}Type>;
+
+
+export type ${1:${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}}Inputs = {
+  ${5:firstInputName}: ${6:firstInputType},
+  $7
+};
+
+export type ${1:${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}}Response = {
+  ...
+} | false;
+
+export type ${1:${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}}Exits = {
+  success: (unusedData: ${1:${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}}Response) => any;
+  issue: (unusedErr: Error | String) => void;
+  notFound: () => void;
+  error: (unusedErr: Error | String) => void;
+  badRequest: (unusedErr: Error | String) => void;
+};
+
+const _exports: SailsActionDefnType<
+  ${1:${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}}Inputs,
+  ${1:${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}}Response,
+  ${1:${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}}Exits
+> = {
+  friendlyName: '${1:${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}}',
+
+  inputs: {
+    $5: {
+      type: '${8:$6}',
+      required: true,
+    },
+    $4
+  },
+
+  exits: {
+    success: {
+      data: false,
+    },
+    notFound: {
+      statusCode: 404,
+    },
+    issue: {
+      statusCode: 403,
+    },
+    badRequest: {
+      responseType: 'badRequest',
+    },
+    error: {
+      statusCode: 500,
+    },
+  },
+
+  fn: async function (
+    inputs: ${1:${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}}Inputs,
+    exits: ${1:${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}}Exits
+  ) {
+    
+
+    return exits.success(ResponseFinal);
+  },
+};
+
+module.exports = _exports;

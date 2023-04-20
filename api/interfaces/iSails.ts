@@ -6,7 +6,7 @@ import { GetAvailableDeliveryPartnerFromPoolInputs } from "../../api/helpers/get
 import { CreateOrderInputs, ValidateOrderResult } from "../../api/controllers/orders/create-order";
 import { iFulfilmentSlot, iSlot } from "./vendors/slot";
 import { CreateProductCategoriesInput } from "../helpers/create-product-categories";
-import { DeliveryPartnerType, DiscountType, NotificationType, OmitId, OrderType, ProductCategoryType, walletAddressString } from '../../scripts/utils';
+import { DeliveryPartnerType, DiscountCodeType, NotificationType, OmitId, OrderType, ProductCategoryType, walletAddressString } from '../../scripts/utils';
 import { EditProductCategoriesInput } from "../helpers/edit-product-categories";
 import { InitialiseDeliveryMethodsInput, InitialiseDeliveryMethodsResult } from "../../api/helpers/initialise-delivery-methods";
 import { GetCoordinatesForAddressInput, GetCoordinatesForAddressResult } from "../../api/helpers/get-coordinates-for-address";
@@ -562,11 +562,11 @@ export type sailsVegi = {
       with: (unusedArgs: {
         discountCode: string;
         vendor?: number | null;
-      }) => Promise<false | DiscountType>;
+      }) => Promise<false | DiscountCodeType>;
     } & ((
       unusedArg1: string,
       unusedArg2: number | null
-    ) => Promise<false | DiscountType>);
+    ) => Promise<false | DiscountCodeType>);
 
     nextAvailableDate: {
       with: (unusedArgs: {
@@ -779,5 +779,6 @@ export type sailsVegi = {
     http: {
       app: any;
     };
+    sockets: any;
   };
 };

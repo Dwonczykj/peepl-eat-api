@@ -329,10 +329,6 @@ export type DeliveryPartnerType = _DeliveryPartnerTypeHidden & {
   users?: Array<_UserTypeHidden>;
 };
 
-export type DiscountType = {
-  id: number;
-  outcode: string;
-};
 export type _ProductTypeHidden = {
   id: number;
   name: string;
@@ -447,6 +443,22 @@ export type VendorType = _VendorTypeHidden & {
 
   /// users registered to the vendor's organisation
   users: [];
+};
+export type DiscountCodeType = {
+  id: number;
+  outcode: string;
+};
+export type DiscountType = {
+  id: number;
+  code: string;
+  value: number;
+  discountType: 'percentage' | 'fixed';
+  expiryDateTime: number;
+  timesUsed: number;
+  maxUses: number;
+  isEnabled: boolean;
+  linkedWalletAddress: string;
+  vendor?: VendorType | null;
 };
 export type ProductCategoryType = _ProductCategoryTypeHidden & {
   vendor: VendorType;
@@ -621,7 +633,7 @@ export type _OrderTypeHidden = {
   completedOrderFeedback: string;
   deliveryPunctuality: RatingType;
   orderCondition: RatingType;
-  discount: DiscountType;
+  discount: DiscountCodeType;
 };
 
 export type NotificationType = {
@@ -640,6 +652,12 @@ export type SurveyType = {
   email: string;
   question: string;
   answer: string | null;
+};
+
+export type SurveyQuestionType = {
+  id: number;
+  question: string;
+  responseType: 'boolean' | ' string' | 'multiline' | 'number';
 };
 
 export type WaitingListEntryType = {

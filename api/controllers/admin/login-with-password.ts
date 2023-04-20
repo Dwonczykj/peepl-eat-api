@@ -1,5 +1,11 @@
 import { DecodedIdToken } from "firebase-admin/auth";
 import * as firebase from '../../../config/firebaseAdmin';
+import { UserType } from "../../../scripts/utils";
+import { SailsModelType, sailsModelKVP, sailsVegi } from "../../../api/interfaces/iSails";
+
+
+declare var User: SailsModelType<UserType>;
+declare var sails: sailsVegi;
 
 export const splitPhoneNumber = (formattedFirebaseNumber: string) => {
   try {
@@ -20,6 +26,11 @@ export const splitPhoneNumber = (formattedFirebaseNumber: string) => {
     };
   }
 };
+
+type LoginWithPasswordResponse = {
+  user:sailsModelKVP<UserType>;
+  session: string;
+}
 
 module.exports = {
   friendlyName: 'Login with Password',
@@ -94,16 +105,15 @@ requests over WebSockets instead of HTTP).`,
       rememberMe: boolean;
     },
     exits: {
-      success: (unusedArgs: { data: any }) => void;
+      success: (
+        unusedArgs: LoginWithPasswordResponse
+      ) => LoginWithPasswordResponse;
       firebaseErrored: (unusedArgs: {
         error: any;
         message: string;
         code: string;
       }) => void;
-      error: (unusedArgs: {
-        error: any;
-        message: string;
-      }) => void;
+      error: (unusedArgs: { error: any; message: string }) => void;
       badCombo: (unusedErr?: Error) => void;
       badCredentials: () => void;
       firebaseUserNoEmail: () => void;
@@ -158,7 +168,7 @@ requests over WebSockets instead of HTTP).`,
           name: inputs.emailAddress,
           phoneCountryCode:
             fbPhoneDetails.countryCode ??
-            decodedToken.phone_number.replace(/[^0-9]/g, '').substring(0,2),
+            decodedToken.phone_number.replace(/[^0-9]/g, '').substring(0, 2),
           phoneNoCountry:
             fbPhoneDetails.phoneNoCountry ??
             decodedToken.phone_number.replace(/[^0-9]/g, '').substring(2),
@@ -184,7 +194,7 @@ requests over WebSockets instead of HTTP).`,
       // Modify the active session instance.
       // (This will be persisted when the response is sent.)
       this.req.session.userId = user.id;
-      this.req.session.userRole = user.role;  
+      this.req.session.userRole = user.role;
 
       // In case there was an existing session (e.g. if we allow users to go to the login page
       // when they're already logged in), broadcast a message that we can display in other open tabs.
@@ -192,7 +202,10 @@ requests over WebSockets instead of HTTP).`,
         // sails.helpers.broadcastSessionChange(this.req);
       }
 
-      return exits.success(user);
+      return exits.success({
+        user: user,
+        session: this.req.session.cookie
+      });
     } catch (err) {
       sails.log.info(err);
       if (err.code === 'auth/wrong-password') {
@@ -204,47 +217,47 @@ requests over WebSockets instead of HTTP).`,
       });
     }
 
-  //   try { // below would allow login without a firebase user attached. However, we now only support firebase for user management. (No Firebase user, no user)
-  //     let _user = await User.findOne({
-  //       email: inputs.emailAddress,
-  //     });
+    //   try { // below would allow login without a firebase user attached. However, we now only support firebase for user management. (No Firebase user, no user)
+    //     let _user = await User.findOne({
+    //       email: inputs.emailAddress,
+    //     });
 
-  //     if (!_user) {
-  //       return exits.badCombo();
-  //     }
-  //     const user = _user;
+    //     if (!_user) {
+    //       return exits.badCombo();
+    //     }
+    //     const user = _user;
 
-  //     if (rememberMe) {
-  //       if (this.req.isSocket) {
-  //         sails.log.warn(
-  //           'Received `rememberMe: true` from a virtual request, but it was ignored\n' +
-  //             "because a browser's session cookie cannot be reset over sockets.\n" +
-  //             'Please use a traditional HTTP request instead.'
-  //         );
-  //       } else {
-  //         this.req.session.cookie.maxAge =
-  //           sails.config.custom.rememberMeCookieMaxAge;
-  //       }
-  //     }
+    //     if (rememberMe) {
+    //       if (this.req.isSocket) {
+    //         sails.log.warn(
+    //           'Received `rememberMe: true` from a virtual request, but it was ignored\n' +
+    //             "because a browser's session cookie cannot be reset over sockets.\n" +
+    //             'Please use a traditional HTTP request instead.'
+    //         );
+    //       } else {
+    //         this.req.session.cookie.maxAge =
+    //           sails.config.custom.rememberMeCookieMaxAge;
+    //       }
+    //     }
 
-  //     // Modify the active session instance.
-  //     // (This will be persisted when the response is sent.)
-  //     this.req.session.userId = user.id;
+    //     // Modify the active session instance.
+    //     // (This will be persisted when the response is sent.)
+    //     this.req.session.userId = user.id;
 
-  //     // In case there was an existing session (e.g. if we allow users to go to the login page
-  //     // when they're already logged in), broadcast a message that we can display in other open tabs.
-  //     if (sails.hooks.sockets) {
-  //       // sails.helpers.broadcastSessionChange(this.req);
-  //     }
+    //     // In case there was an existing session (e.g. if we allow users to go to the login page
+    //     // when they're already logged in), broadcast a message that we can display in other open tabs.
+    //     if (sails.hooks.sockets) {
+    //       // sails.helpers.broadcastSessionChange(this.req);
+    //     }
 
-  //     if (inputs.firebaseSessionToken) {
-  //       return exits.success(user);
-  //     } else {
-  //       return exits.badCombo();
-  //     }
-  //   } catch (err) {
-  //     sails.log.info(err);
-  //     return exits.badCombo(err);
-  //   }
+    //     if (inputs.firebaseSessionToken) {
+    //       return exits.success(user);
+    //     } else {
+    //       return exits.badCombo();
+    //     }
+    //   } catch (err) {
+    //     sails.log.info(err);
+    //     return exits.badCombo(err);
+    //   }
   },
 };

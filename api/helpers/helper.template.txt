@@ -1,4 +1,5 @@
 import axios from 'axios';
+import {v4 as uuidv4} from 'uuid'; // const { v4: uuidv4 } = require('uuid');
 import moment from 'moment';
 
 import { SailsActionDefnType } from '../../scripts/utils';
@@ -16,24 +17,16 @@ declare var User: SailsModelType<UserType>;
 
 
 export type ${1:${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}}Inputs = {
-  ${2:firstInputName}:${3:firstInputType},
-  $4,
+  ${2:firstInputName}: ${3:firstInputType},
+  $4
 };
 
 export type ${1:${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}}Result = {
-    [barcode: string]: {
-  id: number;
-  createdAt: number;
-  productPublicId: string;
-  rating: number;
-  evidence: object;
-  calculatedOn: Date;
-  product: ProductType;
-  explanations: sailsModelKVP<ESCExplanationType>[];
-} | null};
+  ...
+} | false;
 
 export type ${1:${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}}Exits = {
-  success: (unusedData: ${1:${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}}Result|false) => any;
+  success: (unusedData: ${1:${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}}Result) => any;
 };
 
 const _exports: SailsActionDefnType<
@@ -45,7 +38,7 @@ const _exports: SailsActionDefnType<
 
   inputs: {
     $2: {
-      type: $3$5,
+      type: '${5:$3}',
       required: true,
     },
     $4
