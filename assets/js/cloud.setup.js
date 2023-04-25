@@ -205,6 +205,11 @@ Cloud.setup({
       url: '/api/v1/admin/login-with-password',
       args: ['emailAddress', 'firebaseSessionToken', 'rememberMe'],
     },
+    resetPassword: {
+      verb: 'POST',
+      url: '/api/v1/admin/reset-password',
+      args: ['emailAddress'],
+    },
     createVendor: {
       verb: 'POST',
       url: '/api/v1/admin/create-vendor',
@@ -478,6 +483,16 @@ Cloud.setup({
       verb: 'POST',
       url: '/api/v1/admin/update-stock-count',
       args: ['productOptionValueId', 'remainingStockCount'],
+    },
+    getStripeAccounts: {
+      verb: 'GET',
+      url: '/api/v1/admin/get-stripe-accounts',
+      args: ['create', 'starting_after', 'ending_before', 'limit'],
+    },
+    createStripeAccount: {
+      verb: 'POST',
+      url: '/api/v1/admin/create-stripe-account',
+      args: ['companyName', 'businessType', 'email', 'defaultCurrency'],
     },
   },
   /* eslint-enable */

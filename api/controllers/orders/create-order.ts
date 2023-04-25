@@ -2,6 +2,7 @@ import _ from 'lodash';
 import { OrderItemOptionValueType, OrderItemType, OrderType } from '../../../scripts/utils';
 import util from 'util';
 import { SailsModelType, sailsVegi } from '../../../api/interfaces/iSails';
+import { CreatePaymentIntentInternalResult } from '../../../api/helpers/create-payment-intent-internal';
 
 declare var sails: sailsVegi;
 declare var OrderItemOptionValue: SailsModelType<OrderItemOptionValueType>;
@@ -296,8 +297,8 @@ module.exports = {
         }
       };
 
-      var newPaymentIntent;
-      var order;
+      let newPaymentIntent: CreatePaymentIntentInternalResult;
+      let order;
 
       const createOrderTransactionDB = async (db: any) => {
         for (var item in inputs.items) {
@@ -449,41 +450,71 @@ module.exports = {
         }
 
         // Create PaymentIntent on Peepl Pay
-        newPaymentIntent = await sails.helpers
-          .createPaymentIntent(
-            calculatedOrderTotal.finalAmount,
-            vendor.walletAddress,
-            vendor.name
-          )
-          .catch(() => {
-            exits.error(new Error('Error creating payment intent'));
-            return {
-              orderId: null,
-              paymentIntentID: null,
-              orderCreationStatus: 'failed',
-            };
-          });
+        let failureReason;
+        try {
+          const _newPaymentIntent = await sails.helpers.createPaymentIntentInternal
+            .with({
+              amount: calculatedOrderTotal.finalAmount,
+              currency: 'gbp',
+              recipientWalletAddress: vendor.walletAddress,
+              vendorDisplayName: vendor.name,
+              webhookAddress: sails.config.custom.peeplWebhookAddress,
+              customerId: '', // TODO: Add StripeCustomerIds to users and then add them here....
+            });
+          newPaymentIntent = _newPaymentIntent;
+        } catch (error) {
+          failureReason = `${error}`;
+          sails.log.error(`Failed to create payment intent on helper "createPaymentIntentInternal" with reason: "${failureReason}"`);
+        }
+          // .catch((reason) => {
+          //   failureReason = reason;
+          //   sails.log.error(`Failed to create payment intent on helper "createPaymentIntentInternal" with reason: "${failureReason}"`);
+          // });
+        // newPaymentIntent = await sails.helpers
+        //   .createPaymentIntent.with({
+        //     paymentAmount: calculatedOrderTotal.finalAmount,
+        //     currency: 'gbp',
+        //     recipientWalletAddress: vendor.walletAddress,
+        //     recipientName: vendor.name,
+        //     headers: this.req.headers,
+        //   })
+        //   .catch((reason) => {
+        //     failureReason = reason;
+        //     return {
+        //       orderId: null,
+        //       paymentIntentID: null,
+        //       orderCreationStatus: 'failed',
+        //     };
+        //   });
+        if (failureReason){
+          sails.log.error(new Error(`Error creating payment intent: "${failureReason}"`));
+          return {
+            orderId: null,
+            paymentIntentID: null,
+            orderCreationStatus: 'failed',
+          };
+        }
 
         if (!newPaymentIntent) {
-          exits.error(new Error('Error creating payment intent'));
+          sails.log.error(new Error('Error creating payment intent'));
           return {
             orderId: null,
             paymentIntentID: null,
             orderCreationStatus: 'failed'
           };
         }
-
+        const paymentIntentId = newPaymentIntent.paymentIntent.id;
         // Update order with payment intent
         await wrapWithDb(db, () =>
           Order.updateOne(order.id).set({
-            paymentIntentId: newPaymentIntent.paymentIntentId,
+            paymentIntentId: paymentIntentId,
           })
         );
 
         // All done.
         return {
           orderId: order.id,
-          paymentIntentID: newPaymentIntent.paymentIntentId,
+          paymentIntentID: paymentIntentId,
           orderCreationStatus: 'confirmed',
         };
       };

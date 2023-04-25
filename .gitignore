@@ -130,6 +130,8 @@ nbproject
 .node_history
 dump.rdb
 .env
+stripe.json
+test_stripe.json
 vegiliverpool-firebase-adminsdk-*.json
 
 npm-debug.log

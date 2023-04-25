@@ -1,6 +1,15 @@
 import { DecodedIdToken } from 'firebase-admin/auth';
 import * as firebase from '../../../config/firebaseAdmin';
 //TODO: Consider connecting Passport to Google Auth Flow: https://stackoverflow.com/q/34069046
+import {
+  sailsModelKVP,
+  SailsModelType,
+  sailsVegi,
+} from '../../interfaces/iSails';
+import {
+  SailsActionDefnType,
+  UserType
+} from '../../../scripts/utils';
 
 const splitPhoneNumber = (formattedFirebaseNumber:string) => {
   try {
@@ -22,10 +31,48 @@ const splitPhoneNumber = (formattedFirebaseNumber:string) => {
   }
 };
 
-// const bcrypt = require('bcrypt');
-module.exports = {
 
 
+declare var sails: sailsVegi;
+declare var User: SailsModelType<UserType>;
+
+
+export type LoginWithFirebaseInputs = {
+  phoneNumber: string,
+  firebaseSessionToken: string,
+  rememberMe: boolean;
+};
+
+export type LoginWithFirebaseResponse = {
+  user: UserType | sailsModelKVP<UserType>;
+  session: string;
+} | false;
+
+export type LoginWithFirebaseExits = {
+  success: (unusedData: LoginWithFirebaseResponse) => any;
+  // issue: (unusedErr: Error | String) => void;
+  // notFound: () => void;
+  // error: (unusedErr?: Error | String) => void;
+  // badRequest: (unusedErr?: Error | String) => void;
+  firebaseUserNoPhone: (unusedErr?: Error | String) => void;
+  firebaseErrored: (unusedErr?: {
+        "code": string,
+        "message": string,
+        "error": Error | string,
+      } | undefined) => void;
+  badCombo: (unusedErr?: Error | String) => void;
+  serverError: (unusedErr?: {data: {
+        "code": string,
+        "message": string,
+        "error": Error | string,
+      }}) => void;
+};
+
+const _exports: SailsActionDefnType<
+  LoginWithFirebaseInputs,
+  LoginWithFirebaseResponse,
+  LoginWithFirebaseExits
+> = {
   friendlyName: 'Login With Firebase',
 
 
@@ -102,42 +149,43 @@ requests over WebSockets instead of HTTP).`,
     const decodedToken = _decodedToken;
 
     try {
-      const inputPhoneDetails = splitPhoneNumber(inputs.phoneNumber);
-
-      const formattedFirebaseNumber = decodedToken.phone_number;
-      if (!formattedFirebaseNumber){
-        return exits.firebaseUserNoPhone();
-      }
-
-      const firebasePhoneDetails = splitPhoneNumber(formattedFirebaseNumber);
-
-      if (firebasePhoneDetails['countryCode'] !== inputPhoneDetails['countryCode']
-        || firebasePhoneDetails['phoneNoCountry'] !== inputPhoneDetails['phoneNoCountry']){
-        return exits.badCombo(); // phone number doesnt match, throw badCombo
-      }
-
-      let user = await User.findOne({
-        phoneNoCountry: inputPhoneDetails['phoneNoCountry'],
-        phoneCountryCode: inputPhoneDetails['countryCode'],
-      });
-      if(!user){
-        //create one as using valid firebase token:
-        user = await User.create({
-          email: decodedToken.email || "",
-          // password: 'Testing123!',
-          phoneNoCountry: inputPhoneDetails["phoneNoCountry"],
-          phoneCountryCode: inputPhoneDetails["countryCode"],
-          name: decodedToken.email || "",
-          vendor: null,
-          vendorConfirmed: false,
-          isSuperAdmin: false,
-          vendorRole: "none",
-          deliveryPartnerRole: "none",
-          role: "consumer",
-          firebaseSessionToken: inputs.firebaseSessionToken,
-        });
-      }
       try {
+        const inputPhoneDetails = splitPhoneNumber(inputs.phoneNumber);
+
+        const formattedFirebaseNumber = decodedToken.phone_number;
+        if (!formattedFirebaseNumber){
+          return exits.firebaseUserNoPhone();
+        }
+
+        const firebasePhoneDetails = splitPhoneNumber(formattedFirebaseNumber);
+
+        if (firebasePhoneDetails['countryCode'] !== inputPhoneDetails['countryCode']
+          || firebasePhoneDetails['phoneNoCountry'] !== inputPhoneDetails['phoneNoCountry']){
+          return exits.badCombo(); // phone number doesnt match, throw badCombo
+        }
+
+        let user: sailsModelKVP<UserType> | UserType = await User.findOne({ // ! why is this not finding my number in the db...
+          phoneNoCountry: inputPhoneDetails['phoneNoCountry'],
+          phoneCountryCode: inputPhoneDetails['countryCode'],
+        });
+        if(!user){
+          //create one as using valid firebase token:
+          user = await User.create({
+            email: decodedToken.email || "", //todo: This email must exist on user..., channge in model...
+            // password: 'Testing123!',
+            phoneNoCountry: inputPhoneDetails["phoneNoCountry"],
+            phoneCountryCode: inputPhoneDetails["countryCode"],
+            name: decodedToken.email || inputPhoneDetails["phoneNoCountry"],
+            vendor: null,
+            vendorConfirmed: false,
+            isSuperAdmin: false,
+            vendorRole: "none",
+            deliveryPartnerRole: "none",
+            role: "consumer",
+            firebaseSessionToken: inputs.firebaseSessionToken,
+            marketingPushContactAllowed: false
+          }).fetch();
+        }
         // Update the session
         User.updateOne({
           phoneNoCountry: inputPhoneDetails['phoneNoCountry'],
@@ -173,7 +221,10 @@ requests over WebSockets instead of HTTP).`,
         }
 
 
-        return exits.success(user);
+        return exits.success({
+          user: user,
+          session: this.req.session.cookie,
+        });
       } catch(error){
         sails.log.info(error);
         return exits.serverError({data:{
@@ -200,6 +251,6 @@ requests over WebSockets instead of HTTP).`,
 
 
   }
-
-
 };
+
+module.exports = _exports;

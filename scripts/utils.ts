@@ -647,6 +647,8 @@ export type NotificationType = {
   order: _OrderTypeHidden;
 };
 
+export type CurrencyStripeAllowedTypeLiteral = 'gbp';
+
 export type SurveyType = {
   id: number;
   email: string;
@@ -728,9 +730,10 @@ export const openingHoursToMoments = (
 };
 
 type _actionInputType = {
-  type:'ref'|'string'|'number'|'boolean'|'json';
+  type: 'ref' | 'string' | 'number' | 'boolean' | 'json';
   required?: boolean;
   description?: string;
+  extendedDescription?: string;
   allowNull?: boolean;
   defaultsTo?: any;
   min?: number;

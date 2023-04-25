@@ -42,7 +42,8 @@ let custom = {
   pplTokenAddress: '0xa2C7CdB72d177f6259cD12a9A06Fdfd9625419D4',
   pplRewardsPoolAddress: '0x29249e06e8D3e4933cc403AB73136e698a08c38b',
   coopcycleUrl: 'https://agile-delivery.coopcycle.org',
-  peeplPayUrl: 'https://pay.itsaboutpeepl.com/api/v1',
+  fuseApiV2Url: 'https://studio.fuse.io/api/v2',
+  fuseApiJwt: 'jwt',
   vegiScoreApi: 'http://localhost:5002',
   sustainedScoreApi: 'https://api.sustained.com/choice/v1',
   placesApiKey: '', //*in local.js

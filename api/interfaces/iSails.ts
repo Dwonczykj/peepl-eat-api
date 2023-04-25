@@ -20,7 +20,8 @@ import {
 } from '../../api/helpers/get-vendors-in-sphere';
 import { GetProductRatingInputs, GetProductRatingResult } from "../helpers/get-product-rating-by-barcodes";
 import { SelectVendorProductsInputs, SelectVendorProductsResult } from "../../api/helpers/select-vendor-products";
-import { ParseBarcodesUploadInputs, ParseBarcodesUploadResult } from "api/helpers/parse-barcodes-upload";
+import { ParseBarcodesUploadInputs, ParseBarcodesUploadResult } from "../../api/helpers/parse-barcodes-upload";
+import { CreatePaymentIntentInternalInputs, CreatePaymentIntentInternalResult } from "../../api/helpers/create-payment-intent-internal";
 
 export type SailsActionInput =
   | {
@@ -503,7 +504,7 @@ export type sailsVegi = {
       SelectVendorProductsInputs,
       SelectVendorProductsResult
     >;
-    
+
     parseBarcodesUpload: _helperFunction<
       ParseBarcodesUploadInputs,
       ParseBarcodesUploadResult
@@ -610,11 +611,27 @@ export type sailsVegi = {
       unusedOrunusedArg: EditProductCategoriesInput
     ) => Promise<Array<sailsModelKVP<ProductCategoryType> | null>>);
 
-    createPaymentIntent: (
-      unusedFinalAmount: number,
-      unusedWalletAddress: walletAddressString,
-      unusedVendorName: string
-    ) => Promise<NewPaymentIntent>;
+    createPaymentIntent: _helperFunction<
+      {
+        paymentAmount: number,
+        currency: string,
+        recipientWalletAddress: walletAddressString,
+        recipientName: string,
+        headers: any,
+      },
+      NewPaymentIntent
+    >;
+    createPaymentIntentInternal: _helperFunction<
+      CreatePaymentIntentInternalInputs,
+      CreatePaymentIntentInternalResult
+    >;
+    // createPaymentIntent: (
+    //   unusedPaymentAmount: number,
+    //   unusedCurrency: string,
+    //   unusedRecipientWalletAddress: walletAddressString,
+    //   unusedRecipientName: string,
+    //   unusedHeaders: any,
+    // ) => Promise<NewPaymentIntent>;
 
     uploadOneS3: (image: any) => Promise<UploadImageInfoType>;
 

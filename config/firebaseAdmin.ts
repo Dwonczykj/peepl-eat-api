@@ -3,6 +3,24 @@ import * as admin from 'firebase-admin';
 import { DecodedIdToken, getAuth, UserRecord } from 'firebase-admin/auth';
 import fs from 'fs';
 
+let config = {
+  baseUrl:
+    process.env.NODE_ENV === 'production'
+      ? process.env.STAGE_ENV === 'QA'
+        ? 'https://qa-vegi.vegiapp.co.uk'
+        : 'https://vegi.vegiapp.co.uk'
+      : `http://localhost:${process.env.PORT}`,
+};
+if (process.env['local'] || process.env['local.js']) {
+  // eslint-disable-next-line no-console
+  console.log(`Loading config from local env vars for config/firebaseAdmin.ts`);
+  const localConfigFromDotEnv = JSON.parse(
+    Buffer.from(process.env['local'] || process.env['local.js'], 'base64').toString()
+  );
+  config = localConfigFromDotEnv.config.custom;
+}
+
+
 const kebabize = (str, forceJoinerStr = '-') =>
   str.replace(
     /[A-Z]+(?![a-z])|[A-Z]/g,
@@ -120,6 +138,42 @@ export const getUserByEmail = (email:string): Promise<UserRecord> => {
     }
   });
 };
+
+export const sendPasswordResetEmail = (args = {
+  tryEmail: '',
+}): Promise<string> => {
+  return new Promise(async (resolve, reject) => {
+    if (args.tryEmail) {
+      try {
+        const resetLink = await getAuth()
+          .generatePasswordResetLink(args.tryEmail, {
+            url: config.baseUrl,
+            // iOS: {
+            //   bundleId: 'com.example.ios'
+            // },
+            // android: {
+            //   packageName: 'com.example.android',
+            //   installApp: true,
+            //   minimumVersion: '12'
+            // },
+            handleCodeInApp: false,
+            // dynamicLinkDomain: 'custom.page.link'
+          })
+          .then((link) => {
+            return link;
+          })
+          .catch((error) => {
+            // Some error occurred, you can inspect the code: error.code
+            return reject(error);
+          });
+        return resetLink && resolve(resetLink);
+      } catch (err) {
+        return reject(err);
+      }
+    }
+    
+  });
+}
 
 export const tryGetUser = (args = {
   tryEmail: '',

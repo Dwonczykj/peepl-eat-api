@@ -28,9 +28,9 @@ export const splitPhoneNumber = (formattedFirebaseNumber: string) => {
 };
 
 type LoginWithPasswordResponse = {
-  user:sailsModelKVP<UserType>;
+  user: UserType | sailsModelKVP<UserType>;
   session: string;
-}
+};
 
 module.exports = {
   friendlyName: 'Login with Password',
@@ -140,7 +140,7 @@ requests over WebSockets instead of HTTP).`,
     const decodedToken = _decodedToken;
 
     try {
-      let _user = await User.findOne({
+      let _user: sailsModelKVP<UserType> | UserType = await User.findOne({
         email: inputs.emailAddress,
       });
 

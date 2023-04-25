@@ -373,7 +373,6 @@ module.exports = {
     pplTokenAddress: '0xa2C7CdB72d177f6259cD12a9A06Fdfd9625419D4',
     pplRewardsPoolAddress: '0x29249e06e8D3e4933cc403AB73136e698a08c38b',
     coopcycleUrl: 'https://agile-delivery.coopcycle.org',
-    peeplPayUrl: 'https://pay.itsaboutpeepl.com/api/v1',
     amazonS3BucketUrl: 'https://vegiapp-1.s3.us-east-1.amazonaws.com/',
     amazonS3Bucket: 'vegiapp-1',
   },

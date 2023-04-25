@@ -46,6 +46,9 @@
       "name": "View account"
     },
     {
+      "name": "ResetPassword"
+    },
+    {
       "name": "Logout"
     },
     {
@@ -89,6 +92,12 @@
     },
     {
       "name": "View my orders"
+    },
+    {
+      "name": "CreateStripePaymentAttempt"
+    },
+    {
+      "name": "Login"
     },
     {
       "name": "View create vendor"
@@ -167,6 +176,15 @@
     },
     {
       "name": "Check user for phone"
+    },
+    {
+      "name": "CreateStripeAccount"
+    },
+    {
+      "name": "UpdateStripeAccount"
+    },
+    {
+      "name": "StripeEventWebhook"
     },
     {
       "name": "Update User Vendor Role"
@@ -293,6 +311,12 @@
     },
     {
       "name": "Check discount code"
+    },
+    {
+      "name": "CheckStripePaymentIntent"
+    },
+    {
+      "name": "GetStripeAccount"
     },
     {
       "name": "Is user inventory manager"
@@ -2239,10 +2263,8 @@
           },
           {
             "required": [
-              "email",
               "phoneNoCountry",
               "phoneCountryCode",
-              "marketingPushContactAllowed",
               "name",
               "role"
             ]
@@ -2270,6 +2292,7 @@
           "email": {
             "type": "string",
             "format": "email",
+            "default": "",
             "uniqueItems": true
           },
           "phoneNoCountry": {
@@ -2281,8 +2304,8 @@
             "format": "double"
           },
           "marketingPushContactAllowed": {
-            "type": "number",
-            "format": "double"
+            "type": "boolean",
+            "default": false
           },
           "marketingEmailContactAllowed": {
             "type": "boolean",
@@ -3023,6 +3046,58 @@
         }
       }
     },
+    "/admin/reset-password": {
+      "post": {
+        "summary": "ResetPassword",
+        "tags": [
+          "ResetPassword"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "emailAddress",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "A firebase user is already registered to the email requested and should be signed in"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
     "/admin/logout": {
       "get": {
         "summary": "Logout",
@@ -3656,6 +3731,181 @@
           },
           "404": {
             "description": "Resource not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/payment_intents": {
+      "post": {
+        "summary": "CreateStripePaymentAttempt",
+        "tags": [
+          "CreateStripePaymentAttempt"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "amount",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "minimum": 0
+            },
+            "description": "Amount in pence or base unit of currency"
+          },
+          {
+            "in": "query",
+            "name": "currency",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "customerId",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vendorDisplayName",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "recipientWalletAddress",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "webhookAddress",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/api/v1/refunds": {
+      "post": {
+        "summary": "Login",
+        "description": "Login admin.",
+        "tags": [
+          "Login"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "emailAddress",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          },
+          {
+            "in": "query",
+            "name": "password",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "rememberMe",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/revert_reward_issue": {
+      "post": {
+        "summary": "Login",
+        "description": "Login admin.",
+        "tags": [
+          "Login"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "emailAddress",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          },
+          {
+            "in": "query",
+            "name": "password",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "rememberMe",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
           },
           "500": {
             "description": "Internal server error"
@@ -4821,6 +5071,58 @@
         }
       }
     },
+    "/api/v1/admin/reset-password": {
+      "post": {
+        "summary": "ResetPassword",
+        "tags": [
+          "ResetPassword"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "emailAddress",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "A firebase user is already registered to the email requested and should be signed in"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
     "/api/v1/admin/signup-with-password": {
       "post": {
         "summary": "Registration with email and password",
@@ -5263,6 +5565,405 @@
           },
           "500": {
             "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/payments/create-stripe-payment-intent": {
+      "post": {
+        "summary": "CreateStripePaymentAttempt",
+        "tags": [
+          "CreateStripePaymentAttempt"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "amount",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "minimum": 0
+            },
+            "description": "Amount in pence or base unit of currency"
+          },
+          {
+            "in": "query",
+            "name": "currency",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "customerId",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vendorDisplayName",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "recipientWalletAddress",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "webhookAddress",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/api/v1/reward/issue-reward": {
+      "post": {
+        "summary": "Login",
+        "description": "Login admin.",
+        "tags": [
+          "Login"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "emailAddress",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          },
+          {
+            "in": "query",
+            "name": "password",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "rememberMe",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/create-stripe-account": {
+      "post": {
+        "summary": "CreateStripeAccount",
+        "tags": [
+          "CreateStripeAccount"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "companyName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "businessType",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "defaultCurrency",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "gbp",
+              "example": "gbp"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/get-stripe-accounts": {
+      "get": {
+        "summary": "CreateStripeAccount",
+        "tags": [
+          "CreateStripeAccount"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "created",
+            "required": false,
+            "schema": {
+              "type": "object",
+              "properties": {},
+              "default": {},
+              "example": {}
+            }
+          },
+          {
+            "in": "query",
+            "name": "ending_before",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "starting_after",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "default": 10,
+              "example": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/update-stripe-account": {
+      "post": {
+        "summary": "UpdateStripeAccount",
+        "tags": [
+          "UpdateStripeAccount"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "stripeCustomerId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "updateCustomerParams",
+            "required": true,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/api/v1/payments/stripe-event-webhook": {
+      "post": {
+        "summary": "StripeEventWebhook",
+        "tags": [
+          "StripeEventWebhook"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "data",
+            "required": false,
+            "schema": {}
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "api_version",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "created",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "object",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "livemode",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "pending_webhooks",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "account",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "request",
+            "required": false,
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
           }
         }
       }
@@ -9073,6 +9774,84 @@
         }
       }
     },
+    "/api/v1/payments/check-stripe-payment-intent/{paymentIntentId}": {
+      "get": {
+        "summary": "CheckStripePaymentIntent",
+        "tags": [
+          "CheckStripePaymentIntent"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "paymentIntentId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "client_secret",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/api/v1/payments/get-stripe-account/{stripeCustomerId}": {
+      "get": {
+        "summary": "GetStripeAccount",
+        "tags": [
+          "GetStripeAccount"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "stripeCustomerId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
     "/api/v1/admin/is-user-vendor-inventory-manager/{vendorId}": {
       "get": {
         "summary": "Is user inventory manager",
@@ -9348,6 +10127,49 @@
           },
           "500": {
             "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/payment_intents/{paymentIntentId}": {
+      "get": {
+        "summary": "CheckStripePaymentIntent",
+        "tags": [
+          "CheckStripePaymentIntent"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "paymentIntentId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "client_secret",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
           }
         }
       }

@@ -1,7 +1,8 @@
 import { UserRecord } from 'firebase-admin/auth';
 import { UserType } from '../../../scripts/utils';
 import * as firebase from '../../../config/firebaseAdmin';
-declare var User: any;
+import { SailsModelType } from 'api/interfaces/iSails';
+declare var User: SailsModelType<UserType>;
 // const bcrypt = require('bcrypt');
 module.exports = {
   friendlyName: 'Registration with email and password',
@@ -147,7 +148,7 @@ module.exports = {
       tryPhone: `+${inputs.phoneCountryCode}${inputs.phoneNoCountry}`,
     });
 
-    const existingSailsUser: UserType = await User.findOne({
+    const existingSailsUser = await User.findOne({
       or: [
         {
           phoneNoCountry: inputs.phoneNoCountry,

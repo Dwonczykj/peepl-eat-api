@@ -68,8 +68,6 @@ module.exports = {
       return exits.notFound();
     }
 
-    sails.log.info(vendor.products);
-
     return exits.success({ vendor, userRole: this.req.session.userRole });
 
   }

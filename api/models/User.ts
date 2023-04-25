@@ -17,8 +17,9 @@ let _exports: SailsModelDefnType<UserType> & { formatPhoneNumber?: (unusedOpts:{
     email: {
       type: 'string',
       isEmail: true,
-      unique: true,
-      required: true,
+      // unique: true,
+      // required: true,
+      defaultsTo: '',
     },
     phoneNoCountry: {
       type: 'number',
@@ -29,8 +30,9 @@ let _exports: SailsModelDefnType<UserType> & { formatPhoneNumber?: (unusedOpts:{
       required: true,
     },
     marketingPushContactAllowed: {
-      type: 'number',
-      required: true,
+      type: 'boolean',
+      required: false,
+      defaultsTo: false,
     },
     marketingEmailContactAllowed: {
       type: 'boolean',

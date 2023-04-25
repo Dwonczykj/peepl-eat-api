@@ -105,6 +105,8 @@ module.exports.routes = {
   // 'POST /api/v1/admin/login': { action: 'admin/login' },
   'POST /admin/signup': { action: 'admin/signup' },
   'POST /api/v1/admin/signup': { action: 'admin/signup' },
+  'POST /admin/reset-password': { action: 'admin/reset-password' },
+  'POST /api/v1/admin/reset-password': { action: 'admin/reset-password' },
   'POST /api/v1/admin/signup-with-password': {
     action: 'admin/signup-with-password',
   },
@@ -120,6 +122,45 @@ module.exports.routes = {
   },
   'POST /api/v1/admin/user-exists-for-phone': {
     action: 'admin/user-exists-for-phone',
+  },
+
+  'POST /api/v1/payments/create-stripe-payment-intent': {
+    action: 'payments/create-stripe-payment-intent',
+  },
+  'POST /api/v1/payment_intents': {
+    action: 'payments/create-stripe-payment-intent',
+  },
+  'POST /api/v1/refunds': {
+    action: 'admin/login', // todo: Create a route
+  },
+  'POST /api/v1/revert_reward_issue': {
+    action: 'admin/login', // todo: Create a route
+  },
+  'POST /api/v1/reward/issue-reward': {
+    action: 'admin/login', // todo: Create a route
+  },
+
+  'GET /api/v1/payments/check-stripe-payment-intent/:paymentIntentId': {
+    action: 'payments/check-stripe-payment-intent',
+  },
+  'GET /api/v1/payment_intents/:paymentIntentId': {
+    action: 'payments/check-stripe-payment-intent',
+  },
+  'POST /api/v1/admin/create-stripe-account': {
+    action: 'admin/create-stripe-account',
+  },
+  'GET /api/v1/admin/get-stripe-accounts': {
+    action: 'admin/get-stripe-accounts',
+  },
+  'POST /api/v1/admin/update-stripe-account': {
+    action: 'admin/update-stripe-account',
+  },
+  'GET /api/v1/payments/get-stripe-account/:stripeCustomerId': {
+    action: 'payments/get-stripe-account',
+  },
+
+  'POST /api/v1/payments/stripe-event-webhook': {
+    action: 'payments/stripe-event-webhook',
   },
 
   'POST /api/v1/admin/update-user': { action: 'admin/update-user' },

@@ -242,6 +242,20 @@ parasails.registerPage('login-with-password', {
     toLoginWithPassword: function () {
       window.location.replace('/admin/login-with-password');
     },
+    resetPassword: async function() {
+      try {
+        if (!this.email){
+          return;
+        }
+        const email = this.email;
+        await Cloud.resetPassword(email);
+        this.showToast(`Password reset sent to ${email}`);
+      } catch (error) {
+        this.showToast('Unable to send password reset email');
+        // eslint-disable-next-line no-console
+        console.error(error);
+      }
+    },
 
     // * display functions
     showToast: function (message) {
