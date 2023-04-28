@@ -165,7 +165,7 @@ const _exports: SailsActionDefnType<
               title: 'Payment succeeded',
               body: '✅ Payment on vegi succeeded',
               data: {
-                orderId: order.id,
+                orderId: `${order.id}`,
               },
             });
           }
@@ -179,7 +179,7 @@ const _exports: SailsActionDefnType<
             title: 'Payment failed',
             body: '❌ Payment on vegi failed',
             data: {
-              orderId: order.id,
+              orderId: `${order.id}`,
             },
           });
         }
