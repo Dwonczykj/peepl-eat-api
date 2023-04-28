@@ -140,6 +140,7 @@ const _exports: SailsActionDefnType<
           return exits.error(e);
         }
         const order = orders[0];
+        sails.log(`Stripe webhook called for order with public id: "${order.publicId}"`);
   
         if (eventType === 'payment_intent.succeeded') {
           sails.log('💰 Payment captured!');
