@@ -329,7 +329,7 @@ module.exports = {
             newOrderItemOptionValues = await Promise.all(dbPromises);
           } catch (err) {
             sails.log.error(err);
-            exits.badItemsRequest();
+            // exits.badItemsRequest();
             return {
               orderId: null,
               paymentIntentID: null,
@@ -374,7 +374,7 @@ module.exports = {
           ).fetch();
         } catch (error) {
           sails.log.error(`Error on Order.create(...) -> ${error}`);
-          exits.error(error);
+          // exits.error(error);
           return {
             orderId: null,
             paymentIntentID: null,
