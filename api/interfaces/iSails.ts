@@ -637,6 +637,21 @@ export type sailsVegi = {
 
     sendFirebaseNotification: _helperFunction<
       {
+        token: string;
+        title: string;
+        body: string;
+        data:
+          | any
+          | {
+              orderId: string;
+            };
+      },
+      {
+        notification: NotificationType;
+      }
+    >;
+    broadcastFirebaseNotificationForTopic: _helperFunction<
+      {
         topic: string;
         title: string;
         body: string;

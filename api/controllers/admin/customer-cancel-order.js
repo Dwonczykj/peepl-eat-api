@@ -88,7 +88,7 @@ module.exports = {
         // });
       }
 
-      await sails.helpers.sendFirebaseNotification.with({
+      await sails.helpers.broadcastFirebaseNotificationForTopic.with({
         topic: 'order-' + order.publicId,
         title: 'Order update',
         body: `Your refund for ${formulateMoney(

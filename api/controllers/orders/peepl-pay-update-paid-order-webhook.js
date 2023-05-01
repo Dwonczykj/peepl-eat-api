@@ -123,7 +123,7 @@ module.exports = {
     let vendorNotified = false;
     sails.log('notify users');
     try {
-      await sails.helpers.sendFirebaseNotification.with({
+      await sails.helpers.broadcastFirebaseNotificationForTopic.with({
         topic: 'order-' + paidOrder.publicId,
         title: 'Order Partially Refunded',
         body: msgBodyCustomer,

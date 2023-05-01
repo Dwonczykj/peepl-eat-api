@@ -10,7 +10,7 @@ module.exports = {
 
 
   inputs: {
-    topic: {
+    token: {
       type: 'string',
       required: true
     },
@@ -41,7 +41,7 @@ module.exports = {
   fn: async function (inputs, exits) {
 
     const newNotification = await Notification.create({
-      recipient: inputs.topic,
+      recipient: inputs.token,
       type: 'push',
       sentAt: Date.now(),
       title: inputs.title,
@@ -51,10 +51,12 @@ module.exports = {
           ? {
             model: 'order',
             id: inputs.data.orderId,
+            broadcast: false,
           }
           : {
             model: '',
             id: null,
+            broadcast: false,
           }),
     }).fetch();
 
@@ -73,11 +75,12 @@ module.exports = {
       notification:{
         title: inputs.title,
         body: inputs.body
-      }
+      },
+      token: inputs.token,
     };
     // const admin = this.req.firebase;
     admin.messaging()
-      .sendToTopic(inputs.topic, message)
+      .send(message)
       .then((res) => {
         return res;
       }).catch((err) => {

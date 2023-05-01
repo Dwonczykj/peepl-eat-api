@@ -54,7 +54,7 @@ module.exports = {
     }
 
     // Intention is for users to then
-    await sails.helpers.sendFirebaseNotification.with({
+    await sails.helpers.broadcastFirebaseNotificationForTopic.with({
       topic: 'order-' + inputs.orderPublicId,
       title: 'Order update - (Response required)',
       body:

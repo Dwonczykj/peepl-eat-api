@@ -100,6 +100,10 @@ module.exports = {
     paymentIntentId: {
       type: 'string',
     },
+    firebaseRegistrationToken: {
+      type: 'string',
+      required: false,
+    },
     // isArchived: {
     //   type: 'boolean',
     //   defaultsTo: false

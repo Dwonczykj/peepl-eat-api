@@ -56,7 +56,7 @@ module.exports = {
 
     try {
 	    if (order.deliveryPartner){
-	      await sails.helpers.sendFirebaseNotification.with({
+	      await sails.helpers.broadcastFirebaseNotificationForTopic.with({
 	        topic: "order-" + order.publicId,
 	        title: "Rider Cancelled! 🚨",
 	        body: "Your order has been cancelled by the rider. \nWe will find a new rider and notify you again when we do. \n\nAlternatively open vegi to manage to your order.",

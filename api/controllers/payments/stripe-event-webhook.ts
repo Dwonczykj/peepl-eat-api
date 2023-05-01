@@ -164,14 +164,27 @@ const _exports: SailsActionDefnType<
           let paymentStatus: OrderType['paymentStatus'];
           if (eventType === 'payment_intent.succeeded') {
             paymentStatus = 'paid';
-            await sails.helpers.sendFirebaseNotification.with({
-              topic: `order-${order.publicId}`,
-              title: `Payment success`,
-              body: '✅ Payment on vegi succeeded',
-              data: {
-                orderId: `${order.id}`,
-              },
-            });
+            if (order.firebaseRegistrationToken){
+              await sails.helpers.sendFirebaseNotification.with({
+                // topic: `order-${order.publicId}`,
+                token: order.firebaseRegistrationToken,
+                title: 'Payment success',
+                body: '✅ Payment on vegi succeeded',
+                data: {
+                  orderId: `${order.id}`,
+                },
+              });
+            } else {
+              await sails.helpers.broadcastFirebaseNotificationForTopic.with({
+                topic: `order-${order.publicId}`,
+                title: `Payment success`,
+                body: '✅ Payment on vegi succeeded',
+                data: {
+                  orderId: `${order.id}`,
+                },
+              });
+            }
+            
           } else if (eventType === 'payment_intent.processing') {
             sails.log('🧧 Successfully created payment intent for customer');
             paymentStatus = 'unpaid';
@@ -179,14 +192,26 @@ const _exports: SailsActionDefnType<
           } else if (eventType === 'payment_intent.payment_failed') {
             sails.log('❌ Payment failed.');
             paymentStatus = 'failed';
-            await sails.helpers.sendFirebaseNotification.with({
-              topic: `order-${order.publicId}`,
-              title: 'Payment failed',
-              body: '❌ Payment on vegi failed',
-              data: {
-                orderId: `${order.id}`,
-              },
-            });
+            if(order.firebaseRegistrationToken){
+              await sails.helpers.sendFirebaseNotification.with({
+                // topic: `order-${order.publicId}`,
+                token: order.firebaseRegistrationToken,
+                title: 'Payment failed',
+                body: '❌ Payment on vegi failed',
+                data: {
+                  orderId: `${order.id}`,
+                },
+              });  
+            } else {
+              await sails.helpers.broadcastFirebaseNotificationForTopic.with({
+                topic: `order-${order.publicId}`,
+                title: 'Payment failed',
+                body: '❌ Payment on vegi failed',
+                data: {
+                  orderId: `${order.id}`,
+                },
+              });
+            }
           }
 
           if (dataObj['metadata'] && dataObj['metadata']['webhookAddress']) {

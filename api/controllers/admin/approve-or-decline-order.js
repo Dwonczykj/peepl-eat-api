@@ -151,7 +151,7 @@ module.exports = {
         }
       }
       // Send notification to customer that their order has been accepted/declined.
-      await sails.helpers.sendFirebaseNotification.with({
+      await sails.helpers.broadcastFirebaseNotificationForTopic.with({
         topic: 'order-' + order.publicId,
         title: 'Order update',
         body: 'Your order has been accepted 😎.',
@@ -187,7 +187,7 @@ module.exports = {
         }
       }
 
-      await sails.helpers.sendFirebaseNotification.with({
+      await sails.helpers.broadcastFirebaseNotificationForTopic.with({
         topic: 'order-' + order.publicId,
         title: 'Order update',
         body: 'Your order has been declined 😔.',

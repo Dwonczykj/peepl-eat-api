@@ -42,6 +42,7 @@ export type CreateOrderInputs = {
     lat?: undefined | number;
     lng?: undefined | number;
   };
+  firebaseRegistrationToken: string;
   total: number;
   marketingOptIn: boolean;
   discountCode: string;
@@ -80,6 +81,11 @@ module.exports = {
       type: 'ref',
       description: "The user's address.",
       required: true,
+    },
+    firebaseRegistrationToken: {
+      type: 'string',
+      description: 'token used for firebase notifications',
+      required: false,
     },
     total: {
       type: 'number',
@@ -347,6 +353,7 @@ module.exports = {
           order = await wrapWithDb(db, () =>
             Order.create({
               total: inputs.total,
+              firebaseRegistrationToken: inputs.firebaseRegistrationToken,
               orderedDateTime: Date.now(),
               deliveryAccepted: !!availableDeliveryPartner,
               deliveryPartner: availableDeliveryPartner

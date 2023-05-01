@@ -104,7 +104,7 @@ module.exports = function defineSendOrderUpdatesHook(sails) {
             var delivColln = order.fulfilmentMethod.methodType === 'delivery' ? 'delivery' : 'collection';
             var completed = order.completedFlag === 'completed' ? 'complete' : 'in progress';
             // No need to await result of this
-            await sails.helpers.sendFirebaseNotification.with({
+            await sails.helpers.broadcastFirebaseNotificationForTopic.with({
               topic: 'order-' + order.publicId,
               title: `Order update - ${completed}`,
               body: `Your recent order scheduled for ${delivColln} at ${ds} is ${completed}.`
@@ -122,7 +122,7 @@ module.exports = function defineSendOrderUpdatesHook(sails) {
               var ds = formatDeliverySlot(order.fulfilmentSlotFrom);
               var delivColln = order.fulfilmentMethod.methodType === 'delivery' ? 'delivery' : 'collection';
               // No need to await result of this
-              await sails.helpers.sendFirebaseNotification.with({
+              await sails.helpers.broadcastFirebaseNotificationForTopic.with({
                 topic: 'order-' + order.publicId,
                 title: 'Order update',
                 body: `You have an upcoming order at ${ds} scheduled for ${delivColln} 😎.`

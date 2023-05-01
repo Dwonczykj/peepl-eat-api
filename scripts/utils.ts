@@ -626,6 +626,7 @@ export type _OrderTypeHidden = {
   deliveryPartnerAccepted: boolean;
   deliveryPartnerConfirmed: boolean;
   publicId: string;
+  firebaseRegistrationToken: string;
   tipAmount: number;
   rewardsIssued: number;
   sentToDeliveryPartner: boolean;
