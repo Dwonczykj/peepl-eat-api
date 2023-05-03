@@ -156,6 +156,9 @@ executeLocalDbScript.sh
 executeDbScript.sh
 copyQACodeToProd.sh
 
+thunder-tests
+thunder-tests-temp
+
 test/**/*jpg
 test/**/*jpeg
 
