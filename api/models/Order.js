@@ -103,6 +103,8 @@ module.exports = {
     firebaseRegistrationToken: {
       type: 'string',
       required: false,
+      description: 'Used to send notificaitons to devices that are registered to this order',
+      allowNull: true,
     },
     // isArchived: {
     //   type: 'boolean',
@@ -145,7 +147,11 @@ module.exports = {
       defaultsTo: 'pending',
       isIn: ['pending', 'accepted', 'rejected', 'partially fulfilled'],
     },
-    // TODO: Courier Accepted
+    orderAcceptanceStatus: {
+      type: 'string',
+      defaultsTo: 'pending',
+      isIn: ['pending', 'accepted', 'rejected', 'partially fulfilled', 'out for delivery', 'delivered', 'collected'],
+    },
     rewardsIssued: {
       type: 'number',
       defaultsTo: 0,

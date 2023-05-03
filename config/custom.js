@@ -41,6 +41,7 @@ let custom = {
   fuseStudioBaseUrl: 'https://api.chargeweb3.com/api/v0/',
   pplTokenAddress: '0xa2C7CdB72d177f6259cD12a9A06Fdfd9625419D4',
   pplRewardsPoolAddress: '0x29249e06e8D3e4933cc403AB73136e698a08c38b',
+  vegiWalletAddress: '0x6ad1D130d8B4F6f2D133E172799484B653c9fb40',
   coopcycleUrl: 'https://agile-delivery.coopcycle.org',
   fuseApiV2Url: 'https://studio.fuse.io/api/v2',
   fuseApiJwt: 'jwt',

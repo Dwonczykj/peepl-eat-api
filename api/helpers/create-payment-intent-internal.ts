@@ -2,7 +2,7 @@
 
 import stripe, { StripeKeys } from '../../scripts/load_stripe';
 import Stripe from 'stripe';
-import { CurrencyStripeAllowedTypeLiteral, SailsActionDefnType } from '../../scripts/utils';
+import { CurrencyStripeAllowedTypeLiteral, PaymentIntentMetaDataType, SailsActionDefnType } from '../../scripts/utils';
 import {
   sailsVegi,
 } from '../interfaces/iSails';
@@ -16,7 +16,10 @@ export type CreatePaymentIntentInternalInputs = {
   customerId?: string | null | undefined; // "cus_Nkl5aUAezd6MIa"
   vendorDisplayName?:  string | null | undefined;
   recipientWalletAddress?: string | null | undefined;
-  webhookAddress?: string | null | undefined;  
+  senderWalletAddress?: string | null | undefined;
+  accountId?: number | null | undefined;
+  orderId: number;
+  webhookAddress?: string | null | undefined;
 };
 
 export type CreatePaymentIntentInternalResult =
@@ -62,6 +65,18 @@ const _exports: SailsActionDefnType<
       type: 'string',
       required: false,
     },
+    senderWalletAddress: {
+      type: 'string',
+      required: false,
+    },
+    orderId: {
+      type: 'number',
+      required: false,
+    },
+    accountId: {
+      type: 'number',
+      required: false,
+    },
     webhookAddress: {
       type: 'string',
       required: false,
@@ -92,27 +107,27 @@ const _exports: SailsActionDefnType<
     );
 
     try {
+      const meta: PaymentIntentMetaDataType = {
+        amount: inputs.amount,
+        currrency: inputs.currency,
+        accountId: inputs.accountId,
+        senderWalletAddress: inputs.senderWalletAddress,
+        walletAddress: inputs.recipientWalletAddress,
+        recipientWalletAddress: inputs.recipientWalletAddress,
+        orderId: inputs.orderId,
+        webhookAddress: inputs.webhookAddress, // dont need to call the stipeEventWebhook, that is confiured to be called from the stripe dashboard for all events... (https://stripe.com/docs/webhooks#webhooks-summary)
+        // webhookAddress: inputs.webhookAddress || sails.config.custom.stripeEventWebhook,
+      };
       const paymentIntent = await stripe.paymentIntents.create({
         amount: inputs.amount, //TODO get amounts from end ppoint inputs...
         currency: inputs.currency,
         customer: customer.id,
         statement_descriptor: inputs.vendorDisplayName || 'vegi',
-        payment_method_types: [
-          'card',
-          'card_present',
-          'link',
-        ], // ~ https://stripe.com/docs/api/payment_intents/create#create_payment_intent-payment_method_types
+        payment_method_types: ['card', 'card_present', 'link'], // ~ https://stripe.com/docs/api/payment_intents/create#create_payment_intent-payment_method_types
         // automatic_payment_methods: {
         //   enabled: true,
         // },
-        metadata: {
-          amount: inputs.amount,
-          currrency: inputs.currency,
-          walletAddress: inputs.recipientWalletAddress,
-          webhookAddress: inputs.webhookAddress, // dont need to call the stipeEventWebhook, that is confiured to be called from the stripe dashboard for all events... (https://stripe.com/docs/webhooks#webhooks-summary)
-          // webhookAddress: inputs.webhookAddress || sails.config.custom.stripeEventWebhook,
-        },
-
+        metadata: meta,
       });
       return exits.success({
         paymentIntent: paymentIntent,

@@ -1,8 +1,13 @@
 import moment from 'moment';
-import { SailsModelType, sailsVegi } from '../../../api/interfaces/iSails';
-import { dateStrFormat, datetimeStrFormat, OrderItemType, OrderType, walletAddressString } from '../../../scripts/utils';
+import { SailsModelType, sailsModelKVP, sailsVegi } from '../../../api/interfaces/iSails';
+import { AccountType, dateStrFormat, datetimeStrFormat, DiscountType, OrderItemType, OrderType, TransactionType, VendorType, walletAddressString } from '../../../scripts/utils';
+import { TransactionsForAccountResult } from '../../../api/helpers/transactions-for-account';
 
 declare var Order: SailsModelType<OrderType>;
+declare var OrderItem: SailsModelType<OrderItemType>;
+declare var Account: SailsModelType<AccountType>;
+declare var Transaction: SailsModelType<TransactionType>;
+declare var Discount: SailsModelType<DiscountType>;
 declare var sails: sailsVegi;
 
 export type FormattedOrderForClients = ({
@@ -23,6 +28,13 @@ export type FormattedOrderForClients = ({
     | any[];
   deliveryPartner: { id: number; name: string } | any;
   vendor: { id: number; name: string } | any;
+  transactions: TransactionType[],
+  fulfilmentCharge: number,
+  platformFee: number,
+  cartDiscountCode: string,
+  cartDiscountType: DiscountType['discountType'],
+  cartDiscountAmount: number,
+  cartTip: number,
   unfulfilledItems:
     | {
         id: number;
@@ -90,9 +102,13 @@ const _exports = {
         customerWalletAddress: inputs.walletId,
         paidDateTime: { '>': 0 },
         completedFlag: '',
-      }).populate(
-        'fulfilmentMethod&deliveryPartner&vendor&items.product&optionValues&optionValues.option&optionValue'
-      );
+      })
+        // .populate('items&items.product')
+        // .populate('items&items.optionValues&optionValues.option&optionValue')
+        .populate(
+          'fulfilmentMethod&deliveryPartner&vendor&items&items.product'
+        );
+
       if (_orders.length > 0) {
         _ongoingOrders = _orders.filter((order) => {
           return (
@@ -121,21 +137,82 @@ const _exports = {
         completedFlag: '',
         fulfilmentSlotFrom: { '>=': timeNow }, //BUG: this comparison doesnt work for disk db: sails-disk
         fulfilmentSlotTo: { '<=': timeToScheduledOrdersStart },
-      }).populate(
-        'fulfilmentMethod&deliveryPartner&vendor&items.product&optionValues&optionValues.option&optionValue'
-      );
+      })
+        // .populate('items&items.product')
+        // .populate('items&items.optionValues&optionValues.option&optionValue')
+        .populate(
+          'fulfilmentMethod&deliveryPartner&vendor&items&items.product'
+        );
       _scheduledOrders = await Order.find({
         customerWalletAddress: inputs.walletId,
         paidDateTime: { '>': 0 },
         completedFlag: '',
         fulfilmentSlotFrom: { '>': timeToScheduledOrdersStart },
-      }).populate(
-        'fulfilmentMethod&deliveryPartner&vendor&items.product&optionValues&optionValues.option&optionValue'
+      })
+        // .populate('items&items.product')
+        // .populate('items&items.optionValues&optionValues.option&optionValue')
+        .populate(
+          'fulfilmentMethod&deliveryPartner&vendor&items&items.product'
+        );
+    }
+    
+    let transactionsForOngoingOrders: TransactionType[] = [];
+    let transactionsForScheduledOrders: TransactionType[] = [];
+    try {
+      transactionsForOngoingOrders = await Transaction.find({
+        order: _ongoingOrders.map((o) => o.id),
+      }).populate('order&payer');
+      transactionsForOngoingOrders = transactionsForOngoingOrders.filter(t => {
+        return t.payer.walletAddress === inputs.walletId;
+      });
+      transactionsForScheduledOrders = await Transaction.find({
+        order: _scheduledOrders.map((o) => o.id),
+      }).populate('order&payer');
+      transactionsForScheduledOrders = transactionsForScheduledOrders.filter(t => {
+        return t.payer.walletAddress === inputs.walletId;
+      });
+    } catch (error) {
+      sails.log.error(
+        `Unable to query db for transactions for get-orders helper. Error: ${error}`
       );
     }
 
-    const ordersMap = (orders: Array<OrderType>) =>
-      orders.map((order) => {
+    const ordersMap = async (orders: Array<OrderType>) => {
+      let transactions: TransactionType[];
+      try {
+        transactions = await Transaction.find({
+          order: orders.map((o) => o.id),
+        }).populate('order&payer');
+        transactions = transactions.filter(t => {
+          return t.payer.walletAddress === inputs.walletId;
+        });
+      } catch (error) {
+        sails.log.error(
+          `Unable to query db for transactions for get-orders helper. Error: ${error}`
+        );
+      }
+      return await Promise.all(orders.map(async (order) => {
+        // let discounts = await Discount.find({
+        //   id: order.discount.id,
+        //   vendor: order.vendor.id,
+        // });
+        // if(!discounts || discounts.length < 1){
+        //   discounts = await Discount.find({
+        //     id: order.discount.id
+        //   });
+        // }
+        // if(!discounts || discounts.length < 1){
+        //   discounts = await Discount.find({
+        //     code: order.discount.code
+        //   });
+        // }
+        order.items = await Promise.all(order.items.map((orderItem) => {
+          return async () => {
+            const deepOrderItem = await OrderItem.findOne({id: orderItem.id}).populate('product&optionValues');
+            return deepOrderItem;
+          };
+        }).map(p => p()));
+        
         return {
           ...order,
           ...{
@@ -169,13 +246,25 @@ const _exports = {
               methodType: order.fulfilmentMethod.methodType,
               priceModifier: order.fulfilmentMethod.priceModifier,
             },
-            // todo: gbpxUsed, didUsePPL, pplUsed, pplRewardsEarned, pplRewardsEarnedValue;
+            // todo: gbpxUsed, didUsePPL, pplUsed, pplRewardsEarned, pplRewardsEarnedValue; // have methods to fetch transactions by checking both stripe and fuse explorer from one helper to then get transactions relating to a wallet address that we can then add to the orders list end points.
+            // todo: We should also add a transactions table foreign keyeed to orders with a timestampe, currency, orderid, amount so that can have multi lines for one order detailing the different currencies.
+            transactions: transactions.filter(t => t.order.id === order.id), 
+            fulfilmentCharge: order.fulfilmentMethod.priceModifier, // is based on the vendors price modifier on the selected timeslot...
+            platformFee: order.vendor.platformFee, // is fixed based on the fulfilment method...
+            cartDiscountCode: order.discount && order.discount.code, // where can we find the discount code that was applied to this order...
+            cartDiscountType: order.discount ? order.discount.discountType : 'fixed', // where can we find the discount code that was applied to this order...
+            cartDiscountAmount: order.discount ? order.discount.value : 0, // where can we find the discount code that was applied to this order...
+            // cartDiscountType: discounts && discounts.length > 0 ? discounts[0].discountType : '', // where can we find the discount code that was applied to this order...
+            // cartDiscountAmount: discounts && discounts.length > 0 ? discounts[0].value : 0, // where can we find the discount code that was applied to this order...
+            cartTip: order.tipAmount,
+            //TODO: IF no transactions, append an empty transaction to assume all GBP or actually, just do this in UI and ignore for backend as the transaction does not exist...
           },
         };
-      });
-
-    const ongoingOrders = ordersMap(_ongoingOrders);
-    const scheduledOrders = ordersMap(_scheduledOrders);
+      }));
+    };
+    
+    const ongoingOrders = await ordersMap(_ongoingOrders);
+    const scheduledOrders = await ordersMap(_scheduledOrders);
 
     // Respond with view or JSON.
     if (this.req.wantsJSON) {

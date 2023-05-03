@@ -1,7 +1,8 @@
 /* eslint-disable no-unused-vars */
-import { DaysOfWeek } from "./DaysOfWeek";
 import moment from 'moment';
 import { NonValueKeys, OptionalValueKeys, RequiredValueKeys } from "../api/interfaces/iSails";
+import { Currency } from "../api/interfaces/peeplPay";
+import { DaysOfWeek } from "./DaysOfWeek";
 declare var sails: any;
 
 export function getTodayDayName(offset: number = 0): DaysOfWeek {
@@ -182,8 +183,26 @@ type _UserTypeHidden = {
 
 export type AccountType = {
   id: number;
+  accountType: 'ethereum' | 'bank' | null;
   verified: boolean;
-  walletAddress: walletAddressString | '';
+  walletAddress: walletAddressString | '' | string;
+  bankCardNumber: string | null;
+  bankCardAccountName: string | null;
+  bankCardExpiryDateMonth:
+    | 1
+    | 2
+    | 3
+    | 4
+    | 5
+    | 6
+    | 7
+    | 8
+    | 9
+    | 10
+    | 11
+    | 12
+    | null;
+  bankCardExpiryDateYear: number | null;
 };
 
 export type VendorTypeLiteral = 'restaurant' | 'shop';
@@ -594,6 +613,17 @@ export type RestaurantAcceptedStatusType =
   | 'pending'
   | 'partially fulfilled';
 
+export type TimePeriodEnumType = 
+  | 'past'
+  | 'upcoming'
+  | 'all';
+
+export type OrderAcceptedStatusType =
+  | RestaurantAcceptedStatusType
+  | 'out for delivery'
+  | 'collected'
+  | 'delivered';
+
 export type PaymentStatusType = 'paid' | 'unpaid' | 'failed';
 
 export type _OrderTypeHidden = {
@@ -611,6 +641,7 @@ export type _OrderTypeHidden = {
   fulfilmentSlotFrom: Date;
   fulfilmentSlotTo: Date;
   restaurantAcceptanceStatus: RestaurantAcceptedStatusType;
+  orderAcceptanceStatus: OrderAcceptedStatusType;
   deliveryName: string;
   deliveryEmail: string;
   deliveryPhoneNumber: string;
@@ -634,7 +665,7 @@ export type _OrderTypeHidden = {
   completedOrderFeedback: string;
   deliveryPunctuality: RatingType;
   orderCondition: RatingType;
-  discount: DiscountCodeType;
+  discount: DiscountType;
 };
 
 export type NotificationType = {
@@ -649,6 +680,17 @@ export type NotificationType = {
 };
 
 export type CurrencyStripeAllowedTypeLiteral = 'gbp';
+
+export type PaymentIntentMetaDataType = {
+  amount: number;
+  currrency: string;
+  walletAddress: string | null;
+  recipientWalletAddress: string | null;
+  senderWalletAddress: string | null;
+  orderId: number | null;
+  accountId: number | null;
+  webhookAddress: string;
+};
 
 export type SurveyType = {
   id: number;
@@ -684,6 +726,16 @@ export type OrderType = _OrderTypeHidden & {
   parentOrder?: OrderType;
   items: Array<OrderItemType>;
   unfulfilledItems: Array<OrderItemType>;
+};
+
+export type TransactionType = {
+  id: number;
+  timestamp: number;
+  currency: Currency;
+  amount: number;
+  receiver: AccountType;
+  payer: AccountType;
+  order: OrderType | null;
 };
 
 export const openingHoursToMoments = (

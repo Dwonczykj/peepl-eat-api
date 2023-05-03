@@ -1,4 +1,8 @@
-// declare var Order: any;
+import { SailsModelType, sailsVegi } from "../../../api/interfaces/iSails";
+import { OrderType } from "../../../scripts/utils";
+
+declare var Order: SailsModelType<OrderType>;
+declare var sails: sailsVegi;
 // declare var User: any;
 module.exports = {
 
@@ -10,7 +14,7 @@ module.exports = {
     acceptanceStatus: {
       type: 'string',
       description: 'The acceptance status of the order',
-      isIn: ['accepted', 'rejected', 'pending'],
+      isIn: ['accepted', 'rejected', 'pending', 'delivered', 'out for delivery', 'collected'],
     },
     timePeriod: {
       type: 'string',
@@ -31,51 +35,25 @@ module.exports = {
   },
 
   fn: async function (inputs, exits) {
-    let user = await User.findOne(this.req.session.userId);
     let orders;
 
-    let criteria = {
-      paidDateTime: {'>': 0},
-      restaurantAcceptanceStatus: undefined,
-      vendor: undefined,
-      fulfilmentSlotFrom: undefined,
-      fulfilmentSlotTo: undefined,
-      completedFlag: '',
-    };
-
-    // Sort by fulfilment time ascending
-    let sort = 'fulfilmentSlotFrom ASC';
-
-    if(!user.isSuperAdmin) {
-      criteria.vendor = user.vendor;
+    try {
+      orders = await sails.helpers.getOrders.with(inputs);
+    } catch (error) {
+      sails.log.error(error);
     }
-    if(inputs.acceptanceStatus) {
-      criteria.restaurantAcceptanceStatus = inputs.acceptanceStatus;
-    }
-    if(inputs.timePeriod === 'upcoming') {
-      criteria.fulfilmentSlotTo = {
-        '>=': new Date()
-      };
-    }
-    if(inputs.timePeriod === 'past') {
-      // Sort by fulfilment time descending
-      sort = 'fulfilmentSlotFrom DESC';
-      criteria.fulfilmentSlotTo = {
-        '<': new Date()
-      };
-    }
-
-    orders = await Order.find(criteria)
-    .sort(sort)
-    .populate('fulfilmentMethod&items.product&optionValues&optionValues.option&optionValue');
 
     // Respond with view or JSON.
     if(this.req.wantsJSON) {
-      return exits.successJSON(
-        {orders}
-      );
+      return exits.successJSON({
+        orders
+      });
     } else {
-      return exits.success({acceptanceStatus: inputs.acceptanceStatus, timePeriod: inputs.timePeriod, orders});
+      return exits.success({
+        acceptanceStatus: inputs.acceptanceStatus, 
+        timePeriod: inputs.timePeriod, 
+        orders
+      });
     }
 
   }

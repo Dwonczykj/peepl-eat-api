@@ -30,23 +30,29 @@ module.exports = {
   },
 
   fn: async function (inputs, exits) {
-    const newNotification = await Notification.create({
-      recipient: inputs.to,
-      type: 'sms',
-      sentAt: Date.now(),
-      title: inputs.body,
-      order: (inputs.data && inputs.data.orderId) || null,
-      metadata:
-        inputs.data && inputs.data.orderId
-          ? JSON.stringify({
-            model: 'order',
-            id: inputs.data.orderId,
-          })
-          : JSON.stringify({
-            model: '',
-            id: null,
-          }),
-    }).fetch();
+    var newNotification = false;
+    try {
+      newNotification = await Notification.create({
+        recipient: inputs.to,
+        type: 'sms',
+        sentAt: Date.now(),
+        title: inputs.body,
+        order: (inputs.data && inputs.data.orderId && Number.parseInt(inputs.data.orderId)) || null,
+        metadata:
+          inputs.data && inputs.data.orderId
+            ? JSON.stringify({
+              model: 'order',
+              id: inputs.data.orderId,
+            })
+            : JSON.stringify({
+              model: '',
+              id: null,
+            }),
+      }).fetch();
+    } catch (error) {
+      sails.log.error(error);
+      sails.log.error(`Error whilst creating Notification object in send-sms-notification handler`);
+    }
 
     var dontActuallySend =
       sails.config.environment === 'test' ||
@@ -99,7 +105,9 @@ module.exports = {
       sails.log.warn('SMS Helper has no client libraries with secrets configured to send SMS messages');
     }
 
-    return exits.success({notification: newNotification});
+    return exits.success({
+      notification: newNotification
+    });
   },
 };
 

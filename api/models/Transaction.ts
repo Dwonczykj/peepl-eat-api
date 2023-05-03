@@ -1,54 +1,33 @@
 /**
- * Account.ts
+ * transaction.ts
  *
  * @description :: A model definition represents a database table/collection.
  * @docs        :: https://sailsjs.com/docs/concepts/models-and-orm/models
  */
 
-import { AccountType, SailsModelDefnType } from '../../scripts/utils';
 
-let _exports: SailsModelDefnType<AccountType> = {
+import {
+  SailsModelDefnType,
+  TransactionType,
+} from '../../scripts/utils';
+
+let _exports: SailsModelDefnType<TransactionType> = {
   attributes: {
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
     //  ╩  ╩╚═╩╩ ╩╩ ╩ ╩ ╚╝ ╚═╝╚═╝
 
-    accountType: {
-      type: 'string',
-      required: false,
-      isIn: ['ethereum', 'bank'],
-      allowNull: true,
+    timestamp: {
+      type: 'number',
+      required: true,
     },
-    walletAddress: {
+    amount: {
+      type: 'number',
+      required: true,
+    },
+    currency: {
       type: 'string',
       required: true,
-      regex: /^0x[a-fA-F0-9]{40}$|^$/,
-    },
-    verified: {
-      type: 'boolean',
-      required: false,
-      defaultsTo: false,
-    },
-    bankCardAccountName: {
-      type: 'string',
-      required: false,
-      allowNull: true,
-    },
-    bankCardNumber: {
-      type: 'string',
-      required: false,
-      regex: /^[0-9]{4}[-\s]?[0-9]{4}[-\s]?[0-9]{4}[-\s]?[0-9]{4}$|^$/,
-      allowNull: true,
-    },
-    bankCardExpiryDateMonth: {
-      type: 'number',
-      required: false,
-      allowNull: true,
-    },
-    bankCardExpiryDateYear: {
-      type: 'number',
-      required: false,
-      allowNull: true,
     },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
@@ -58,6 +37,17 @@ let _exports: SailsModelDefnType<AccountType> = {
     //  ╔═╗╔═╗╔═╗╔═╗╔═╗╦╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
     //  ╠═╣╚═╗╚═╗║ ║║  ║╠═╣ ║ ║║ ║║║║╚═╗
     //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
+    receiver: {
+      model: 'account',
+      required: true,
+    },
+    payer: {
+      model: 'account',
+      required: true,
+    },
+    order: {
+      model: 'order',
+    },
   },
 };
 

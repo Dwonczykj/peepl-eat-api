@@ -5,12 +5,13 @@ import {
   SailsActionDefnType,
 } from '../../../scripts/utils';
 import Stripe from 'stripe';
-import { sailsVegi } from 'api/interfaces/iSails';
+import { sailsVegi } from '../../../api/interfaces/iSails';
+import { CreatePaymentIntentInternalInputs } from '../../../api/helpers/create-payment-intent-internal';
 
 declare var sails: sailsVegi;
 
 
-export type CreateStripePaymentAttemptInputs = {
+export type CreateStripePaymentAttemptInputs = CreatePaymentIntentInternalInputs /*{
   amount: number; // amount in pence
   currency: CurrencyStripeAllowedTypeLiteral;
   // customerPayToStripeAccountId: string; not needed to set up the payment intent
@@ -18,7 +19,7 @@ export type CreateStripePaymentAttemptInputs = {
   vendorDisplayName?:  string | null | undefined;
   recipientWalletAddress?: string | null | undefined;
   webhookAddress?: string | null | undefined;
-};
+};*/
 
 export type CreateStripePaymentAttemptResponse =
   | {
@@ -59,6 +60,11 @@ const _exports: SailsActionDefnType<
       type: 'string',
       required: false,
     },
+    webhookAddress: {
+      type: 'string',
+      required: false,
+      defaultsTo: '',
+    },
     vendorDisplayName: {
       type: 'string',
       required: false,
@@ -67,10 +73,17 @@ const _exports: SailsActionDefnType<
       type: 'string',
       required: false,
     },
-    webhookAddress: {
+    senderWalletAddress: {
       type: 'string',
       required: false,
-      defaultsTo: '',
+    },
+    orderId: {
+      type: 'number',
+      required: true,
+    },
+    accountId: {
+      type: 'number',
+      required: true,
     },
   },
 

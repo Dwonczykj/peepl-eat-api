@@ -136,10 +136,13 @@
       "name": "Cancel delivery"
     },
     {
+      "name": "Ongoing Orders by Wallet"
+    },
+    {
       "name": "Create order"
     },
     {
-      "name": "Get order status"
+      "name": "GetOrderStatus"
     },
     {
       "name": "Peepl pay webhook"
@@ -152,9 +155,6 @@
     },
     {
       "name": "Get order details"
-    },
-    {
-      "name": "Ongoing Orders by Wallet"
     },
     {
       "name": "Logged in"
@@ -379,6 +379,14 @@
             "uniqueItems": true,
             "description": "Note Sails special attributes: autoIncrement"
           },
+          "accountType": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "ethereum",
+              "bank"
+            ]
+          },
           "walletAddress": {
             "type": "string",
             "pattern": "^0x[a-fA-F0-9]{40}$|^$"
@@ -386,6 +394,25 @@
           "verified": {
             "type": "boolean",
             "default": false
+          },
+          "bankCardAccountName": {
+            "type": "string",
+            "nullable": true
+          },
+          "bankCardNumber": {
+            "type": "string",
+            "pattern": "^[0-9]{4}[-\\s]?[0-9]{4}[-\\s]?[0-9]{4}[-\\s]?[0-9]{4}$|^$",
+            "nullable": true
+          },
+          "bankCardExpiryDateMonth": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "bankCardExpiryDateYear": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
           }
         }
       },
@@ -1331,6 +1358,11 @@
           "paymentIntentId": {
             "type": "string"
           },
+          "firebaseRegistrationToken": {
+            "type": "string",
+            "nullable": true,
+            "description": "Used to send notificaitons to devices that are registered to this order"
+          },
           "deliveryId": {
             "type": "string",
             "description": "The ID to identify the delivery in the logistics system"
@@ -1370,6 +1402,20 @@
               "accepted",
               "rejected",
               "partially fulfilled"
+            ],
+            "example": "pending"
+          },
+          "orderAcceptanceStatus": {
+            "type": "string",
+            "default": "pending",
+            "enum": [
+              "pending",
+              "accepted",
+              "rejected",
+              "partially fulfilled",
+              "out for delivery",
+              "delivered",
+              "collected"
             ],
             "example": "pending"
           },
@@ -2255,6 +2301,78 @@
           }
         }
       },
+      "transaction": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/transaction-without-required-constraint"
+          },
+          {
+            "required": [
+              "timestamp",
+              "amount",
+              "currency",
+              "receiver",
+              "payer"
+            ]
+          }
+        ]
+      },
+      "transaction-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **Transaction**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "timestamp": {
+            "type": "number",
+            "format": "double"
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "receiver": {
+            "description": "JSON dictionary representing the **account** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/account"
+              }
+            ]
+          },
+          "payer": {
+            "description": "JSON dictionary representing the **account** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/account"
+              }
+            ]
+          },
+          "order": {
+            "description": "JSON dictionary representing the **order** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/order"
+              }
+            ]
+          }
+        }
+      },
       "user": {
         "type": "object",
         "allOf": [
@@ -2292,8 +2410,7 @@
           "email": {
             "type": "string",
             "format": "email",
-            "default": "",
-            "uniqueItems": true
+            "default": ""
           },
           "phoneNoCountry": {
             "type": "number",
@@ -3314,7 +3431,10 @@
               "enum": [
                 "accepted",
                 "rejected",
-                "pending"
+                "pending",
+                "delivered",
+                "out for delivery",
+                "collected"
               ]
             },
             "description": "The acceptance status of the order"
@@ -3774,6 +3894,15 @@
           },
           {
             "in": "query",
+            "name": "webhookAddress",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          },
+          {
+            "in": "query",
             "name": "vendorDisplayName",
             "required": false,
             "schema": {
@@ -3790,11 +3919,28 @@
           },
           {
             "in": "query",
-            "name": "webhookAddress",
+            "name": "senderWalletAddress",
             "required": false,
             "schema": {
-              "type": "string",
-              "default": ""
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "orderId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "accountId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
             }
           }
         ],
@@ -4471,6 +4617,36 @@
         }
       }
     },
+    "/api/v1/orders/ongoing-orders-by-wallet": {
+      "get": {
+        "summary": "Ongoing Orders by Wallet",
+        "description": "Fetch all ongoing orders from a wallet address",
+        "tags": [
+          "Ongoing Orders by Wallet"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "walletAddress",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
     "/api/v1/orders/create-order": {
       "post": {
         "summary": "Create order",
@@ -4492,6 +4668,15 @@
             "required": true,
             "schema": {},
             "description": "The user's address."
+          },
+          {
+            "in": "query",
+            "name": "firebaseRegistrationToken",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "token used for firebase notifications"
           },
           {
             "in": "query",
@@ -4643,9 +4828,9 @@
     },
     "/api/v1/orders/get-order-status": {
       "get": {
-        "summary": "Get order status",
+        "summary": "GetOrderStatus",
         "tags": [
-          "Get order status"
+          "GetOrderStatus"
         ],
         "parameters": [
           {
@@ -4664,13 +4849,16 @@
             "description": "Success"
           },
           "400": {
-            "description": "Not found"
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
           },
           "404": {
-            "description": "Resource not found"
+            "description": "Not found"
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Server error"
           }
         }
       }
@@ -4823,36 +5011,6 @@
           },
           "500": {
             "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/api/v1/orders/ongoing-orders-by-wallet": {
-      "get": {
-        "summary": "Ongoing Orders by Wallet",
-        "description": "Fetch all ongoing orders from a wallet address",
-        "tags": [
-          "Ongoing Orders by Wallet"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "walletAddress",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "500": {
-            "description": "Server error"
           }
         }
       }
@@ -5605,6 +5763,15 @@
           },
           {
             "in": "query",
+            "name": "webhookAddress",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          },
+          {
+            "in": "query",
             "name": "vendorDisplayName",
             "required": false,
             "schema": {
@@ -5621,11 +5788,28 @@
           },
           {
             "in": "query",
-            "name": "webhookAddress",
+            "name": "senderWalletAddress",
             "required": false,
             "schema": {
-              "type": "string",
-              "default": ""
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "orderId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "accountId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
             }
           }
         ],

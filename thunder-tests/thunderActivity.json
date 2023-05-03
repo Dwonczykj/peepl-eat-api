@@ -1,0 +1,21 @@
+[
+  {
+    "_id": "6550b89b-e6db-4d7f-943b-6dacf6eca384",
+    "colId": "history",
+    "containerId": "",
+    "name": "localhost:1337/admin/orders",
+    "url": "localhost:1337/admin/orders",
+    "method": "GET",
+    "sortNum": 0,
+    "created": "2023-05-02T10:55:20.600Z",
+    "modified": "2023-05-03T13:39:47.303Z",
+    "headers": [
+      {
+        "name": "Cookie",
+        "value": "_pk_id.2.1fff=3ced6b32ee0f9fb4.1664464999.; remember_token=1|60dec60c9fe355e3c61fcfef88b4391b5013f7cfdd853b1ad9ffcaaffe8de02c919aaeff33821e6ed97b2fef3a5eaeece415f560d749c84b850870ca0cab7f7f; session=.eJwljktuwzAMRK8iaB0UJGVRUk7RfREY-pCxUTcuLGcV5O4V0NXMkIOHedlZt9wX6fb69bLmHGJ_pPd8F3uxn5vkLmbb72Z9mHM3udbxNOeydvM7Oh_29r5dBuSQvtjreTxlpLXZq6XqtQoABxedauCkpITeU8nSGBv5KMNMTB5VOeSIMPieYsu5BiwuUYQ0NcDgWAt6buJqZg0Aor6KJh7YQkkKOpIsjoeH7FliGfPnZ5fjfw2OWPuh87l_y2McFFLgKTVQnNQFglK8Y8QqCQEBCJ1Qosm-_wA-H1WM.ZDerzg.R0PqS57KWTZb_ZubnEoYyNt-vKM; sails.sid=s:J9zm449UT3SLeiEiSe9hEBXdus7_q0y4.9Ha0Qp17lTZzhOxSK4LJPHfQxIvi5aPP2u1huBxjB6w"
+      }
+    ],
+    "params": [],
+    "tests": []
+  }
+]

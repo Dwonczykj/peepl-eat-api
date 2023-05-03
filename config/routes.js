@@ -71,6 +71,9 @@ module.exports.routes = {
 
   // ORDERS
   'GET /api/v1/orders': { action: 'orders/view-my-orders' },
+  'GET /api/v1/orders/ongoing-orders-by-wallet': {
+    action: 'orders/ongoing-orders-by-wallet',
+  },
   'POST /api/v1/orders/create-order': { action: 'orders/create-order' },
   'GET /api/v1/orders/get-order-status': { action: 'orders/get-order-status' },
   'POST /api/v1/orders/peepl-pay-webhook': {
@@ -84,9 +87,6 @@ module.exports.routes = {
   },
   'GET /api/v1/orders/get-order-details': {
     action: 'orders/get-order-details',
-  },
-  'GET /api/v1/orders/ongoing-orders-by-wallet': {
-    action: 'orders/ongoing-orders-by-wallet',
   },
 
   // ADMIN

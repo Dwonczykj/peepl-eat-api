@@ -28,6 +28,11 @@ module.exports = {
       description: "The user's address.",
       required: true,
     },
+    firebaseRegistrationToken: {
+      type: 'string',
+      description: 'token used for firebase notifications',
+      required: false,
+    },
     total: {
       type: 'number',
       description: 'The total order value, including shipping.',

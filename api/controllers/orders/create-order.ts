@@ -1,13 +1,14 @@
 import _ from 'lodash';
-import { OrderItemOptionValueType, OrderItemType, OrderType } from '../../../scripts/utils';
+import { AccountType, OrderItemOptionValueType, OrderItemType, OrderType } from '../../../scripts/utils';
 import util from 'util';
-import { SailsModelType, sailsVegi } from '../../../api/interfaces/iSails';
+import { SailsModelType, sailsModelKVP, sailsVegi } from '../../../api/interfaces/iSails';
 import { CreatePaymentIntentInternalResult } from '../../../api/helpers/create-payment-intent-internal';
 
 declare var sails: sailsVegi;
 declare var OrderItemOptionValue: SailsModelType<OrderItemOptionValueType>;
 declare var OrderItem: SailsModelType<OrderItemType>;
 declare var Order: SailsModelType<OrderType>;
+declare var Account: SailsModelType<AccountType>;
 
 export const cleanPersonalDetails = <T extends {
   email?: string;
@@ -60,9 +61,10 @@ export type ValidateOrderResult = {
 };
 
 
-export type CreateOrderSuccess = {
+export type CreateOrderResult = {
   orderId: number;
   paymentIntentID: string;
+  orderCreationStatus: string;
 }
 
 module.exports = {
@@ -170,7 +172,7 @@ module.exports = {
   fn: async function (
     inputs: CreateOrderInputs,
     exits: {
-      success: (unusedResult: CreateOrderSuccess) => CreateOrderSuccess;
+      success: (unusedResult: CreateOrderResult) => CreateOrderResult;
       invalidSlot: (unusedArg?: string | Error) => void;
       deliveryPartnerUnavailable: (unusedErr: Error) => void;
       allItemsUnavailable: (unusedArg?: string | Error) => void;
@@ -285,7 +287,7 @@ module.exports = {
     }
 
     // ! Merchant fulfilment check done by merchant after receiveing the SMS and they click the link /orders/peepl-pay-webhook which itself is a callback from /helpers/create-payment-intent
-
+    let result: CreateOrderResult;
     try {
       const datastore = sails.getDatastore();
 
@@ -428,7 +430,7 @@ module.exports = {
             sails.log.warn(
               `New Order #${order.id} has a ${calculatedOrderTotal.withoutFees} subtotal with a total of ${calculatedOrderTotal.finalAmount}`
             );
-            exits.error(`Could not calculate subtotal for order.`);
+            // exits.error(`Could not calculate subtotal for order.`);
             return {
               orderId: null,
               paymentIntentID: null,
@@ -448,81 +450,21 @@ module.exports = {
         // Return error if vendor minimum order value not met
         if (calculatedOrderTotal.withoutFees < vendor.minimumOrderAmount) {
           sails.log.info('Vendor minimum order value not met');
-          exits.minimumOrderAmount('Vendor minimum order value not met');
+          // exits.minimumOrderAmount('Vendor minimum order value not met');
           return {
             orderId: null,
             paymentIntentID: null,
             orderCreationStatus: 'failed',
           };
         }
-
-        // Create PaymentIntent on Peepl Pay
-        let failureReason;
-        try {
-          const _newPaymentIntent = await sails.helpers.createPaymentIntentInternal
-            .with({
-              amount: calculatedOrderTotal.finalAmount,
-              currency: 'gbp',
-              recipientWalletAddress: vendor.walletAddress,
-              vendorDisplayName: vendor.name,
-              webhookAddress: sails.config.custom.peeplWebhookAddress,
-              customerId: '', // TODO: Add StripeCustomerIds to users and then add them here....
-            });
-          newPaymentIntent = _newPaymentIntent;
-        } catch (error) {
-          failureReason = `${error}`;
-          sails.log.error(`Failed to create payment intent on helper "createPaymentIntentInternal" with reason: "${failureReason}"`);
-        }
-          // .catch((reason) => {
-          //   failureReason = reason;
-          //   sails.log.error(`Failed to create payment intent on helper "createPaymentIntentInternal" with reason: "${failureReason}"`);
-          // });
-        // newPaymentIntent = await sails.helpers
-        //   .createPaymentIntent.with({
-        //     paymentAmount: calculatedOrderTotal.finalAmount,
-        //     currency: 'gbp',
-        //     recipientWalletAddress: vendor.walletAddress,
-        //     recipientName: vendor.name,
-        //     headers: this.req.headers,
-        //   })
-        //   .catch((reason) => {
-        //     failureReason = reason;
-        //     return {
-        //       orderId: null,
-        //       paymentIntentID: null,
-        //       orderCreationStatus: 'failed',
-        //     };
-        //   });
-        if (failureReason){
-          sails.log.error(new Error(`Error creating payment intent: "${failureReason}"`));
-          return {
-            orderId: null,
-            paymentIntentID: null,
-            orderCreationStatus: 'failed',
-          };
-        }
-
-        if (!newPaymentIntent) {
-          sails.log.error(new Error('Error creating payment intent'));
-          return {
-            orderId: null,
-            paymentIntentID: null,
-            orderCreationStatus: 'failed'
-          };
-        }
-        const paymentIntentId = newPaymentIntent.paymentIntent.id;
-        // Update order with payment intent
-        await wrapWithDb(db, () =>
-          Order.updateOne(order.id).set({
-            paymentIntentId: paymentIntentId,
-          })
-        );
 
         // All done.
         return {
           orderId: order.id,
-          paymentIntentID: paymentIntentId,
+          // paymentIntentID: paymentIntentId,
+          paymentIntentID: null,
           orderCreationStatus: 'confirmed',
+          calculatedOrderTotal: calculatedOrderTotal,
         };
       };
 
@@ -545,9 +487,9 @@ module.exports = {
       //     );
       //   }
       // };
-
+      let result; //todo: or just move account find before the transaction...
       if (datastore.config.adapter === 'sails-disk') {
-        const result = await createOrderTransactionDB(null);
+        result = await createOrderTransactionDB(null);
         if(process.env.NODE_ENV && ! process.env.NODE_ENV.toLowerCase().startsWith('prod')){
           sails.log('USING sails-disk');
           sails.log(
@@ -556,12 +498,7 @@ module.exports = {
             })}`
           );
         }
-        if (result) {
-          // await sendSMSOrder(result);
-          return exits.success(result);
-        }
       } else {
-        let result;
         await sails
           .getDatastore()
           .transaction(async (db) => {
@@ -574,9 +511,77 @@ module.exports = {
         if(process.env.NODE_ENV && ! process.env.NODE_ENV.toLowerCase().startsWith('prod')){
           sails.log(`create-order -> order created -> ${util.inspect(result, { depth: 0 })}`);
         }
-        // await sendSMSOrder(result);
-        return exits.success(result);
       }
+
+      // Create PaymentIntent on Peepl Pay
+      let account: sailsModelKVP<AccountType> | null = null;
+      try {
+        const accounts = await Account.find({
+          walletAddress: inputs.walletAddress,
+        });
+        if(accounts.length < 1){
+          sails.log.error(`Unable to locate account for wallet address used to create-order of "${inputs.walletAddress}"`);
+        } else {
+          account = accounts[0];
+        }
+      } catch (error) {
+        sails.log.error(`Unable to locate account for wallet address used to create-order of "${inputs.walletAddress}": ${error}`);
+      }
+
+      let failureReason;
+      try {
+        const _newPaymentIntent = await sails.helpers.createPaymentIntentInternal
+          .with({
+            amount: result.calculatedOrderTotal.finalAmount,
+            currency: 'gbp',
+            recipientWalletAddress: vendor.walletAddress,
+            vendorDisplayName: vendor.name,
+            webhookAddress: sails.config.custom.peeplWebhookAddress,
+            customerId: '', // TODO: Add StripeCustomerIds to users and then add them here....
+            senderWalletAddress: inputs.walletAddress,
+            accountId: account && account.id,
+            orderId: order.id,
+          });
+        newPaymentIntent = _newPaymentIntent;
+      } catch (error) {
+        failureReason = `${error}`;
+        sails.log.error(`Failed to create payment intent on helper "createPaymentIntentInternal" with reason: "${failureReason}"`);
+      }
+        
+      
+      if (failureReason){
+        sails.log.error(new Error(`Error creating payment intent: "${failureReason}"`));
+        return exits.success({
+          orderId: null,
+          paymentIntentID: null,
+          orderCreationStatus: 'failed',
+        });
+      }
+
+      if (!newPaymentIntent) {
+        sails.log.error(new Error('Error creating payment intent'));
+        return exits.success({
+          orderId: null,
+          paymentIntentID: null,
+          orderCreationStatus: 'failed'
+        });
+      }
+      const paymentIntentId = newPaymentIntent.paymentIntent.id;
+      sails.log(`Update order [${order.id}] with paymentIntentId: ${paymentIntentId}`);
+      
+      try {
+        await Order.updateOne(order.id).set({
+          paymentIntentId: paymentIntentId,
+        });
+      } catch (error) {
+        sails.log.error(error);
+      }
+      
+      return exits.success({
+        orderId: result.orderId,
+        paymentIntentID: paymentIntentId,
+        orderCreationStatus: result.orderCreationStatus,
+      });
     } catch (error) {
       sails.log.error(error);
       try {
@@ -585,7 +590,7 @@ module.exports = {
           body: `We're sorry but your order has been declined by the merchant 😔
 For help please contact help@vegiapp.co.uk`,
           data: {
-            orderId: 'NULL',
+            orderId: null,
           },
         });
       } catch (error) {
@@ -595,5 +600,6 @@ For help please contact help@vegiapp.co.uk`,
       }
       return exits.error(new Error('Error creating Order in DB'));
     }
+    return exits.success(result);
   },
 };

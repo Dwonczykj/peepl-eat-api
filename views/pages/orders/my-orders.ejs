@@ -5,7 +5,7 @@
       <div v-for="order in orders" class="my-3 p-3 bg-white rounded">
         <p class="text-muted m-0">Order #{{order.id}}</p>
         <div v-for="item in order.items">
-          <h2 class="h5 border-top pt-3 mt-3 mb-0">{{item.product.name}}</h2>
+          <h2 class="h5 border-top pt-3 mt-3 mb-0">{{item.product ? item.product.name : 'NA'}}</h2>
             <ol class="order-confirmation__option-values" v-if="item.optionValues && item.optionValues.length">
                 <li v-for="optionValue in item.optionValues">{{optionValue.name}}</li>
             </ol>

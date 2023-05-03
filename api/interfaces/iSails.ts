@@ -22,6 +22,10 @@ import { GetProductRatingInputs, GetProductRatingResult } from "../helpers/get-p
 import { SelectVendorProductsInputs, SelectVendorProductsResult } from "../../api/helpers/select-vendor-products";
 import { ParseBarcodesUploadInputs, ParseBarcodesUploadResult } from "../../api/helpers/parse-barcodes-upload";
 import { CreatePaymentIntentInternalInputs, CreatePaymentIntentInternalResult } from "../../api/helpers/create-payment-intent-internal";
+import { TransactionsForAccountInputs, TransactionsForAccountResult } from "../../api/helpers/transactions-for-account";
+import { GetOrdersInputs, GetOrdersResult } from "../../api/helpers/get-orders";
+import { RefreshStripeTransactionsInputs, RefreshStripeTransactionsResult } from "../../api/helpers/refresh-stripe-transactions";
+import { RefreshFuseTransactionsInputs, RefreshFuseTransactionsResult } from "../../api/helpers/refresh-fuse-transactions";
 
 export type SailsActionInput =
   | {
@@ -239,15 +243,16 @@ export type sailsModelKVP<T> = ({
 //     populate: (unusedArg: string) => Promise<T | null>;
 //   };
 
-type SailsFindPopulateType<T> = Promise<sailsModelKVP<T>[] | null> & {
-  populate: (unusedArg: keyof T | string) => Promise<T[] | null>;
-};
 type SailsQueryType<T> = Promise<T | null>;
 
 type _populateStr = `${string}.${string}`;
 
 type _populated<T> = Promise<T | null> & {
-  populate: <S extends string>(unusedArg: S) => S extends _populateStr ? Promise<T | null> : Promise<T | null> & _populated<T>; // * This can be chained to populate multiple collections if non-deep population.
+  populate: <S extends string>(unusedArg: S) => Promise<T | null> & _populated<T>; // * This can be chained to populate multiple collections if non-deep population.
+};
+type SailsFindPopulateType<T> = Promise<sailsModelKVP<T>[] | null> & {
+  populate: (unusedArg: keyof T | string) => Promise<T[] | null> & _populated<T[]>;
+  sort: (unusedArg: string) => SailsFindPopulateType<T>;
 };
 type SailsFindOnePopulateType<T> = Promise<sailsModelKVP<T> | null> & {
   populate: (unusedArg: string) => Promise<T | null> & _populated<T>; // * This can be chained to populate multiple collections.
@@ -486,6 +491,10 @@ export type sailsVegi = {
       DistanceHaversineInputs,
       DistanceHaversineResult
     >;
+    getOrders: _helperFunction<
+      GetOrdersInputs,
+      GetOrdersResult
+    >;
     distanceViaBearing: _helperFunction<
       DistanceViaBearingInputs,
       DistanceViaBearingResult
@@ -611,7 +620,12 @@ export type sailsVegi = {
       unusedOrunusedArg: EditProductCategoriesInput
     ) => Promise<Array<sailsModelKVP<ProductCategoryType> | null>>);
 
-    createPaymentIntent: _helperFunction<
+    transactionsForAccount: _helperFunction<TransactionsForAccountInputs, TransactionsForAccountResult>;
+
+    refreshFuseTransactions: _helperFunction<RefreshFuseTransactionsInputs, RefreshFuseTransactionsResult>;
+    refreshStripeTransactions: _helperFunction<RefreshStripeTransactionsInputs, RefreshStripeTransactionsResult>;
+
+    createPeeplPaymentIntent: _helperFunction<
       {
         paymentAmount: number,
         currency: string,
