@@ -33,7 +33,7 @@ module.exports = {
     });
 
     if (existingPostalDistrict && existingPostalDistrict.length > 0) {
-      exits.postalDistrictAlreadyExists();
+      return exits.postalDistrictAlreadyExists();
     }
 
     var postalDistrict = await PostalDistrict.create({

@@ -4761,7 +4761,7 @@
         ],
         "responses": {
           "200": {
-            "description": "The requested resource"
+            "description": "Success"
           },
           "400": {
             "description": "Success",
@@ -4784,15 +4784,14 @@
                     {
                       "type": "string",
                       "description": "Bad request"
-                    },
-                    {
-                      "type": "string",
-                      "description": "Server error"
                     }
                   ]
                 }
               }
             }
+          },
+          "403": {
+            "description": "Success"
           },
           "404": {
             "description": "Not found"
@@ -4821,7 +4820,7 @@
             }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Server error"
           }
         }
       }

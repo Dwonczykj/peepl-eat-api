@@ -4,12 +4,17 @@ declare var Cloud: any;
 const util = require("util");
 declare var _:any;
 
-export type UpdateItemsForOrderSuccess = { data: {
-        validRequest: boolean;
-        calculatedOrderTotal: number;
-        orderId: number;
-        paymentIntentID: string;
-      } | {validRequest:false}};
+export type UpdateItemsForOrderSuccess = { 
+  data: {
+    validRequest: boolean;
+    calculatedOrderTotal: number;
+    orderId: number;
+    paymentIntentID: string;
+  } | {
+    validRequest:false,
+    error:Error|string,
+  }
+};
 
 module.exports = {
   friendlyName: "Update items for order",
@@ -187,7 +192,7 @@ module.exports = {
     ];
 
     if (!arraysEqual(orderIds, partialFulfilCheckItems)) {
-      return exits.success({ data: { validRequest: false } });
+      return exits.success({ data: { validRequest: false, error: 'Expected orderIds not equal to the partialFulfilCheckItems in update-items-for-order helper' } });
     }
 
     // Create the copy of the order object now before removing items on th new order
@@ -284,10 +289,14 @@ module.exports = {
           calculatedOrderTotal.withoutFees <
           originalOrder.vendor.minimumOrderAmount
         ) {
-          exits.minimumOrderAmount(
-            "Vendor minimum order value not met on partially fulfilled updated order"
-          );
-          return;
+          let x: UpdateItemsForOrderSuccess = {
+            data: {
+              validRequest: false,
+              error:
+                'Vendor minimum order value not met on partially fulfilled updated order',
+            },
+          };
+          return x;
         }
 
         await wrapWithDb(db, () =>
@@ -304,20 +313,22 @@ module.exports = {
         //   }).set({ unfulfilled: true, unfulfilledOnOrderId: originalOrder.id })
         // ).fetch();
 
-        return {
-          validRequest: true,
-          calculatedOrderTotal: calculatedOrderTotal.finalAmount,
-          orderId: newOrder.id,
-          paymentIntentID: newOrder.paymentIntentId,
+        let x: UpdateItemsForOrderSuccess = {
+          data: {
+            validRequest: true,
+            calculatedOrderTotal: calculatedOrderTotal.finalAmount,
+            orderId: newOrder.id,
+            paymentIntentID: newOrder.paymentIntentId,
+          }
         };
+
+        return x;
       };
 
       if (datastore.config.adapter === "sails-disk") {
         const result = await createOrderTransactionDB(null);
         if (result) {
-          return exits.success({
-            data: result,
-          });
+          return exits.success(result);
         }
       } else {
         const result = await sails
@@ -327,7 +338,12 @@ module.exports = {
           })
           .intercept((issues) => {
             sails.log(issues);
-            return exits.error(new Error("Error creating Order in DB"));
+            return exits.success({
+              data: {
+                validRequest: false,
+                error: new Error("Error creating Order in DB")
+              }
+            });
           });
         return exits.success({
           data: result,

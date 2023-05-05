@@ -1,8 +1,19 @@
 import _ from 'lodash';
-import { AccountType, OrderItemOptionValueType, OrderItemType, OrderType } from '../../../scripts/utils';
 import util from 'util';
-import { SailsModelType, sailsModelKVP, sailsVegi } from '../../../api/interfaces/iSails';
-import { CreatePaymentIntentInternalResult } from '../../../api/helpers/create-payment-intent-internal';
+
+import { CreatePaymentIntentInternalResult } from '../../helpers/create-payment-intent-internal';
+import {
+  sailsModelKVP,
+  SailsModelType,
+  sailsVegi,
+} from '../../interfaces/iSails';
+import {
+  SailsActionDefnType,
+  OrderType,
+  OrderItemType,
+  AccountType,
+  OrderItemOptionValueType
+} from '../../../scripts/utils';
 
 declare var sails: sailsVegi;
 declare var OrderItemOptionValue: SailsModelType<OrderItemOptionValueType>;
@@ -22,6 +33,7 @@ export const cleanPersonalDetails = <T extends {
     phoneNumber: details.phoneNumber && details.phoneNumber.trim(),
   };
 };
+
 
 export type CreateOrderInputs = {
   items: Array<{
@@ -61,13 +73,34 @@ export type ValidateOrderResult = {
 };
 
 
-export type CreateOrderResult = {
+type CreateOrderResult = {
   orderId: number;
   paymentIntentID: string;
-  orderCreationStatus: string;
+  orderCreationStatus: 'confirmed' | 'failed';
+  order: OrderType | null;
 }
 
-module.exports = {
+export type CreateOrderResponse = CreateOrderResult | false;
+
+export type CreateOrderExits = {
+  success: (unusedData: CreateOrderResponse) => any;
+  issue: (unusedErr: Error | String) => void;
+  notFound: () => void;
+  error: (unusedErr: Error | String) => void;
+  badRequest: (unusedErr: Error | String) => void;
+  invalidSlot: (unusedErr: Error | String) => void;
+  deliveryPartnerUnavailable: (unusedErr: Error | String) => void;
+  allItemsUnavailable: (unusedErr: Error | String) => void;
+  minimumOrderAmount: (unusedErr: Error | String) => void;
+  noItemsFound: (unusedErr: Error | String) => void;
+  badItemsRequest: (unusedErr: Error | String) => void;
+};
+
+const _exports: SailsActionDefnType<
+  CreateOrderInputs,
+  CreateOrderResponse,
+  CreateOrderExits
+> = {
   friendlyName: 'Create order',
 
   description: 'This action is responsible for the creation of new orders.',
@@ -150,7 +183,6 @@ module.exports = {
     },
     noItemsFound: {
       statusCode: 400,
-      responseType: 'noItemsFound',
     },
     badItemsRequest: {
       responseType: 'badRequest',
@@ -164,31 +196,25 @@ module.exports = {
       responseType: 'badRequest',
       statusCode: 400,
     },
+    success: {
+      data: false,
+    },
+    issue: {
+      statusCode: 403,
+    },
     error: {
-      statusCode: 400,
+      statusCode: 500,
     },
   },
 
-  fn: async function (
-    inputs: CreateOrderInputs,
-    exits: {
-      success: (unusedResult: CreateOrderResult) => CreateOrderResult;
-      invalidSlot: (unusedArg?: string | Error) => void;
-      deliveryPartnerUnavailable: (unusedErr: Error) => void;
-      allItemsUnavailable: (unusedArg?: string | Error) => void;
-      minimumOrderAmount: (unusedArg?: string | Error) => void;
-      noItemsFound: (unusedArg?: string | Error) => void;
-      badItemsRequest: (unusedArg?: string | Error) => void;
-      notFound: (unusedArg?: string | Error) => void;
-      badRequest: (unusedArg?: string | Error) => void;
-      error: (unusedArg?: string | Error) => void;
-    }
-  ) {
+  fn: async function (inputs: CreateOrderInputs, exits: CreateOrderExits) {
     try {
       const cleanAddress = cleanPersonalDetails(inputs.address);
       inputs.address = cleanAddress;
-      const validateOrderResult = await sails.helpers.validateOrder.with(inputs);
-      if(validateOrderResult.orderIsValid){
+      const validateOrderResult = await sails.helpers.validateOrder.with(
+        inputs
+      );
+      if (validateOrderResult.orderIsValid) {
         inputs = validateOrderResult.orderInputs;
       } else {
         return exits.badRequest(`Order invalid`);
@@ -224,7 +250,7 @@ module.exports = {
         fulfilmentMethod.deliveryPartner.id !== vendor.deliveryPartner.id
       ) {
         return exits.badRequest(
-          'DeliveryPartner of the fulfilment method did not match vendor\'s CHOSEN DeliveryPartner. No other DP should be used.'
+          "DeliveryPartner of the fulfilment method did not match vendor's CHOSEN DeliveryPartner. No other DP should be used."
         );
       }
       // ! Ignore as we want to allow a deliverypartner from the pool to service this request.
@@ -313,14 +339,14 @@ module.exports = {
           var orderItemOptionValues = [];
           for (var option in inputs.items[item].options) {
             // options is a dictionary of <string, int> where the int is the selectedProductOptions.id
-            if (Object.keys(inputs.items[item]).includes('quantity')){
+            if (Object.keys(inputs.items[item]).includes('quantity')) {
               orderItemOptionValues.push(
                 ...Array(inputs.items[item].quantity).fill({
                   option: option,
                   optionValue: inputs.items[item].options[option],
                 })
               );
-            }else{
+            } else {
               orderItemOptionValues.push({
                 option: option,
                 optionValue: inputs.items[item].options[option],
@@ -330,9 +356,7 @@ module.exports = {
           var newOrderItemOptionValues = [];
           try {
             const dbPromises = orderItemOptionValues.map((o) =>
-              wrapWithDb(db, () =>
-                OrderItemOptionValue.create(o)
-              ).fetch()
+              wrapWithDb(db, () => OrderItemOptionValue.create(o)).fetch()
             );
             newOrderItemOptionValues = await Promise.all(dbPromises);
           } catch (err) {
@@ -368,7 +392,9 @@ module.exports = {
               deliveryAddressLineTwo: inputs.address.lineTwo,
               deliveryAddressCity: inputs.address.city,
               deliveryAddressPostCode:
-                inputs.address.postCode || vendor.pickupAddress.postCode || 'NA11 1AA',
+                inputs.address.postCode ||
+                vendor.pickupAddress.postCode ||
+                'NA11 1AA',
               deliveryAddressLatitude: inputs.address.lat,
               deliveryAddressLongitude: inputs.address.lng,
               deliveryAddressInstructions: inputs.address.deliveryInstructions,
@@ -392,23 +418,27 @@ module.exports = {
         }
 
         // Strip unneccesary data from order items
-        var updatedItems = _.flatten(_.map(inputs.items, (object) => {
-          return Object.keys(object).includes('quantity')
-            ? Array(object.quantity).fill({
-              order: order.id,
-              product: object.id,
-              optionValues: object.optionValues,
-            })
-            : [{
-              order: order.id,
-              product: object.id,
-              optionValues: object.optionValues,
-            }];
-        }));
+        var updatedItems = _.flatten(
+          _.map(inputs.items, (object) => {
+            return Object.keys(object).includes('quantity')
+              ? Array(object.quantity).fill({
+                  order: order.id,
+                  product: object.id,
+                  optionValues: object.optionValues,
+                })
+              : [
+                  {
+                    order: order.id,
+                    product: object.id,
+                    optionValues: object.optionValues,
+                  },
+                ];
+          })
+        );
 
         // Create each order item
-        const dbPromises = updatedItems.map((o) =>
-          wrapWithDb(db, () => OrderItem.create(o))//.fetch()
+        const dbPromises = updatedItems.map(
+          (o) => wrapWithDb(db, () => OrderItem.create(o)) //.fetch()
         );
         await Promise.all(dbPromises);
 
@@ -426,7 +456,7 @@ module.exports = {
             `Order total is ${order.total} but is calculated to be total ${calculatedOrderTotal.finalAmount}`
           );
 
-          if (calculatedOrderTotal.withoutFees <= 0){
+          if (calculatedOrderTotal.withoutFees <= 0) {
             sails.log.warn(
               `New Order #${order.id} has a ${calculatedOrderTotal.withoutFees} subtotal with a total of ${calculatedOrderTotal.finalAmount}`
             );
@@ -437,7 +467,6 @@ module.exports = {
               orderCreationStatus: 'failed',
             };
           }
-
         }
         // Update with correct amount
         await wrapWithDb(db, () =>
@@ -487,10 +516,13 @@ module.exports = {
       //     );
       //   }
       // };
-      let result; //todo: or just move account find before the transaction...
+      let result;
       if (datastore.config.adapter === 'sails-disk') {
         result = await createOrderTransactionDB(null);
-        if(process.env.NODE_ENV && ! process.env.NODE_ENV.toLowerCase().startsWith('prod')){
+        if (
+          process.env.NODE_ENV &&
+          !process.env.NODE_ENV.toLowerCase().startsWith('prod')
+        ) {
           sails.log('USING sails-disk');
           sails.log(
             `create-order -> order created -> ${util.inspect(result, {
@@ -508,8 +540,15 @@ module.exports = {
             sails.log(issues);
             return exits.error(new Error('Error creating Order in DB'));
           });
-        if(process.env.NODE_ENV && ! process.env.NODE_ENV.toLowerCase().startsWith('prod')){
-          sails.log(`create-order -> order created -> ${util.inspect(result, { depth: 0 })}`);
+        if (
+          process.env.NODE_ENV &&
+          !process.env.NODE_ENV.toLowerCase().startsWith('prod')
+        ) {
+          sails.log(
+            `create-order -> order created -> ${util.inspect(result, {
+              depth: 0,
+            })}`
+          );
         }
       }
 
@@ -519,19 +558,23 @@ module.exports = {
         const accounts = await Account.find({
           walletAddress: inputs.walletAddress,
         });
-        if(accounts.length < 1){
-          sails.log.error(`Unable to locate account for wallet address used to create-order of "${inputs.walletAddress}"`);
+        if (accounts.length < 1) {
+          sails.log.error(
+            `Unable to locate account for wallet address used to create-order of "${inputs.walletAddress}"`
+          );
         } else {
           account = accounts[0];
         }
       } catch (error) {
-        sails.log.error(`Unable to locate account for wallet address used to create-order of "${inputs.walletAddress}": ${error}`);
+        sails.log.error(
+          `Unable to locate account for wallet address used to create-order of "${inputs.walletAddress}": ${error}`
+        );
       }
 
       let failureReason;
       try {
-        const _newPaymentIntent = await sails.helpers.createPaymentIntentInternal
-          .with({
+        const _newPaymentIntent =
+          await sails.helpers.createPaymentIntentInternal.with({
             amount: result.calculatedOrderTotal.finalAmount,
             currency: 'gbp',
             recipientWalletAddress: vendor.walletAddress,
@@ -545,16 +588,20 @@ module.exports = {
         newPaymentIntent = _newPaymentIntent;
       } catch (error) {
         failureReason = `${error}`;
-        sails.log.error(`Failed to create payment intent on helper "createPaymentIntentInternal" with reason: "${failureReason}"`);
+        sails.log.error(
+          `Failed to create payment intent on helper "createPaymentIntentInternal" with reason: "${failureReason}"`
+        );
       }
-        
-      
-      if (failureReason){
-        sails.log.error(new Error(`Error creating payment intent: "${failureReason}"`));
+
+      if (failureReason) {
+        sails.log.error(
+          new Error(`Error creating payment intent: "${failureReason}"`)
+        );
         return exits.success({
           orderId: null,
           paymentIntentID: null,
           orderCreationStatus: 'failed',
+          order: null,
         });
       }
 
@@ -563,12 +610,15 @@ module.exports = {
         return exits.success({
           orderId: null,
           paymentIntentID: null,
-          orderCreationStatus: 'failed'
+          orderCreationStatus: 'failed',
+          order: null,
         });
       }
       const paymentIntentId = newPaymentIntent.paymentIntent.id;
-      sails.log(`Update order [${order.id}] with paymentIntentId: ${paymentIntentId}`);
-      
+      sails.log(
+        `Update order [${order.id}] with paymentIntentId: ${paymentIntentId}`
+      );
+
       try {
         await Order.updateOne(order.id).set({
           paymentIntentId: paymentIntentId,
@@ -576,11 +626,22 @@ module.exports = {
       } catch (error) {
         sails.log.error(error);
       }
-      
+
+      const _newOrder = await Order.findOne(result.orderId).populate(
+        'fulfilmentMethod&discount&deliveryPartner&vendor&items&items.product'
+      );
+
+      const formattedOrders = await sails.helpers.formatOrders.with({
+        orders: [_newOrder],
+      });
+
+      const newOrder = formattedOrders && formattedOrders.orders[0];
+
       return exits.success({
         orderId: result.orderId,
         paymentIntentID: paymentIntentId,
         orderCreationStatus: result.orderCreationStatus,
+        order: newOrder,
       });
     } catch (error) {
       sails.log.error(error);
@@ -600,6 +661,8 @@ For help please contact help@vegiapp.co.uk`,
       }
       return exits.error(new Error('Error creating Order in DB'));
     }
-    return exits.success(result);
+    // return exits.success(result);
   },
 };
+
+module.exports = _exports;

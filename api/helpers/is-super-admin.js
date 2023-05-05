@@ -29,8 +29,9 @@ module.exports = {
 
     if (!user) {
       sails.log.error('Requesting User uid is not the id of a registered user');
-      exits.catastrophicFailure();
+      // await exits.catastrophicFailure();
       this.res.redirect('/admin/logout');
+      return exits.success({ data: false });
     }
 
     if (user.isSuperAdmin) {

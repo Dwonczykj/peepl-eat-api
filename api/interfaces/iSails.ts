@@ -26,6 +26,7 @@ import { TransactionsForAccountInputs, TransactionsForAccountResult } from "../.
 import { GetOrdersInputs, GetOrdersResult } from "../../api/helpers/get-orders";
 import { RefreshStripeTransactionsInputs, RefreshStripeTransactionsResult } from "../../api/helpers/refresh-stripe-transactions";
 import { RefreshFuseTransactionsInputs, RefreshFuseTransactionsResult } from "../../api/helpers/refresh-fuse-transactions";
+import { FormatOrdersInputs, FormatOrdersResult } from "../../api/helpers/format-orders";
 
 export type SailsActionInput =
   | {
@@ -494,6 +495,10 @@ export type sailsVegi = {
     getOrders: _helperFunction<
       GetOrdersInputs,
       GetOrdersResult
+    >;
+    formatOrders: _helperFunction<
+      FormatOrdersInputs,
+      FormatOrdersResult
     >;
     distanceViaBearing: _helperFunction<
       DistanceViaBearingInputs,

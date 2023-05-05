@@ -21,6 +21,6 @@ module.exports = {
       customerWalletAddress: inputs.walletAddress,
       completedFlag: ''
     });
-    exits.success({ orders });
+    return exits.success({ orders });
   }
 };
