@@ -1433,11 +1433,12 @@
             "default": "",
             "enum": [
               "",
+              "none",
               "completed",
               "cancelled",
               "refunded",
               "partially refunded",
-              "void"
+              "voided"
             ]
           },
           "completedOrderFeedback": {

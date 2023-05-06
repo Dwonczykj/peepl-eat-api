@@ -241,7 +241,7 @@ describe(`${CUSTOMER_CAN_UPDATE_ITEMS_ON_PAID_ORDER(fixtures).ACTION_NAME}()`, (
         DEFAULT_NEW_ORDER_OBJECT(fixtures, {
           paymentStatus: 'paid',
           paymentIntentId: 'dummy_payint_id_' + uuidv4(),
-          completedFlag: '',
+          completedFlag: 'none',
           parentOrder: null,
           items: [1, 2, 3, 6, 8],
           total: 5425,

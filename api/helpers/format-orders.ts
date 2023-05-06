@@ -51,7 +51,6 @@ export type FormattedOrderForClients =
       cartDiscountCode: string;
       cartDiscountType: DiscountType['discountType'];
       cartDiscountAmount: number;
-      cartTip: number;
       unfulfilledItems:
         | {
             id: number;
@@ -116,7 +115,7 @@ const _exports: SailsActionDefnType<
     
     try {
       const firstOrder = orders && orders.length > 0 && orders[0];
-      if(isInt(firstOrder.fulfilmentMethod) || isInt(firstOrder.vendor) || isInt(firstOrder.deliveryPartner)){
+      if(isInt(firstOrder.fulfilmentMethod) || isInt(firstOrder.vendor) || isInt(firstOrder.deliveryPartner) || (firstOrder.items && firstOrder.items.length > 0 && isInt(firstOrder.items[0].product))){
         orders = await Order.find({
           id: orders.map(o => o.id)
         })
@@ -164,10 +163,15 @@ const _exports: SailsActionDefnType<
           ...order,
           ...{
             items: order.items.map((orderItem) => {
+              if(!orderItem.product){
+                sails.log(`No product found on orderItem[${orderItem.id}] for order[${order.id}]`);
+                sails.log(JSON.stringify(orderItem,null,4));
+                return false;
+              }
               return {
                 id: orderItem.id,
                 unfulfilled: orderItem.unfulfilled,
-                product: {
+                product: isInt(orderItem.product) ? orderItem.product : orderItem.product && {
                   name: orderItem.product.name,
                   basePrice: orderItem.product.basePrice,
                   options: orderItem.optionValues.map((optionValue) => {
@@ -179,16 +183,16 @@ const _exports: SailsActionDefnType<
                   }),
                 },
               };
-            }),
-            deliveryPartner: order.deliveryPartner && {
+            }).filter((orderItem) => (orderItem !== false)),
+            deliveryPartner: isInt(order.deliveryPartner) ? order.deliveryPartner : order.deliveryPartner && {
               id: order.deliveryPartner.id,
               name: order.deliveryPartner.name,
             },
-            vendor: {
+            vendor: isInt(order.vendor) ? order.vendor : order.vendor && {
               id: order.vendor.id,
               name: order.vendor.name,
             },
-            fulfilmentMethod: {
+            fulfilmentMethod: isInt(order.fulfilmentMethod) ? order.fulfilmentMethod : order.fulfilmentMethod && {
               id: order.fulfilmentMethod.id,
               methodType: order.fulfilmentMethod.methodType,
               priceModifier: order.fulfilmentMethod.priceModifier,
@@ -205,7 +209,6 @@ const _exports: SailsActionDefnType<
             cartDiscountAmount: order.discount ? order.discount.value : 0, // where can we find the discount code that was applied to this order...
             // cartDiscountType: discounts && discounts.length > 0 ? discounts[0].discountType : '', // where can we find the discount code that was applied to this order...
             // cartDiscountAmount: discounts && discounts.length > 0 ? discounts[0].value : 0, // where can we find the discount code that was applied to this order...
-            cartTip: order.tipAmount,
             //TODO: IF no transactions, append an empty transaction to assume all GBP or actually, just do this in UI and ignore for backend as the transaction does not exist...
           },
         };

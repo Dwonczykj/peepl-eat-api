@@ -53,7 +53,7 @@ module.exports = {
     // Update order with payment ID and time
     var order = await Order.updateOne({
       paymentIntentId: inputs.publicId,
-      completedFlag: '',
+      completedFlag: 'none',
     }).set({
       paymentStatus: ['paid', 'unpaid', 'failed'].includes(inputs.status)
         ? inputs.status

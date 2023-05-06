@@ -30,7 +30,7 @@ module.exports = function(){
       deliveryPartnerConfirmed: false, //TODO Check can update,
       rewardsIssued: 0, //TODO Check can update,
       sentToDeliveryPartner: false, //TODO Check can update,
-      completedFlag: '', //TODO Check can update ["", "completed", "cancelled", "refunded", "void"]
+      completedFlag: 'none', //TODO Check can update ["", "completed", "cancelled", "refunded", "void"]
       completedOrderFeedback: null, //TODO: Check can add feedback after order
       deliveryPunctuality: null,
       orderCondition: null,
@@ -70,7 +70,7 @@ module.exports = function(){
       deliveryPartnerConfirmed: false,
       rewardsIssued: 0,
       sentToDeliveryPartner: false,
-      completedFlag: '',
+      completedFlag: 'none',
       completedOrderFeedback: null,
       deliveryPunctuality: null,
       orderCondition: null,
@@ -110,7 +110,7 @@ module.exports = function(){
       deliveryPartnerConfirmed: false,
       rewardsIssued: 0,
       sentToDeliveryPartner: false,
-      completedFlag: '',
+      completedFlag: 'none',
       completedOrderFeedback: null,
       deliveryPunctuality: null,
       orderCondition: null,
@@ -149,7 +149,7 @@ module.exports = function(){
       deliveryPartnerConfirmed: false, //TODO Check can update,
       rewardsIssued: 0, //TODO Check can update,
       sentToDeliveryPartner: false, //TODO Check can update,
-      completedFlag: '', //TODO Check can update ["", "completed", "cancelled", "refunded", "void"]
+      completedFlag: 'none', //TODO Check can update ["", "completed", "cancelled", "refunded", "void"]
       completedOrderFeedback: null, //TODO: Check can add feedback after order
       deliveryPunctuality: null,
       orderCondition: null,
@@ -189,7 +189,7 @@ module.exports = function(){
       deliveryPartnerConfirmed: false,
       rewardsIssued: 0,
       sentToDeliveryPartner: false,
-      completedFlag: '',
+      completedFlag: 'none',
       completedOrderFeedback: null,
       deliveryPunctuality: null,
       orderCondition: null,
@@ -230,7 +230,7 @@ module.exports = function(){
       deliveryPartner: 1,
       rewardsIssued: 0,
       sentToDeliveryPartner: false,
-      completedFlag: '',
+      completedFlag: 'none',
       completedOrderFeedback: null,
       deliveryPunctuality: null,
       orderCondition: null,

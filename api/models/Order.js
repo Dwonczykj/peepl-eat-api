@@ -165,11 +165,12 @@ module.exports = {
       defaultsTo: '',
       isIn: [
         '',
+        'none',
         'completed',
         'cancelled',
         'refunded',
         'partially refunded',
-        'void',
+        'voided',
       ],
     },
     completedOrderFeedback: {

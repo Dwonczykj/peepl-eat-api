@@ -218,9 +218,10 @@ module.exports = {
             subject +
             '\n' +
             '\n' +
-            'Body:\n' +
-            htmlEmailContents +
-            '\n' +
+            // 'Body:\n' +
+            // 'Ignored as too long' +
+            // htmlEmailContents +
+            // '\n' +
             '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'
         );
       } else {

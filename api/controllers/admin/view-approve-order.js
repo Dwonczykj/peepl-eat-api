@@ -23,7 +23,7 @@ module.exports = {
   fn: async function (inputs, exits) {
     var order = await Order.findOne({
       publicId: inputs.orderId,
-      completedFlag: '',
+      completedFlag: 'none',
     }).populate(
       'fulfilmentMethod&items.product&optionValues&optionValues.option&optionValue'
     );

@@ -61,7 +61,7 @@ const DEFAULT_NEW_ORDER_OBJECT = (fixtures, overrides = {}) => {
       deliveryPartner: fixtures.deliveryPartners[0].id,
       rewardsIssued: 0,
       sentToDeliveryPartner: false,
-      completedFlag: '',
+      completedFlag: 'none',
       completedOrderFeedback: null,
       deliveryPunctuality: null,
       orderCondition: null,

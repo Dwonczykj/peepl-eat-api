@@ -81,7 +81,7 @@ module.exports = {
       // fulfilmentSlotFrom: {
       //   '>=': new Date()
       // },
-      completedFlag: '',
+      completedFlag: 'none',
     });
     const slotTo = moment.utc(order.fulfilmentSlotTo, 'YYYY-MM-DD HH:mm:ss');
     if (slotTo.isBefore(moment.utc())) {

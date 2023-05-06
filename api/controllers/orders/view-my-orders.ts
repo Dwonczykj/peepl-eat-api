@@ -34,8 +34,7 @@ export type FormattedOrderForClients = ({
   cartDiscountCode: string,
   cartDiscountType: DiscountType['discountType'],
   cartDiscountAmount: number,
-  cartTip: number,
-  unfulfilledItems:
+  unfulfilledItems: 
     | {
         id: number;
         methodType: 'delivery' | 'collection';
@@ -47,6 +46,7 @@ export type FormattedOrderForClients = ({
 export type ViewMyOrdersResponseType = {
   ongoingOrders: Array<FormattedOrderForClients>;
   scheduledOrders: Array<FormattedOrderForClients>;
+  unpaidOrders: Array<FormattedOrderForClients>;
   pastOrders: Array<FormattedOrderForClients>;
   userRole: any;
 }
@@ -86,7 +86,7 @@ const _exports = {
     // const _orders = await Order.find({
     //   customerWalletAddress: inputs.walletId,
     //   paidDateTime: { '>': 0 },
-    //   completedFlag: '',
+    //   completedFlag: 'none',
     // }).populate(
     //   'fulfilmentMethod&deliveryPartner&vendor&items.product&optionValues&optionValues.option&optionValue'
     // );
@@ -94,6 +94,8 @@ const _exports = {
     let _ongoingOrders: Array<OrderType>;
     let _scheduledOrders: Array<OrderType>;
     let _pastOrders: Array<OrderType>;
+    let _allMyOrders: Array<OrderType>;
+    let _unpaidOrders: Array<OrderType>;
     let timeNow = moment.utc().format(datetimeStrFormat); // e.g. 25/12/2022 09:00
     let timeToScheduledOrdersStart = moment
       .utc()
@@ -103,7 +105,7 @@ const _exports = {
       const _orders = await Order.find({
         customerWalletAddress: inputs.walletId,
         paidDateTime: { '>': 0 },
-        completedFlag: '',
+        completedFlag: 'none',
       })
         // .populate('items&items.product')
         // .populate('items&items.optionValues&optionValues.option&optionValue')
@@ -138,13 +140,17 @@ const _exports = {
               moment.utc(timeToScheduledOrdersStart, `${datetimeStrFormat}`)
             );
         });
+        _allMyOrders = _orders;
+        _unpaidOrders = _orders.filter((order) => {
+          return order.paymentStatus !== 'paid' && !order.paidDateTime;
+        });
       }
     } else {
       _ongoingOrders = await Order.find({
         customerWalletAddress: inputs.walletId,
         paidDateTime: { '>': 0 },
-        completedFlag: '',
-        fulfilmentSlotFrom: { '>=': timeNow }, //BUG: this comparison doesnt work for disk db: sails-disk
+        completedFlag: 'none',
+        fulfilmentSlotFrom: { '>=': timeNow },
         fulfilmentSlotTo: { '<=': timeToScheduledOrdersStart },
       })
         // .populate('items&items.product')
@@ -155,7 +161,7 @@ const _exports = {
       _scheduledOrders = await Order.find({
         customerWalletAddress: inputs.walletId,
         paidDateTime: { '>': 0 },
-        completedFlag: '',
+        completedFlag: 'none',
         fulfilmentSlotFrom: { '>': timeToScheduledOrdersStart },
       })
         // .populate('items&items.product')
@@ -167,6 +173,25 @@ const _exports = {
         customerWalletAddress: inputs.walletId,
         paidDateTime: { '>': 0 },
         fulfilmentSlotFrom: { '<=': timeToScheduledOrdersStart },
+      })
+        // .populate('items&items.product')
+        // .populate('items&items.optionValues&optionValues.option&optionValue')
+        .populate(
+          'fulfilmentMethod&deliveryPartner&vendor&items&items.product'
+        );
+      _allMyOrders = await Order.find({
+        customerWalletAddress: inputs.walletId,
+        paidDateTime: { '>': 0 },
+      })
+        // .populate('items&items.product')
+        // .populate('items&items.optionValues&optionValues.option&optionValue')
+        .populate(
+          'fulfilmentMethod&deliveryPartner&vendor&items&items.product'
+        );
+      _unpaidOrders = await Order.find({
+        customerWalletAddress: inputs.walletId,
+        paymentStatus: { '!=': ['paid']} as any,
+        paidDateTime: null,
       })
         // .populate('items&items.product')
         // .populate('items&items.optionValues&optionValues.option&optionValue')
@@ -282,7 +307,6 @@ const _exports = {
     //         cartDiscountAmount: order.discount ? order.discount.value : 0, // where can we find the discount code that was applied to this order...
     //         // cartDiscountType: discounts && discounts.length > 0 ? discounts[0].discountType : '', // where can we find the discount code that was applied to this order...
     //         // cartDiscountAmount: discounts && discounts.length > 0 ? discounts[0].value : 0, // where can we find the discount code that was applied to this order...
-    //         cartTip: order.tipAmount,
     //         //TODO: IF no transactions, append an empty transaction to assume all GBP or actually, just do this in UI and ignore for backend as the transaction does not exist...
     //       },
     //     };
@@ -304,6 +328,10 @@ const _exports = {
       orders:_pastOrders,
       walletId: inputs.walletId,
     });
+    const unpaidOrders = await sails.helpers.formatOrders.with({
+      orders:_unpaidOrders,
+      walletId: inputs.walletId,
+    });
 
     // Respond with view or JSON.
     if (this.req.wantsJSON) {
@@ -311,6 +339,7 @@ const _exports = {
         ongoingOrders: ongoingOrders ? ongoingOrders.orders : [],
         scheduledOrders: scheduledOrders ? scheduledOrders.orders : [],
         pastOrders: pastOrders ? pastOrders.orders : [],
+        unpaidOrders: unpaidOrders ? unpaidOrders.orders : [],
         userRole: this.req.session.userRole,
       });
     } else {
@@ -318,6 +347,7 @@ const _exports = {
         ongoingOrders: ongoingOrders ? ongoingOrders.orders : [],
         scheduledOrders: scheduledOrders ? scheduledOrders.orders : [],
         pastOrders: pastOrders ? pastOrders.orders : [],
+        unpaidOrders: unpaidOrders ? unpaidOrders.orders : [],
         userRole: this.req.session.userRole,
       });
     }

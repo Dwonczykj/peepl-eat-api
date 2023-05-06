@@ -253,7 +253,7 @@ const _exports: SailsActionDefnType<
           try {
             await Order.updateOne({
               paymentIntentId: paymentIntent.id,
-              completedFlag: '',
+              completedFlag: 'none',
             }).set({
               paymentStatus: ['paid', 'unpaid', 'failed'].includes(
                 paymentStatus

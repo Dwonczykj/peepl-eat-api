@@ -124,10 +124,10 @@ type WaterlineValueComparisonKeys<T extends Date | number | string | boolean> =
       }
     : T extends string
     ? {
-        '=='?: T;
-        '!='?: T;
+        '=='?: T | T[]; // ~ https://sailsjs.com/documentation/concepts/models-and-orm/query-language#?notin-modifier
+        '!='?: T | T[];
         nin?: T;
-        in?: T;
+        in?: T | T[];
         contains?: T;
         startsWith?: T;
         endsWith?: T;

@@ -239,12 +239,12 @@ export type _AddressTypeHidden = {
 
 export type RatingType = 0 | 1 | 2 | 3 | 4 | 5;
 export type CompletedFlagType =
-  | ''
+  | 'none'
   | 'completed'
   | 'cancelled'
   | 'refunded'
   | 'partially refunded'
-  | 'void';
+  | 'voided';
 
 type PostalOutCode = string;
 
@@ -628,8 +628,6 @@ export type PaymentStatusType = 'paid' | 'unpaid' | 'failed';
 
 export type _OrderTypeHidden = {
   id: number;
-  vendor: VendorType;
-  deliveryPartner?: DeliveryPartnerType;
   subtotal: number;
   total: number;
   orderedDateTime: number;
@@ -637,11 +635,7 @@ export type _OrderTypeHidden = {
   refundDateTime: number;
   paymentStatus: PaymentStatusType;
   paymentIntentId: string;
-  fulfilmentMethod: FulfilmentMethodType;
-  fulfilmentSlotFrom: Date;
-  fulfilmentSlotTo: Date;
-  restaurantAcceptanceStatus: RestaurantAcceptedStatusType;
-  orderAcceptanceStatus: OrderAcceptedStatusType;
+  firebaseRegistrationToken: string;
   deliveryName: string;
   deliveryEmail: string;
   deliveryPhoneNumber: string;
@@ -652,12 +646,13 @@ export type _OrderTypeHidden = {
   deliveryAddressLatitude?: number | null;
   deliveryAddressLongitude?: number | null;
   deliveryAddressInstructions: string;
-  customerWalletAddress: string;
   deliveryId?: string;
   deliveryPartnerAccepted: boolean;
   deliveryPartnerConfirmed: boolean;
+  customerWalletAddress: string;
   publicId: string;
-  firebaseRegistrationToken: string;
+  restaurantAcceptanceStatus: RestaurantAcceptedStatusType;
+  orderAcceptanceStatus: OrderAcceptedStatusType;
   tipAmount: number;
   rewardsIssued: number;
   sentToDeliveryPartner: boolean;
@@ -665,7 +660,12 @@ export type _OrderTypeHidden = {
   completedOrderFeedback: string;
   deliveryPunctuality: RatingType;
   orderCondition: RatingType;
+  fulfilmentSlotFrom: Date;
+  fulfilmentSlotTo: Date;
+  fulfilmentMethod: FulfilmentMethodType;
   discount: DiscountType;
+  vendor: VendorType;
+  deliveryPartner?: DeliveryPartnerType;
 };
 
 export type NotificationType = {
@@ -723,8 +723,8 @@ export type OrderItemType = _OrderItemTypeHidden & {
 };
 
 export type OrderType = _OrderTypeHidden & {
-  parentOrder?: OrderType;
   items: Array<OrderItemType>;
+  parentOrder?: OrderType;
   unfulfilledItems: Array<OrderItemType>;
 };
 

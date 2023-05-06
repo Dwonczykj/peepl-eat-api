@@ -25,13 +25,13 @@ module.exports = function defineSendOrderUpdatesHook(sails) {
               fulfilmentSlotFrom: {
                 '>=': new Date()
               },
-              completedFlag: '',
+              completedFlag: 'none',
             },
             {
               fulfilmentSlotFrom: {
                 '<=': new Date().addHours(1.1)
               },
-              completedFlag: '',
+              completedFlag: 'none',
             },
           ]
         });
@@ -42,13 +42,13 @@ module.exports = function defineSendOrderUpdatesHook(sails) {
               fulfilmentSlotFrom: {
                 '<=': new Date()
               },
-              completedFlag: '',
+              completedFlag: 'none',
             },
             {
               fulfilmentSlotFrom: {
                 '>=': new Date().addHours(-1.1)
               },
-              completedFlag: '',
+              completedFlag: 'none',
             },
           ]
         });

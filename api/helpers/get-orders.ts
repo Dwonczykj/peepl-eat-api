@@ -1,4 +1,4 @@
-import { CompletedFlagType, DiscountType, OrderAcceptedStatusType, OrderItemType, ProductType, SailsActionDefnType, TimePeriodEnumType, TransactionType } from '../../scripts/utils';
+import { DiscountType, OrderAcceptedStatusType, OrderItemType, SailsActionDefnType, TimePeriodEnumType, TransactionType } from '../../scripts/utils';
 import {
   sailsModelKVP as SailsModelKVP,
   SailsModelType,
@@ -28,7 +28,6 @@ export type GetOrdersResult =
       cartDiscountCode: string;
       cartDiscountType: DiscountType['discountType'];
       cartDiscountAmount: number;
-      cartTip: number;
     })[]
   | false;
 
@@ -170,7 +169,6 @@ const _exports: SailsActionDefnType<
             cartDiscountCode: order.discount && order.discount.code, // where can we find the discount code that was applied to this order...
             cartDiscountType: order.discount ? order.discount.discountType : 'fixed', // where can we find the discount code that was applied to this order...
             cartDiscountAmount: order.discount ? order.discount.value : 0, // where can we find the discount code that was applied to this order...
-            cartTip: order.tipAmount,
           };
         };
       }).map(p => p());

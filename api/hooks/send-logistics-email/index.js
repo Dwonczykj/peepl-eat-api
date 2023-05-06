@@ -36,7 +36,7 @@ module.exports = function defineSendLogisticsEmailsHook(sails) {
               '>=': today,
               '<=': tomorrow
             },
-            completedFlag: '',
+            completedFlag: 'none',
           };
 
           // Find orders that have not yet been sent to the delivery partner due to be fulfilled in the next 24 hours
