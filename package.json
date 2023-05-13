@@ -32,7 +32,7 @@
     "lodash-es": "^4.17.21",
     "md5": "^2.3.0",
     "moment": "^2.29.1",
-    "nanoid": "4.0.2",
+    "nanoid": "^2.1.11",
     "node-cron": "^3.0.2",
     "plivo": "^4.35.0",
     "request-json": "^0.6.5",
