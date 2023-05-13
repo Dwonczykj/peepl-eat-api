@@ -184,14 +184,8 @@ const _exports: SailsActionDefnType<
                 },
               };
             }).filter((orderItem) => (orderItem !== false)),
-            deliveryPartner: isInt(order.deliveryPartner) ? order.deliveryPartner : order.deliveryPartner && {
-              id: order.deliveryPartner.id,
-              name: order.deliveryPartner.name,
-            },
-            vendor: isInt(order.vendor) ? order.vendor : order.vendor && {
-              id: order.vendor.id,
-              name: order.vendor.name,
-            },
+            deliveryPartner: isInt(order.deliveryPartner) ? order.deliveryPartner : order.deliveryPartner,
+            vendor: isInt(order.vendor) ? order.vendor : order.vendor,
             fulfilmentMethod: isInt(order.fulfilmentMethod) ? order.fulfilmentMethod : order.fulfilmentMethod && {
               id: order.fulfilmentMethod.id,
               methodType: order.fulfilmentMethod.methodType,
