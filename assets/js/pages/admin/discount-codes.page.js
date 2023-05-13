@@ -3,16 +3,17 @@ parasails.registerPage('admin-discount-codes', {
   //  ║║║║║ ║ ║╠═╣║    ╚═╗ ║ ╠═╣ ║ ║╣
   //  ╩╝╚╝╩ ╩ ╩╩ ╩╩═╝  ╚═╝ ╩ ╩ ╩ ╩ ╚═╝
   data: {
-    discounts: []
+    discounts: [],
+    formErrors: {},
   },
 
   //  ╦  ╦╔═╗╔═╗╔═╗╦ ╦╔═╗╦  ╔═╗
   //  ║  ║╠╣ ║╣ ║  ╚╦╝║  ║  ║╣
   //  ╩═╝╩╚  ╚═╝╚═╝ ╩ ╚═╝╩═╝╚═╝
-  beforeMount: function() {
+  beforeMount: function () {
     //…
   },
-  mounted: async function() {
+  mounted: async function () {
     _.extend(this, SAILS_LOCALS);
   },
 
@@ -20,17 +21,17 @@ parasails.registerPage('admin-discount-codes', {
   //  ║║║║ ║ ║╣ ╠╦╝╠═╣║   ║ ║║ ║║║║╚═╗
   //  ╩╝╚╝ ╩ ╚═╝╩╚═╩ ╩╚═╝ ╩ ╩╚═╝╝╚╝╚═╝
   methods: {
-    clickAddDiscount: function(){
+    clickAddDiscount: function () {
       var newDiscount = {
         code: '',
         percentage: 0,
         expiryDateTime: 0,
         timesUsed: 0,
         maxUses: 0,
-        isEnabled: false
+        isEnabled: false,
       };
 
       this.discounts.push(newDiscount);
-    }
-  }
+    },
+  },
 });

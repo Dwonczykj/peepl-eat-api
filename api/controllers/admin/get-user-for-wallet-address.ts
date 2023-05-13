@@ -1,14 +1,18 @@
 import { sailsModelKVP, SailsModelType } from "../../../api/interfaces/iSails";
-import { AccountType, walletAddressString } from "../../../scripts/utils";
+import { AccountType, UserRoleLiteral, UserType, walletAddressString } from "../../../scripts/utils";
 
 declare var Account: SailsModelType<AccountType>;
+declare var User: SailsModelType<UserType>;
 
 type GetAccountForWalletInput = {
   walletAddress:walletAddressString;
 }
+type GetAccountForWalletResult = {
+  account: sailsModelKVP<AccountType>;
+};
 
 type GetAccountForWalletOutput = {
-  success: (unusedUser: sailsModelKVP<AccountType> | {}) => void;
+  success: (unusedUser: GetAccountForWalletResult) => void;
   badFormat: () => void;
 };
 
@@ -58,7 +62,7 @@ module.exports = {
     if(!inputs.walletAddress.match(walletAddressPattern)){
       return exits.badFormat();
     }
-    
+
     const account = await Account.findOne({
       walletAddress: inputs.walletAddress,
     });
@@ -71,7 +75,7 @@ module.exports = {
       return exits.success({account: newAccount});
     }
 
-    return exits.success(account);
+    return exits.success({ account: account });
 
   }
 

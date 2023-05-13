@@ -1,0 +1,107 @@
+import {
+  SailsModelType,
+  sailsVegi,
+} from '../../interfaces/iSails';
+import {
+  AccountType,
+  SailsActionDefnType,
+} from '../../../scripts/utils';
+
+declare var sails: sailsVegi;
+declare var Account: SailsModelType<AccountType>;
+
+
+export type SetRandomAvatarInputs = {
+  accountId: number;
+};
+
+export type SetRandomAvatarResponse = {
+  imageUrl: string;
+} | false;
+
+export type SetRandomAvatarExits = {
+  success: (unusedData: SetRandomAvatarResponse) => any;
+  issue: (unusedErr: Error | String) => void;
+  notFound: () => void;
+  error: (unusedErr: Error | String) => void;
+  badRequest: (unusedErr: Error | String) => void;
+};
+
+const _exports: SailsActionDefnType<
+  SetRandomAvatarInputs,
+  SetRandomAvatarResponse,
+  SetRandomAvatarExits
+> = {
+  friendlyName: 'SetRandomAvatar',
+
+  inputs: {
+    accountId: {
+      type: 'number',
+      required: true,
+    }
+  },
+
+  exits: {
+    success: {
+      data: false,
+    },
+    notFound: {
+      statusCode: 404,
+    },
+    issue: {
+      statusCode: 403,
+    },
+    badRequest: {
+      responseType: 'badRequest',
+    },
+    error: {
+      statusCode: 500,
+    },
+  },
+
+  fn: async function (
+    inputs: SetRandomAvatarInputs,
+    exits: SetRandomAvatarExits
+  ) {
+    const accounts = await Account.find({
+      id: inputs.accountId,
+    });
+    if (!accounts || accounts.length < 1) {
+      return exits.notFound();
+    }
+
+    const avatarUrls = [
+      'https://vegiapp-s3bucket.s3.eu-west-2.amazonaws.com/aubergini.jpeg',
+      'https://vegiapp-s3bucket.s3.eu-west-2.amazonaws.com/broc.jpeg',
+      'https://vegiapp-s3bucket.s3.eu-west-2.amazonaws.com/carrot.jpeg',
+      'https://vegiapp-s3bucket.s3.eu-west-2.amazonaws.com/pepper.jpeg',
+      'https://vegiapp-s3bucket.s3.eu-west-2.amazonaws.com/strawbug.jpeg',
+    ];
+
+    const index = Math.round(Math.random() * 5);
+
+    let imageUrl = avatarUrls[0];
+    
+    try {
+      imageUrl = avatarUrls[index];
+    } catch (error) {
+      sails.log.error(error);
+    }
+
+    try {
+      await Account.update({
+        id: inputs.accountId,
+      }).set({
+        imageUrl: imageUrl,
+      });
+    } catch (error) {
+      sails.log.error(error);
+    }
+
+    return exits.success({
+      imageUrl: imageUrl,
+    });
+  },
+};
+
+module.exports = _exports;

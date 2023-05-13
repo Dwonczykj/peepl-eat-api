@@ -39,6 +39,11 @@ module.exports.policies = {
   'admin/get-survey-questions': true,
   'admin/submit-survey-response': true,
   'admin/register-email-to-waiting-list': true,
+  'admin/update-waiting-list-entry': ['is-logged-in'],
+  'admin/subscribe-waitlist-email-notifications': true,
+  'admin/get-position-in-waitinglist': true,
+  'admin/generate-voucher-code': ['is-super-admin'],
+  'admin/validate-discount-code': ['is-super-admin'],
   'admin/send-sms': 'is-super-admin', // ! only super-admins
   'admin/signup-with-password': ['firebase'],
   'admin/view-signup': true,
@@ -78,6 +83,7 @@ module.exports.policies = {
     "is-logged-in",
     "is-vendor",
   ],*/,
+  'users/*': ['is-logged-in'],
   'couriers/*': true, // ["is-logged-in", "is-delivery-partner"],
   '*': true, // "is-logged-in",
 };

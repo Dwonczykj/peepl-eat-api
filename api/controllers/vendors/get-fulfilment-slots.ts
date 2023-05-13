@@ -3,7 +3,7 @@ import { iCollectionDates, iFulfilmentSlot, intersectTimeWindowArrays, iSlot, me
 import util from 'util';
 import { FulfilmentMethodType, timeStrFormat, TimeHourString, datetimeStrFormat, datetimeMomentUtcStrTzFormat } from '../../../scripts/utils';
 import { AvailableDateOpeningHours } from '../../../api/helpers/get-available-dates';
-import { sailsVegi } from 'api/interfaces/iSails';
+import { sailsVegi } from '../../../api/interfaces/iSails';
 
 declare var sails: sailsVegi;
 

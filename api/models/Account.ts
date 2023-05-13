@@ -29,6 +29,11 @@ let _exports: SailsModelDefnType<AccountType> = {
       required: false,
       defaultsTo: false,
     },
+    imageUrl: {
+      type: 'string',
+      required: false,
+      defaultsTo: '',
+    },
     bankCardAccountName: {
       type: 'string',
       required: false,

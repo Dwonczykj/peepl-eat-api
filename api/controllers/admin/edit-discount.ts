@@ -4,13 +4,13 @@ import moment from 'moment';
 
 import { DiscountType, SailsActionDefnType } from '../../../scripts/utils';
 import {
-  sailsModelKVP,
   SailsModelType,
   sailsVegi,
 } from '../../interfaces/iSails';
 import {
   UserType
 } from '../../../scripts/utils';
+import { Currency } from '../../../api/interfaces/peeplPay/currency';
 
 declare var sails: sailsVegi;
 declare var User: SailsModelType<UserType>;
@@ -53,6 +53,11 @@ const _exports: SailsActionDefnType<
       type: 'number',
       min: 0,
       max: 100,
+    },
+    currency: {
+      type: 'string',
+      required: false,
+      defaultsTo: Currency.GBPx,
     },
     expiryDateTime: {
       type: 'number',

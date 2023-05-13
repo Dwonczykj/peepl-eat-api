@@ -23,6 +23,10 @@ module.exports = {
       min: 0,
       required: true,
     },
+    currency: {
+      type: 'string',
+      required: true,
+    },
     discountType: {
       type: 'string',
       isIn: ['percentage', 'fixed'],

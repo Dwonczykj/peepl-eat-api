@@ -1,7 +1,7 @@
 import { UserRecord } from 'firebase-admin/auth';
 import { UserType } from '../../../scripts/utils';
 import * as firebase from '../../../config/firebaseAdmin';
-import { SailsModelType } from 'api/interfaces/iSails';
+import { SailsModelType } from '../../../api/interfaces/iSails';
 declare var User: SailsModelType<UserType>;
 // const bcrypt = require('bcrypt');
 module.exports = {

@@ -43,8 +43,13 @@ module.exports = {
 
     if(postalDistrict){
       var vendorsUnsorted = postalDistrict.vendors;
+      const vendorsPopulated = await Vendor.find({
+        id: vendorsUnsorted.map((v) => v.id),
+      }).populate(
+        'pickupAddress&fulfilmentPostalDistricts&deliveryPartner&deliveryFulfilmentMethod&collectionFulfilmentMethod'
+      );
 
-      const vendors = vendorsUnsorted.sort((a, b) => {
+      const vendors = vendorsPopulated.sort((a, b) => {
         const statae: VendorType['status'][] = ['active', 'draft', 'inactive'];
         return (
           statae.indexOf(a.status) - statae.indexOf(b.status) ||

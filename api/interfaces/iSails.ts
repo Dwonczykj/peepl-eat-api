@@ -253,7 +253,7 @@ type _populated<T> = Promise<T | null> & {
 };
 type SailsFindPopulateType<T> = Promise<sailsModelKVP<T>[] | null> & {
   populate: (unusedArg: keyof T | string) => Promise<T[] | null> & _populated<T[]>;
-  sort: (unusedArg: string) => SailsFindPopulateType<T>;
+  sort: (unusedArg: keyof T) => SailsFindPopulateType<T>;
 };
 type SailsFindOnePopulateType<T> = Promise<sailsModelKVP<T> | null> & {
   populate: (unusedArg: string) => Promise<T | null> & _populated<T>; // * This can be chained to populate multiple collections.
@@ -314,6 +314,17 @@ export type CreateSailsModelType3<T extends { id: number }> = OmitId<T> & (
   } 
 );
 
+export type SailsQueryFindCriteria<T> =
+  | number
+  | {
+      [key in keyof T]?: T[key] extends number | boolean | Date
+        ? T[key] | Array<T[key]> | WaterlineValueComparisonKeys<T[key]>
+        : T[key] extends string
+        ? T[key] | Array<T[key]>
+        : number | number[] | WaterlineValueComparisonKeys<number>;
+    }
+  | WaterlineQueryKeys<T>;
+
 export type SailsModelType<T> = {
   addToCollection: (
     // ~ https://sailsjs.com/documentation/reference/waterline-orm/models/add-to-collection#-addtocollection-
@@ -329,26 +340,24 @@ export type SailsModelType<T> = {
   ) => Promise<Array<S>>;
   find: (
     // ~ https://www.typescriptlang.org/docs/handbook/utility-types.html#extracttype-union
-    unusedArg?:
-      | number
-      | {
-          [key in keyof T]?: T[key] extends number | boolean | Date
-            ? T[key] | Array<T[key]> | WaterlineValueComparisonKeys<T[key]>
-            : T[key] extends string
-            ? T[key] | Array<T[key]>
-            : number | number[] | WaterlineValueComparisonKeys<number>;
-        }
-      | WaterlineQueryKeys<T>
+    unusedArg?: SailsQueryFindCriteria<T>
   ) => SailsFindPopulateType<T>;
+  count: (
+    // ~ https://www.typescriptlang.org/docs/handbook/utility-types.html#extracttype-union
+    unusedArg?: SailsQueryFindCriteria<T>
+  ) => number;
+  avg: (
+    numericAttrName: string,
+    // ~ https://www.typescriptlang.org/docs/handbook/utility-types.html#extracttype-union
+    unusedArg?: SailsQueryFindCriteria<T>
+  ) => number;
+  sum: (
+    numericAttrName: string,
+    // ~ https://www.typescriptlang.org/docs/handbook/utility-types.html#extracttype-union
+    unusedArg?: SailsQueryFindCriteria<T>
+  ) => number;
   findOne: (
-    unusedArg:
-      | number
-      | {
-          [key in keyof T]?: T[key] extends ValueType
-            ? T[key] | Array<T[key]>
-            : number | number[];
-        }
-      | WaterlineQueryKeys<T>
+    unusedArg: SailsQueryFindCriteria<T>
   ) => SailsFindOnePopulateType<T>;
   update: (
     unusedArg:

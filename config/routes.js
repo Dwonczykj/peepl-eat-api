@@ -215,6 +215,9 @@ module.exports.routes = {
   'GET /api/v1/admin/user-for-wallet-address': {
     action: 'admin/get-user-for-wallet-address',
   },
+  'GET /api/v1/admin/user-details': {
+    action: 'admin/get-user-details',
+  },
   'GET /admin/white-list': {
     action: 'admin/view-white-list',
   },
@@ -227,6 +230,10 @@ module.exports.routes = {
   'POST /api/v1/admin/onboard-user-email-from-waiting-list': {
     action: 'admin/onboard-user-email-from-waiting-list',
   },
+  'GET /api/v1/admin/get-position-in-waitinglist': {
+    action: 'admin/get-position-in-waitinglist',
+  },
+
   'GET /api/v1/admin/account-is-vendor': {
     action: 'admin/account-is-vendor',
   },
@@ -306,6 +313,12 @@ module.exports.routes = {
   },
   'POST /api/v1/admin/create-discount': { action: 'admin/create-discount' },
   'POST /api/v1/admin/edit-discount': { action: 'admin/edit-discount' },
+  'POST /api/v1/admin/generate-voucher-code': {
+    action: 'admin/generate-voucher-code',
+  },
+  'GET /api/v1/admin/validate-discount-code': {
+    action: 'admin/validate-discount-code',
+  },
   // 'POST /api/v1/admin/create-update-openinghours': {
   //   action: 'admin/create-update-openinghours',
   // },
@@ -317,6 +330,18 @@ module.exports.routes = {
   },
   'POST /api/v1/admin/register-email-to-waiting-list': {
     action: 'admin/register-email-to-waiting-list',
+  },
+  'POST /api/v1/admin/update-waiting-list-entry': {
+    action: 'admin/update-waiting-list-entry',
+  },
+  'POST /api/v1/admin/subscribe-waitlist-email-notifications': {
+    action: 'admin/subscribe-waitlist-email-notifications',
+  },
+  'POST /api/v1/users/upload-user-avatar': {
+    action: 'users/upload-user-avatar',
+  },
+  'POST /api/v1/users/set-random-avatar': {
+    action: 'users/set-random-avatar',
   },
   'POST /api/v1/admin/send-sms': {
     action: 'admin/send-sms',

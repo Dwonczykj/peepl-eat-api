@@ -205,7 +205,13 @@
       "name": "Get account for wallet address"
     },
     {
+      "name": "Get user details"
+    },
+    {
       "name": "onboard user email from waitinglist"
+    },
+    {
+      "name": "GetPositionInWaitinglist"
     },
     {
       "name": "Account is vendor"
@@ -271,6 +277,12 @@
       "name": "EditDiscount"
     },
     {
+      "name": "GenerateVoucherCode"
+    },
+    {
+      "name": "ValidateDiscountCode"
+    },
+    {
       "name": "Update Fulfilment Method"
     },
     {
@@ -278,6 +290,18 @@
     },
     {
       "name": "Register Email to Waiting List"
+    },
+    {
+      "name": "UpdateWaitingListEntry"
+    },
+    {
+      "name": "SubscribeWaitlistEmailNotifications"
+    },
+    {
+      "name": "UploadUserAvatar"
+    },
+    {
+      "name": "SetRandomAvatar"
     },
     {
       "name": "Send SMS"
@@ -394,6 +418,10 @@
           "verified": {
             "type": "boolean",
             "default": false
+          },
+          "imageUrl": {
+            "type": "string",
+            "default": ""
           },
           "bankCardAccountName": {
             "type": "string",
@@ -682,7 +710,8 @@
           {
             "required": [
               "code",
-              "value"
+              "value",
+              "currency"
             ]
           }
         ]
@@ -715,6 +744,9 @@
             "type": "number",
             "format": "double",
             "minimum": 0
+          },
+          "currency": {
+            "type": "string"
           },
           "discountType": {
             "type": "string",
@@ -2753,7 +2785,10 @@
           },
           {
             "required": [
-              "email"
+              "email",
+              "personInFront",
+              "positionLastCalculatedTime",
+              "order"
             ]
           }
         ]
@@ -2790,6 +2825,24 @@
             "default": ""
           },
           "onboarded": {
+            "type": "boolean",
+            "default": false
+          },
+          "personInFront": {
+            "type": "number",
+            "format": "double",
+            "nullable": false,
+            "description": "the id of the person in front in the queue"
+          },
+          "positionLastCalculatedTime": {
+            "type": "string",
+            "format": "date"
+          },
+          "order": {
+            "type": "number",
+            "format": "double"
+          },
+          "emailUpdates": {
             "type": "boolean",
             "default": false
           }
@@ -6900,6 +6953,78 @@
         }
       }
     },
+    "/api/v1/admin/user-details": {
+      "get": {
+        "summary": "Get user details",
+        "tags": [
+          "Get user details"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "phoneNoCountry",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "example": {
+                        "isOwner": false,
+                        "vendorID": 0
+                      },
+                      "type": "object",
+                      "properties": {
+                        "isOwner": {
+                          "example": false,
+                          "type": "boolean"
+                        },
+                        "vendorID": {
+                          "example": 0,
+                          "type": "integer",
+                          "format": "int64"
+                        }
+                      },
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "You are not authenticated"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/api/v1/admin/verify-wallet-account": {
       "post": {
         "summary": "Update User Vendor Role",
@@ -7012,6 +7137,41 @@
           },
           "500": {
             "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/get-position-in-waitinglist": {
+      "get": {
+        "summary": "GetPositionInWaitinglist",
+        "tags": [
+          "GetPositionInWaitinglist"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "emailAddress",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
           }
         }
       }
@@ -8837,6 +8997,16 @@
           },
           {
             "in": "query",
+            "name": "currency",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "GBPx",
+              "example": "GBPx"
+            }
+          },
+          {
+            "in": "query",
             "name": "percentage",
             "required": true,
             "schema": {
@@ -8947,6 +9117,16 @@
           },
           {
             "in": "query",
+            "name": "currency",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "GBPx",
+              "example": "GBPx"
+            }
+          },
+          {
+            "in": "query",
             "name": "expiryDateTime",
             "required": false,
             "schema": {
@@ -8984,6 +9164,139 @@
           },
           "500": {
             "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/generate-voucher-code": {
+      "post": {
+        "summary": "GenerateVoucherCode",
+        "tags": [
+          "GenerateVoucherCode"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "value",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "walletAddress",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            }
+          },
+          {
+            "in": "query",
+            "name": "expiresInNMonths",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "nullable": true,
+              "default": 6,
+              "minimum": 0.03,
+              "example": 6
+            }
+          },
+          {
+            "in": "query",
+            "name": "vendor",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/validate-discount-code": {
+      "get": {
+        "summary": "ValidateDiscountCode",
+        "tags": [
+          "ValidateDiscountCode"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "walletAddress",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "nullable": true,
+              "default": ""
+            },
+            "description": "required when checking fixed value codes"
+          },
+          {
+            "in": "query",
+            "name": "isGlobalPercentageCode",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "in": "query",
+            "name": "vendor",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
           }
         }
       }
@@ -9302,6 +9615,189 @@
           },
           "500": {
             "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/update-waiting-list-entry": {
+      "post": {
+        "summary": "UpdateWaitingListEntry",
+        "tags": [
+          "UpdateWaitingListEntry"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "emailAddress",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/subscribe-waitlist-email-notifications": {
+      "post": {
+        "summary": "SubscribeWaitlistEmailNotifications",
+        "tags": [
+          "SubscribeWaitlistEmailNotifications"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "emailAddress",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "receiveUpdates",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/api/v1/users/upload-user-avatar": {
+      "post": {
+        "summary": "UploadUserAvatar",
+        "description": "Upload an image for a user to be viewed as their avatar...",
+        "tags": [
+          "UploadUserAvatar"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "image",
+            "required": true,
+            "schema": {},
+            "description": "image byte stream"
+          },
+          {
+            "in": "query",
+            "name": "accountId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Bad request"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/api/v1/users/set-random-avatar": {
+      "post": {
+        "summary": "SetRandomAvatar",
+        "tags": [
+          "SetRandomAvatar"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "accountId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
           }
         }
       }

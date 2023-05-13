@@ -1,5 +1,7 @@
-import { WaitingListEntryType } from "../../../scripts/utils";
-import { SailsModelType, sailsVegi } from "../../../api/interfaces/iSails";
+import { WaitingListEntryType, datetimeMomentUtcStrTzFormat, datetimeStrFormat } from "../../../scripts/utils";
+import { SailsModelType, sailsModelKVP, sailsVegi } from "../../../api/interfaces/iSails";
+import { last } from "lodash-es";
+import moment from "moment";
 
 declare var sails: sailsVegi;
 
@@ -64,17 +66,46 @@ module.exports = {
     },
     exits: {
       userExists;
-      success;
+      success: (waitingListEntry:sailsModelKVP<WaitingListEntryType>) => void;
       firebaseErrored;
       error;
     }
   ) {
+    const email = inputs.emailAddress.trim().toLowerCase();
+    const _existingWaitingListEntries = await WaitingList.find({
+      email: email,
+    });
+    if (_existingWaitingListEntries && _existingWaitingListEntries.length > 0) {
+      return exits.success(_existingWaitingListEntries[0]);
+    }
+    const getLastPersonInQueue = async () => {
+      try {
+        const queue = await WaitingList.find({
+          onboarded: false,
+        }).sort('order');
+        const lastPerson = queue && queue.length > 0 ? queue[queue.length-1] : null;
+        return lastPerson;
+      } catch (error) {
+        sails.log.error(error);
+        return null;
+      }
+    };
+    
+    const lastPerson = await getLastPersonInQueue();
+    let newEntry: WaitingListEntryType;
     try {
-      await WaitingList.create({
+      newEntry = await WaitingList.create({
         email: inputs.emailAddress,
         userType: inputs.userType,
         origin: inputs.origin,
-      });
+        positionLastCalculatedTime:
+          moment(moment.now()).format('YYYY-MM-DD HH:mm:ss'), // 'yyyy-MM-dd HH:mm:ss'
+        // positionLastCalculatedTime: Date.now(),
+        onboarded: false,
+        personInFront: lastPerson ? lastPerson.id : 0,
+        order: lastPerson ? lastPerson.order + 1 : 1,
+        emailUpdates: false,
+      }).fetch();
     } catch (error) {
       sails.log.warn(
         `There was an issue registering [${inputs.userType}] user: ${inputs.emailAddress} with error: ${error}`
@@ -121,9 +152,12 @@ module.exports = {
         return this.res.redirect(origin);
       }
     } catch (error) {
-      sails.log.warn(`Unable to find origin url for reqest`);
+      sails.log.warn(`Unable to find origin url for reqest: ${error}`);
     }
 
-    return exits.success();
+    if(!newEntry){
+      return exits.error();
+    }
+    return exits.success(newEntry);
   },
 };

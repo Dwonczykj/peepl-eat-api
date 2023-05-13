@@ -1,9 +1,10 @@
-declare enum Currency {
-    GBP = 'GBP',
-    GBPx = 'GBPx',
-    USD = 'USD',
-    PPL = 'PPL',
-    EUR = 'EUR',
+enum Currency {
+  GBP = 'GBP',
+  USD = 'USD',
+  EUR = 'EUR',
+  GBPx = 'GBPx',
+  PPL = 'PPL',
+  GBT = 'GBT',
 }
 
 export { Currency };

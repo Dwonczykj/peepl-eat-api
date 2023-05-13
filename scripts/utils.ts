@@ -55,6 +55,8 @@ export const dateStrFormat = 'YYYY-MM-DD';
 export const timeStrFormat = 'HH:mm';
 export const datetimeStrFormat = 'YYYY-MM-DD HH:mm';
 export const datetimeStrFormatExact = 'YYYY-MM-DD HH:mm:ss';
+export const datetimeStrFormatExactForSQLTIMESTAMP = datetimeStrFormatExact;
+export const datetimeStrFormatExactForSQLDATE = dateStrFormat;
 export const datetimeStrTzFormat = 'YYYY-MM-DD HH:mm Z';
 export const datetimeMomentUtcStrTzFormat = 'YYYY-MM-DDTHH:mm:ss.000Z';
 export const timeStrTzFormat = 'HH:mm Z';
@@ -186,6 +188,7 @@ export type AccountType = {
   accountType: 'ethereum' | 'bank' | null;
   verified: boolean;
   walletAddress: walletAddressString | '' | string;
+  imageUrl: string;
   bankCardNumber: string | null;
   bankCardAccountName: string | null;
   bankCardExpiryDateMonth:
@@ -471,6 +474,7 @@ export type DiscountType = {
   id: number;
   code: string;
   value: number;
+  currency: Currency;
   discountType: 'percentage' | 'fixed';
   expiryDateTime: number;
   timesUsed: number;
@@ -485,9 +489,9 @@ export type ProductCategoryType = _ProductCategoryTypeHidden & {
 };
 
 export type ProductType = _ProductTypeHidden & {
+  category: ProductCategoryType;
   vendor: VendorType;
   options: Array<ProductOptionType>;
-  category: ProductCategoryType;
   proxyForVegiProduct: ProductType;
 };
 
@@ -711,6 +715,10 @@ export type WaitingListEntryType = {
   onboarded: boolean;
   origin: 'mobile' | 'vegiapp.co.uk' | 'guide' | 'leaflet' | 'instagram' | '';
   userType: 'business' | 'unknown' | 'customer' | 'consumer';
+  personInFront: number;
+  positionLastCalculatedTime: Date;
+  order: number;
+  emailUpdates: boolean;
 };
 
 export type OrderItemType = _OrderItemTypeHidden & {

@@ -1,6 +1,6 @@
 // import moment from 'moment';
 
-import { ParseBarcodesUploadInputs } from 'api/helpers/parse-barcodes-upload';
+import { ParseBarcodesUploadInputs } from '../../../api/helpers/parse-barcodes-upload';
 import {
   OmitId,
   ProductCategoryType,
@@ -146,6 +146,7 @@ const _exports: SailsActionDefnType<
           taxGroup: product.taxGroup,
           vendor: inputs.vendorId,
           category: _catId,
+          proxyForVegiProduct: null,
           options: [],
         };
         const newProduct = await Product.create(createProduct).fetch();

@@ -12,6 +12,11 @@ module.exports = {
       type: 'string',
       required: true
     },
+    currency: {
+      type: 'string',
+      required: false,
+      defaultsTo: 'GBPx',
+    },
     percentage:{
       type: 'number',
       min: 0,

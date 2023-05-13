@@ -31,6 +31,26 @@ module.exports = {
       required: false,
       defaultsTo: false,
     },
+    personInFront: {
+      type: 'number',
+      description: 'the id of the person in front in the queue',
+      required: true,
+      allowNull: false,
+    },
+    positionLastCalculatedTime: {
+      type: 'ref',
+      columnType: 'date',
+      required: true,
+    },
+    order: {
+      type: 'number',
+      required: true,
+    },
+    emailUpdates: {
+      type: 'boolean',
+      required: false,
+      defaultsTo: false,
+    },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗

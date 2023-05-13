@@ -13,6 +13,10 @@ module.exports = {
     email: {
       type: 'string',
       required: true
+    },
+    phoneNoCountry: {
+      type: 'string',
+      required: true
     }
   },
 
@@ -41,6 +45,7 @@ module.exports = {
   fn: async function (inputs, exits) {
     const user = await User.findOne({
       email: inputs.email,
+      phoneNoCountry: inputs.phoneNoCountry,
     });
 
     if (!user) {

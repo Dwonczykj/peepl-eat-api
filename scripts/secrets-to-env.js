@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+// * secrets_relative_paths=config/local.js,config/aws.json,config/vegiliverpool-firebase-adminsdk-4dfpz-8f01f888b3.json,config/stripe.json,config/test_stripe.json NODE_ENV=production-script node ./node_modules/sails/bin/sails run secrets-to-env
 // const _ = require(`lodash`);
 const fs = require(`fs`);
 const path = require('path');

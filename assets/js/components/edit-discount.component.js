@@ -13,25 +13,22 @@ parasails.registerComponent('editDiscount', {
   //  ╔═╗╦═╗╔═╗╔═╗╔═╗
   //  ╠═╝╠╦╝║ ║╠═╝╚═╗
   //  ╩  ╩╚═╚═╝╩  ╚═╝
-  props: [
-    'discount',
-  ],
+  props: ['discount'],
   //  ╦╔╗╔╦╔╦╗╦╔═╗╦    ╔═╗╔╦╗╔═╗╔╦╗╔═╗
   //  ║║║║║ ║ ║╠═╣║    ╚═╗ ║ ╠═╣ ║ ║╣
   //  ╩╝╚╝╩ ╩ ╩╩ ╩╩═╝  ╚═╝ ╩ ╩ ╩ ╩ ╚═╝
-  data: function (){
+  data: function () {
     return {
       syncing: false,
       formRules: {
         code: {
-          required: true
+          required: true,
         },
         percentage: {
-          required: true
-        }
+          required: true,
+        },
       },
-      formErrors: {
-      },
+      formErrors: {},
       cloudError: '',
     };
   },
@@ -55,8 +52,35 @@ parasails.registerComponent('editDiscount', {
               <input :class="{ 'is-invalid': formErrors.code }" maxlength="50" minlength="3" style="text-transform: uppercase; max-width: 10em" v-model.trim="discount.code" type="text" class="form-control" id="discountCode" required>
             </div>
             <div class="form-group">
-              <label for="percentage">Percentage</label>
-              <input :class="{ 'is-invalid': formErrors.percentage }" v-model="discount.percentage" type="number" class="form-control" id="percentage" required>
+              <label for="discountType">Discount Type</label>
+              <select class="form-control" id="discountType" @change="typeOnChange($event)" v-model="discount.discountType">
+                <option value="percentage">Percentage</option>
+                <option value="fixed">Fixed</option>
+              </select>
+            </div>
+            <div class="form-group" v-if="discount.discountType === 'percentage'">
+              <label for="value">Percentage</label>
+              <input :class="{ 'is-invalid': formErrors.value }" v-model="discount.value" type="number" class="form-control" id="value" required>
+            </div>
+            <div class="form-group" v-else-if="discount.discountType === 'fixed'">
+              <label for="value">Fixed Value [{{discount.currency}}]</label>
+              <input :class="{ 'is-invalid': formErrors.value }" v-model="discount.value" type="number" class="form-control" id="value" required>
+            </div>
+            <div class="form-group">
+              <label for="currency">Currency</label>
+              <select class="form-control" id="currency" @change="currencyOnChange($event)" v-model="discount.currency">
+                <option value="GBP">GBP</option>
+                <!-- <option value="USD">USD</option> -->
+                <!-- <option value="EUR">EUR</option> -->
+                <option value="GBPx">GBPx</option>
+                <option value="PPL">PPL</option>
+                <!-- <option value="GBT">GBT</option> -->
+              </select>
+              <!-- <input :class="{ 'is-invalid': formErrors.currency }" v-model="discount.currency" type="text" class="form-control" id="currency"> -->
+            </div>
+            <div class="form-group">
+              <label for="linkedWalletAddress">Linked Wallet Address</label>
+              <input :class="{ 'is-invalid': formErrors.linkedWalletAddress }" v-model="discount.linkedWalletAddress" type="text" class="form-control" id="linkedWalletAddress">
             </div>
             <div class="form-group">
               <label for="maxUses">Max Uses (or 0 for no limit)</label>
@@ -86,37 +110,61 @@ parasails.registerComponent('editDiscount', {
   //  ╦  ╦╔═╗╔═╗╔═╗╦ ╦╔═╗╦  ╔═╗
   //  ║  ║╠╣ ║╣ ║  ╚╦╝║  ║  ║╣
   //  ╩═╝╩╚  ╚═╝╚═╝ ╩ ╚═╝╩═╝╚═╝
-  beforeMount: function() {
+  beforeMount: function () {
     //…
   },
-  mounted: async function(){
+  mounted: async function () {
     //…
     this.discount.vendor = this.vendorid;
   },
-  beforeDestroy: function() {
+  beforeDestroy: function () {
     //…
   },
 
   filters: {
     convertToPounds: function (value) {
-      if (!value) {return '£0';}
-      value = '£' + (value/100).toFixed(2);
+      if (!value) {
+        return '£0';
+      }
+      value = '£' + (value / 100).toFixed(2);
       value = value.toString();
       return value;
     },
     capitalise: function (value) {
-      if (!value) {return ''; }
+      if (!value) {
+        return '';
+      }
       value = value.toString();
       return value.toUpperCase();
-    }
+    },
   },
 
   //  ╦╔╗╔╔╦╗╔═╗╦═╗╔═╗╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
   //  ║║║║ ║ ║╣ ╠╦╝╠═╣║   ║ ║║ ║║║║╚═╗
   //  ╩╝╚╝ ╩ ╚═╝╩╚═╩ ╩╚═╝ ╩ ╩╚═╝╝╚╝╚═╝
   methods: {
-    createdDiscount: function({id}){
+    createdDiscount: function ({ id }) {
       Vue.set(this.discount, 'id', id);
     },
-  }
+    typeOnChange: function (selectEvent) {
+      const newVal = selectEvent.srcElement.value;
+
+      if (newVal === 'percentage') {
+        // this.discount.currency = 'GBPx';
+      }
+      if (newVal === 'fixed') {
+        // this.discount.currency = 'GBPx';
+      }
+    },
+    currencyOnChange: function (selectEvent) {
+      const newVal = selectEvent.srcElement.value;
+
+      // if (newVal === 'deliveryPartner' && !this.isDeliveryPartner) {
+      //   window.alert('isDeliveryPartner getter not working');
+      // }
+      // if (newVal === 'vendor' && !this.isVendor) {
+      //   window.alert('isVendor getter not working');
+      // }
+    },
+  },
 });
