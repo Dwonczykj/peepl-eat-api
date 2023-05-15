@@ -22,7 +22,7 @@ let _exports: SailsModelDefnType<UserType> & { formatPhoneNumber?: (unusedOpts:{
       defaultsTo: '',
     },
     phoneNoCountry: {
-      type: 'number',
+      type: 'string',
       required: true,
     },
     phoneCountryCode: {

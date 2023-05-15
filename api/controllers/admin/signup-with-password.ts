@@ -20,7 +20,7 @@ module.exports = {
       required: true,
     },
     phoneNoCountry: {
-      type: 'number',
+      type: 'string',
       required: true,
     },
     phoneCountryCode: {
@@ -98,7 +98,7 @@ module.exports = {
     inputs: {
       emailAddress: string;
       password: string;
-      phoneNoCountry: number;
+      phoneNoCountry: string;
       phoneCountryCode: number;
       name?: string;
       vendorId?: number;

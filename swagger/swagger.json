@@ -2446,8 +2446,7 @@
             "default": ""
           },
           "phoneNoCountry": {
-            "type": "number",
-            "format": "double"
+            "type": "string"
           },
           "phoneCountryCode": {
             "type": "number",
@@ -5364,8 +5363,7 @@
             "name": "phoneNoCountry",
             "required": true,
             "schema": {
-              "type": "number",
-              "format": "double"
+              "type": "string"
             }
           },
           {
@@ -5533,6 +5531,14 @@
                     {
                       "type": "string",
                       "description": "firebase errored on verifying the user token"
+                    },
+                    {
+                      "type": "string",
+                      "description": "firebase ID token has expired"
+                    },
+                    {
+                      "type": "string",
+                      "description": "firebase ID token has expired"
                     },
                     {
                       "type": "string",

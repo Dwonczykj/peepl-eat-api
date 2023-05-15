@@ -49,7 +49,8 @@ module.exports = {
     });
 
     if (!user) {
-      return exits.badCombo();
+      sails.log.warn(`No user found for inputs: \n${JSON.stringify(inputs, null, 2)}`);
+      return exits.notFound();
     }
 
     // Update the session

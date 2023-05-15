@@ -174,6 +174,7 @@ requests over WebSockets instead of HTTP).`,
             decodedToken.phone_number.replace(/[^0-9]/g, '').substring(2),
           role: `consumer`,
           firebaseSessionToken: inputs.firebaseSessionToken,
+          fbUid: decodedToken.uid,
         }).fetch();
       }
       const user = _user;
@@ -204,7 +205,7 @@ requests over WebSockets instead of HTTP).`,
 
       return exits.success({
         user: user,
-        session: this.req.session.cookie
+        session: this.req.session.cookie,
       });
     } catch (err) {
       sails.log.info(err);

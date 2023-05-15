@@ -166,7 +166,7 @@ export type UserDeliveryPartnerRoleLiteral =
 type _UserTypeHidden = {
   id: number;
   email: string;
-  phoneNoCountry: number;
+  phoneNoCountry: string;
   phoneCountryCode: number;
   name: string;
   isSuperAdmin: boolean;
@@ -919,6 +919,8 @@ export type ActionExitsDefnType<TExits extends ActionExitRequired<any>> = {
           | 'error'
           | 'success'
           | 'firebaseError'
+          | 'firebaseIdTokenExpired'
+          | 'firebaseVerificationCodeExpired'
           | 'unauthorised'
           | 'badRequest';
       }) & {
