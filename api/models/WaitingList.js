@@ -51,6 +51,11 @@ module.exports = {
       required: false,
       defaultsTo: false,
     },
+    firebaseRegistrationToken: {
+      type: 'string',
+      required: false,
+      defaultsTo: '',
+    },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗

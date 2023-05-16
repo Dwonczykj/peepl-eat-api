@@ -19,6 +19,7 @@ declare var WaitingList: SailsModelType<WaitingListEntryType>;
 export type SubscribeWaitlistEmailNotificationsInputs = {
   emailAddress: string;
   receiveUpdates: boolean;
+  firebaseRegistrationToken: string | null;
 };
 
 export type SubscribeWaitlistEmailNotificationsResponse = WaitingListEntryType | false;
@@ -46,7 +47,12 @@ const _exports: SailsActionDefnType<
     receiveUpdates: {
       type: 'boolean',
       required: true,
-    }
+    },
+    firebaseRegistrationToken: {
+      type: 'string',
+      required: false,
+      defaultsTo: '',
+    },
   },
 
   exits: {
@@ -74,14 +80,22 @@ const _exports: SailsActionDefnType<
     const entries = await WaitingList.find({
       email: inputs.emailAddress.toLowerCase(),
     });
-    if(!entries || entries.length < 1){
+    if (!entries || entries.length < 1) {
       return exits.notFound();
     }
+
     await WaitingList.update({
       email: inputs.emailAddress.toLowerCase(),
-    }).set({
-      emailUpdates: true,
-    });
+    }).set(
+      inputs.firebaseRegistrationToken
+        ? {
+          emailUpdates: true,
+          firebaseRegistrationToken: inputs.firebaseRegistrationToken,
+        }
+        : { 
+          emailUpdates: true,
+        }
+    );
     const updatedEntries = await WaitingList.find({
       email: inputs.emailAddress.toLowerCase(),
     });

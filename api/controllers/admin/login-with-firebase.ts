@@ -278,7 +278,7 @@ requests over WebSockets instead of HTTP).`,
         if (sails.hooks.sockets) {
           // sails.helpers.broadcastSessionChange(this.req);
         }
-
+        
         return exits.success({
           user: user,
           session: this.req.session.cookie,

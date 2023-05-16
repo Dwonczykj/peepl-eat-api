@@ -719,6 +719,7 @@ export type WaitingListEntryType = {
   positionLastCalculatedTime: Date;
   order: number;
   emailUpdates: boolean;
+  firebaseRegistrationToken: string;
 };
 
 export type OrderItemType = _OrderItemTypeHidden & {
