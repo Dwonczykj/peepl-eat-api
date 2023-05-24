@@ -344,7 +344,17 @@ Cloud.setup({
     createDiscount: {
       verb: 'POST',
       url: '/api/v1/admin/create-discount',
-      args: ['code', 'percentage', 'expiryDateTime', 'maxUses', 'isEnabled'],
+      args: [
+        'code',
+        'value',
+        'currency',
+        'discountType',
+        'expiryDateTime',
+        'maxUses',
+        'isEnabled',
+        'linkedWalletAddress',
+        'vendor',
+      ],
     },
     editDiscount: {
       verb: 'POST',
@@ -352,10 +362,14 @@ Cloud.setup({
       args: [
         'id',
         'code',
-        'percentage',
+        'value',
+        'currency',
+        'discountType',
         'expiryDateTime',
         'maxUses',
         'isEnabled',
+        'linkedWalletAddress',
+        'vendor',
       ],
     },
     createProductSuggestion: {

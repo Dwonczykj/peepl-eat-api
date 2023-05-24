@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { nanoid } from 'nanoid';
+import nanoid from 'nanoid';
 
 import {
   sailsModelKVP,

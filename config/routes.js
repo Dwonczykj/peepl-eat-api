@@ -75,6 +75,7 @@ module.exports.routes = {
     action: 'orders/ongoing-orders-by-wallet',
   },
   'POST /api/v1/orders/create-order': { action: 'orders/create-order' },
+  'POST /api/v1/orders/cancel-order': { action: 'orders/cancel-order' },
   'GET /api/v1/orders/get-order-status': { action: 'orders/get-order-status' },
   'POST /api/v1/orders/peepl-pay-webhook': {
     action: 'orders/peepl-pay-webhook',
@@ -316,7 +317,7 @@ module.exports.routes = {
   'POST /api/v1/admin/generate-voucher-code': {
     action: 'admin/generate-voucher-code',
   },
-  'GET /api/v1/admin/validate-discount-code': {
+  'POST /api/v1/admin/validate-discount-code': {
     action: 'admin/validate-discount-code',
   },
   // 'POST /api/v1/admin/create-update-openinghours': {

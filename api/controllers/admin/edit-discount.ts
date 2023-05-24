@@ -5,6 +5,7 @@ import moment from 'moment';
 import { DiscountType, SailsActionDefnType } from '../../../scripts/utils';
 import {
   SailsModelType,
+  sailsModelKVP,
   sailsVegi,
 } from '../../interfaces/iSails';
 import {
@@ -17,7 +18,7 @@ declare var User: SailsModelType<UserType>;
 declare var Discount: SailsModelType<DiscountType>;
 
 
-export type EditDiscountInputs = Partial<DiscountType>;
+export type EditDiscountInputs = Partial<sailsModelKVP<DiscountType>>;
 
 export type EditDiscountResult = {id:number} | false;
 
@@ -41,14 +42,6 @@ const _exports: SailsActionDefnType<
     code: {
       type: 'string',
     },
-    discountType: {
-      type: 'string',
-      isIn: ['percentage', 'fixed'],
-    },
-    linkedWalletAddress: {
-      type: 'string',
-      regex: /^0x[a-fA-F0-9]{40}$|^$/,
-    },
     value: {
       type: 'number',
       min: 0,
@@ -59,14 +52,27 @@ const _exports: SailsActionDefnType<
       required: false,
       defaultsTo: Currency.GBPx,
     },
+    discountType: {
+      type: 'string',
+      isIn: ['percentage', 'fixed'],
+    },
     expiryDateTime: {
-      type: 'number',
+      type: 'ref',
     },
     maxUses: {
       type: 'number',
     },
     isEnabled: {
       type: 'boolean',
+    },
+    linkedWalletAddress: {
+      type: 'string',
+      regex: /^0x[a-fA-F0-9]{40}$|^$/,
+    },
+    vendor: {
+      type: 'number',
+      required: false,
+      allowNull: true,
     },
   },
 
@@ -75,8 +81,8 @@ const _exports: SailsActionDefnType<
       data: false,
     },
     error: {
-      statusCode: 403,
-    }
+      statusCode: 400,
+    },
   },
 
   fn: async function (inputs: EditDiscountInputs, exits: EditDiscountExits) {
@@ -89,26 +95,47 @@ const _exports: SailsActionDefnType<
       }
     }
 
+    if (typeof inputs.value !== 'number') {
+      sails.log(
+        `Request contained a discount code value of "${
+          inputs.value
+        }" with type: ${typeof inputs.value}`
+      );
+      return exits.error(
+        `Request contained a discount code value of "${
+          inputs.value
+        }" with type: ${typeof inputs.value}`
+      );
+    }
+
     inputs.code = inputs.code.toUpperCase();
     const valuesToSet = inputs;
-    if(valuesToSet.discountType === 'percentage'){
-      valuesToSet.value = Math.max(Math.min(100,valuesToSet.value),0);
-    }else if(valuesToSet.discountType === 'fixed'){
-      if(valuesToSet.maxUses !== 1){
-        sails.log.warn(`When creating a discount voucher, the maxUses must be set to "1" not "${valuesToSet.maxUses}"`);
+    if (valuesToSet.discountType === 'percentage') {
+      valuesToSet.value = Math.max(Math.min(100, valuesToSet.value), 0);
+    } else if (valuesToSet.discountType === 'fixed') {
+      if (valuesToSet.maxUses !== 1) {
+        sails.log.warn(
+          `When creating a discount voucher, the maxUses must be set to "1" not "${valuesToSet.maxUses}"`
+        );
       }
-      if(valuesToSet.value === 0){
-        sails.log.warn(`When creating a discount voucher, the amount should be > 0.`);
+      if (valuesToSet.value === 0) {
+        sails.log.warn(
+          `When creating a discount voucher, the amount should be > 0.`
+        );
       }
       valuesToSet.maxUses = 1;
     }
 
-    var updatedDiscount = await Discount.updateOne(inputs.id).set(valuesToSet);
-
-    // All done.
-    return exits.success({
-      id: updatedDiscount.id,
-    });
+    try {
+      var updatedDiscount = await Discount.updateOne(inputs.id).set(valuesToSet);
+  
+      // All done.
+      return exits.success({
+        id: updatedDiscount.id,
+      });
+    } catch (error) {
+      return exits.error(error);
+    }
   },
 };
 

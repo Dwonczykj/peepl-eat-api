@@ -142,6 +142,9 @@
       "name": "Create order"
     },
     {
+      "name": "CancelOrder"
+    },
+    {
       "name": "GetOrderStatus"
     },
     {
@@ -271,7 +274,7 @@
       "name": "Update product statuses"
     },
     {
-      "name": "Create discount"
+      "name": "CreateDiscount"
     },
     {
       "name": "EditDiscount"
@@ -736,7 +739,7 @@
           },
           "code": {
             "type": "string",
-            "maxLength": 30,
+            "maxLength": 36,
             "minLength": 3,
             "uniqueItems": true
           },
@@ -758,8 +761,8 @@
             "example": "fixed"
           },
           "expiryDateTime": {
-            "type": "number",
-            "format": "double"
+            "type": "string",
+            "format": "date"
           },
           "timesUsed": {
             "type": "number",
@@ -1433,7 +1436,8 @@
               "pending",
               "accepted",
               "rejected",
-              "partially fulfilled"
+              "partially fulfilled",
+              "cancelled by user"
             ],
             "example": "pending"
           },
@@ -1444,6 +1448,7 @@
               "pending",
               "accepted",
               "rejected",
+              "cancelled by user",
               "partially fulfilled",
               "out for delivery",
               "delivered",
@@ -2844,6 +2849,10 @@
           "emailUpdates": {
             "type": "boolean",
             "default": false
+          },
+          "firebaseRegistrationToken": {
+            "type": "string",
+            "default": ""
           }
         }
       }
@@ -4878,6 +4887,70 @@
         }
       }
     },
+    "/api/v1/orders/cancel-order": {
+      "post": {
+        "summary": "CancelOrder",
+        "tags": [
+          "CancelOrder"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "orderId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "senderWalletAddress",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Bad request"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
     "/api/v1/orders/get-order-status": {
       "get": {
         "summary": "GetOrderStatus",
@@ -5522,6 +5595,25 @@
           "200": {
             "description": "Success"
           },
+          "400": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
           "401": {
             "description": "Success",
             "content": {
@@ -5550,7 +5642,7 @@
             }
           },
           "404": {
-            "description": "Success"
+            "description": "Resource not found"
           },
           "500": {
             "description": "Success"
@@ -8988,9 +9080,9 @@
     },
     "/api/v1/admin/create-discount": {
       "post": {
-        "summary": "Create discount",
+        "summary": "CreateDiscount",
         "tags": [
-          "Create discount"
+          "CreateDiscount"
         ],
         "parameters": [
           {
@@ -9003,29 +9095,8 @@
           },
           {
             "in": "query",
-            "name": "currency",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "GBPx",
-              "example": "GBPx"
-            }
-          },
-          {
-            "in": "query",
-            "name": "percentage",
+            "name": "value",
             "required": true,
-            "schema": {
-              "type": "number",
-              "format": "double",
-              "maximum": 100,
-              "minimum": 0
-            }
-          },
-          {
-            "in": "query",
-            "name": "expiryDateTime",
-            "required": false,
             "schema": {
               "type": "number",
               "format": "double"
@@ -9033,8 +9104,30 @@
           },
           {
             "in": "query",
+            "name": "currency",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "discountType",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "expiryDateTime",
+            "required": true,
+            "schema": {}
+          },
+          {
+            "in": "query",
             "name": "maxUses",
-            "required": false,
+            "required": true,
             "schema": {
               "type": "number",
               "format": "double"
@@ -9043,24 +9136,73 @@
           {
             "in": "query",
             "name": "isEnabled",
-            "required": false,
+            "required": true,
             "schema": {
               "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "linkedWalletAddress",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          },
+          {
+            "in": "query",
+            "name": "vendor",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "The requested resource"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "409": {
             "description": "Success"
           },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Bad request"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Success"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
           "500": {
-            "description": "Internal server error"
+            "description": "Server error"
           }
         }
       }
@@ -9091,27 +9233,6 @@
           },
           {
             "in": "query",
-            "name": "discountType",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "percentage",
-                "fixed"
-              ]
-            }
-          },
-          {
-            "in": "query",
-            "name": "linkedWalletAddress",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "pattern": "^0x[a-fA-F0-9]{40}$|^$"
-            }
-          },
-          {
-            "in": "query",
             "name": "value",
             "required": false,
             "schema": {
@@ -9133,12 +9254,21 @@
           },
           {
             "in": "query",
-            "name": "expiryDateTime",
+            "name": "discountType",
             "required": false,
             "schema": {
-              "type": "number",
-              "format": "double"
+              "type": "string",
+              "enum": [
+                "percentage",
+                "fixed"
+              ]
             }
+          },
+          {
+            "in": "query",
+            "name": "expiryDateTime",
+            "required": false,
+            "schema": {}
           },
           {
             "in": "query",
@@ -9156,13 +9286,32 @@
             "schema": {
               "type": "boolean"
             }
+          },
+          {
+            "in": "query",
+            "name": "linkedWalletAddress",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^0x[a-fA-F0-9]{40}$|^$"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vendor",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "Success"
           },
-          "403": {
+          "400": {
             "description": "Server error"
           },
           "404": {
@@ -9243,7 +9392,7 @@
       }
     },
     "/api/v1/admin/validate-discount-code": {
-      "get": {
+      "post": {
         "summary": "ValidateDiscountCode",
         "tags": [
           "ValidateDiscountCode"
@@ -9690,6 +9839,15 @@
             "required": true,
             "schema": {
               "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "firebaseRegistrationToken",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": ""
             }
           }
         ],

@@ -61,7 +61,9 @@ module.exports = {
       sails.log
         .info(`Running sails in test mode, helpers.sendSmsNotification will not send notifications.
       Message would have been send to ${inputs.to} with body: ${inputs.body}`);
-      return exits.success();
+      return exits.success({
+        notification: newNotification,
+      });
     }
 
     if(sails.config.custom.plivoAuthId && sails.config.custom.plivoAuthToken){
@@ -89,7 +91,7 @@ module.exports = {
         sails.config.custom.twilioAuthToken
       );
 
-      twilioClient.messages
+      await twilioClient.messages
         .create({
           body: inputs.body,
           to: inputs.to,

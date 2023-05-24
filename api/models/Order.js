@@ -103,7 +103,8 @@ module.exports = {
     firebaseRegistrationToken: {
       type: 'string',
       required: false,
-      description: 'Used to send notificaitons to devices that are registered to this order',
+      description:
+        'Used to send notificaitons to devices that are registered to this order',
       allowNull: true,
     },
     // isArchived: {
@@ -145,12 +146,27 @@ module.exports = {
     restaurantAcceptanceStatus: {
       type: 'string',
       defaultsTo: 'pending',
-      isIn: ['pending', 'accepted', 'rejected', 'partially fulfilled'],
+      isIn: [
+        'pending',
+        'accepted',
+        'rejected',
+        'partially fulfilled',
+        'cancelled by user',
+      ],
     },
     orderAcceptanceStatus: {
       type: 'string',
       defaultsTo: 'pending',
-      isIn: ['pending', 'accepted', 'rejected', 'partially fulfilled', 'out for delivery', 'delivered', 'collected'],
+      isIn: [
+        'pending',
+        'accepted',
+        'rejected',
+        'cancelled by user',
+        'partially fulfilled',
+        'out for delivery',
+        'delivered',
+        'collected',
+      ],
     },
     rewardsIssued: {
       type: 'number',

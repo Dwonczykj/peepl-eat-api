@@ -476,7 +476,7 @@ export type DiscountType = {
   value: number;
   currency: Currency;
   discountType: 'percentage' | 'fixed';
-  expiryDateTime: number;
+  expiryDateTime: Date;
   timesUsed: number;
   maxUses: number;
   isEnabled: boolean;
@@ -615,6 +615,7 @@ export type RestaurantAcceptedStatusType =
   | 'rejected'
   | 'accepted'
   | 'pending'
+  | 'cancelled by user'
   | 'partially fulfilled';
 
 export type TimePeriodEnumType = 

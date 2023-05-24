@@ -185,8 +185,17 @@ type SailsUsingConnectionType<T> = {
   usingConnection: (unusedDb:any) => Promise<T>;
 }
 
+type InterceptErrCodeLiteral = 'E_UNIQUE';
+
+type Interceptable<T> = {
+  intercept: (
+    errCode: InterceptErrCodeLiteral,
+    returnErrCode: string
+  ) => Promise<T>;
+};
+
 type _SailsFetchType<T> = {
-  fetch: () => Promise<T>;
+  fetch: () => (Promise<T> & Interceptable<T>);
 }
 type SailsFetchType<T> = _SailsFetchType<T> &
   SailsUsingConnectionType<_SailsFetchType<T>>;

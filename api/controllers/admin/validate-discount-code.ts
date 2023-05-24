@@ -76,7 +76,7 @@ const _exports: SailsActionDefnType<
       statusCode: 403,
     },
     badRequest: {
-      responseType: 'badRequest',
+      responseType: 'badRequest', // 400
     },
     error: {
       statusCode: 500,
@@ -126,13 +126,13 @@ const _exports: SailsActionDefnType<
       return exits.badRequest(
         'WalletAddress must be a valid wallet address to validate fixed discount codes'
       );
-    } else if (
+    } /*else if ( //! allow fixed discount codes to not be registered to a single vendor
       !inputs.vendor
     ) {
       return exits.badRequest(
         'Vendor must be provided to validate fixed discount codes'
       );
-    }
+    }*/
     let fixedDiscounts = await Discount.find({
       code: inputs.code,
       linkedWalletAddress: inputs.walletAddress,
@@ -153,11 +153,24 @@ const _exports: SailsActionDefnType<
         subject: 'vegi-server WARNING: Non-unique discount codes found in DB',
       });
     } else if (!fixedDiscounts || fixedDiscounts.length < 1) {
-      sails.log.info(`No discount codes found for code: ${inputs.code}`);
-      return exits.success(false);
-    } else {
-      return exits.success(fixedDiscounts[0]);
+      let fixedDiscounts = await Discount.find({
+        code: inputs.code,
+        linkedWalletAddress: inputs.walletAddress,
+        vendor: inputs.vendor,
+        discountType: 'fixed',
+        isEnabled: true,
+      });
+      fixedDiscounts = fixedDiscounts.filter(
+        (d) =>
+          d.timesUsed <= d.maxUses &&
+          moment.utc(d.expiryDateTime).isSameOrAfter(moment.utc())
+      );
+      if (!fixedDiscounts || fixedDiscounts.length < 1){
+        sails.log.info(`No discount codes found for code: ${inputs.code}`);
+        return exits.success(false);
+      }
     }
+    return exits.success(fixedDiscounts[0]);
   },
 };
 

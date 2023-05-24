@@ -14,7 +14,7 @@ module.exports = {
     code: {
       type: 'string',
       minLength: 3,
-      maxLength: 30,
+      maxLength: 36,
       unique: true,
       required: true,
     },
@@ -33,7 +33,9 @@ module.exports = {
       defaultsTo: 'fixed',
     },
     expiryDateTime: {
-      type: 'number',
+      type: 'ref',
+      // columnType: 'datetime',
+      columnType: 'date',
     },
     timesUsed: {
       type: 'number',
@@ -67,14 +69,18 @@ module.exports = {
   },
 
   beforeCreate: function (valuesToSet, proceed) {
-    if(valuesToSet.discountType === 'percentage'){
-      valuesToSet.value = Math.max(Math.min(100,valuesToSet.value),0);
-    }else if(valuesToSet.discountType === 'fixed'){
-      if(valuesToSet.maxUses !== 1){
-        sails.log.warn(`When creating a discount voucher, the maxUses must be set to "1" not "${valuesToSet.maxUses}"`);
+    if (valuesToSet.discountType === 'percentage') {
+      valuesToSet.value = Math.max(Math.min(100, valuesToSet.value), 0);
+    } else if (valuesToSet.discountType === 'fixed') {
+      if (valuesToSet.maxUses !== 1) {
+        sails.log.warn(
+          `When creating a discount voucher, the maxUses must be set to "1" not "${valuesToSet.maxUses}"`
+        );
       }
-      if(valuesToSet.value === 0){
-        sails.log.warn(`When creating a discount voucher, the amount should be > 0.`);
+      if (valuesToSet.value === 0) {
+        sails.log.warn(
+          `When creating a discount voucher, the amount should be > 0.`
+        );
       }
       valuesToSet.maxUses = 1;
     }

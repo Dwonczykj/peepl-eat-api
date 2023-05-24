@@ -53,6 +53,7 @@ export type LoginWithFirebaseExits = {
   // error: (unusedErr?: Error | String) => void;
   // badRequest: (unusedErr?: Error | String) => void;
   firebaseUserNoPhone: (unusedErr?: Error | String) => void;
+  firebaseUserNoPhoneInDecodedToken: (unusedErr?: Error | String) => void;
   firebaseErrored: (
     unusedErr?:
       | {
@@ -122,7 +123,7 @@ requests over WebSockets instead of HTTP).`,
       message: 'success',
     },
     firebaseUserNoPhone: {
-      statusCode: 404,
+      statusCode: 400,
     },
     firebaseErrored: {
       responseType: 'firebaseError',
@@ -152,6 +153,9 @@ requests over WebSockets instead of HTTP).`,
       statusCode: 500,
       data: null,
     },
+    firebaseUserNoPhoneInDecodedToken: {
+      statusCode: 400,
+    }
   },
 
   fn: async function (inputs, exits) {
@@ -196,26 +200,28 @@ requests over WebSockets instead of HTTP).`,
         const inputPhoneDetails = splitPhoneNumber(inputs.phoneNumber);
 
         const formattedFirebaseNumber = decodedToken.phone_number;
-        if (!formattedFirebaseNumber) {
-          sails.log.error(
-            `Login-with-firebase (phone) failed due to no firebase user existing with input phonenumber.`
-          );
+        // if (!formattedFirebaseNumber) {
+        //   sails.log.error(
+        //     `Login-with-firebase (phone) failed due to no firebase user existing with input phonenumber.`
+        //   );
 
-          return exits.firebaseUserNoPhone();
-        }
+        //   return exits.firebaseUserNoPhoneInDecodedToken();
+        // }
+        if(formattedFirebaseNumber){
+          const firebasePhoneDetails = splitPhoneNumber(formattedFirebaseNumber);
 
-        const firebasePhoneDetails = splitPhoneNumber(formattedFirebaseNumber);
+          if (
+            firebasePhoneDetails['countryCode'] !==
+              inputPhoneDetails['countryCode'] ||
+            firebasePhoneDetails['phoneNoCountry'] !==
+              inputPhoneDetails['phoneNoCountry']
+          ) {
+            sails.log.error(
+              `Login-with-firebase (phone) failed due because phone details stored against firebase user does not match request input phone number`
+            );
+            return exits.badCombo(); // phone number doesnt match, throw badCombo
+          }
 
-        if (
-          firebasePhoneDetails['countryCode'] !==
-            inputPhoneDetails['countryCode'] ||
-          firebasePhoneDetails['phoneNoCountry'] !==
-            inputPhoneDetails['phoneNoCountry']
-        ) {
-          sails.log.error(
-            `Login-with-firebase (phone) failed due because phone details stored against firebase user does not match request input phone number`
-          );
-          return exits.badCombo(); // phone number doesnt match, throw badCombo
         }
 
         let user: sailsModelKVP<UserType> | UserType = await User.findOne({
@@ -278,7 +284,7 @@ requests over WebSockets instead of HTTP).`,
         if (sails.hooks.sockets) {
           // sails.helpers.broadcastSessionChange(this.req);
         }
-        
+
         return exits.success({
           user: user,
           session: this.req.session.cookie,
