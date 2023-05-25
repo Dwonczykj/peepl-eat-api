@@ -1,3 +1,3 @@
 export * from './currency';
-export * from './peeplPay';
+export * from './currencyConverter';
 

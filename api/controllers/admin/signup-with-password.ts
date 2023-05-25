@@ -169,6 +169,12 @@ module.exports = {
         existingFirebaseUser.phoneNumber ===
         `+${inputs.phoneCountryCode}${inputs.phoneNoCountry}`
       ) {
+        sails.log.warn(
+          `Failed to register new user for email: "${inputs.emailAddress}" as phoneNumber:+${inputs.phoneCountryCode}${inputs.phoneNoCountry} is already registered to email: "${existingFirebaseUser.email}" with firebase. https://console.firebase.google.com/u/0/project/vegiliverpool/authentication/users`
+        );
+        await firebase.sendPasswordResetEmail({
+          tryEmail: existingFirebaseUser.email,
+        });
         return exits.firebaseUserExistsForPhone();
       }
       return exits.userExists();
@@ -213,6 +219,7 @@ module.exports = {
           }).fetch();
           return exits.success(user);
         } catch (error) {
+          sails.log.error(error);
           sails.log.error(
             `Error creating user in signup-with-password action: ${error}`
           );
@@ -251,6 +258,7 @@ module.exports = {
           sails.log.error(
             `Error creating user in signup-with-password action: ${error}`
           );
+          sails.log.error(error);
           // return exits.error(
           //   new Error(
           //     `Error creating user in signup-with-password action: ${error}`

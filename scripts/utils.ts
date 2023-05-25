@@ -470,10 +470,15 @@ export type DiscountCodeType = {
   id: number;
   outcode: string;
 };
-export type DiscountType = {
+
+
+export type _DiscountTypeHidden = {
   id: number;
   code: string;
+
+  /// Must be between 0 and 100 if percentage discount
   value: number;
+
   currency: Currency;
   discountType: 'percentage' | 'fixed';
   expiryDateTime: Date;
@@ -635,6 +640,7 @@ export type _OrderTypeHidden = {
   id: number;
   subtotal: number;
   total: number;
+  currency: Currency | '';
   orderedDateTime: number;
   paidDateTime: number;
   refundDateTime: number;
@@ -668,9 +674,14 @@ export type _OrderTypeHidden = {
   fulfilmentSlotFrom: Date;
   fulfilmentSlotTo: Date;
   fulfilmentMethod: FulfilmentMethodType;
-  discount: DiscountType;
+  // discount: DiscountType;
+  discounts: Array<_DiscountTypeHidden>;
   vendor: VendorType;
   deliveryPartner?: DeliveryPartnerType;
+};
+
+export type DiscountType = _DiscountTypeHidden & {
+  orders?: _OrderTypeHidden[];
 };
 
 export type NotificationType = {
@@ -746,6 +757,7 @@ export type TransactionType = {
   receiver: AccountType;
   payer: AccountType;
   order: OrderType | null;
+  discount: DiscountType | null; //TODO: Create discounts when an order is marked as paid in webhook and the order has multiple discount objects stored on the order.
 };
 
 export const openingHoursToMoments = (
@@ -853,14 +865,33 @@ export type ModelAttributeAssociationColnDefnType = {
   via: string;
   description?: string;
 };
-export type ModelAttributePrimitiveDefnType = _actionPrimitiveDefnType & {
+export type ModelAttributePostgreSQLColumnType = {
+  columnType?:
+    | 'int4'
+    | 'int8'
+    | 'float4'
+    | 'float8'
+    | 'text'
+    | `text(${number})` // i.e. text(255)
+    | 'varchar'
+    | `varchar(${number})` // i.e. varchar(32)
+    | 'bool'
+    | 'json'
+    | 'xml'
+    | 'date'
+    | 'timestamp'
+    | 'timestamptz'
+    | null;
+};
+export type ModelAttributeMySQLColumnType = {
   columnType?: 'INT' | 'TINYINT' | 'DATETIME' | 'LONGTEXT' | 'TEXT' | null;
 };
+export type ModelAttributePrimitiveDefnType = _actionPrimitiveDefnType & ModelAttributePostgreSQLColumnType;
 export type ModelAttributeRefDefnType =
   // | ActionInputArrayDefnType
   // | ActionInputObjectDefnType
-  | (_actionInputType & {
-      type: 'json';
+  | (_actionInputType & ModelAttributePostgreSQLColumnType & {
+      type: 'json' | 'ref';
     });
 
 export type ModelAttributeType =
@@ -956,9 +987,9 @@ export type ModelInputAttributeDerivedType<T extends ModelAttributeType> = {
     : T extends ActionInputBooleanDefnType
     ? boolean
     : T extends ModelAttributeRefDefnType
-    ? Array<any> | object
+    ? Array<any> | object | Date
     : T extends ModelAttributePrimitiveDefnType
-    ? string | boolean | number
+    ? string | boolean | number | Date
     : T extends ModelAttributeAssociationColnDefnType
     ? Array<any>
     : T extends ModelAttributeAssociationModlDefnType

@@ -45,6 +45,10 @@ let _exports: SailsModelDefnType<TransactionType> = {
       model: 'account',
       required: true,
     },
+    discount: {
+      model: 'discount',
+      required: false,  
+    },
     order: {
       model: 'order',
     },

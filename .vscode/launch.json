@@ -97,8 +97,10 @@
             "args": [
                 "--verbose",
                 "--hookTimeout=160000",
-                // "--drop"
-                "--alter"
+                "--log=verbose", // ~ https://stackoverflow.com/a/32980570
+                // ! Recommend exporting data from db first to dump file before running either of these...
+                // "--drop" // Drop will delete all your tables and recreate them, which is good for a new project and you want to seed new dummy data all the time.
+                "--alter" // Alter will try to keep your data but will make changes to your tables if you do so in your models. If sails can't keep the data, it will be deleted.
             ],
             "outFiles": [
                 "${workspaceFolder}/out/**/*.js"

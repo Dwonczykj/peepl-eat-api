@@ -147,7 +147,9 @@ export const sendPasswordResetEmail = (args = {
       try {
         const resetLink = await getAuth()
           .generatePasswordResetLink(args.tryEmail, {
-            url: config.baseUrl,
+            url: process.env.NODE_ENV === 'production'
+              ? 'https://vegi.vegiapp.co.uk' 
+              : 'https://qa-vegi.vegiapp.co.uk',
             // iOS: {
             //   bundleId: 'com.example.ios'
             // },

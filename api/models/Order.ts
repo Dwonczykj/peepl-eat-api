@@ -1,11 +1,17 @@
 /**
- * Order.js
+ * Order.ts
  *
  * @description :: A model definition represents a database table/collection.
  * @docs        :: https://sailsjs.com/docs/concepts/models-and-orm/models
  */
-const { v4: uuidv4 } = require('uuid');
-module.exports = {
+import {v4 as uuidv4} from 'uuid';
+
+import {
+  SailsModelDefnType,
+  OrderType,
+} from '../../scripts/utils';
+
+let _exports: SailsModelDefnType<OrderType> = {
   attributes: {
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
@@ -18,6 +24,11 @@ module.exports = {
       type: 'number',
       description: 'The order total in pence.',
       required: true,
+    },
+    currency: {
+      type: 'string',
+      required: true,
+      // defaultsTo: Currency.GBPx, //'GBPx'
     },
     orderedDateTime: {
       type: 'number',
@@ -126,13 +137,13 @@ module.exports = {
     fulfilmentSlotFrom: {
       type: 'ref',
       // columnType: 'datetime',
-      columnType: 'date',
+      columnType: 'timestamp',
       description: 'The beginning of the estimated fulfilment slot.',
     },
     fulfilmentSlotTo: {
       type: 'ref',
       // columnType: 'datetime',
-      columnType: 'date',
+      columnType: 'timestamp',
       description: 'The end of the estimated fulfilment slot.',
     },
     publicId: {
@@ -195,14 +206,14 @@ module.exports = {
     },
     deliveryPunctuality: {
       type: 'number',
-      columnType: 'int',
+      columnType: 'int4',
       min: 0,
       max: 5,
       allowNull: true,
     },
     orderCondition: {
       type: 'number',
-      columnType: 'int',
+      columnType: 'int4',
       min: 0,
       max: 5,
       allowNull: true,
@@ -218,8 +229,13 @@ module.exports = {
       model: 'fulfilmentmethod',
       required: true,
     },
-    discount: {
-      model: 'discount',
+    // discount: {
+    //   model: 'discount',
+    // },
+    discounts: {
+      collection: 'discount',
+      via: 'orders',
+      description: 'all discouns that have been applied to this order',
     },
     items: {
       collection: 'orderitem',
@@ -247,3 +263,5 @@ module.exports = {
     return proceed();
   },
 };
+
+module.exports = _exports;

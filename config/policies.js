@@ -24,6 +24,7 @@ module.exports.policies = {
   'admin/login-with-password': true,
   'admin/login': true,
   'admin/logout': true,
+  'admin/reset-password': true,
   'admin/logged-in': true,
   'admin/view-account': [
     'localize',

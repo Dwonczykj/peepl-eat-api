@@ -746,6 +746,7 @@
           "value": {
             "type": "number",
             "format": "double",
+            "description": "The amount to discount; between 0 and 100 if percentage.",
             "minimum": 0
           },
           "currency": {
@@ -789,6 +790,13 @@
                 "$ref": "#/components/schemas/vendor"
               }
             ]
+          },
+          "orders": {
+            "description": "all orders that the discount has been applied to Array of **order**'s or array of FK's when creating / updating / not populated",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/order"
+            }
           }
         }
       },
@@ -1272,6 +1280,7 @@
           {
             "required": [
               "total",
+              "currency",
               "orderedDateTime",
               "deliveryName",
               "deliveryEmail",
@@ -1312,6 +1321,9 @@
             "type": "number",
             "format": "double",
             "description": "The order total in pence."
+          },
+          "currency": {
+            "type": "string"
           },
           "orderedDateTime": {
             "type": "number",
@@ -1412,12 +1424,12 @@
           },
           "fulfilmentSlotFrom": {
             "type": "string",
-            "format": "date",
+            "format": "date-time",
             "description": "The beginning of the estimated fulfilment slot."
           },
           "fulfilmentSlotTo": {
             "type": "string",
-            "format": "date",
+            "format": "date-time",
             "description": "The end of the estimated fulfilment slot."
           },
           "publicId": {
@@ -1504,13 +1516,12 @@
               }
             ]
           },
-          "discount": {
-            "description": "JSON dictionary representing the **discount** instance or FK when creating / updating / not populated",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/discount"
-              }
-            ]
+          "discounts": {
+            "description": "all discouns that have been applied to this order Array of **discount**'s or array of FK's when creating / updating / not populated",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/discount"
+            }
           },
           "items": {
             "description": "Array of **orderitem**'s or array of FK's when creating / updating / not populated",
@@ -2398,6 +2409,14 @@
             "oneOf": [
               {
                 "$ref": "#/components/schemas/account"
+              }
+            ]
+          },
+          "discount": {
+            "description": "JSON dictionary representing the **discount** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/discount"
               }
             ]
           },

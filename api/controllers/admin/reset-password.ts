@@ -77,7 +77,7 @@ const _exports: SailsActionDefnType<
       return exits.success(resetLink);
     } catch (error) {
       sails.log.error(error);
-      return exits.success(false);
+      return exits.error(`Unable to reset-password with error: ${error}`);
     }
   },
 };

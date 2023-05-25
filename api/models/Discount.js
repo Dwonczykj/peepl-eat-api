@@ -22,6 +22,7 @@ module.exports = {
       type: 'number',
       min: 0,
       required: true,
+      description: 'The amount to discount; between 0 and 100 if percentage.',
     },
     currency: {
       type: 'string',
@@ -66,6 +67,11 @@ module.exports = {
       model: 'vendor',
       description: 'Optional vendor for this discount',
     },
+    orders: {
+      collection: 'order',
+      via: 'discounts',
+      description: 'all orders that the discount has been applied to',
+    }
   },
 
   beforeCreate: function (valuesToSet, proceed) {

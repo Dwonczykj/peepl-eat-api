@@ -1,6 +1,6 @@
 // // import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 // // const _ = require('lodash');
-// // import * as _ from 'lodash';
+// // import _ from 'lodash';
 // var SAILS_LOCALS:any;
 // var firebase:any;
 // var sails: any;

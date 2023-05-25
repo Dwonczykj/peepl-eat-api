@@ -1,8 +1,13 @@
-declare var Order: any;
-declare var OrderItem: any;
-declare var Cloud: any;
+import { OrderItemType, OrderType } from "../../scripts/utils";
+import { Currency } from "../../api/interfaces/peeplPay";
+import { SailsModelType } from "api/interfaces/iSails";
+import _ from 'lodash';
+
 const util = require("util");
-declare var _:any;
+
+declare var Order: SailsModelType<OrderType>;
+declare var OrderItem: SailsModelType<OrderItemType>;
+declare var Cloud: any;
 
 export type UpdateItemsForOrderSuccess = { 
   data: {
@@ -217,6 +222,7 @@ module.exports = {
         const newOrder = await wrapWithDb(db, () =>
           Order.create({
             total: 0.0, // * Set later!
+            currency: Currency.GBPx,
             orderedDateTime: originalOrder.orderedDateTime,
             paidDateTime: originalOrder.paidDateTime,
             paymentStatus: originalOrder.paymentStatus,
@@ -301,8 +307,8 @@ module.exports = {
 
         await wrapWithDb(db, () =>
           Order.updateOne(originalOrder.id).set({
-            restaurantAcceptanceStatus: "partially fulfilled",
-            completedFlag: "void",
+            restaurantAcceptanceStatus: 'partially fulfilled',
+            completedFlag: 'voided',
           })
         );
         // Remove items from order that were not fulfilled by vendor

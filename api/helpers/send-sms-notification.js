@@ -35,19 +35,23 @@ module.exports = {
       newNotification = await Notification.create({
         recipient: inputs.to,
         type: 'sms',
-        sentAt: Date.now(),
+        sentAt: Date.now(), // TODO: Consider casting sql type to timestamp with a temp colum to do the cast and then channing the type here. and then using moment().format(datetimeStrFormatExactForSQLTIMESTAMP)
         title: inputs.body,
-        order: (inputs.data && inputs.data.orderId && Number.parseInt(inputs.data.orderId)) || null,
+        order:
+          (inputs.data &&
+            inputs.data.orderId &&
+            Number.parseInt(inputs.data.orderId)) ||
+          null,
         metadata:
           inputs.data && inputs.data.orderId
             ? JSON.stringify({
-              model: 'order',
-              id: inputs.data.orderId,
-            })
+                model: 'order',
+                id: inputs.data.orderId,
+              })
             : JSON.stringify({
-              model: '',
-              id: null,
-            }),
+                model: '',
+                id: null,
+              }),
       }).fetch();
     } catch (error) {
       sails.log.error(error);

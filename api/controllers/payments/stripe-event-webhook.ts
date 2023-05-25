@@ -3,15 +3,18 @@ import stripe from '../../../scripts/load_stripe';
 import Stripe from 'stripe';
 import _ from 'lodash';
 import axios from 'axios';
+import moment from 'moment';
 import { SailsModelType, sailsVegi } from '../../interfaces/iSails';
-import { OrderType, SailsActionDefnType } from '../../../scripts/utils';
+import { DiscountType, OrderType, SailsActionDefnType, TransactionType, datetimeStrFormatExactForSQLTIMESTAMP } from '../../../scripts/utils';
 import {
   generateCorrelationId,
   mintTokensAndSendToken,
 } from '../../../fuse/fuseApi';
+import { Currency } from '../../../api/interfaces/peeplPay';
 
 declare var sails: sailsVegi;
 declare var Order: SailsModelType<OrderType>;
+declare var Transaction: SailsModelType<TransactionType>;
 
 export type StripeEventWebhookInputs = Stripe.Event;
 
@@ -132,7 +135,7 @@ const _exports: SailsActionDefnType<
         const paymentIntentId = paymentIntent.id;
         const orders = await Order.find({
           paymentIntentId: paymentIntentId,
-        }).populate('vendor');
+        }).populate('vendor&discounts');
         if (!orders || orders.length < 1) {
           const e = Error(
             `Stripe Event Webook for "${eventType}" webhook was unable to locate an order with matching payment intent: "${paymentIntentId}"`
@@ -312,12 +315,75 @@ Delivery/Collection on ${order.fulfilmentSlotFrom} - ${order.fulfilmentSlotTo}`,
             );
           }
 
-          await Order.update({
-            publicId:order.publicId,
-          }).set({
-            paymentStatus: 'paid',
-            paidDateTime: Date.now(),
-          });
+          // turn into transaction if supported, then fo an order find after to check the updated order and TX
+          try {
+            await Order.update({
+              publicId: order.publicId,
+            }).set({
+              paymentStatus: 'paid',
+              paidDateTime: Date.now(), // TODO: Consider casting sql type to timestamp with a temp colum to do the cast and then channing the type here. and then using moment().format(datetimeStrFormatExactForSQLTIMESTAMP)
+            });
+            if(order.discounts && order.discounts.length > 1){
+              const addTxFn = async (discount:DiscountType) => {
+                if (discount.discountType === 'fixed') {
+                  await Transaction.create({
+                    amount: discount.value,
+                    currency: discount.currency,
+                    discount: discount.id,
+                    order: order.id,
+                    payer: order.customerWalletAddress,
+                    receiver: order.vendor.walletAddress,
+                    timestamp: moment().format(
+                      datetimeStrFormatExactForSQLTIMESTAMP
+                    ),
+                  });
+                } else if (discount.discountType === 'percentage') {
+                  let amount = (discount.value / 100) * order.subtotal;
+                  if(discount.value > 100) {
+                    sails.log.error(
+                      `Cant add percentage discount to order with value > 100% for discount with code: ${discount.code}`
+                    );
+                    return;
+                  } else if (discount.value < 0){
+                    sails.log.error(
+                      `Cant add percentage discount to order with value < 0% for discount with code: ${discount.code}`
+                    );
+                    return;
+                  } else {
+                    sails.log(`Percentage discount of ${discount.value}% applied to order subtotal gives discounted amount of ${amount} [${discount.currency}]`);
+                  }
+                  
+                  const toCurrency = order.currency || Currency.GBPx;
+                  if (toCurrency !== discount.currency) {
+                    amount = await sails.helpers.convertCurrencyAmount.with({
+                      amount: amount,
+                      fromCurrency: discount.currency,
+                      toCurrency: toCurrency,
+                    });
+                  }
+                  await Transaction.create({
+                    amount: amount,
+                    currency: toCurrency,
+                    discount: discount.id,
+                    order: order.id,
+                    payer: order.customerWalletAddress,
+                    receiver: order.vendor.walletAddress,
+                    timestamp: moment().format(
+                      datetimeStrFormatExactForSQLTIMESTAMP
+                    ),
+                  });
+                } else {
+                  sails.log.warn(`Unable to calculate discounts in stripe-event-webhook for discounts with type: "${discount.discountType}"`);
+                }
+              };
+              await Promise.all(order.discounts.map((discount) => addTxFn(discount)));
+            }
+          } catch (error) {
+            sails.log.error(
+              `stripe-event-webhook errored when updating order with publicId: "${order.publicId}" to "paymentStatus:paid": ${error}`
+            );
+            return exits.error(`Failed to set order to paid with error: ${error}`);
+          }
           
         }  
       } else {

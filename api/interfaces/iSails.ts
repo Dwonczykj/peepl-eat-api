@@ -27,6 +27,7 @@ import { GetOrdersInputs, GetOrdersResult } from "../../api/helpers/get-orders";
 import { RefreshStripeTransactionsInputs, RefreshStripeTransactionsResult } from "../../api/helpers/refresh-stripe-transactions";
 import { RefreshFuseTransactionsInputs, RefreshFuseTransactionsResult } from "../../api/helpers/refresh-fuse-transactions";
 import { FormatOrdersInputs, FormatOrdersResult } from "../../api/helpers/format-orders";
+import { ConvertCurrencyAmountInputs, ConvertCurrencyAmountResponse } from "../../api/helpers/convert-currency-amount";
 
 export type SailsActionInput =
   | {
@@ -510,13 +511,11 @@ export type sailsVegi = {
       DistanceHaversineInputs,
       DistanceHaversineResult
     >;
-    getOrders: _helperFunction<
-      GetOrdersInputs,
-      GetOrdersResult
-    >;
-    formatOrders: _helperFunction<
-      FormatOrdersInputs,
-      FormatOrdersResult
+    getOrders: _helperFunction<GetOrdersInputs, GetOrdersResult>;
+    formatOrders: _helperFunction<FormatOrdersInputs, FormatOrdersResult>;
+    convertCurrencyAmount: _helperFunction<
+      ConvertCurrencyAmountInputs,
+      ConvertCurrencyAmountResponse
     >;
     distanceViaBearing: _helperFunction<
       DistanceViaBearingInputs,
@@ -643,18 +642,27 @@ export type sailsVegi = {
       unusedOrunusedArg: EditProductCategoriesInput
     ) => Promise<Array<sailsModelKVP<ProductCategoryType> | null>>);
 
-    transactionsForAccount: _helperFunction<TransactionsForAccountInputs, TransactionsForAccountResult>;
+    transactionsForAccount: _helperFunction<
+      TransactionsForAccountInputs,
+      TransactionsForAccountResult
+    >;
 
-    refreshFuseTransactions: _helperFunction<RefreshFuseTransactionsInputs, RefreshFuseTransactionsResult>;
-    refreshStripeTransactions: _helperFunction<RefreshStripeTransactionsInputs, RefreshStripeTransactionsResult>;
+    refreshFuseTransactions: _helperFunction<
+      RefreshFuseTransactionsInputs,
+      RefreshFuseTransactionsResult
+    >;
+    refreshStripeTransactions: _helperFunction<
+      RefreshStripeTransactionsInputs,
+      RefreshStripeTransactionsResult
+    >;
 
     createPeeplPaymentIntent: _helperFunction<
       {
-        paymentAmount: number,
-        currency: string,
-        recipientWalletAddress: walletAddressString,
-        recipientName: string,
-        headers: any,
+        paymentAmount: number;
+        currency: string;
+        recipientWalletAddress: walletAddressString;
+        recipientName: string;
+        headers: any;
       },
       NewPaymentIntent
     >;

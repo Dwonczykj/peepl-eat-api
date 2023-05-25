@@ -14,6 +14,7 @@ import {
   AccountType,
   OrderItemOptionValueType
 } from '../../../scripts/utils';
+import { Currency } from '../../../api/interfaces/peeplPay';
 
 declare var sails: sailsVegi;
 declare var OrderItemOptionValue: SailsModelType<OrderItemOptionValueType>;
@@ -379,6 +380,7 @@ const _exports: SailsActionDefnType<
           order = await wrapWithDb(db, () =>
             Order.create({
               total: inputs.total,
+              currency: Currency.GBPx,
               firebaseRegistrationToken: inputs.firebaseRegistrationToken,
               orderedDateTime: Date.now(),
               deliveryAccepted: !!availableDeliveryPartner,
