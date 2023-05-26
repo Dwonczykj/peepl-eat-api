@@ -152,7 +152,7 @@ parasails.registerComponent('editDiscount', {
         return '£0';
       }
       // value = '£' + (value / 100).toFixed(2);
-      value = '£' + value.toFixed(2);
+      value = '£' + Number.parseFloat(value).toFixed(2);
       value = value.toString();
       return value;
     },
@@ -160,7 +160,7 @@ parasails.registerComponent('editDiscount', {
       if (!value) {
         return '0%';
       }
-      value = (value * 100).toFixed(2) + '%';
+      value = (Number.parseFloat(value) * 100).toFixed(2) + '%';
       value = value.toString();
       return value;
     },
@@ -200,14 +200,18 @@ parasails.registerComponent('editDiscount', {
         return '£0';
       }
       // value = '£' + (value / 100).toFixed(2);
-      value = '£' + value.toFixed(2);
+      value = '£' + Number.parseFloat(value).toFixed(2);
       value = value.toString();
       return value;
     },
     printValue: function () {
       return this.discount.currency === 'GBP'
         ? this.toPoundsMethod(this.discount.value)
-        : `${this.discount.value.toFixed(2)} ${this.discount.currency}`;
+        : `${
+            this.discount.value
+              ? Number.parseFloat(this.discount.value).toFixed(2)
+              : 0.0
+          } ${this.discount.currency}`;
     },
     typeOnChange: function (selectEvent) {
       const newVal = selectEvent.srcElement.value;
