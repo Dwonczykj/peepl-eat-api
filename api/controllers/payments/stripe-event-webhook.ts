@@ -14,6 +14,7 @@ import { Currency } from '../../../api/interfaces/peeplPay';
 
 declare var sails: sailsVegi;
 declare var Order: SailsModelType<OrderType>;
+declare var Discount: SailsModelType<DiscountType>;
 declare var Transaction: SailsModelType<TransactionType>;
 
 export type StripeEventWebhookInputs = Stripe.Event;
@@ -323,6 +324,16 @@ Delivery/Collection on ${order.fulfilmentSlotFrom} - ${order.fulfilmentSlotTo}`,
               paymentStatus: 'paid',
               paidDateTime: Date.now(), // TODO: Consider casting sql type to timestamp with a temp colum to do the cast and then channing the type here. and then using moment().format(datetimeStrFormatExactForSQLTIMESTAMP)
             });
+          } catch (error) {
+            sails.log.error(
+              `stripe-event-webhook errored when updating order with publicId: "${order.publicId}" to "paymentStatus:paid": ${error}`
+            );
+            sails.log.error(error);
+            return exits.error(
+              `Failed to set order to "paid" with error: ${error}`
+            );
+          }
+          try {
             if(order.discounts && order.discounts.length > 1){
               const addTxFn = async (discount:DiscountType) => {
                 if (discount.discountType === 'fixed') {
@@ -337,6 +348,16 @@ Delivery/Collection on ${order.fulfilmentSlotFrom} - ${order.fulfilmentSlotTo}`,
                       datetimeStrFormatExactForSQLTIMESTAMP
                     ),
                   });
+                  await Discount.update({
+                    id: discount.id
+                  }).set({
+                    timesUsed: discount.timesUsed + 1,
+                    isEnabled: false,
+                  });
+                  await Discount.addToCollection(discount.id, 'orders').members(
+                    [order.id]
+                  );
+                  return;
                 } else if (discount.discountType === 'percentage') {
                   let amount = (discount.value / 100) * order.subtotal;
                   if(discount.value > 100) {
@@ -372,6 +393,14 @@ Delivery/Collection on ${order.fulfilmentSlotFrom} - ${order.fulfilmentSlotTo}`,
                       datetimeStrFormatExactForSQLTIMESTAMP
                     ),
                   });
+                  await Discount.update({
+                    id: discount.id,
+                  }).set({
+                    timesUsed: discount.timesUsed + 1,
+                    isEnabled: discount.isEnabled && (discount.timesUsed + 1) < discount.maxUses,
+                  });
+                  await Discount.addToCollection(discount.id, "orders").members([order.id]);
+                  return;
                 } else {
                   sails.log.warn(`Unable to calculate discounts in stripe-event-webhook for discounts with type: "${discount.discountType}"`);
                 }
@@ -380,9 +409,12 @@ Delivery/Collection on ${order.fulfilmentSlotFrom} - ${order.fulfilmentSlotTo}`,
             }
           } catch (error) {
             sails.log.error(
-              `stripe-event-webhook errored when updating order with publicId: "${order.publicId}" to "paymentStatus:paid": ${error}`
+              `stripe-event-webhook errored when updating discounts on order: "${order.publicId}" with error: ${error}`
             );
-            return exits.error(`Failed to set order to paid with error: ${error}`);
+            sails.log.error(error);
+            return exits.error(
+              `stripe-event-webhook errored when updating discounts on order: "${order.publicId}" with error: ${error}`
+            );
           }
           
         }  

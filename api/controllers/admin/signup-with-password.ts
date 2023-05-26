@@ -170,11 +170,13 @@ module.exports = {
         `+${inputs.phoneCountryCode}${inputs.phoneNoCountry}`
       ) {
         sails.log.warn(
-          `Failed to register new user for email: "${inputs.emailAddress}" as phoneNumber:+${inputs.phoneCountryCode}${inputs.phoneNoCountry} is already registered to email: "${existingFirebaseUser.email}" with firebase. https://console.firebase.google.com/u/0/project/vegiliverpool/authentication/users`
+          `Failed to register new user for email: "${inputs.emailAddress}" as phoneNumber:+${inputs.phoneCountryCode}${inputs.phoneNoCountry} is already registered to email: "${existingFirebaseUser.email}" with firebase. https://console.firebase.google.com/u/0/project/vegiliverpool/authentication/users We will send a password reset email request`
         );
-        await firebase.sendPasswordResetEmail({
-          tryEmail: existingFirebaseUser.email,
-        });
+        if(existingFirebaseUser.email){
+          await firebase.sendPasswordResetEmail({
+            tryEmail: existingFirebaseUser.email,
+          });
+        }
         return exits.firebaseUserExistsForPhone();
       }
       return exits.userExists();
@@ -188,6 +190,9 @@ module.exports = {
           name: inputs.name,
           phoneNumber: `+${inputs.phoneCountryCode}${inputs.phoneNoCountry}`,
         });
+        sails.log.verbose(
+          `Created user in firebase for email: "${inputs.emailAddress} and phone:+${inputs.phoneCountryCode}${inputs.phoneNoCountry}"`
+        );
       } catch (err) {
         sails.log.error(`Firebase Errored on User_Creation with code: ${err.code} because: "${err.message}"`);
 
@@ -217,6 +222,9 @@ module.exports = {
             // firebaseSessionToken: `DUMMY_SIGNUP_${fbUser.uid}`, //! Set when they log in not here!
             fbUid: fbUser.uid,
           }).fetch();
+          sails.log.verbose(
+            `Created user in vegi DB for email: "${inputs.emailAddress} and phone:+${inputs.phoneCountryCode}${inputs.phoneNoCountry}"`
+          );
           return exits.success(user);
         } catch (error) {
           sails.log.error(error);
@@ -253,6 +261,9 @@ module.exports = {
             deliveryPartnerRole: inputs.deliveryPartnerRole ?? 'none',
             role: inputs.role,
           }).fetch();
+          sails.log.verbose(
+            `Created user in vegi DB for email: "${inputs.emailAddress} and phone:+${inputs.phoneCountryCode}${inputs.phoneNoCountry}"`
+          );
           return exits.success(user);
         } catch (error) {
           sails.log.error(
@@ -267,8 +278,14 @@ module.exports = {
         }
       }
       if(existingFirebaseUser.email === inputs.emailAddress){
+        sails.log.verbose(
+          `Signup result, user created but firebase account already found for email: ${inputs.emailAddress}"`
+        );
         return exits.firebaseUserExistsForEmail();
       } else {
+        sails.log.verbose(
+          `Signup result, user created but firebase account already found for phone: +${inputs.phoneCountryCode}${inputs.phoneNoCountry}"`
+        );
         return exits.firebaseUserExistsForPhone();
       }
     }
