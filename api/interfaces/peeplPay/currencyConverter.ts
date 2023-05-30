@@ -62,6 +62,11 @@ export const getCurrencyConversionRate = async (fromCurrency: Currency, toCurren
   }
   if (fromCurrency === Currency.GBP) {
     if (toCurrency === Currency.GBPx) {
+      sails.log.verbose(
+        `Converting from GBP to GBPx with rate: (1 / ${GBPxPoundPegValue}) -> return rate: ${
+          1.0 / GBPxPoundPegValue
+        }`
+      );
       return 1.0 / GBPxPoundPegValue;
     } else if (toCurrency === Currency.GBT) {
       return 1.0 / GBTPoundPegValue;
@@ -86,12 +91,17 @@ export const getCurrencyConversionRate = async (fromCurrency: Currency, toCurren
       );
     }
   } else if (toCurrency === Currency.GBP) {
-    return 1.0 / getCurrencyConversionRate(toCurrency, fromCurrency);
-  } else {
-    return (
-      getCurrencyConversionRate(fromCurrency, Currency.GBP) *
-      getCurrencyConversionRate(Currency.GBP, toCurrency)
+    const inverseRate = await getCurrencyConversionRate(toCurrency, fromCurrency);
+    sails.log.verbose(
+      `Converting from ${fromCurrency} to GBP with rate: (1 / ${inverseRate}) -> return rate: ${
+        1.0 / inverseRate
+      }`
     );
+    return 1.0 / inverseRate ;
+  } else {
+    const midRateLeft = await getCurrencyConversionRate(fromCurrency, Currency.GBP);
+    const midRateRight = await getCurrencyConversionRate(Currency.GBP, toCurrency);
+    return midRateLeft * midRateRight;
   }
 };
 
@@ -107,7 +117,18 @@ export const getCurrencyConversionRate = async (fromCurrency: Currency, toCurren
  * @returns {Promise<number>}
  */
 export const convertCurrency = async (amount:number, fromCurrency: Currency, toCurrency: Currency) => {
-  return amount * getCurrencyConversionRate(fromCurrency,toCurrency);
+  if(amount === 0){
+    return 0;
+  } else if(fromCurrency === toCurrency){
+    return amount;
+  }
+  const conversionRate = await getCurrencyConversionRate(fromCurrency,toCurrency);
+  sails.log.verbose(
+    `Converting ${amount} [${fromCurrency}] to ${
+      amount * conversionRate
+    } [${toCurrency}] at rate: ${conversionRate}`
+  );
+  return amount * conversionRate;
 };
 
 export { iConvertCurrency as iConvertCurrency };

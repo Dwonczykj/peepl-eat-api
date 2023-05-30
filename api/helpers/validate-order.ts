@@ -6,6 +6,7 @@ import {
 import { SailsModelType, sailsVegi } from '../../api/interfaces/iSails';
 import { FulfilmentMethodType, ProductType, VendorType } from '../../scripts/utils';
 import { GetCoordinatesForAddressResult } from './get-coordinates-for-address';
+import { Currency } from '../../api/interfaces/peeplPay';
 declare var sails: sailsVegi;
 declare var Product: SailsModelType<ProductType>;
 declare var Vendor: SailsModelType<VendorType>;
@@ -37,6 +38,19 @@ module.exports = {
       type: 'number',
       description: 'The total order value, including shipping.',
       required: true,
+    },
+    currency: {
+      type: 'string',
+      description: 'The currency for the total amount',
+      required: true,
+      isIn: [
+        Currency.EUR,
+        Currency.GBP,
+        Currency.GBPx,
+        Currency.GBT,
+        Currency.PPL,
+        Currency.USD,
+      ],
     },
     marketingOptIn: {
       type: 'boolean',

@@ -60,6 +60,7 @@ module.exports = {
 
     var dontActuallySend =
       sails.config.environment === 'test' ||
+      process.env.NODE_ENV !== 'production' ||
       sails.config.custom.FIREBASE_AUTH_EMULATOR_HOST;
     if (dontActuallySend) {
       sails.log

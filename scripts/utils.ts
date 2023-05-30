@@ -640,7 +640,7 @@ export type _OrderTypeHidden = {
   id: number;
   subtotal: number;
   total: number;
-  currency: Currency | '';
+  currency: Currency;
   orderedDateTime: number;
   paidDateTime: number;
   refundDateTime: number;
@@ -699,7 +699,7 @@ export type CurrencyStripeAllowedTypeLiteral = 'gbp';
 
 export type PaymentIntentMetaDataType = {
   amount: number;
-  currrency: string;
+  currency: string;
   walletAddress: string | null;
   recipientWalletAddress: string | null;
   senderWalletAddress: string | null;

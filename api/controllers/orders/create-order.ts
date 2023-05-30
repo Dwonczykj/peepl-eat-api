@@ -58,6 +58,7 @@ export type CreateOrderInputs = {
   };
   firebaseRegistrationToken: string;
   total: number;
+  currency: Currency;
   marketingOptIn: boolean;
   discountCode: string;
   vendor: number;
@@ -127,6 +128,19 @@ const _exports: SailsActionDefnType<
       type: 'number',
       description: 'The total order value, including shipping.',
       required: true,
+    },
+    currency: {
+      type: 'string',
+      description: 'The currency for the total amount',
+      required: true,
+      isIn: [
+        Currency.EUR,
+        Currency.GBP,
+        Currency.GBPx,
+        Currency.GBT,
+        Currency.PPL,
+        Currency.USD,
+      ],
     },
     marketingOptIn: {
       type: 'boolean',
@@ -333,7 +347,7 @@ const _exports: SailsActionDefnType<
       };
 
       let newPaymentIntent: CreatePaymentIntentInternalResult;
-      let order;
+      let order: OrderType;
 
       const createOrderTransactionDB = async (db: any) => {
         for (var item in inputs.items) {
@@ -375,12 +389,41 @@ const _exports: SailsActionDefnType<
             ({ id: number }) => number
           );
         }
+        let orderTotal = inputs.total;
+        let tipAmountPence = 0;
+        try {
+          tipAmountPence = await sails.helpers.convertCurrencyAmount.with({
+            amount: inputs.tipAmount,
+            fromCurrency: inputs.currency,
+            toCurrency: Currency.GBPx,
+          });
+        } catch (error) {
+          sails.log.error(`Error trying to convert tip amount to GBPx: ${error}`);
+        }
+        try {
+          if(inputs.currency !== Currency.GBP){
+            orderTotal = await sails.helpers.convertCurrencyAmount.with({
+              amount: inputs.total,
+              fromCurrency: inputs.currency,
+              toCurrency: Currency.GBP,
+            });
+          }
+        } catch (error) {
+          sails.log.error(
+            `Error trying to convert order total to GBPx: ${error}`
+          );
+          return {
+            orderId: null,
+            paymentIntentID: null,
+            orderCreationStatus: 'failed',
+          };
+        }
 
         try {
           order = await wrapWithDb(db, () =>
             Order.create({
-              total: inputs.total,
-              currency: Currency.GBPx,
+              total: orderTotal,
+              currency: inputs.currency || Currency.GBPx,
               firebaseRegistrationToken: inputs.firebaseRegistrationToken,
               orderedDateTime: Date.now(),
               deliveryAccepted: !!availableDeliveryPartner,
@@ -406,7 +449,7 @@ const _exports: SailsActionDefnType<
               fulfilmentMethod: inputs.fulfilmentMethod,
               fulfilmentSlotFrom: inputs.fulfilmentSlotFrom,
               fulfilmentSlotTo: inputs.fulfilmentSlotTo,
-              tipAmount: inputs.tipAmount,
+              tipAmount: tipAmountPence,
             })
           ).fetch();
         } catch (error) {
@@ -448,6 +491,7 @@ const _exports: SailsActionDefnType<
         var calculatedOrderTotal = await sails.helpers.calculateOrderTotal.with(
           {
             orderId: order.id,
+            inCurrency: order.currency,
           }
         );
 
@@ -475,11 +519,22 @@ const _exports: SailsActionDefnType<
           Order.updateOne(order.id).set({
             subtotal: calculatedOrderTotal.withoutFees,
             total: calculatedOrderTotal.finalAmount,
+            currency: calculatedOrderTotal.currency,
           })
         );
 
         // Return error if vendor minimum order value not met
-        if (calculatedOrderTotal.withoutFees < vendor.minimumOrderAmount) {
+        let calculatedOrderTotalWithoutFeesGBPx =
+          calculatedOrderTotal.withoutFees;
+        if(calculatedOrderTotal.currency !== Currency.GBPx){
+          calculatedOrderTotalWithoutFeesGBPx =
+            await sails.helpers.convertCurrencyAmount.with({
+              amount: calculatedOrderTotal.withoutFees,
+              fromCurrency: calculatedOrderTotal.currency,
+              toCurrency: Currency.GBPx,
+            });
+        }
+        if (calculatedOrderTotalWithoutFeesGBPx < vendor.minimumOrderAmount) {
           sails.log.info('Vendor minimum order value not met');
           // exits.minimumOrderAmount('Vendor minimum order value not met');
           return {
@@ -546,7 +601,7 @@ const _exports: SailsActionDefnType<
           process.env.NODE_ENV &&
           !process.env.NODE_ENV.toLowerCase().startsWith('prod')
         ) {
-          sails.log(
+          sails.log.verbose(
             `create-order -> order created -> ${util.inspect(result, {
               depth: 0,
             })}`
@@ -573,12 +628,22 @@ const _exports: SailsActionDefnType<
         );
       }
 
+
+      let finalAmount = result.calculatedOrderTotal.finalAmount;
+      if (order.currency !== result.calculatedOrderTotal.currency){
+        finalAmount = await sails.helpers.convertCurrencyAmount.with({
+          amount: result.calculatedOrderTotal.finalAmount,
+          fromCurrency: result.calculatedOrderTotal.currency,
+          toCurrency: order.currency || Currency.GBP,
+        });
+      }
+      
       let failureReason;
       try {
         const _newPaymentIntent =
           await sails.helpers.createPaymentIntentInternal.with({
-            amount: result.calculatedOrderTotal.finalAmount,
-            currency: 'gbp',
+            amount: finalAmount,
+            currency: order.currency || Currency.GBP,
             recipientWalletAddress: vendor.walletAddress,
             vendorDisplayName: vendor.name,
             webhookAddress: sails.config.custom.peeplWebhookAddress,

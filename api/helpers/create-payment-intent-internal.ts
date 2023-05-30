@@ -6,12 +6,13 @@ import { CurrencyStripeAllowedTypeLiteral, PaymentIntentMetaDataType, SailsActio
 import {
   sailsVegi,
 } from '../interfaces/iSails';
+import { Currency } from '../../api/interfaces/peeplPay';
 
 declare var sails: sailsVegi;
 
 export type CreatePaymentIntentInternalInputs = {
   amount: number; // amount in pence
-  currency: CurrencyStripeAllowedTypeLiteral;
+  currency: Currency;
   // customerPayToStripeAccountId: string; not needed to set up the payment intent
   customerId?: string | null | undefined; // "cus_Nkl5aUAezd6MIa"
   vendorDisplayName?:  string | null | undefined;
@@ -109,7 +110,7 @@ const _exports: SailsActionDefnType<
     try {
       const meta: PaymentIntentMetaDataType = {
         amount: inputs.amount,
-        currrency: inputs.currency,
+        currency: inputs.currency,
         accountId: inputs.accountId,
         senderWalletAddress: inputs.senderWalletAddress,
         walletAddress: inputs.recipientWalletAddress,
@@ -118,9 +119,36 @@ const _exports: SailsActionDefnType<
         webhookAddress: inputs.webhookAddress, // dont need to call the stipeEventWebhook, that is confiured to be called from the stripe dashboard for all events... (https://stripe.com/docs/webhooks#webhooks-summary)
         // webhookAddress: inputs.webhookAddress || sails.config.custom.stripeEventWebhook,
       };
+      const inputCurrency = inputs.currency.toLocaleLowerCase();
+      let useCurrency = 'gbp';
+      let inputAmountPence = inputs.amount; //stripe expects gbp amounts in pence as ints
+      if (inputCurrency === Currency.GBPx.toLocaleLowerCase()) {
+        useCurrency = 'gbp';
+        inputAmountPence = inputs.amount;
+      } else if (inputCurrency === Currency.PPL.toLocaleLowerCase()) {
+        sails.log.error(`Cant make a stripe payment intent for PPL tokens.`);
+        return exits.success(false);
+      } else if (inputCurrency === Currency.GBP.toLocaleLowerCase()) {
+        useCurrency = 'gbp';
+        inputAmountPence = Math.round(inputs.amount * 100);
+      } else if (inputCurrency === Currency.USD.toLocaleLowerCase()) {
+        useCurrency = 'usd';
+        inputAmountPence = Math.round(inputs.amount * 100);
+      } else if (inputCurrency === Currency.EUR.toLocaleLowerCase()) {
+        useCurrency = 'eur';
+        inputAmountPence = Math.round(inputs.amount * 100);
+      } else if (inputCurrency === Currency.GBT.toLocaleLowerCase()) {
+        sails.log.error(`Cant make a stripe payment intent for GBT tokens.`);
+        return exits.success(false);
+      } else {
+        sails.log.error(
+          `Cant make a stripe payment intent for [${inputCurrency}].`
+        );
+        return exits.success(false);
+      }
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: inputs.amount, //TODO get amounts from end ppoint inputs...
-        currency: inputs.currency,
+        amount: inputAmountPence, //TODO get amounts from end ppoint inputs...
+        currency: useCurrency,
         customer: customer.id,
         statement_descriptor: inputs.vendorDisplayName || 'vegi',
         payment_method_types: ['card', 'card_present', 'link'], // ~ https://stripe.com/docs/api/payment_intents/create#create_payment_intent-payment_method_types

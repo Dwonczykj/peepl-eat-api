@@ -135,10 +135,10 @@ const _exports: SailsActionDefnType<
       });
     }
 
-    const updatedOrder = await Order.find({
+    const updatedOrder = await Order.findOne({
       id: order.id
-    })[0];
-
+    });
+    
     return exits.success(updatedOrder);
   },
 };

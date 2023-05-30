@@ -28,6 +28,8 @@ import { RefreshStripeTransactionsInputs, RefreshStripeTransactionsResult } from
 import { RefreshFuseTransactionsInputs, RefreshFuseTransactionsResult } from "../../api/helpers/refresh-fuse-transactions";
 import { FormatOrdersInputs, FormatOrdersResult } from "../../api/helpers/format-orders";
 import { ConvertCurrencyAmountInputs, ConvertCurrencyAmountResponse } from "../../api/helpers/convert-currency-amount";
+import { CalculateCurrencyOperationInputs, CalculateCurrencyOperationResponse } from "../../api/helpers/calculate-currency-operation";
+import { Currency } from "./peeplPay";
 
 export type SailsActionInput =
   | {
@@ -513,6 +515,10 @@ export type sailsVegi = {
     >;
     getOrders: _helperFunction<GetOrdersInputs, GetOrdersResult>;
     formatOrders: _helperFunction<FormatOrdersInputs, FormatOrdersResult>;
+    calculateCurrencyOperation: _helperFunction<
+      CalculateCurrencyOperationInputs,
+      CalculateCurrencyOperationResponse
+    >;
     convertCurrencyAmount: _helperFunction<
       ConvertCurrencyAmountInputs,
       ConvertCurrencyAmountResponse
@@ -545,9 +551,10 @@ export type sailsVegi = {
       with: (unusedArgs: CreateOrderInputs) => Promise<ValidateOrderResult>;
     };
     calculateOrderTotal: {
-      with: (unusedArg: { orderId: number }) => Promise<{
+      with: (unusedArg: { orderId: number, inCurrency: Currency, }) => Promise<{
         finalAmount: number;
         withoutFees: number;
+        currency: Currency,
       }>;
     };
 

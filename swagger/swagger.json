@@ -4771,6 +4771,23 @@
           },
           {
             "in": "query",
+            "name": "currency",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "EUR",
+                "GBP",
+                "GBPx",
+                "GBT",
+                "PPL",
+                "USD"
+              ]
+            },
+            "description": "The currency for the total amount"
+          },
+          {
+            "in": "query",
             "name": "marketingOptIn",
             "required": false,
             "schema": {
