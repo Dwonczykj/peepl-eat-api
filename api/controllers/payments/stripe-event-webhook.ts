@@ -334,7 +334,7 @@ Delivery/Collection on ${order.fulfilmentSlotFrom} - ${order.fulfilmentSlotTo}`,
             );
           }
           try {
-            if(order.discounts && order.discounts.length > 1){
+            if(order.discounts && order.discounts.length > 0){
               const addTxFn = async (discount:DiscountType) => {
                 if (discount.discountType === 'fixed') {
                   await Transaction.create({

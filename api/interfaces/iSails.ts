@@ -30,6 +30,7 @@ import { FormatOrdersInputs, FormatOrdersResult } from "../../api/helpers/format
 import { ConvertCurrencyAmountInputs, ConvertCurrencyAmountResponse } from "../../api/helpers/convert-currency-amount";
 import { CalculateCurrencyOperationInputs, CalculateCurrencyOperationResponse } from "../../api/helpers/calculate-currency-operation";
 import { Currency } from "./peeplPay";
+import { CheckDiscountCodeInputs, CheckDiscountCodeResponse } from "../../api/helpers/check-discount-code";
 
 export type SailsActionInput =
   | {
@@ -264,8 +265,10 @@ type _populated<T> = Promise<T | null> & {
   populate: <S extends string>(unusedArg: S) => Promise<T | null> & _populated<T>; // * This can be chained to populate multiple collections if non-deep population.
 };
 type SailsFindPopulateType<T> = Promise<sailsModelKVP<T>[] | null> & {
-  populate: (unusedArg: keyof T | string) => Promise<T[] | null> & _populated<T[]>;
-  sort: (unusedArg: keyof T) => SailsFindPopulateType<T>;
+  populate: (
+    unusedArg: keyof T | string
+  ) => Promise<T[] | null> & _populated<T[]>;
+  sort: (unusedArg: keyof T | string) => SailsFindPopulateType<T>;
 };
 type SailsFindOnePopulateType<T> = Promise<sailsModelKVP<T> | null> & {
   populate: (unusedArg: string) => Promise<T | null> & _populated<T>; // * This can be chained to populate multiple collections.
@@ -551,10 +554,10 @@ export type sailsVegi = {
       with: (unusedArgs: CreateOrderInputs) => Promise<ValidateOrderResult>;
     };
     calculateOrderTotal: {
-      with: (unusedArg: { orderId: number, inCurrency: Currency, }) => Promise<{
+      with: (unusedArg: { orderId: number; inCurrency: Currency }) => Promise<{
         finalAmount: number;
         withoutFees: number;
-        currency: Currency,
+        currency: Currency;
       }>;
     };
 
@@ -597,15 +600,10 @@ export type sailsVegi = {
       unusedArg1: string,
       unusedArg2: string
     ) => Promise<boolean>);
-    checkDiscountCode: {
-      with: (unusedArgs: {
-        discountCode: string;
-        vendor?: number | null;
-      }) => Promise<false | DiscountCodeType>;
-    } & ((
-      unusedArg1: string,
-      unusedArg2: number | null
-    ) => Promise<false | DiscountCodeType>);
+    checkDiscountCode: _helperFunction<
+      CheckDiscountCodeInputs,
+      CheckDiscountCodeResponse
+    >;
 
     nextAvailableDate: {
       with: (unusedArgs: {

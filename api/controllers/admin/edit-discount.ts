@@ -109,7 +109,8 @@ const _exports: SailsActionDefnType<
     }
 
     inputs.code = inputs.code.toUpperCase();
-    const valuesToSet = inputs;
+    const {id, ...valuesToSet} = inputs;
+    
     if (valuesToSet.discountType === 'percentage') {
       valuesToSet.value = Math.max(Math.min(100, valuesToSet.value), 0);
     } else if (valuesToSet.discountType === 'fixed') {

@@ -77,8 +77,9 @@ module.exports = {
         body: inputs.body
       }
     };
+    sails.log.verbose(`Sending Firebase notification for "${inputs.topic}".`);
     // const admin = this.req.firebase;
-    admin.messaging()
+    await admin.messaging()
       .sendToTopic(inputs.topic, message)
       .then((res) => {
         return res;

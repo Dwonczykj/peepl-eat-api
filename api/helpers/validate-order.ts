@@ -55,8 +55,8 @@ module.exports = {
     marketingOptIn: {
       type: 'boolean',
     },
-    discountCode: {
-      type: 'string',
+    discountCodes: {
+      type: 'ref',
       required: false,
     },
     vendor: {
@@ -348,13 +348,12 @@ module.exports = {
     }
 
     // Check discount code is valid
-    if (inputs.discountCode) {
-      var discount = await sails.helpers.checkDiscountCode(
-        inputs.discountCode,
-        inputs.vendor
-      );
-
-      if (!discount) {
+    if (inputs.discountCodes && inputs.discountCodes.length) {
+      const discountsAreFine = await Promise.all(inputs.discountCodes.filter(dc => dc).map((discountCode) =>
+        sails.helpers.checkDiscountCode.with({discountCode:discountCode, vendorId: inputs.vendor})
+      ));
+      const badDiscounts = discountsAreFine.filter(isFine => !isFine);
+      if (badDiscounts.length > 0) {
         sails.log.warn('helpers.validateOrder: invalidDiscountCode');
         return exits.invalidDiscountCode('Invalid discount code');
       }

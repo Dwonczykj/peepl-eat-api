@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import util from 'util';
+import moment from 'moment';
 
 import { CreatePaymentIntentInternalResult } from '../../helpers/create-payment-intent-internal';
 import {
@@ -12,7 +13,8 @@ import {
   OrderType,
   OrderItemType,
   AccountType,
-  OrderItemOptionValueType
+  OrderItemOptionValueType,
+  DiscountType
 } from '../../../scripts/utils';
 import { Currency } from '../../../api/interfaces/peeplPay';
 
@@ -60,7 +62,7 @@ export type CreateOrderInputs = {
   total: number;
   currency: Currency;
   marketingOptIn: boolean;
-  discountCode: string;
+  discountCodes: string[];
   vendor: number;
   fulfilmentMethod: number;
   fulfilmentSlotFrom: string;
@@ -145,9 +147,10 @@ const _exports: SailsActionDefnType<
     marketingOptIn: {
       type: 'boolean',
     },
-    discountCode: {
-      type: 'string',
+    discountCodes: {
+      type: 'ref',
       required: false,
+      defaultsTo: [],
     },
     vendor: {
       type: 'number',
@@ -241,11 +244,27 @@ const _exports: SailsActionDefnType<
     let vendor = await Vendor.findOne({ id: inputs.vendor })
       .populate('deliveryPartner')
       .populate('pickupAddress');
-    let discount;
+    let discounts: sailsModelKVP<DiscountType>[] = [];
 
-    if (inputs.discountCode) {
-      discount = await Discount.findOne({ code: inputs.discountCode });
+    if (inputs.discountCodes && inputs.discountCodes.length > 0) {
+      if (inputs.vendor) {
+        discounts = await Discount.find({
+          code: inputs.discountCodes,
+          vendor: inputs.vendor,
+        });
+      } else {
+        discounts = await Discount.find({ code: inputs.discountCodes });
+      }
+      var currentTime = new Date().getTime();
+      discounts = discounts.filter(
+        (d) =>
+          d.timesUsed < d.maxUses &&
+          moment.utc(d.expiryDateTime).isSameOrAfter(moment.utc()) &&
+          d.isEnabled
+      );
     }
+
+    sails.log.verbose(`Create-order found ${discounts.length} discount objects from ${inputs.discountCodes.length} input codes.`);
 
     const fulfilmentMethod = await FulfilmentMethod.findOne(
       inputs.fulfilmentMethod
@@ -322,10 +341,6 @@ const _exports: SailsActionDefnType<
     // } else {
     //   availableDeliveryPartner = null;
     // }
-
-    if (inputs.discountCode) {
-      discount = await Discount.findOne({ code: inputs.discountCode });
-    }
 
     // ! Merchant fulfilment check done by merchant after receiveing the SMS and they click the link /orders/peepl-pay-webhook which itself is a callback from /helpers/create-payment-intent
     let result: CreateOrderResult;
@@ -444,7 +459,7 @@ const _exports: SailsActionDefnType<
               deliveryAddressLongitude: inputs.address.lng,
               deliveryAddressInstructions: inputs.address.deliveryInstructions,
               customerWalletAddress: inputs.walletAddress,
-              discount: discount ? discount.id : undefined,
+              // discount: discounts ? discounts.id : undefined,
               vendor: vendor.id,
               fulfilmentMethod: inputs.fulfilmentMethod,
               fulfilmentSlotFrom: inputs.fulfilmentSlotFrom,
@@ -452,6 +467,9 @@ const _exports: SailsActionDefnType<
               tipAmount: tipAmountPence,
             })
           ).fetch();
+          await wrapWithDb(db, () =>
+            Order.addToCollection(order.id, "discounts").members(discounts.map((discount) => discount.id))
+          );
         } catch (error) {
           sails.log.error(`Error on Order.create(...) -> ${error}`);
           // exits.error(error);

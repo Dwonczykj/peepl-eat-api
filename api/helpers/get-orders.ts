@@ -25,9 +25,6 @@ export type GetOrdersResult =
       transactions: SailsModelKVP<TransactionType>[];
       fulfilmentCharge: number;
       platformFee: number;
-      cartDiscountCode: string;
-      cartDiscountType: DiscountType['discountType'];
-      cartDiscountAmount: number;
     })[]
   | false;
 
@@ -107,7 +104,7 @@ const _exports: SailsActionDefnType<
       orderDetails = await Order.find(criteria)
         .sort(sort)
         .populate(
-          'fulfilmentMethod&discount&deliveryPartner&vendor&items&items.product'
+          'fulfilmentMethod&discounts&deliveryPartner&vendor&items&items.product'
         );
       // const ordersWithItemProducts = await Order.find(criteria)
       //   .sort(sort)
@@ -133,23 +130,24 @@ const _exports: SailsActionDefnType<
 
       const promises = orderDetails.map((order) => {
         return async () => {
-          let discounts: SailsModelKVP<DiscountType>[] = [];
-          if(order.discount){
-            discounts = await Discount.find({
-              id: order.discount.id,
-              vendor: order.vendor.id,
-            });
-            if(!discounts || discounts.length < 1){
-              discounts = await Discount.find({
-                id: order.discount.id
-              });
-            }
-            if(!discounts || discounts.length < 1){
-              discounts = await Discount.find({
-                code: order.discount.code
-              });
-            }
-          }
+          // let discounts: SailsModelKVP<DiscountType>[] = order.discounts;
+          
+          // if(order.discounts && order.discounts.length > 0){
+          //   discounts = await Discount.find({
+          //     id: ,
+          //     vendor: order.vendor.id,
+          //   });
+          //   if(!discounts || discounts.length < 1){
+          //     discounts = await Discount.find({
+          //       id: order.discount.id
+          //     });
+          //   }
+          //   if(!discounts || discounts.length < 1){
+          //     discounts = await Discount.find({
+          //       code: order.discount.code
+          //     });
+          //   }
+          // }
           
           order.items = await Promise.all(order.items.map((orderItem) => {
             return async () => {
@@ -166,9 +164,6 @@ const _exports: SailsActionDefnType<
             transactions: transactions.filter((t) => t.order === order.id),
             fulfilmentCharge: order.fulfilmentMethod.priceModifier, // is based on the vendors price modifier on the selected timeslot...
             platformFee: order.vendor.platformFee, // is fixed based on the fulfilment method...
-            cartDiscountCode: order.discount && order.discount.code, // where can we find the discount code that was applied to this order...
-            cartDiscountType: order.discount ? order.discount.discountType : 'fixed', // where can we find the discount code that was applied to this order...
-            cartDiscountAmount: order.discount ? order.discount.value : 0, // where can we find the discount code that was applied to this order...
           };
         };
       }).map(p => p());

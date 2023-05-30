@@ -41,9 +41,13 @@ module.exports = {
   },
 
   fn: async function (inputs, exits) {
-    var order = await Order.findOne(inputs.orderId).populate(
-      'items.product&optionValues&optionValues.option&optionValue&discounts'
+    const orders = await Order.find({
+      id: inputs.orderId,
+    }).populate(
+      'fulfilmentMethod&deliveryPartner&vendor&discounts&items&items.product&optionValues&optionValues.option&optionValue'
     );
+
+    const order = orders[0];
 
     let workingTotalGBPx = 0;
 
@@ -63,7 +67,12 @@ module.exports = {
     }
 
     // Apply discount
-    if (order.discounts && order.discounts.length > 1) {
+    sails.log.verbose(
+      `calculate order total on order with ${
+        order.discounts && order.discounts.length
+      } discount vouchers applied.`
+    );
+    if (order.discounts && order.discounts.length > 0) {
       // var discount = await Discount.findOne(order.discount);
       const percentageDiscounts = order.discounts
         .filter((discount) => discount.discountType === 'percentage')
@@ -103,7 +112,7 @@ module.exports = {
 
     // Add delivery cost
     var fulfilmentMethod = await FulfilmentMethod.findOne({
-      id: order.fulfilmentMethod as any,
+      id: order.fulfilmentMethod.id as any,
     });
     workingTotalGBPx += fulfilmentMethod.priceModifier;
 
@@ -111,7 +120,7 @@ module.exports = {
     workingTotalGBPx = workingTotalGBPx + order.tipAmount;
 
     // Add platform fee (vendor specific)
-    var vendor = await Vendor.findOne({ id: order.vendor as any });
+    var vendor = await Vendor.findOne({ id: order.vendor.id as any });
     var platformFee = vendor.platformFee;
     workingTotalGBPx = workingTotalGBPx + platformFee;
 
@@ -120,7 +129,7 @@ module.exports = {
       fromCurrency: Currency.GBPx,
       toCurrency: inputs.inCurrency,
     });
-    
+
     const finalAmountInCurrency =
       await sails.helpers.convertCurrencyAmount.with({
         amount: workingTotalGBPx,

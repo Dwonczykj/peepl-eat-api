@@ -2412,14 +2412,6 @@
               }
             ]
           },
-          "discount": {
-            "description": "JSON dictionary representing the **discount** instance or FK when creating / updating / not populated",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/discount"
-              }
-            ]
-          },
           "order": {
             "description": "JSON dictionary representing the **order** instance or FK when creating / updating / not populated",
             "oneOf": [
@@ -4796,10 +4788,13 @@
           },
           {
             "in": "query",
-            "name": "discountCode",
+            "name": "discountCodes",
             "required": false,
             "schema": {
-              "type": "string"
+              "type": "array",
+              "items": {},
+              "default": [],
+              "example": []
             }
           },
           {

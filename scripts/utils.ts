@@ -757,7 +757,6 @@ export type TransactionType = {
   receiver: AccountType;
   payer: AccountType;
   order: OrderType | null;
-  discount: DiscountType | null; //TODO: Create discounts when an order is marked as paid in webhook and the order has multiple discount objects stored on the order.
 };
 
 export const openingHoursToMoments = (

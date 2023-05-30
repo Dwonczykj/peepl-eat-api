@@ -31,7 +31,7 @@ describe("helpers.getOrders()", async () => {
     const orders = await sails.helpers.getOrders.with({
       timePeriod: timePeriod,
       acceptanceStatus: acceptanceStatus,
-    });
+    },);
 
     assert.isArray(orders);
 
