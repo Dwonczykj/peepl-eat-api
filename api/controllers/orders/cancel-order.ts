@@ -118,21 +118,23 @@ const _exports: SailsActionDefnType<
       }
       // Send notification to customer that their order has been accepted/declined.
       const vendorName = order.vendor ? ` from ${order.vendor.name}` : '';
-      await sails.helpers.broadcastFirebaseNotificationForTopic.with({
-        topic: 'order-' + order.publicId,
-        title: 'Order update',
-        body: `Your order${vendorName} has been cancelled.`,
-        data: {
-          orderId: inputs.orderId.toString(),
-        },
-      });
-      await sails.helpers.sendSmsNotification.with({
-        to: order.deliveryPhoneNumber,
-        body: `Order cancelled${vendorName}!`,
-        data: {
-          orderId: order.id.toString(),
-        },
-      });
+      if(order.paymentStatus !== 'unpaid'){
+        await sails.helpers.broadcastFirebaseNotificationForTopic.with({
+          topic: 'order-' + order.publicId,
+          title: 'Order update',
+          body: `Your order${vendorName} has been cancelled.`,
+          data: {
+            orderId: inputs.orderId.toString(),
+          },
+        });
+        await sails.helpers.sendSmsNotification.with({
+          to: order.deliveryPhoneNumber,
+          body: `Order cancelled${vendorName}!`,
+          data: {
+            orderId: order.id.toString(),
+          },
+        });
+      }
     }
 
     const updatedOrder = await Order.findOne({

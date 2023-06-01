@@ -150,12 +150,13 @@ const _exports: SailsActionDefnType<
         amount: inputAmountPence, //TODO get amounts from end ppoint inputs...
         currency: useCurrency,
         customer: customer.id,
-        statement_descriptor: inputs.vendorDisplayName || 'vegi',
+        statement_descriptor: inputs.vendorDisplayName || 'vegi',// + ` (${})`,
         payment_method_types: ['card', 'card_present', 'link'], // ~ https://stripe.com/docs/api/payment_intents/create#create_payment_intent-payment_method_types
         // automatic_payment_methods: {
         //   enabled: true,
         // },
         metadata: meta,
+        setup_future_usage: 'off_session',
       });
       return exits.success({
         paymentIntent: paymentIntent,

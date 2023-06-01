@@ -278,7 +278,7 @@ const _exports: SailsActionDefnType<
     //   (barcode) => !resultDict[barcode]
     // );
 
-    sails.log.info(
+    sails.log.verbose(
       `SEARCHING VEGI SCORING API FOR ${productsToSearchFor.length} PRODUCTS from vegi ESC api`
     );
 
@@ -334,7 +334,7 @@ const _exports: SailsActionDefnType<
           },
         ]);
         return { [p.id]: result };
-      }
+      };
       const results = await Promise.all(products.map(p => createRating(p)));
       const resultsDict = Object.assign({},...results);
 
@@ -350,7 +350,7 @@ const _exports: SailsActionDefnType<
       // let match = await findMatchInVegiScoreApi(
       //   productNameVal,
       // );
-      // todo: impleent below line
+      // todo: implement below line
       // let match = await findMatchInVegiScoreApi(ids);
       
       
