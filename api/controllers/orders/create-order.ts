@@ -364,7 +364,42 @@ const _exports: SailsActionDefnType<
       let newPaymentIntent: CreatePaymentIntentInternalResult;
       let order: OrderType;
 
-      const createOrderTransactionDB = async (db: any) => {
+      // type CreateOrderTransactionFuncType = Promise<| {
+      //         orderId: any;
+      //         paymentIntentID: any;
+      //         orderCreationStatus: 'failed';
+      //         // calculatedOrderTotal?: undefined;
+      //     } | {
+      //   orderId: number | null;
+      //   paymentIntentID: string | null;
+      //   orderCreationStatus: CreateOrderResult['orderCreationStatus'];
+      //   calculatedOrderTotal:
+      //     | 
+      //     {
+      //         finalAmount: number;
+      //         withoutFees: number;
+      //         currency: Currency;
+      //       };
+      // }>;
+
+      const createOrderTransactionDB: (db: any) => Promise<
+        | {
+            orderId: null;
+            paymentIntentID: null;
+            orderCreationStatus: 'failed';
+            calculatedOrderTotal: null;
+          }
+        | {
+            orderId: number;
+            paymentIntentID: string;
+            orderCreationStatus: CreateOrderResult['orderCreationStatus'];
+            calculatedOrderTotal: {
+              finalAmount: number;
+              withoutFees: number;
+              currency: Currency;
+            };
+          }
+      > = async (db: any) => {
         for (var item in inputs.items) {
           var orderItemOptionValues = [];
           for (var option in inputs.items[item].options) {
@@ -395,7 +430,9 @@ const _exports: SailsActionDefnType<
             return {
               orderId: null,
               paymentIntentID: null,
-              orderCreationStatus: 'failed',
+              orderCreationStatus:
+                'failed' as CreateOrderResult['orderCreationStatus'],
+              calculatedOrderTotal: null,
             };
           }
 
@@ -413,10 +450,12 @@ const _exports: SailsActionDefnType<
             toCurrency: Currency.GBPx,
           });
         } catch (error) {
-          sails.log.error(`Error trying to convert tip amount to GBPx: ${error}`);
+          sails.log.error(
+            `Error trying to convert tip amount to GBPx: ${error}`
+          );
         }
         try {
-          if(inputs.currency !== Currency.GBP){
+          if (inputs.currency !== Currency.GBP) {
             orderTotal = await sails.helpers.convertCurrencyAmount.with({
               amount: inputs.total,
               fromCurrency: inputs.currency,
@@ -430,7 +469,9 @@ const _exports: SailsActionDefnType<
           return {
             orderId: null,
             paymentIntentID: null,
-            orderCreationStatus: 'failed',
+            orderCreationStatus:
+              'failed' as CreateOrderResult['orderCreationStatus'],
+            calculatedOrderTotal: null,
           };
         }
 
@@ -468,7 +509,9 @@ const _exports: SailsActionDefnType<
             })
           ).fetch();
           await wrapWithDb(db, () =>
-            Order.addToCollection(order.id, "discounts").members(discounts.map((discount) => discount.id))
+            Order.addToCollection(order.id, 'discounts').members(
+              discounts.map((discount) => discount.id)
+            )
           );
         } catch (error) {
           sails.log.error(`Error on Order.create(...) -> ${error}`);
@@ -476,7 +519,9 @@ const _exports: SailsActionDefnType<
           return {
             orderId: null,
             paymentIntentID: null,
-            orderCreationStatus: 'failed',
+            orderCreationStatus:
+              'failed' as CreateOrderResult['orderCreationStatus'],
+            calculatedOrderTotal: null,
           };
         }
 
@@ -528,7 +573,9 @@ const _exports: SailsActionDefnType<
             return {
               orderId: null,
               paymentIntentID: null,
-              orderCreationStatus: 'failed',
+              orderCreationStatus:
+                'failed' as CreateOrderResult['orderCreationStatus'],
+              calculatedOrderTotal: null,
             };
           }
         }
@@ -544,7 +591,7 @@ const _exports: SailsActionDefnType<
         // Return error if vendor minimum order value not met
         let calculatedOrderTotalWithoutFeesGBPx =
           calculatedOrderTotal.withoutFees;
-        if(calculatedOrderTotal.currency !== Currency.GBPx){
+        if (calculatedOrderTotal.currency !== Currency.GBPx) {
           calculatedOrderTotalWithoutFeesGBPx =
             await sails.helpers.convertCurrencyAmount.with({
               amount: calculatedOrderTotal.withoutFees,
@@ -559,6 +606,7 @@ const _exports: SailsActionDefnType<
             orderId: null,
             paymentIntentID: null,
             orderCreationStatus: 'failed',
+            calculatedOrderTotal: null,
           };
         }
 
@@ -567,7 +615,8 @@ const _exports: SailsActionDefnType<
           orderId: order.id,
           // paymentIntentID: paymentIntentId,
           paymentIntentID: null,
-          orderCreationStatus: 'confirmed',
+          orderCreationStatus:
+            'confirmed' as CreateOrderResult['orderCreationStatus'],
           calculatedOrderTotal: calculatedOrderTotal,
         };
       };
@@ -591,7 +640,7 @@ const _exports: SailsActionDefnType<
       //     );
       //   }
       // };
-      let result;
+      let result: Awaited<ReturnType<typeof createOrderTransactionDB>>;
       if (datastore.config.adapter === 'sails-disk') {
         result = await createOrderTransactionDB(null);
         if (
