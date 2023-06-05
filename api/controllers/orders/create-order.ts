@@ -719,7 +719,7 @@ const _exports: SailsActionDefnType<
             recipientWalletAddress: vendor.walletAddress,
             vendorDisplayName: vendor.name,
             webhookAddress: sails.config.custom.peeplWebhookAddress,
-            customerId: account && account.stripeCustomerId,
+            customerId: account && account.stripeCustomerId || '',
             senderWalletAddress: inputs.walletAddress,
             accountId: account && account.id,
             orderId: order.id,
