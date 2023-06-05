@@ -88,7 +88,7 @@ module.exports = {
         const x = await sails.helpers.getAvailableSlots.with({
           date: nextAvailableDate.format(dateStrFormat),
           fulfilmentMethodId: fm.id, // * for vendor fm, should not return 10 - 11am where this has 1 order
-        });
+        }); //TODO: This is returning 1pm -> 1pm slot for PC, need to fix..., run the get-available-slots.test.ts or its the intersection function below fucking up
         allAvailableSlots[fm.id] = x.map(
           (_islot) =>
             new FulfilmentTimeWindow({
@@ -120,9 +120,10 @@ module.exports = {
       }
 
       if (intersectedSlots.length > 0) {
-        const _nextAvailableSlot = intersectedSlots.sort((a, b) =>
-          a.startsBefore(b) ? -1 : 1
-        )[0];
+        const _nextAvailableSlot = intersectedSlots
+          .sort((a, b) =>
+            a.startsBefore(b) ? -1 : 1
+          )[0];
         nextAvailableSlot = { // Removes class properties
           startTime: _nextAvailableSlot.startTime,
           endTime: _nextAvailableSlot.endTime,

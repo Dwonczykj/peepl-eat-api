@@ -110,15 +110,19 @@ const _exports: SailsActionDefnType<
       restaurantAcceptanceStatus: 'cancelled by user',
       orderAcceptanceStatus: 'cancelled by user',
     });
-    if(order.completedFlag !== 'none'){
-      if(order.paymentStatus === 'paid'){
-        sails.log.warn('TODO: Process automatic order refunds from cancel-order action when the order has the paymentStatus of "paid"');
+    if (order.completedFlag !== 'none' && order.completedFlag !== '') {
+      if (order.paymentStatus === 'paid') {
+        sails.log.warn(
+          'TODO: Process automatic order refunds from cancel-order action when the order has the paymentStatus of "paid"'
+        );
       } else {
-        sails.log.warn(`Cancelled order[${order.id}] that had a completedFlag of: "${order.completedFlag}"`);
+        sails.log.warn(
+          `Cancelled order[${order.id}] that had a completedFlag of: "${order.completedFlag}"`
+        );
       }
       // Send notification to customer that their order has been accepted/declined.
       const vendorName = order.vendor ? ` from ${order.vendor.name}` : '';
-      if(order.paymentStatus !== 'unpaid'){
+      if (order.paymentStatus !== 'unpaid') {
         await sails.helpers.broadcastFirebaseNotificationForTopic.with({
           topic: 'order-' + order.publicId,
           title: 'Order update',

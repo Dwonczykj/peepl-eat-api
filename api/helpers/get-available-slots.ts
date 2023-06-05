@@ -133,7 +133,6 @@ module.exports = {
           } catch (error) {
             sails.log.error(`Unable to calculate fulfilment slots for opening hours window with error: ${error}`);
           }
-
           slots.push(slot);
         }
 

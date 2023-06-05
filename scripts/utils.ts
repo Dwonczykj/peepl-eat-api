@@ -189,6 +189,8 @@ export type AccountType = {
   verified: boolean;
   walletAddress: walletAddressString | '' | string;
   imageUrl: string;
+  stripeCustomerId: string | null;
+  stripeAccountId: string | null;
   bankCardNumber: string | null;
   bankCardAccountName: string | null;
   bankCardExpiryDateMonth:
@@ -242,7 +244,7 @@ export type _AddressTypeHidden = {
 
 export type RatingType = 0 | 1 | 2 | 3 | 4 | 5;
 export type CompletedFlagType =
-  | 'none'
+  | 'none' | ''
   | 'completed'
   | 'cancelled'
   | 'refunded'

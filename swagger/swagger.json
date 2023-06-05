@@ -426,6 +426,14 @@
             "type": "string",
             "default": ""
           },
+          "stripeCustomerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "stripeAccountId": {
+            "type": "string",
+            "nullable": true
+          },
           "bankCardAccountName": {
             "type": "string",
             "nullable": true
@@ -6069,6 +6077,15 @@
           "CreateStripeAccount"
         ],
         "parameters": [
+          {
+            "in": "query",
+            "name": "account",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
           {
             "in": "query",
             "name": "companyName",

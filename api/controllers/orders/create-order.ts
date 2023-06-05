@@ -707,6 +707,11 @@ const _exports: SailsActionDefnType<
       
       let failureReason;
       try {
+        if(!account){
+          sails.log.warn(
+            `Failed to create paymentIntent for new order with vegiAccount as cant locate a vegiAccount with {walletAddress: "${inputs.walletAddress}"}`
+          );
+        }
         const _newPaymentIntent =
           await sails.helpers.createPaymentIntentInternal.with({
             amount: finalAmount,
@@ -714,7 +719,7 @@ const _exports: SailsActionDefnType<
             recipientWalletAddress: vendor.walletAddress,
             vendorDisplayName: vendor.name,
             webhookAddress: sails.config.custom.peeplWebhookAddress,
-            customerId: '', // TODO: Add StripeCustomerIds to users and then add them here....
+            customerId: account && account.stripeCustomerId,
             senderWalletAddress: inputs.walletAddress,
             accountId: account && account.id,
             orderId: order.id,
@@ -750,7 +755,7 @@ const _exports: SailsActionDefnType<
       }
       const paymentIntentId = newPaymentIntent.paymentIntent.id;
       sails.log(
-        `Update order [${order.id}] with paymentIntentId: ${paymentIntentId}`
+        `Update order[${order.id}] with publicId: "${order.publicId}" and set paymentIntentId: "${paymentIntentId}" from stripe`
       );
 
       try {

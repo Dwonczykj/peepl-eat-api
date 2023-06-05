@@ -45,9 +45,13 @@ module.exports = {
     if(!['paid', 'unpaid', 'failed'].includes(inputs.status)){
       sails.log.warn(`peepl-pay-webhook received inputs.status="${inputs.status}". This is not handled!`);
     }
-    if (sails.config.custom.baseUrl !== 'https://vegi.itsaboutpeepl.com') {
+    if (sails.config.custom.baseUrl !== 'https://vegi.vegiapp.co.uk') {
       const util = require('util');
-      sails.log(`peepl-pay-webook called with inputs: ${util.inspect(inputs, {depth: null})}`);
+      sails.log(
+        `peepl-pay-webook called with inputs: ${util.inspect(inputs, {
+          depth: null,
+        })}`
+      );
     }
 
     // Update order with payment ID and time

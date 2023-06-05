@@ -62,18 +62,16 @@ export const getCurrencyConversionRate = async (fromCurrency: Currency, toCurren
   }
   if (fromCurrency === Currency.GBP) {
     if (toCurrency === Currency.GBPx) {
-      sails.log.verbose(
-        `Converting from GBP to GBPx with rate: (1 / ${GBPxPoundPegValue}) -> return rate: ${
-          1.0 / GBPxPoundPegValue
-        }`
-      );
       return 1.0 / GBPxPoundPegValue;
     } else if (toCurrency === Currency.GBT) {
       return 1.0 / GBTPoundPegValue;
     } else if (toCurrency === Currency.PPL) {
       return 1.0 / PPLPoundPegValue;
     } else if (toCurrency === Currency.USD || toCurrency === Currency.EUR) {
-      const liveRateJson = await axios.get(`http://free.currencyconverterapi.com/api/v5/convert?q=${fromCurrency}_${toCurrency}&compact=y&apikey=${config.currencyconverterapiKey}`);
+      const ccyPair = `${fromCurrency}_${toCurrency}`;
+      const liveRateJson = await axios.get(
+        `http://free.currencyconverterapi.com/api/v5/convert?q=${ccyPair}&compact=ultra&apiKey=${config.currencyconverterapiKey}`
+      );
       if(!liveRateJson){
         throw new Error(
           `Currency converter webservice failed to request live currency rates from currency:[${fromCurrency}] to currency:[${toCurrency}] with no status.`
@@ -84,7 +82,13 @@ export const getCurrencyConversionRate = async (fromCurrency: Currency, toCurren
           `Currency converter webservice failed to request live currency rates from currency:[${fromCurrency}] to currency:[${toCurrency}] with status: ${liveRateJson.status} and reason: ${liveRateJson.statusText}`
         );
       }
-      return liveRateJson.data ? (liveRateJson.data.rate as number) : 0.0;
+      const rate:number = liveRateJson[ccyPair] || 0.0;
+      sails.log.verbose(
+        `Converting from ${fromCurrency} to ${toCurrency} with rate: (${rate}) -> return rate: ${
+          rate
+        }`
+      );
+      return rate;
     } else {
       throw new Error(
         `Need a webservice call using axios for live currency rates from currency:[${fromCurrency}] to currency:[${toCurrency}].`
@@ -92,12 +96,7 @@ export const getCurrencyConversionRate = async (fromCurrency: Currency, toCurren
     }
   } else if (toCurrency === Currency.GBP) {
     const inverseRate = await getCurrencyConversionRate(toCurrency, fromCurrency);
-    sails.log.verbose(
-      `Converting from ${fromCurrency} to GBP with rate: (1 / ${inverseRate}) -> return rate: ${
-        1.0 / inverseRate
-      }`
-    );
-    return 1.0 / inverseRate ;
+    return 1.0 / inverseRate;
   } else {
     const midRateLeft = await getCurrencyConversionRate(fromCurrency, Currency.GBP);
     const midRateRight = await getCurrencyConversionRate(Currency.GBP, toCurrency);
@@ -123,11 +122,6 @@ export const convertCurrency = async (amount:number, fromCurrency: Currency, toC
     return amount;
   }
   const conversionRate = await getCurrencyConversionRate(fromCurrency,toCurrency);
-  sails.log.verbose(
-    `Converting ${amount} [${fromCurrency}] to ${
-      amount * conversionRate
-    } [${toCurrency}] at rate: ${conversionRate}`
-  );
   return amount * conversionRate;
 };
 

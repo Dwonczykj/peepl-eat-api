@@ -2,13 +2,16 @@
 
 import stripe, { StripeKeys } from '../../scripts/load_stripe';
 import Stripe from 'stripe';
-import { CurrencyStripeAllowedTypeLiteral, PaymentIntentMetaDataType, SailsActionDefnType } from '../../scripts/utils';
+import { AccountType, CurrencyStripeAllowedTypeLiteral, PaymentIntentMetaDataType, SailsActionDefnType } from '../../scripts/utils';
 import {
+  SailsModelType,
+  sailsModelKVP,
   sailsVegi,
 } from '../interfaces/iSails';
 import { Currency } from '../../api/interfaces/peeplPay';
 
 declare var sails: sailsVegi;
+declare var Account: SailsModelType<AccountType>;
 
 export type CreatePaymentIntentInternalInputs = {
   amount: number; // amount in pence
@@ -95,11 +98,48 @@ const _exports: SailsActionDefnType<
     inputs: CreatePaymentIntentInternalInputs,
     exits: CreatePaymentIntentInternalExits
   ) {
+    
+    let vegiAccount: sailsModelKVP<AccountType>;
+    try {
+      const vegiAccounts = await Account.find({
+        id: inputs.accountId,
+      });
+      if (!vegiAccounts || vegiAccounts.length < 1) {
+        sails.log.warn(
+          `No account found for id: "${inputs.accountId}" in create-payment-intent-internal helper`
+        );
+        return exits.success(false);
+      }
+      vegiAccount = vegiAccounts[0];
+    } catch (error) {
+      sails.log.error(
+        `No account found for id: "${inputs.accountId}" in create-payment-intent-internal helper with error: ${error}`
+      );
+      return exits.success(false);
+    }
+
     let customer: Stripe.Customer | Stripe.DeletedCustomer; // ~ https://stripe.com/docs/api/accounts
     if (inputs.customerId) {
       customer = await stripe.customers.retrieve(inputs.customerId); // todo: link the stripe customer id in the new stripe model table that links optionally to the users table or doesnt link and the customers stripe customer id is stored in the cloud on their device for security
+      sails.log.verbose(`Stripe customer RETRIEVED with id: "${customer.id}" and to be ensured sync with vegiAccount[${vegiAccount && vegiAccount.id}] from inputs.accountId: ${inputs.accountId}`);
     } else {
-      customer = await stripe.customers.create();
+      customer = await stripe.customers.create();  
+      sails.log.verbose(`Stripe customer CREATED with id: "${customer.id}" and to be added to vegiAccount[${vegiAccount && vegiAccount.id}] from inputs.accountId: ${inputs.accountId}`);
+    }
+    if (
+      !vegiAccount.stripeCustomerId ||
+      vegiAccount.stripeCustomerId !== customer.id
+    ) {
+      try {
+        await Account.updateOne(vegiAccount.id).set({
+          stripeCustomerId: customer.id,
+        });
+      } catch (error) {
+        sails.log.error(
+          `Failed to update account in vegi with new stripe account id. Error: ${error}`
+        );
+        return exits.success(false);
+      }
     }
 
     const ephemeralKey = await stripe.ephemeralKeys.create(
@@ -156,7 +196,7 @@ const _exports: SailsActionDefnType<
         //   enabled: true,
         // },
         metadata: meta,
-        setup_future_usage: 'off_session',
+        setup_future_usage: 'on_session',
       });
       return exits.success({
         paymentIntent: paymentIntent,

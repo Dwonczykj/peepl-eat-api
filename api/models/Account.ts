@@ -34,6 +34,16 @@ let _exports: SailsModelDefnType<AccountType> = {
       required: false,
       defaultsTo: '',
     },
+    stripeCustomerId: {
+      type: 'string',
+      required: false,
+      allowNull: true,
+    },
+    stripeAccountId: {
+      type: 'string',
+      required: false,
+      allowNull: true,
+    },
     bankCardAccountName: {
       type: 'string',
       required: false,
