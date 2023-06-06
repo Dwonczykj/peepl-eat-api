@@ -55,8 +55,13 @@ type iStripeApi = {
   };
 };
 
-import {Stripe} from 'stripe';
-const stripe:Stripe = require('stripe')(stripeKeys['secretKey']);
+// import {Stripe} from 'stripe';
+import Stripe from 'stripe';
+// const stripe:Stripe = require('stripe')(stripeKeys['secretKey']);
+const stripe: Stripe = new Stripe(stripeKeys['secretKey'] as string, {
+  apiVersion: '2022-11-15',
+  typescript: true,
+});
 
 if (
   process.env.NODE_ENV !== 'production' &&

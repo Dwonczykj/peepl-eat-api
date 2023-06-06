@@ -697,11 +697,13 @@ const _exports: SailsActionDefnType<
 
 
       let finalAmount = result.calculatedOrderTotal.finalAmount;
+      let finalAmountCurrency = order.currency;
       if (order.currency !== result.calculatedOrderTotal.currency){
+        finalAmountCurrency = order.currency || Currency.GBP;
         finalAmount = await sails.helpers.convertCurrencyAmount.with({
           amount: result.calculatedOrderTotal.finalAmount,
           fromCurrency: result.calculatedOrderTotal.currency,
-          toCurrency: order.currency || Currency.GBP,
+          toCurrency: finalAmountCurrency,
         });
       }
       
@@ -715,7 +717,7 @@ const _exports: SailsActionDefnType<
         const _newPaymentIntent =
           await sails.helpers.createPaymentIntentInternal.with({
             amount: finalAmount,
-            currency: order.currency || Currency.GBP,
+            currency: finalAmountCurrency,
             recipientWalletAddress: vendor.walletAddress,
             vendorDisplayName: vendor.name,
             webhookAddress: sails.config.custom.peeplWebhookAddress,
@@ -723,6 +725,7 @@ const _exports: SailsActionDefnType<
             senderWalletAddress: inputs.walletAddress,
             accountId: account && account.id,
             orderId: order.id,
+            receiptEmail: order.deliveryEmail,
           });
         newPaymentIntent = _newPaymentIntent;
       } catch (error) {

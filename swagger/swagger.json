@@ -157,7 +157,7 @@
       "name": "Peepl pay refunds webhook"
     },
     {
-      "name": "Get order details"
+      "name": "GetOrderDetails"
     },
     {
       "name": "Logged in"
@@ -4023,6 +4023,14 @@
               "type": "number",
               "format": "double"
             }
+          },
+          {
+            "in": "query",
+            "name": "receiptEmail",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -5152,9 +5160,9 @@
     },
     "/api/v1/orders/get-order-details": {
       "get": {
-        "summary": "Get order details",
+        "summary": "GetOrderDetails",
         "tags": [
-          "Get order details"
+          "GetOrderDetails"
         ],
         "parameters": [
           {
@@ -5162,19 +5170,26 @@
             "name": "orderId",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "number",
+              "format": "double"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "The requested resource"
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
           },
           "404": {
             "description": "Not found"
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Server error"
           }
         }
       }
@@ -6000,6 +6015,14 @@
             "schema": {
               "type": "number",
               "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "receiptEmail",
+            "required": false,
+            "schema": {
+              "type": "string"
             }
           }
         ],

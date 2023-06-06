@@ -85,6 +85,10 @@ const _exports: SailsActionDefnType<
       type: 'number',
       required: true,
     },
+    receiptEmail: {
+      type: 'string',
+      required: false,
+    }
   },
 
   exits: {
