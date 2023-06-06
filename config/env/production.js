@@ -363,7 +363,7 @@ module.exports = {
    *                                                                         *
    ***************************************************************************/
   custom: {
-    internalEmailAddress: 'help@vegiapp.co.uk',
+    internalEmailAddress: 'support@vegiapp.co.uk',
     buildNumber: 1,
     baseUrl: BASE_URL,
     peeplWebhookAddress: `${BASE_URL}/api/v1/orders/peepl-pay-webhook`,

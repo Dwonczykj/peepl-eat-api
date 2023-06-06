@@ -30,11 +30,11 @@ export type CreatePaymentIntentInternalInputs = {
 
 export type CreatePaymentIntentInternalResult =
   | {
-      paymentIntent: Stripe.Response<Stripe.PaymentIntent>;
-      setupIntent: Stripe.Response<Stripe.SetupIntent> | null;
-      ephemeralKey: string;
       customer: string;
+      ephemeralKey: string;
+      paymentIntent: Stripe.Response<Stripe.PaymentIntent>;
       publishableKey: string;
+      setupIntent: Stripe.Response<Stripe.SetupIntent> | null;
     }
   | false;
 
@@ -227,49 +227,55 @@ const _exports: SailsActionDefnType<
         );
         return exits.success(false);
       }
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: inputAmountPence, //TODO get amounts from end ppoint inputs...
-        currency: useCurrency,
-        customer: customer.id,
-        shipping: {
-          name: order.deliveryName,
-          address: {
-            state: order.deliveryAddressCity,
-            city: order.deliveryAddressCity,
-            line1: order.deliveryAddressLineOne,
-            postal_code: order.deliveryAddressPostCode,
-            country: 'GB', // ~ https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes
+      const paymentIntent = await stripe.paymentIntents.create(
+        {
+          amount: inputAmountPence, //TODO get amounts from end ppoint inputs...
+          currency: useCurrency,
+          customer: customer.id,
+          shipping: {
+            name: order.deliveryName,
+            address: {
+              state: order.deliveryAddressCity,
+              city: order.deliveryAddressCity,
+              line1: order.deliveryAddressLineOne,
+              postal_code: order.deliveryAddressPostCode,
+              country: 'GB', // ~ https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes
+            },
           },
-        },
-        // Edit the following to support different payment methods in your PaymentSheet
-        // Note: some payment methods have different requirements: https://stripe.com/docs/payments/payment-methods/integration-options
-        payment_method_types: [
-          'card',
-          // 'ideal',
-          // 'sepa_debit',
-          // 'sofort',
-          // 'bancontact',
-          // 'p24',
-          // 'giropay',
-          // 'eps',
-          // 'afterpay_clearpay',
-          // 'klarna',
-          // 'us_bank_account',
-        ],
-        statement_descriptor: inputs.vendorDisplayName || 'vegi', // + ` (${})`,
-        // payment_method_types: ['card', 'link'],
-        // ['card_present', 'link', acss_debit, affirm, afterpay_clearpay, alipay, au_becs_debit, bacs_debit, bancontact, blik, boleto, card, card_present, cashapp, customer_balance, eps, fpx, giropay, grabpay, ideal, interac_present, klarna, konbini, link, oxxo, p24, paynow, paypal, pix, promptpay, sepa_debit, sofort, us_bank_account, wechat_pay, and zip]
-        // ~ https://stripe.com/docs/api/payment_intents/create#create_payment_intent-payment_method_types
-        // automatic_payment_methods: {
-        //   enabled: true,
-        // },
-        metadata: meta,
+          // Edit the following to support different payment methods in your PaymentSheet
+          // Note: some payment methods have different requirements: https://stripe.com/docs/payments/payment-methods/integration-options
+          payment_method_types: [
+            'card',
+            // 'ideal',
+            // 'sepa_debit',
+            // 'sofort',
+            // 'bancontact',
+            // 'p24',
+            // 'giropay',
+            // 'eps',
+            // 'afterpay_clearpay',
+            // 'klarna',
+            // 'us_bank_account',
+          ],
+          statement_descriptor: inputs.vendorDisplayName || 'vegi', // + ` (${})`,
+          // payment_method_types: ['card', 'link'],
+          // ['card_present', 'link', acss_debit, affirm, afterpay_clearpay, alipay, au_becs_debit, bacs_debit, bancontact, blik, boleto, card, card_present, cashapp, customer_balance, eps, fpx, giropay, grabpay, ideal, interac_present, klarna, konbini, link, oxxo, p24, paynow, paypal, pix, promptpay, sepa_debit, sofort, us_bank_account, wechat_pay, and zip]
+          // ~ https://stripe.com/docs/api/payment_intents/create#create_payment_intent-payment_method_types
+          // automatic_payment_methods: {
+          //   enabled: true,
+          // },
+          metadata: meta,
 
-        /// ~ https://stripe.com/docs/payments/setup-intents
-        /// NOTE However, if you only plan to use the card when the customer is checking out, set usage to on_session. This lets the bank know you plan to use the card when the customer is available to authenticate, so you can postpone authenticating the card details until then and avoid upfront friction.
-        // setup_future_usage: 'off_session',
-        // receipt_email: inputs.receiptEmail || order.deliveryEmail || undefined,
-      });
+          /// ~ https://stripe.com/docs/payments/setup-intents
+          /// NOTE However, if you only plan to use the card when the customer is checking out, set usage to on_session. This lets the bank know you plan to use the card when the customer is available to authenticate, so you can postpone authenticating the card details until then and avoid upfront friction.
+          // setup_future_usage: 'off_session',
+          // receipt_email: inputs.receiptEmail || order.deliveryEmail || undefined,
+        },
+        {
+          idempotencyKey: order.publicId, // ~ https://stripe.com/docs/api/idempotent_requests
+        }
+      );
+      sails.log.verbose(`New payment intent: "${paymentIntent.id}" created for customer:[${customer.id}] and order[${order.id}]`);
       return exits.success({
         paymentIntent: paymentIntent,
         setupIntent: setupIntent,

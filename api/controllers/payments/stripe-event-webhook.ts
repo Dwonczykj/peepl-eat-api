@@ -2,6 +2,7 @@
 import stripe from '../../../scripts/load_stripe';
 import Stripe from 'stripe';
 import _ from 'lodash';
+const util = require('util');
 import axios from 'axios';
 import moment from 'moment';
 import { SailsModelType, sailsVegi } from '../../interfaces/iSails';
@@ -141,7 +142,7 @@ const _exports: SailsActionDefnType<
         if (!orders || orders.length < 1) {
           const util = require('util');
           const e = Error(
-            `Stripe Event Webook for "${eventType}" webhook was unable to locate an order with matching payment intent: "${paymentIntentId}". The stripe event contained meta: ${util.inspect(dataObj,{depth:null,})}`
+            `Stripe Event Webhook for "${eventType}" webhook was unable to locate an order with matching payment intent: "${paymentIntentId}". The stripe event contained meta: ${util.inspect(dataObj,{depth:null,})}`
           );
           sails.log.error(e);
           return exits.error(e);
@@ -276,10 +277,10 @@ const _exports: SailsActionDefnType<
 
           order = await Order.findOne(order.id).populate('vendor');
 
-          await sails.helpers.sendSlackNotification.with({ order: order });
 
           try {
             if (order.paymentStatus === 'paid') {
+              await sails.helpers.sendSlackNotification.with({ order: order });
               await sails.helpers.sendSmsNotification.with({
                 to: order.vendor.phoneNumber,
                 // body: `You have received a new order from vegi for delivery between ${order.fulfilmentSlotFrom} and ${order.fulfilmentSlotTo}. ` +
@@ -300,7 +301,8 @@ Delivery/Collection on ${order.fulfilmentSlotFrom} - ${order.fulfilmentSlotTo}`,
                   orderId: order.id,
                 },
               });
-            } else {
+            } else if (order.paymentStatus === 'unpaid') {
+              await sails.helpers.sendSlackNotification.with({ order: order });
               await sails.helpers.sendSmsNotification.with({
                 to: order.deliveryPhoneNumber,
                 body:
@@ -313,6 +315,8 @@ Delivery/Collection on ${order.fulfilmentSlotFrom} - ${order.fulfilmentSlotTo}`,
                   orderId: order.id,
                 },
               });
+            } else {
+              sails.log.warn(`Payment for recent order[${order.id}] hit the stripe-event-webhook with paymentStatus of ${order.paymentStatus} and contained inputs: ${util.inspect(inputs, {depth: null})}`);
             }
           } catch (error) {
             sails.log.error(

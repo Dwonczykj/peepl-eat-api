@@ -7,6 +7,7 @@ import {
 import {
   SailsActionDefnType,
 } from '../../../scripts/utils';
+// import { CreatePaymentIntentInternalResult } from '../../../api/helpers/create-payment-intent-internal';
 
 declare var sails: sailsVegi;
 
@@ -15,7 +16,7 @@ export type CheckStripePaymentIntentInputs = {
   client_secret?: string | null | undefined;
 };
 
-export type CheckStripePaymentIntentResponse = {paymentIntent: Stripe.Response<Stripe.PaymentIntent>} | false;
+export type CheckStripePaymentIntentResponse = Stripe.Response<Stripe.PaymentIntent> | false;
 
 export type CheckStripePaymentIntentExits = {
   success: (unusedData: CheckStripePaymentIntentResponse) => any;
@@ -69,7 +70,10 @@ const _exports: SailsActionDefnType<
       const paymentIntent = await stripe.paymentIntents.retrieve(inputs.paymentIntentId, !inputs.client_secret ? {} : {
         client_secret: inputs.client_secret,
       });
-      return exits.success({paymentIntent: paymentIntent});
+      sails.log.verbose(`Retrieved paymentIntent[${paymentIntent.id}] for customer[${paymentIntent.customer}]`);
+      return exits.success(
+        paymentIntent
+      );
     } catch (error) {
       sails.log.error(error);
       return exits.success(false);

@@ -17,6 +17,7 @@ import {
   DiscountType
 } from '../../../scripts/utils';
 import { Currency } from '../../../api/interfaces/peeplPay';
+import Stripe from 'stripe';
 
 declare var sails: sailsVegi;
 declare var OrderItemOptionValue: SailsModelType<OrderItemOptionValueType>;
@@ -79,10 +80,14 @@ export type ValidateOrderResult = {
 
 type CreateOrderResult = {
   orderId: number;
-  paymentIntentID: string;
   orderCreationStatus: 'confirmed' | 'failed';
   order: OrderType | null;
-}
+  stripePaymentIntent: CreatePaymentIntentInternalResult;
+  // paymentIntent: Stripe.Response<Stripe.PaymentIntent>;
+  // ephemeralKey: string;
+  // customer: string;
+  // publishableKey: string;
+};
 
 export type CreateOrderResponse = CreateOrderResult | false;
 
@@ -741,9 +746,13 @@ const _exports: SailsActionDefnType<
         );
         return exits.success({
           orderId: null,
-          paymentIntentID: null,
           orderCreationStatus: 'failed',
           order: null,
+          stripePaymentIntent: false,
+          // paymentIntent: null,
+          // ephemeralKey: null,
+          // customer: null,
+          // publishableKey: null,
         });
       }
 
@@ -751,9 +760,13 @@ const _exports: SailsActionDefnType<
         sails.log.error(new Error('Error creating payment intent'));
         return exits.success({
           orderId: null,
-          paymentIntentID: null,
           orderCreationStatus: 'failed',
           order: null,
+          stripePaymentIntent: false
+          // paymentIntent: null,
+          // ephemeralKey: null,
+          // customer: null,
+          // publishableKey: null,
         });
       }
       const paymentIntentId = newPaymentIntent.paymentIntent.id;
@@ -781,17 +794,17 @@ const _exports: SailsActionDefnType<
 
       return exits.success({
         orderId: result.orderId,
-        paymentIntentID: paymentIntentId,
         orderCreationStatus: result.orderCreationStatus,
         order: newOrder,
+        stripePaymentIntent: newPaymentIntent,
       });
     } catch (error) {
       sails.log.error(error);
       try {
         await sails.helpers.sendSmsNotification.with({
           to: inputs.address.phoneNumber,
-          body: `We're sorry but your order has been declined by the merchant 😔
-For help please contact help@vegiapp.co.uk`,
+          body: `We're sorry but your order has been declined.
+For help please contact support@vegiapp.co.uk`,
           data: {
             orderId: null,
           },

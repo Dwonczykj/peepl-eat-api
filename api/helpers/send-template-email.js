@@ -248,7 +248,7 @@ module.exports = {
               Data: subjectLinePrefix + subject,
             },
           },
-          Source: 'vegi <help@vegiapp.co.uk>',
+          Source: 'vegi <support@vegiapp.co.uk>',
         };
 
         try {
