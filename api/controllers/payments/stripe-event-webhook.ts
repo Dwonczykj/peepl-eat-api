@@ -136,16 +136,35 @@ const _exports: SailsActionDefnType<
       if (eventType.startsWith('payment_intent') && dataObj['object'] === "payment_intent") {
         const paymentIntent:Stripe.PaymentIntent = dataObj as any;
         const paymentIntentId = paymentIntent.id;
-        const orders = await Order.find({
+        let orders = await Order.find({
           paymentIntentId: paymentIntentId,
         }).populate('vendor&discounts');
         if (!orders || orders.length < 1) {
           const util = require('util');
+          if (dataObj['metadata'] && dataObj['metadata']['orderId']){
+            orders = await Order.find({
+              id: Number.parseInt(dataObj['metadata']['orderId']),
+            }).populate('vendor&discounts');
+          }
+          if (!orders || orders.length < 1){
+            const e = Error(
+              `Stripe Event Webhook for "${eventType}" webhook was unable to locate an order with matching payment intent: "${paymentIntentId}". The stripe event contained meta: ${util.inspect(
+                dataObj,
+                { depth: null }
+              )}`
+            );
+            sails.log.error(e);
+            return exits.success();
+          }
+          let order = orders[0];
           const e = Error(
-            `Stripe Event Webhook for "${eventType}" webhook was unable to locate an order with matching payment intent: "${paymentIntentId}". The stripe event contained meta: ${util.inspect(dataObj,{depth:null,})}`
+            `Stripe Event Webhook for "${eventType}" webhook located an order with different payment intent: "${order.paymentIntentId}" vs the passed paymentIntentId from stripe: "${paymentIntentId}". The stripe event contained meta: ${util.inspect(
+              dataObj,
+              { depth: null }
+            )}`
           );
           sails.log.error(e);
-          return exits.error(e);
+          return exits.success();
         }
         let order = orders[0];
         sails.log(`Stripe webhook called for order with public id: "${order.publicId}"`);
