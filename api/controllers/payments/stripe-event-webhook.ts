@@ -302,21 +302,35 @@ Delivery/Collection on ${order.fulfilmentSlotFrom} - ${order.fulfilmentSlotTo}`,
                 },
               });
             } else if (order.paymentStatus === 'unpaid') {
+              sails.log.verbose(
+                `New payment intent successfully setup for order[${
+                  order.id
+                }] from inputs: ${util.inspect(inputs, { depth: null })}`
+              );
+            } else if (order.paymentStatus === 'failed') {
               await sails.helpers.sendSlackNotification.with({ order: order });
               await sails.helpers.sendSmsNotification.with({
                 to: order.deliveryPhoneNumber,
                 body:
-                  'Your payment for a recent order failed. Details of order ' +
+                  `Your payment for a recent order to ${order.vendor.name} failed. Order was scheduled between ` +
                   order.fulfilmentSlotFrom +
                   ' and ' +
                   order.fulfilmentSlotTo +
-                  '. Please review your payment method in the vegi app.',
+                  '. Please review your payment in the vegi app.',
                 data: {
                   orderId: order.id,
                 },
               });
             } else {
-              sails.log.warn(`Payment for recent order[${order.id}] hit the stripe-event-webhook with paymentStatus of ${order.paymentStatus} and contained inputs: ${util.inspect(inputs, {depth: null})}`);
+              sails.log.warn(
+                `Payment for recent order[${
+                  order.id
+                }] hit the stripe-event-webhook with paymentStatus of ${
+                  order.paymentStatus
+                } and contained inputs: ${util.inspect(inputs, {
+                  depth: null,
+                })}`
+              );
             }
           } catch (error) {
             sails.log.error(
