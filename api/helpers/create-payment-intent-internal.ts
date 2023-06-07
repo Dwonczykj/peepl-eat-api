@@ -30,9 +30,10 @@ export type CreatePaymentIntentInternalInputs = {
 
 export type CreatePaymentIntentInternalResult =
   | {
-      customer: string;
-      ephemeralKey: string;
       paymentIntent: Stripe.Response<Stripe.PaymentIntent>;
+      paymentMethods: Stripe.PaymentMethod[];
+      customer: Stripe.Customer;
+      ephemeralKey: string;
       publishableKey: string;
       setupIntent: Stripe.Response<Stripe.SetupIntent> | null;
     }
@@ -276,11 +277,26 @@ const _exports: SailsActionDefnType<
         }
       );
       sails.log.verbose(`New payment intent: "${paymentIntent.id}" created for customer:[${customer.id}] and order[${order.id}]`);
+      const paymentMethodsResponse = await stripe.customers.listPaymentMethods(customer.id);
+      let paymentMethods = paymentMethodsResponse ? paymentMethodsResponse.data : [];
+      if(paymentMethodsResponse && paymentMethodsResponse.has_more){
+        const morePaymentMethodsResponse =
+          await stripe.customers.listPaymentMethods(customer.id, {
+            starting_after: paymentMethods[paymentMethods.length].id,
+          });
+        if (morePaymentMethodsResponse && morePaymentMethodsResponse.data){
+          paymentMethods = [
+            ...paymentMethods,
+            ...morePaymentMethodsResponse.data,
+          ];
+        }
+      }
       return exits.success({
         paymentIntent: paymentIntent,
+        paymentMethods: paymentMethodsResponse && paymentMethodsResponse.data,
         setupIntent: setupIntent,
         ephemeralKey: ephemeralKey.secret, // used temporarily to allow client to fetch card details from client side stripe api and populate payment box
-        customer: customer.id,
+        customer: customer && !customer.deleted ? (customer as Stripe.Customer) : null,
         publishableKey: StripeKeys.publishableKey,
       });
     } catch (error) {

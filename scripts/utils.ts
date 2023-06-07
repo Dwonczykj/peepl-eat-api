@@ -5,6 +5,40 @@ import { Currency } from "../api/interfaces/peeplPay";
 import { DaysOfWeek } from "./DaysOfWeek";
 declare var sails: any;
 
+/**
+ * A type guard. Checks if given object x has the key.
+ */
+export const has = <K extends string>(
+  key: K,
+  x: object,
+): x is { [key in K]: unknown } => (
+    key in x
+  );
+/**
+ * A type guard. Checks if given object x has the key.
+ */
+export const notFalseyAndHas = <K extends string>(
+  key: K,
+  x: object
+): x is { [key in K]: unknown } => typeof x !== 'object' || !x ? false : (key in x);
+
+function exampleUseOfHas(response: unknown) {
+  if (
+    typeof response !== 'object'
+    || response === null
+    || !has('items', response)
+    || !has('meta', response)
+  ) {
+    // TODO: Paste a proper error handling here.
+    throw new Error('Invalid response!');
+  }
+
+  return [
+    response.items,
+    response.meta
+  ];
+}
+
 export function getTodayDayName(offset: number = 0): DaysOfWeek {
   // const weekday:any = moment().format("dddd");
   const today = new Date();

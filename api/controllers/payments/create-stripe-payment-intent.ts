@@ -6,7 +6,7 @@ import {
 } from '../../../scripts/utils';
 import Stripe from 'stripe';
 import { sailsVegi } from '../../../api/interfaces/iSails';
-import { CreatePaymentIntentInternalInputs } from '../../../api/helpers/create-payment-intent-internal';
+import { CreatePaymentIntentInternalInputs, CreatePaymentIntentInternalResult } from '../../../api/helpers/create-payment-intent-internal';
 
 declare var sails: sailsVegi;
 
@@ -22,13 +22,15 @@ export type CreateStripePaymentAttemptInputs = CreatePaymentIntentInternalInputs
 };*/
 
 export type CreateStripePaymentAttemptResponse =
-  | {
-      paymentIntent: Stripe.Response<Stripe.PaymentIntent>;
-      ephemeralKey: string;
-      customer: string;
-      publishableKey: string;
-    }
-  | false;
+  | CreatePaymentIntentInternalResult;
+  // | {
+  //     paymentIntent: Stripe.Response<Stripe.PaymentIntent>;
+  //     paymentMethods: Stripe.Response<Stripe.ApiList<Stripe.PaymentMethod>>;
+  //     ephemeralKey: string;
+  //     customer: string;
+  //     publishableKey: string;
+  //   }
+  // | false;
 
 export type CreateStripePaymentAttemptExits = {
   success: (unusedData: CreateStripePaymentAttemptResponse) => any;
