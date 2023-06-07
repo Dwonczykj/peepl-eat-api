@@ -213,3 +213,15 @@ export const deleteUser = (uid:string): Promise<void> => {
     }
   });
 };
+
+// export const sendMessage = (title: string, message:string, token: string, orderPublicId: string,): Promise<string> =>
+export const sendMessage = (message: {
+  data: {[k:string]:string},
+  token: string,
+  notification: {
+    title: string,
+    body: string,
+  }
+}): Promise<string> =>
+  admin.messaging().send(message);
+

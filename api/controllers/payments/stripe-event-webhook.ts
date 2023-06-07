@@ -176,7 +176,7 @@ const _exports: SailsActionDefnType<
             if (order.firebaseRegistrationToken){
               sails.log.warn(`Firebase notifications on registration tokens (i.e. "${order.firebaseRegistrationToken}" for order[${order.id}]) are  not currently working...`);
               await sails.helpers.sendFirebaseNotification.with({
-                // topic: `order-${order.publicId}`,
+                topicBackup: `order-${order.publicId}`,
                 token: order.firebaseRegistrationToken,
                 title: 'Payment success',
                 body: '✅ Payment on vegi succeeded',
@@ -184,15 +184,16 @@ const _exports: SailsActionDefnType<
                   orderId: `${order.id}`,
                 },
               });
+            } else {
+              await sails.helpers.broadcastFirebaseNotificationForTopic.with({
+                topic: `order-${order.publicId}`,
+                title: `Payment success`,
+                body: '✅ Payment on vegi succeeded',
+                data: {
+                  orderId: `${order.id}`,
+                },
+              });
             }
-            await sails.helpers.broadcastFirebaseNotificationForTopic.with({
-              topic: `order-${order.publicId}`,
-              title: `Payment success`,
-              body: '✅ Payment on vegi succeeded',
-              data: {
-                orderId: `${order.id}`,
-              },
-            });
             
           } else if (eventType === 'payment_intent.processing') {
             sails.log(
@@ -205,7 +206,7 @@ const _exports: SailsActionDefnType<
             paymentStatus = 'failed';
             if(order.firebaseRegistrationToken){
               await sails.helpers.sendFirebaseNotification.with({
-                // topic: `order-${order.publicId}`,
+                topicBackup: `order-${order.publicId}`,
                 token: order.firebaseRegistrationToken,
                 title: 'Payment failed',
                 body: '❌ Payment on vegi failed',

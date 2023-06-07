@@ -31,6 +31,7 @@ import { ConvertCurrencyAmountInputs, ConvertCurrencyAmountResponse } from "../.
 import { CalculateCurrencyOperationInputs, CalculateCurrencyOperationResponse } from "../../api/helpers/calculate-currency-operation";
 import { Currency } from "./peeplPay";
 import { CheckDiscountCodeInputs, CheckDiscountCodeResponse } from "../../api/helpers/check-discount-code";
+import { SendFirebaseNotificationInputs, SendFirebaseNotificationResult } from "../../api/helpers/send-firebase-notification";
 
 export type SailsActionInput =
   | {
@@ -686,19 +687,8 @@ export type sailsVegi = {
     uploadOneS3: (image: any) => Promise<UploadImageInfoType>;
 
     sendFirebaseNotification: _helperFunction<
-      {
-        token: string;
-        title: string;
-        body: string;
-        data:
-          | any
-          | {
-              orderId: string;
-            };
-      },
-      {
-        notification: NotificationType;
-      }
+      SendFirebaseNotificationInputs,
+      SendFirebaseNotificationResult
     >;
     broadcastFirebaseNotificationForTopic: _helperFunction<
       {
@@ -810,6 +800,7 @@ export type sailsVegi = {
   ) => any;
   config: {
     appPath: string;
+    environment: 'test' | 'production' | 'development' | 'qa';
     custom: { [configKey: string]: any };
     uploads: {
       adapter: any;
