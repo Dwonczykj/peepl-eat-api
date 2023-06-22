@@ -29,6 +29,15 @@ let _exports: SailsModelDefnType<TransactionType> = {
       type: 'string',
       required: true,
     },
+    status: {
+      type: 'string',
+      required: false,
+    },
+    remoteJobId: {
+      type: 'string',
+      required: false,
+      allowNull: true,
+    },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗

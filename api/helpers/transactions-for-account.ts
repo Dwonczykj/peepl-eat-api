@@ -134,6 +134,8 @@ const _exports: SailsActionDefnType<
           payer: account.id,
           receiver: vegiAccount.id,
           timestamp: pi.created,
+          status: 'succeeded',
+          remoteJobId: null,
         }).fetch();
         transactions.push(newTransaction);
       } else {

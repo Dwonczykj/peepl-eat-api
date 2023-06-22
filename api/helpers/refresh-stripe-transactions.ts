@@ -208,6 +208,8 @@ const _exports: SailsActionDefnType<
             payer: payerAccountId,
             receiver: vegiAccount.id,
             timestamp: pi.created,
+            status: 'succeeded',
+            remoteJobId: null,
           }).fetch();
           transactions.push(newTransaction);
         } catch (error) {

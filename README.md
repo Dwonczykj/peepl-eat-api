@@ -48,3 +48,22 @@ This app was originally generated on Tue Oct 20 2020 09:54:07 GMT+0100 (British 
 Note:  Generators are usually run using the globally-installed `sails` CLI (command-line interface).  This CLI version is _environment-specific_ rather than app-specific, thus over time, as a project's dependencies are upgraded or the project is worked on by different developers on different computers using different versions of Node.js, the Sails dependency in its package.json file may differ from the globally-installed Sails CLI release it was originally generated with.  (Be sure to always check out the relevant [upgrading guides](https://sailsjs.com/upgrading) before upgrading the version of Sails used by your app.  If you're stuck, [get help here](https://sailsjs.com/support).)
 -->
 
+## Fuse Community Administration
+See the [fuseCommunity.md](./fuseCommunity.md) for additional admin details for fuse administration.
+
+For example we can set the webhooks using:
+## Update the webhook for *Production*:
+
+See [docs]()
+
+```shell
+curl -L -X PUT 'https://api.fuse.io/api/v0/notifications/webhook?apiKey=<fuse_public_key>' \
+-H 'Content-Type: application/json' \
+-H 'Accept: application/json' \
+-H 'API-SECRET: <fuse_secret_key>' \
+--data-raw '{
+  "webhookId": "<GUID>",
+  "webhookUrl": "https://vegi.vegiapp.co.uk/api/v1/payments/fuse-event-webhook",
+  "eventType": "ALL"
+}'
+```

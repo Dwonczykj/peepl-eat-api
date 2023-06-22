@@ -1,6 +1,8 @@
 import { StripeAccountType } from '../api/interfaces/payments/stripe/iStripeAccount';
 import { StripeCustomerType } from '../api/interfaces/payments/stripe/iStripeCustomer';
 import fs from 'fs';
+// import {Stripe} from 'stripe';
+import Stripe from 'stripe';
 
 const kebabize = (str, forceJoinerStr = '-') =>
   str.replace(
@@ -54,9 +56,6 @@ type iStripeApi = {
     create: (paymentIntentInput: any) => { client_secret: string };
   };
 };
-
-// import {Stripe} from 'stripe';
-import Stripe from 'stripe';
 // const stripe:Stripe = require('stripe')(stripeKeys['secretKey']);
 const stripe: Stripe = new Stripe(stripeKeys['secretKey'] as string, {
   apiVersion: '2022-11-15',

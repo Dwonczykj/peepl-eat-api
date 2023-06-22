@@ -3,8 +3,10 @@ enum Currency {
   USD = 'USD',
   EUR = 'EUR',
   GBPx = 'GBPx',
-  PPL = 'PPL',
+  FUSD = 'FUSD',
   GBT = 'GBT',
+  FUSE = 'FUSE',
+  PPL = 'PPL',
 }
 
 export { Currency };

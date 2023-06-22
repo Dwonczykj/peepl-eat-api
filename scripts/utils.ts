@@ -568,7 +568,7 @@ export type ESCSourceType = {
 export type ESCRatingType = {
   id: number;
   createdAt: number;
-  productPublicId: string;
+  escRatingId: string;
   rating: number;
   calculatedOn:Date;
   product: ProductType;
@@ -670,7 +670,7 @@ export type OrderAcceptedStatusType =
   | 'collected'
   | 'delivered';
 
-export type PaymentStatusType = 'paid' | 'unpaid' | 'failed';
+export type PaymentStatusType = 'paid' | 'unpaid' | 'failed' | 'refunded';
 
 export type _OrderTypeHidden = {
   id: number;
@@ -785,6 +785,8 @@ export type OrderType = _OrderTypeHidden & {
   unfulfilledItems: Array<OrderItemType>;
 };
 
+type TransactionTypeStatusLiteral = 'pending' | 'succeeded' | 'failed';
+
 export type TransactionType = {
   id: number;
   timestamp: number;
@@ -793,6 +795,8 @@ export type TransactionType = {
   receiver: AccountType;
   payer: AccountType;
   order: OrderType | null;
+  status: TransactionTypeStatusLiteral;
+  remoteJobId?: string | null;
 };
 
 export const openingHoursToMoments = (

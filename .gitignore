@@ -129,6 +129,7 @@ nbproject
 #.vscode
 .node_history
 dump.rdb
+fuseCommunity.md
 .env
 stripe.json
 test_stripe.json

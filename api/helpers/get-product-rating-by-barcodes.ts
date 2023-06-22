@@ -91,14 +91,14 @@ const _exports: SailsActionDefnType<
     inputs: GetProductRatingInputs,
     exits: GetProductRatingExits
   ) {
-    const getResult = (
+    const formatResult = (
       rating: ESCRatingType,
       explanations: ESCExplanationType[]
     ) => {
       const x: GetProductRatingResult[''] = {
         id: rating.id,
         createdAt: rating.createdAt,
-        productPublicId: rating.productPublicId,
+        productPublicId: rating.escRatingId,
         rating: rating.rating,
         // evidence: rating.evidence,
         calculatedOn: rating.calculatedOn,
@@ -252,7 +252,7 @@ const _exports: SailsActionDefnType<
         const explanations = await ESCExplanation.find({
           escrating: rating.id,
         }).populate('escsource');
-        return { [id]: getResult(rating, explanations) };
+        return { [id]: formatResult(rating, explanations) };
       } else {
         return { [id]: null };
       }
@@ -304,7 +304,7 @@ const _exports: SailsActionDefnType<
         id: ids
       });
       
-      const createRating = async (p:sailsModelKVP<ProductType>) => {
+      const createZeroDefautRating = async (p:sailsModelKVP<ProductType>) => {
         const newRating = await ESCRating.create({
           calculatedOn: moment.utc().toISOString(),
           productPublicId: p.productBarCode,
@@ -319,10 +319,8 @@ const _exports: SailsActionDefnType<
           measure: 0,
           escrating: newRating.id,
         }).fetch();
-
-
         
-        const result = getResult(newRating, [
+        const result = formatResult(newRating, [
           {
             id: explanation.id,
             title: explanation.title,
@@ -335,7 +333,7 @@ const _exports: SailsActionDefnType<
         ]);
         return { [p.id]: result };
       };
-      const results = await Promise.all(products.map(p => createRating(p)));
+      const results = await Promise.all(products.map(p => createZeroDefautRating(p)));
       const resultsDict = Object.assign({},...results);
 
       // await ESCRating.addToCollection(newRating.id, 'explanation').members(explanations.map(e => e.id));

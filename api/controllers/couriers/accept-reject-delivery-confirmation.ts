@@ -1,3 +1,9 @@
+import { SailsModelType } from "../../../api/interfaces/iSails";
+import { OrderType } from "../../../scripts/utils";
+import stripe from '../../../scripts/load_stripe';
+
+declare var Order: SailsModelType<OrderType>;
+
 module.exports = {
   friendlyName: "Accept / Reject Delivery Confirmation",
 
@@ -71,6 +77,24 @@ module.exports = {
         : null,
       deliveryPartnerConfirmed: inputs.deliveryPartnerConfirmed,
     });
+
+    if (order.paymentStatus === 'paid'){
+      const charges = await stripe.charges.search({
+        query: `payment_intent='${order.paymentIntentId}'`,
+      });
+      if(charges && charges.data){
+        const charge = charges.data[0];
+        stripe.refunds.create({
+          charge: charge.id,
+          payment_intent: order.paymentIntentId,
+          metadata: {
+            orderId: order.id,
+          },
+        })
+      } else {
+        sails.log.error(`Unable to locate stripe Charge object for order: [${order.id}]`);
+      }
+    }
 
     // All done.
     return exits.success();

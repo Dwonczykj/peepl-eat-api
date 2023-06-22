@@ -2,6 +2,7 @@ import axios from 'axios';
 import {v4 as uuidv4} from 'uuid'; // const { v4: uuidv4 } = require('uuid');
 import moment from 'moment';
 import * as firebase from '../../config/firebaseAdmin';
+import Stripe from 'stripe';
 import {
   sailsModelKVP,
   SailsModelType,
@@ -17,13 +18,14 @@ declare var Notification: SailsModelType<NotificationType>;
 
 
 export type SendFirebaseNotificationInputs = {
-  topicBackup: string,
-  token: string,
-  title: string,
-  body: string,
+  topicBackup: string;
+  token: string;
+  title: string;
+  body: string;
   data: {
-    orderId?: string,
-  },
+    orderId?: string;
+    dataObj?: Stripe.Event.Data.Object;
+  } & any;
 };
 
 export type SendFirebaseNotificationResult = NotificationType | false;

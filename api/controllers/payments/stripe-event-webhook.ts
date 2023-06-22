@@ -6,10 +6,10 @@ const util = require('util');
 import axios from 'axios';
 import moment from 'moment';
 import { SailsModelType, sailsVegi } from '../../interfaces/iSails';
-import { AccountType, DiscountType, OrderType, SailsActionDefnType, TransactionType, datetimeStrFormatExactForSQLTIMESTAMP } from '../../../scripts/utils';
+import { AccountType, DiscountType, OrderType, SailsActionDefnType, TransactionType, datetimeStrFormatExact, datetimeStrFormatExactForSQLTIMESTAMP, has } from '../../../scripts/utils';
 import {
   generateCorrelationId,
-  mintTokensAndSendToken,
+  mintTokensToAddress,
 } from '../../../fuse/fuseApi';
 import { Currency } from '../../../api/interfaces/peeplPay';
 
@@ -18,6 +18,51 @@ declare var Order: SailsModelType<OrderType>;
 declare var Discount: SailsModelType<DiscountType>;
 declare var Account: SailsModelType<AccountType>;
 declare var Transaction: SailsModelType<TransactionType>;
+
+export const getOrderByPaymentIntentIdSafe = async (params: {
+  paymentIntentId: string;
+  eventType: Stripe.Event['type'];
+  dataObj: Stripe.Event.Data.Object;
+}) => {
+  const { paymentIntentId, dataObj, eventType } = params;
+  let orders = await Order.find({
+    paymentIntentId: paymentIntentId,
+  }).populate('vendor&discounts');
+  if (!orders || orders.length < 1) {
+    const util = require('util');
+    if (dataObj['metadata'] && dataObj['metadata']['orderId']) {
+      orders = await Order.find({
+        id: Number.parseInt(dataObj['metadata']['orderId']),
+      }).populate('vendor&discounts');
+    }
+    if (!orders || orders.length < 1) {
+      const e = Error(
+        `Stripe Event Webhook for "${eventType}" webhook was unable to locate an order with matching payment intent: "${paymentIntentId}". The stripe event contained meta: ${util.inspect(
+          dataObj,
+          { depth: null }
+        )}`
+      );
+      sails.log.error(e);
+      // return exits.success();
+      return null;
+    }
+    let order = orders[0];
+    const e = Error(
+      `Stripe Event Webhook for "${eventType}" webhook located an order with different payment intent: "${
+        order.paymentIntentId
+      }" vs the passed paymentIntentId from stripe: "${paymentIntentId}". The stripe event contained meta: ${util.inspect(
+        dataObj,
+        { depth: null }
+      )}`
+    );
+    sails.log.error(e);
+    // return exits.success();
+    return null;
+  }
+  let order = orders[0];
+  return order;
+};
+
 
 export type StripeEventWebhookInputs = Stripe.Event;
 
@@ -134,116 +179,119 @@ const _exports: SailsActionDefnType<
       }
   
       if (eventType.startsWith('payment_intent') && dataObj['object'] === "payment_intent") {
-        const paymentIntent:Stripe.PaymentIntent = dataObj as any;
+        const paymentIntent = dataObj as Stripe.PaymentIntent;
         const paymentIntentId = paymentIntent.id;
-        let orders = await Order.find({
+        let order = await getOrderByPaymentIntentIdSafe({
+          dataObj: dataObj,
           paymentIntentId: paymentIntentId,
-        }).populate('vendor&discounts');
-        if (!orders || orders.length < 1) {
-          const util = require('util');
-          if (dataObj['metadata'] && dataObj['metadata']['orderId']){
-            orders = await Order.find({
-              id: Number.parseInt(dataObj['metadata']['orderId']),
-            }).populate('vendor&discounts');
-          }
-          if (!orders || orders.length < 1){
-            const e = Error(
-              `Stripe Event Webhook for "${eventType}" webhook was unable to locate an order with matching payment intent: "${paymentIntentId}". The stripe event contained meta: ${util.inspect(
-                dataObj,
-                { depth: null }
-              )}`
-            );
-            sails.log.error(e);
-            return exits.success();
-          }
-          let order = orders[0];
-          const e = Error(
-            `Stripe Event Webhook for "${eventType}" webhook located an order with different payment intent: "${order.paymentIntentId}" vs the passed paymentIntentId from stripe: "${paymentIntentId}". The stripe event contained meta: ${util.inspect(
-              dataObj,
-              { depth: null }
-            )}`
-          );
-          sails.log.error(e);
+          eventType: eventType,
+        });
+        if (!order) {
           return exits.success();
         }
-        let order = orders[0];
-        sails.log(`Stripe webhook called for order with public id: "${order.publicId}"`);
-  
-        
+        sails.log(
+          `Stripe webhook called for order with public id: "${order.publicId}"`
+        );
         sails.log('PaymentIntent event captured!');
+        // * if (dataObj.charges.data[0].metadata.walletAddress) for normal payments we pass receiverWalletAddress and senderWalletAddress
         const { amount, walletAddress: toAddress } = _.get(
           dataObj,
-          ['charges', 'data', '0', 'metadata'],
+          ['charges', 'data', '0', 'metadata'], // * dataObj.charges.data[0].metadata.amount, dataObj.charges.data[0].metadata.walletAddress
           {}
         );
-        if (toAddress) {
-          // Crypto Transaction:...
-          sails.log(`Minting ${amount} ${toAddress} 💰!`);
-          const correlationId = generateCorrelationId();
-          await mintTokensAndSendToken({
-            correlationId,
-            toAddress,
-            amount: amount / 100,
-          });
-        } else {
-          let paymentStatus: OrderType['paymentStatus'];
-          if (eventType === 'payment_intent.succeeded') {
-            sails.log(
-              `💰 Stripe card payment succeeded for order: "${order.publicId}"`
+        
+        let paymentStatus: OrderType['paymentStatus'];
+        if (eventType === 'payment_intent.succeeded') {
+          sails.log(
+            `💰 Stripe card payment succeeded for order: "${order.publicId}"`
+          );
+          paymentStatus = 'paid';
+          if (order.firebaseRegistrationToken) {
+            sails.log.warn(
+              `Firebase notifications on registration tokens (i.e. "${order.firebaseRegistrationToken}" for order[${order.id}]) are  not currently working...`
             );
-            paymentStatus = 'paid';
-            if (order.firebaseRegistrationToken){
-              sails.log.warn(`Firebase notifications on registration tokens (i.e. "${order.firebaseRegistrationToken}" for order[${order.id}]) are  not currently working...`);
-              await sails.helpers.sendFirebaseNotification.with({
-                topicBackup: `order-${order.publicId}`,
-                token: order.firebaseRegistrationToken,
-                title: 'Payment success',
-                body: '✅ Payment on vegi succeeded',
-                data: {
-                  orderId: `${order.id}`,
-                },
-              });
-            } else {
-              await sails.helpers.broadcastFirebaseNotificationForTopic.with({
-                topic: `order-${order.publicId}`,
-                title: `Payment success`,
-                body: '✅ Payment on vegi succeeded',
-                data: {
-                  orderId: `${order.id}`,
-                },
-              });
-            }
-            
-          } else if (eventType === 'payment_intent.processing') {
-            sails.log(
-              '🧧 Stripe webhook: Successfully created payment intent for customer'
-            );
-            paymentStatus = 'unpaid';
-            // do nothing for now...
-          } else if (eventType === 'payment_intent.payment_failed') {
-            sails.log('❌ Stripe webhook: Payment failed.');
-            paymentStatus = 'failed';
-            if(order.firebaseRegistrationToken){
-              await sails.helpers.sendFirebaseNotification.with({
-                topicBackup: `order-${order.publicId}`,
-                token: order.firebaseRegistrationToken,
-                title: 'Payment failed',
-                body: '❌ Payment on vegi failed',
-                data: {
-                  orderId: `${order.id}`,
-                },
-              });  
-            }
+            await sails.helpers.sendFirebaseNotification.with({
+              topicBackup: `order-${order.publicId}`,
+              token: order.firebaseRegistrationToken,
+              title: 'Payment success',
+              body: '✅ Payment on vegi succeeded',
+              data: {
+                orderId: `${order.id}`,
+                stripeData: dataObj,
+              },
+            });
+          } else {
             await sails.helpers.broadcastFirebaseNotificationForTopic.with({
               topic: `order-${order.publicId}`,
+              title: `Payment success`,
+              body: '✅ Payment on vegi succeeded',
+              data: {
+                orderId: `${order.id}`,
+                stripeData: dataObj,
+              },
+            });
+          }
+          const {
+            amount,
+            reward,
+            walletAddress: toAddress,
+          } = _.get(
+            dataObj,
+            ['charges', 'data', '0', 'metadata'], // * dataObj.charges.data[0].metadata.amount, dataObj.charges.data[0].metadata.walletAddress
+            {}
+          );
+          if (toAddress) {
+            // Crypto Transaction:...
+            sails.log(`Minting ${amount} to "${toAddress}" 💰!`);
+            const correlationId = generateCorrelationId();
+            try {
+              await mintTokensToAddress({
+                toAddress,
+                amount: (amount / 100).toString(),
+                correlationId,
+                orderId: order.id,
+              });
+            } catch (error) {
+              sails.log.error(
+                `Unable to mint ${amount} Tokens to "${toAddress}" with error: ${error}`
+              );
+            }
+          }
+        } else if (eventType === 'payment_intent.processing') {
+          sails.log(
+            '🧧 Stripe webhook: Successfully created payment intent for customer'
+          );
+          paymentStatus = 'unpaid';
+          // do nothing for now...
+        } else if (eventType === 'payment_intent.payment_failed') {
+          sails.log('❌ Stripe webhook: Payment failed.');
+          paymentStatus = 'failed';
+          if (order.firebaseRegistrationToken) {
+            await sails.helpers.sendFirebaseNotification.with({
+              topicBackup: `order-${order.publicId}`,
+              token: order.firebaseRegistrationToken,
               title: 'Payment failed',
               body: '❌ Payment on vegi failed',
               data: {
                 orderId: `${order.id}`,
+                stripeData: dataObj,
               },
             });
           }
-
+          await sails.helpers.broadcastFirebaseNotificationForTopic.with({
+            topic: `order-${order.publicId}`,
+            title: 'Payment failed',
+            body: '❌ Payment on vegi failed',
+            data: {
+              orderId: `${order.id}`,
+              stripeData: dataObj,
+            },
+          });
+        }
+        if (
+          process.env.NODE_ENV &&
+          !process.env.NODE_ENV.toLowerCase().startsWith('prod')
+        ) {
           // if (dataObj['metadata'] && dataObj['metadata']['webhookAddress']) {
           //   // TODO: REMOVE THIS as this old from the peeplPay server to connect peepl pay to vegi backend via webhooks written into the stripe metadata.
           //   const wh = dataObj['metadata']['webhookAddress'];
@@ -253,212 +301,271 @@ const _exports: SailsActionDefnType<
           //   await axios.get(wh);
           // }
 
-          if (
-            process.env.NODE_ENV &&
-            !process.env.NODE_ENV.toLowerCase().startsWith('prod')
-          ) {
-            sails.log(
-              `stripe-event-webhook updating order w/ payIntId: [${paymentIntent.id}] to ${paymentStatus}!`
-            );
-          }
+          sails.log(
+            `stripe-event-webhook updating order w/ payIntId: [${paymentIntent.id}] to ${paymentStatus}!`
+          );
+        }
 
-          var unixtime = Date.now();
+        var unixtime = Date.now();
 
-          if (!['paid', 'unpaid', 'failed'].includes(paymentStatus)) {
-            sails.log.warn(
-              `stripe-event-webhook received a vegi paymentStatus enum: PaymentStatus.[${paymentStatus}]. This is not handled!`
-            );
-          }
-          if (sails.config.custom.baseUrl !== 'https://vegi.vegiapp.co.uk') {
-            const util = require('util');
-            sails.log(
-              `stripe-event-webook called with inputs: ${util.inspect(inputs, {
-                depth: null,
-              })}`
-            );
-          }
+        if (!['paid', 'unpaid', 'failed'].includes(paymentStatus)) {
+          sails.log.warn(
+            `stripe-event-webhook received a vegi paymentStatus enum: PaymentStatus.[${paymentStatus}]. This is not handled!`
+          );
+        }
+        if (sails.config.custom.baseUrl !== 'https://vegi.vegiapp.co.uk') {
+          const util = require('util');
+          sails.log(
+            `stripe-event-webook called with inputs: ${util.inspect(inputs, {
+              depth: null,
+            })}`
+          );
+        }
 
-          // Update order with payment ID and time
-          try {
-            await Order.updateOne({
-              paymentIntentId: paymentIntent.id,
-              completedFlag: 'none',
-            }).set({
-              paymentStatus: ['paid', 'unpaid', 'failed'].includes(
-                paymentStatus
-              )
-                ? paymentStatus
-                : 'failed',
-              paidDateTime: unixtime,
-            });
-          } catch (error) {
-            sails.log.error(error);
-          }
+        // Update order with payment ID and time
+        try {
+          await Order.updateOne({
+            paymentIntentId: paymentIntent.id,
+            completedFlag: 'none',
+          }).set({
+            paymentStatus: ['paid', 'unpaid', 'failed'].includes(
+              paymentStatus
+            )
+              ? paymentStatus
+              : 'failed',
+            paidDateTime: unixtime,
+          });
+        } catch (error) {
+          sails.log.error(error);
+        }
 
-          order = await Order.findOne(order.id).populate('vendor');
+        order = await Order.findOne(order.id).populate('vendor');
 
-
-          try {
-            if (order.paymentStatus === 'paid') {
-              await sails.helpers.sendSlackNotification.with({ order: order });
-              await sails.helpers.sendSmsNotification.with({
-                to: order.vendor.phoneNumber,
-                // body: `You have received a new order from vegi for delivery between ${order.fulfilmentSlotFrom} and ${order.fulfilmentSlotTo}. ` +
-                // `To accept or decline: ' + sails.config.custom.baseUrl + '/admin/approve-order/' + order.publicId,
-                body: `[from vegi]
+        try {
+          if (order.paymentStatus === 'paid') {
+            await sails.helpers.sendSlackNotification.with({ order: order });
+            await sails.helpers.sendSmsNotification.with({
+              to: order.vendor.phoneNumber,
+              // body: `You have received a new order from vegi for delivery between ${order.fulfilmentSlotFrom} and ${order.fulfilmentSlotTo}. ` +
+              // `To accept or decline: ' + sails.config.custom.baseUrl + '/admin/approve-order/' + order.publicId,
+              body: `[from vegi]
 New order alert! 🚨
 Order details ${sails.config.custom.baseUrl}/admin/approve-order/${order.publicId}
 Please accept/decline ASAP.
 Delivery/Collection on ${order.fulfilmentSlotFrom} - ${order.fulfilmentSlotTo}`,
-                data: {
-                  orderId: order.id,
-                },
-              });
-              await sails.helpers.sendSmsNotification.with({
-                to: order.deliveryPhoneNumber,
-                body: `Order accepted! Details of your order can be found in the My Orders section of the vegi app. Thank you!`,
-                data: {
-                  orderId: order.id,
-                },
-              });
-            } else if (order.paymentStatus === 'unpaid') {
-              sails.log.verbose(
-                `New payment intent successfully setup for order[${
-                  order.id
-                }] from inputs: ${util.inspect(inputs, { depth: null })}`
-              );
-            } else if (order.paymentStatus === 'failed') {
-              await sails.helpers.sendSlackNotification.with({ order: order });
-              await sails.helpers.sendSmsNotification.with({
-                to: order.deliveryPhoneNumber,
-                body:
-                  `Your payment for a recent order to ${order.vendor.name} failed. Order was scheduled between ` +
-                  order.fulfilmentSlotFrom +
-                  ' and ' +
-                  order.fulfilmentSlotTo +
-                  '. Please review your payment in the vegi app.',
-                data: {
-                  orderId: order.id,
-                },
-              });
-            } else {
-              sails.log.warn(
-                `Payment for recent order[${
-                  order.id
-                }] hit the stripe-event-webhook with paymentStatus of ${
-                  order.paymentStatus
-                } and contained inputs: ${util.inspect(inputs, {
-                  depth: null,
-                })}`
-              );
-            }
-          } catch (error) {
-            sails.log.error(
-              `stripe-event-webhook errored sending sms notification to vendor for paid order: ${error}`
-            );
-          }
-
-          // turn into transaction if supported, then fo an order find after to check the updated order and TX
-          try {
-            await Order.update({
-              publicId: order.publicId,
-            }).set({
-              paymentStatus: 'paid',
-              paidDateTime: Date.now(), // TODO: Consider casting sql type to timestamp with a temp colum to do the cast and then channing the type here. and then using moment().format(datetimeStrFormatExactForSQLTIMESTAMP)
+              data: {
+                orderId: order.id,
+              },
             });
-          } catch (error) {
-            sails.log.error(
-              `stripe-event-webhook errored when updating order with publicId: "${order.publicId}" to "paymentStatus:paid": ${error}`
+            await sails.helpers.sendSmsNotification.with({
+              to: order.deliveryPhoneNumber,
+              body: `Order accepted! Details of your order can be found in the My Orders section of the vegi app. Thank you!`,
+              data: {
+                orderId: order.id,
+              },
+            });
+          } else if (order.paymentStatus === 'unpaid') {
+            sails.log.verbose(
+              `New payment intent successfully setup for order[${
+                order.id
+              }] from inputs: ${util.inspect(inputs, { depth: null })}`
             );
-            sails.log.error(error);
-            return exits.error(
-              `Failed to set order to "paid" with error: ${error}`
+          } else if (order.paymentStatus === 'failed') {
+            await sails.helpers.sendSlackNotification.with({ order: order });
+            await sails.helpers.sendSmsNotification.with({
+              to: order.deliveryPhoneNumber,
+              body:
+                `Your payment for a recent order to ${order.vendor.name} failed. Order was scheduled between ` +
+                order.fulfilmentSlotFrom +
+                ' and ' +
+                order.fulfilmentSlotTo +
+                '. Please review your payment in the vegi app.',
+              data: {
+                orderId: order.id,
+              },
+            });
+          } else {
+            sails.log.warn(
+              `Payment for recent order[${
+                order.id
+              }] hit the stripe-event-webhook with paymentStatus of ${
+                order.paymentStatus
+              } and contained inputs: ${util.inspect(inputs, {
+                depth: null,
+              })}`
             );
           }
-          try {
-            if(order.discounts && order.discounts.length > 0){
-              const addTxFn = async (discount:DiscountType) => {
-                if (discount.discountType === 'fixed') {
-                  await Transaction.create({
-                    amount: discount.value,
-                    currency: discount.currency,
-                    discount: discount.id,
-                    order: order.id,
-                    payer: order.customerWalletAddress,
-                    receiver: order.vendor.walletAddress,
-                    timestamp: moment().format(
-                      datetimeStrFormatExactForSQLTIMESTAMP
-                    ),
-                  });
-                  await Discount.update({
-                    id: discount.id
-                  }).set({
-                    timesUsed: discount.timesUsed + 1,
-                    isEnabled: false,
-                  });
-                  await Discount.addToCollection(discount.id, 'orders').members(
-                    [order.id]
+        } catch (error) {
+          sails.log.error(
+            `stripe-event-webhook errored sending sms notification to vendor for paid order: ${error}`
+          );
+        }
+
+        // turn into transaction if supported, then fo an order find after to check the updated order and TX
+        try {
+          await Order.update({
+            publicId: order.publicId,
+          }).set({
+            paymentStatus: 'paid',
+            paidDateTime: Date.now(), // TODO: Consider casting sql type to timestamp with a temp colum to do the cast and then channing the type here. and then using moment().format(datetimeStrFormatExactForSQLTIMESTAMP)
+          });
+        } catch (error) {
+          sails.log.error(
+            `stripe-event-webhook errored when updating order with publicId: "${order.publicId}" to "paymentStatus:paid": ${error}`
+          );
+          sails.log.error(error);
+          return exits.error(
+            `Failed to set order to "paid" with error: ${error}`
+          );
+        }
+        try {
+          if (order.discounts && order.discounts.length > 0) {
+            const addTxFn = async (discount: DiscountType) => {
+              if (discount.discountType === 'fixed') {
+                await Transaction.create({
+                  amount: discount.value,
+                  currency: discount.currency,
+                  discount: discount.id,
+                  order: order.id,
+                  payer: order.customerWalletAddress,
+                  receiver: order.vendor.walletAddress,
+                  timestamp: moment().format(
+                    datetimeStrFormatExactForSQLTIMESTAMP
+                  ),
+                  status: 'succeeded',
+                  remoteJobId: null,
+                });
+                await Discount.update({
+                  id: discount.id,
+                }).set({
+                  timesUsed: discount.timesUsed + 1,
+                  isEnabled: false,
+                });
+                await Discount.addToCollection(discount.id, 'orders').members(
+                  [order.id]
+                );
+                return;
+              } else if (discount.discountType === 'percentage') {
+                let amount = (discount.value / 100) * order.subtotal;
+                if (discount.value > 100) {
+                  sails.log.error(
+                    `Cant add percentage discount to order with value > 100% for discount with code: ${discount.code}`
                   );
                   return;
-                } else if (discount.discountType === 'percentage') {
-                  let amount = (discount.value / 100) * order.subtotal;
-                  if(discount.value > 100) {
-                    sails.log.error(
-                      `Cant add percentage discount to order with value > 100% for discount with code: ${discount.code}`
-                    );
-                    return;
-                  } else if (discount.value < 0){
-                    sails.log.error(
-                      `Cant add percentage discount to order with value < 0% for discount with code: ${discount.code}`
-                    );
-                    return;
-                  } else {
-                    sails.log(`Percentage discount of ${discount.value}% applied to order subtotal gives discounted amount of ${amount} [${discount.currency}]`);
-                  }
-                  
-                  const toCurrency = order.currency || Currency.GBPx;
-                  if (toCurrency !== discount.currency) {
-                    amount = await sails.helpers.convertCurrencyAmount.with({
-                      amount: amount,
-                      fromCurrency: discount.currency,
-                      toCurrency: toCurrency,
-                    });
-                  }
-                  await Transaction.create({
-                    amount: amount,
-                    currency: toCurrency,
-                    discount: discount.id,
-                    order: order.id,
-                    payer: order.customerWalletAddress,
-                    receiver: order.vendor.walletAddress,
-                    timestamp: moment().format(
-                      datetimeStrFormatExactForSQLTIMESTAMP
-                    ),
-                  });
-                  await Discount.update({
-                    id: discount.id,
-                  }).set({
-                    timesUsed: discount.timesUsed + 1,
-                    isEnabled: discount.isEnabled && (discount.timesUsed + 1) < discount.maxUses,
-                  });
-                  await Discount.addToCollection(discount.id, "orders").members([order.id]);
+                } else if (discount.value < 0) {
+                  sails.log.error(
+                    `Cant add percentage discount to order with value < 0% for discount with code: ${discount.code}`
+                  );
                   return;
                 } else {
-                  sails.log.warn(`Unable to calculate discounts in stripe-event-webhook for discounts with type: "${discount.discountType}"`);
+                  sails.log(
+                    `Percentage discount of ${discount.value}% applied to order subtotal gives discounted amount of ${amount} [${discount.currency}]`
+                  );
                 }
-              };
-              await Promise.all(order.discounts.map((discount) => addTxFn(discount)));
-            }
-          } catch (error) {
-            sails.log.error(
-              `stripe-event-webhook errored when updating discounts on order: "${order.publicId}" with error: ${error}`
-            );
-            sails.log.error(error);
-            return exits.error(
-              `stripe-event-webhook errored when updating discounts on order: "${order.publicId}" with error: ${error}`
+
+                const toCurrency = order.currency || Currency.GBPx;
+                if (toCurrency !== discount.currency) {
+                  amount = await sails.helpers.convertCurrencyAmount.with({
+                    amount: amount,
+                    fromCurrency: discount.currency,
+                    toCurrency: toCurrency,
+                  });
+                }
+                await Transaction.create({
+                  amount: amount,
+                  currency: toCurrency,
+                  discount: discount.id,
+                  order: order.id,
+                  payer: order.customerWalletAddress,
+                  receiver: order.vendor.walletAddress,
+                  timestamp: moment().format(
+                    datetimeStrFormatExactForSQLTIMESTAMP
+                  ),
+                  status: 'succeeded',
+                  remoteJobId: null,
+                });
+                await Discount.update({
+                  id: discount.id,
+                }).set({
+                  timesUsed: discount.timesUsed + 1,
+                  isEnabled:
+                    discount.isEnabled &&
+                    discount.timesUsed + 1 < discount.maxUses,
+                });
+                await Discount.addToCollection(discount.id, 'orders').members(
+                  [order.id]
+                );
+                return;
+              } else {
+                sails.log.warn(
+                  `Unable to calculate discounts in stripe-event-webhook for discounts with type: "${discount.discountType}"`
+                );
+              }
+            };
+            await Promise.all(
+              order.discounts.map((discount) => addTxFn(discount))
             );
           }
+        } catch (error) {
+          sails.log.error(
+            `stripe-event-webhook errored when updating discounts on order: "${order.publicId}" with error: ${error}`
+          );
+          sails.log.error(error);
+          return exits.error(
+            `stripe-event-webhook errored when updating discounts on order: "${order.publicId}" with error: ${error}`
+          );
+        }
+        
+      } else if (
+        eventType.startsWith('refund') &&
+        dataObj['object'] === 'refund'
+      ) {
+        const refundDataObj = dataObj as Stripe.Refund;
+        const order = await getOrderByPaymentIntentIdSafe({
+          dataObj: dataObj,
+          paymentIntentId:
+            typeof refundDataObj.payment_intent === 'string'
+              ? refundDataObj.payment_intent
+              : refundDataObj.payment_intent.id,
+          eventType: eventType,
+        });
+        if (!order) {
+          return exits.success();
+        }
+        if (eventType === 'refund.created'){
+          // paymentStatus = 'refunded';
+          if (order.firebaseRegistrationToken) {
+            await sails.helpers.sendFirebaseNotification.with({
+              topicBackup: `order-${order.publicId}`,
+              token: order.firebaseRegistrationToken,
+              title: 'Payment refunded',
+              body: `Order[${order.id}] for ${order.total} has been refunded.`,
+              data: {
+                orderId: `${order.id}`,
+                stripeData: dataObj,
+              },
+            });
+          }
           
+          await sails.helpers.broadcastFirebaseNotificationForTopic.with({
+            topic: `order-${order.publicId}`,
+            title: 'Payment refunded',
+            body: `Order[${order.id}] for ${order.total} has been refunded.`,
+            data: {
+              orderId: `${order.id}`,
+            },
+          });
+
+          try {
+            await Order.updateOne(order.id).set({
+              refundDateTime: Date.now(),
+              paymentStatus: 'refunded',
+              completedFlag: 'refunded'
+              // refundDateTime: moment().format(datetimeStrFormatExact);
+            });
+          } catch (error) {
+            sails.log.error(`Failed to update refund status on order: [${order.id}] in stripe-event-webhook with error: ${error}`);
+          }
         }
       } else if (
         eventType.startsWith('customer') &&

@@ -163,6 +163,9 @@ module.exports.routes = {
   'POST /api/v1/payments/stripe-event-webhook': {
     action: 'payments/stripe-event-webhook',
   },
+  'POST /api/v1/payments/fuse-event-webhook': {
+    action: 'payments/fuse-event-webhook',
+  },
 
   'POST /api/v1/admin/update-user': { action: 'admin/update-user' },
 

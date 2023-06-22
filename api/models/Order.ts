@@ -106,7 +106,7 @@ let _exports: SailsModelDefnType<OrderType> = {
     paymentStatus: {
       type: 'string',
       defaultsTo: 'unpaid',
-      isIn: ['unpaid', 'paid', 'failed'],
+      isIn: ['unpaid', 'paid', 'failed', 'refunded'],
     },
     paymentIntentId: {
       type: 'string',
