@@ -61,7 +61,8 @@ let _exports: SailsModelDefnType<ProductType> = {
     },
     ingredients: {
       type: 'string',
-      columnType:  sails.config.datastores.default.adapter === 'sails-postgresql' ? 'TEXT' : 'LONGTEXT',
+      // columnType:  sails.config.datastores.default.adapter === 'sails-postgresql' ? 'text' : 'LONGTEXT',
+      columnType: 'text',
       required: false,
       allowNull: true,
       description: 'back of the package information',
@@ -75,7 +76,7 @@ let _exports: SailsModelDefnType<ProductType> = {
       type: 'number',
       description: 'The remaining stock count for this product SKU',
       min: 0,
-      columnType: 'INT',
+      columnType: 'int8',
       defaultsTo: 0,
     },
     supplier: {
@@ -140,7 +141,8 @@ let _exports: SailsModelDefnType<ProductType> = {
     },
     proxyForVegiProduct: {
       model: 'product',
-      description: 'A proxy product used to provide ratings for a vegi product from a similar product not on vegi. This field is Foreign Keyed to product.id in the DB',
+      description:
+        'A proxy product used to provide ratings for a vegi product from a similar product not on vegi. This field is Foreign Keyed to product.id in the DB',
     },
   },
 };
