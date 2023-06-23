@@ -84,13 +84,16 @@ const _exports: SailsActionDefnType<
     inputs: UpdateProductRatingInputs,
     exits: UpdateProductRatingExits
   ) {
-    await ESCRating.create({
+    const x = await ESCRating.create({
       calculatedOn: moment(inputs.calculatedOn).format(datetimeStrFormatExactForSQLDATE),
       createdAt: inputs.createdAt,
       escRatingId: inputs.escRatingId,
       product: inputs.product,
       rating: inputs.rating,
-    })
+    }).fetch();
+    return exits.success({
+      id: x.id
+    });
   },
 };
 
