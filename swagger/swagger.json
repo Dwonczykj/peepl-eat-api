@@ -190,6 +190,9 @@
       "name": "StripeEventWebhook"
     },
     {
+      "name": "FuseEventWebhook"
+    },
+    {
       "name": "Update User Vendor Role"
     },
     {
@@ -808,74 +811,6 @@
           }
         }
       },
-      "escexplanation": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/escexplanation-without-required-constraint"
-          },
-          {
-            "required": [
-              "title",
-              "measure",
-              "evidence"
-            ]
-          }
-        ]
-      },
-      "escexplanation-without-required-constraint": {
-        "type": "object",
-        "description": "Sails ORM Model **ESCExplanation**",
-        "properties": {
-          "createdAt": {
-            "type": "number",
-            "format": "double"
-          },
-          "updatedAt": {
-            "type": "number",
-            "format": "double"
-          },
-          "id": {
-            "type": "integer",
-            "format": "int64",
-            "uniqueItems": true,
-            "description": "Note Sails special attributes: autoIncrement"
-          },
-          "title": {
-            "type": "string",
-            "description": "The headline for the explanatory reason that contributes to the products aggregated esc measure"
-          },
-          "measure": {
-            "type": "number",
-            "format": "double",
-            "maximum": 5,
-            "minimum": 0
-          },
-          "reasons": {
-            "type": "array",
-            "items": {},
-            "default": [],
-            "example": []
-          },
-          "evidence": {},
-          "escrating": {
-            "description": "JSON dictionary representing the **escrating** instance or FK when creating / updating / not populated",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/escrating"
-              }
-            ]
-          },
-          "escsource": {
-            "description": "JSON dictionary representing the **escsource** instance or FK when creating / updating / not populated",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/escsource"
-              }
-            ]
-          }
-        }
-      },
       "escrating": {
         "type": "object",
         "allOf": [
@@ -884,7 +819,7 @@
           },
           {
             "required": [
-              "productPublicId",
+              "escRatingId",
               "rating"
             ]
           }
@@ -908,7 +843,7 @@
             "uniqueItems": true,
             "description": "Note Sails special attributes: autoIncrement"
           },
-          "productPublicId": {
+          "escRatingId": {
             "type": "string",
             "description": "The public id of the product"
           },
@@ -930,63 +865,6 @@
                 "$ref": "#/components/schemas/product"
               }
             ]
-          }
-        }
-      },
-      "escsource": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/escsource-without-required-constraint"
-          },
-          {
-            "required": [
-              "name",
-              "type"
-            ]
-          }
-        ]
-      },
-      "escsource-without-required-constraint": {
-        "type": "object",
-        "description": "Sails ORM Model **ESCSource**",
-        "properties": {
-          "createdAt": {
-            "type": "number",
-            "format": "double"
-          },
-          "updatedAt": {
-            "type": "number",
-            "format": "double"
-          },
-          "id": {
-            "type": "integer",
-            "format": "int64",
-            "uniqueItems": true,
-            "description": "Note Sails special attributes: autoIncrement"
-          },
-          "name": {
-            "type": "string",
-            "uniqueItems": true
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "database",
-              "api",
-              "webpage"
-            ]
-          },
-          "domain": {
-            "type": "string",
-            "default": ""
-          },
-          "credibility": {
-            "type": "number",
-            "format": "double",
-            "default": 0,
-            "maximum": 1,
-            "minimum": 0
           }
         }
       },
@@ -1406,7 +1284,8 @@
             "enum": [
               "unpaid",
               "paid",
-              "failed"
+              "failed",
+              "refunded"
             ],
             "example": "unpaid"
           },
@@ -2403,6 +2282,13 @@
           },
           "currency": {
             "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "remoteJobId": {
+            "type": "string",
+            "nullable": true
           },
           "receiver": {
             "description": "JSON dictionary representing the **account** instance or FK when creating / updating / not populated",
@@ -6355,6 +6241,32 @@
             "schema": {}
           }
         ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/api/v1/payments/fuse-event-webhook": {
+      "post": {
+        "summary": "FuseEventWebhook",
+        "tags": [
+          "FuseEventWebhook"
+        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "Success"

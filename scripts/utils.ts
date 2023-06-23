@@ -556,15 +556,6 @@ export type ProductSuggestionType = _ProductSuggestionTypeHidden & {
   imageUrls: Array<ProductSuggestionImageType>;
 }
 
-export type ESCSourceType = {
-  id: number;
-  createdAt: number;
-  name: string;
-  type: 'database' | 'api' | 'webpage';
-  domain: string;
-  credibility: number;
-};
-
 export type ESCRatingType = {
   id: number;
   createdAt: number;
@@ -582,27 +573,6 @@ export const SustainedGradeToRatingMap = {
   E: 1,
   F: 0.5,
   G: 0,
-};
-
-export type ESCExplanationType = {
-  id: number;
-
-  /// 'The headline for the explanatory reason that contributes to the products aggregated esc measure'
-  title: string;
-
-  reasons: string[];
-
-  /// 'The esc measure / 5 thaat is attributed only from this explanation that feeds into the aggregation of the products rating'
-  measure: number;
-
-  /// A json object containing unstructured evidential information
-  evidence: object;
-
-  escrating: ESCRatingType;
-  escsource: ESCSourceType;
-  
-  // /// An ESCexplanation that `this` explanation fees
-  // parentESCExplanation: ESCExplanationType;
 };
 
 type SustainedAPIChoiceResponseType = {

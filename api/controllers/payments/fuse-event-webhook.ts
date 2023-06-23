@@ -15,7 +15,6 @@ import { FuseEventGeneric } from '../../../fuse/fuseApi';
 declare var sails: sailsVegi;
 
 
-
 export type FuseEventWebhookInputs = FuseEventGeneric & {
   
 }

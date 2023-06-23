@@ -1,29 +1,21 @@
 import axios from 'axios';
-import {v4 as uuidv4} from 'uuid'; // const { v4: uuidv4 } = require('uuid');
 import moment from 'moment';
 
-import { ESCExplanationType, ProductType, SailsActionDefnType } from '../../../scripts/utils';
+import { ESCRatingType, SailsActionDefnType, datetimeStrFormatExactForSQLDATE } from '../../../scripts/utils';
 import {
-  sailsModelKVP,
   SailsModelType,
-  sailsVegi,
 } from '../../interfaces/iSails';
-import {
-  UserType
-} from '../../../scripts/utils';
 
-declare var sails: sailsVegi;
-declare var User: SailsModelType<UserType>;
+declare var ESCRating: SailsModelType<ESCRatingType>;
 
 
 export type UpdateProductRatingInputs = {
-    id: number;
+    id: number | null | undefined;
     createdAt: number;
-    productPublicId: string;
+    escRatingId: string;
     rating: number;
     calculatedOn: Date;
-    product: ProductType;
-    explanations: ESCExplanationType[];
+    product: number;
   };
 
 export type UpdateProductRatingResult = {
@@ -44,8 +36,34 @@ const _exports: SailsActionDefnType<
   friendlyName: 'UpdateProductRating',
 
   inputs: {
-    
-    
+    id: {
+      type: 'number',
+      required: false,
+      allowNull: true,
+    },
+    createdAt: {
+      type: 'number',
+      required: false,
+      allowNull: true,
+    },
+    escRatingId: {
+      type: 'string',
+      required: true,
+    },
+    rating: {
+      type: 'number',
+      required: true,
+      min: 0,
+      max: 5,
+    },
+    calculatedOn: {
+      type: 'ref',
+      required: false,
+    },
+    product: {
+      type: 'number',
+      required: true,
+    }
   },
 
   exits: {
@@ -66,11 +84,13 @@ const _exports: SailsActionDefnType<
     inputs: UpdateProductRatingInputs,
     exits: UpdateProductRatingExits
   ) {
-    // create new product ratings always
-    
-
-
-    return exits.success(resultFinal);
+    await ESCRating.create({
+      calculatedOn: moment(inputs.calculatedOn).format(datetimeStrFormatExactForSQLDATE),
+      createdAt: inputs.createdAt,
+      escRatingId: inputs.escRatingId,
+      product: inputs.product,
+      rating: inputs.rating,
+    })
   },
 };
 

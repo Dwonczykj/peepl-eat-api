@@ -9,28 +9,13 @@ import {
 } from '../interfaces/iSails';
 import {
   ProductType,
-  ProductOptionValueType,
   ESCRatingType,
-  ESCExplanationType,
   SustainedAPIChoiceGetProductsResponseType,
   datetimeStrFormat,
-  SustainedAPIChoiceGetImpactsResponseType,
 } from '../../scripts/utils';
 
-const SustainedGradeToRatingMap = {
-  A: 5,
-  B: 4,
-  C: 3,
-  D: 2,
-  E: 1,
-  F: 0.5,
-  G: 0,
-};
-
 declare var Product: SailsModelType<ProductType>;
-declare var ProductOptionValue: SailsModelType<ProductOptionValueType>;
 declare var ESCRating: SailsModelType<ESCRatingType>;
-declare var ESCExplanation: SailsModelType<ESCExplanationType>;
 declare var sails: sailsVegi;
 
 export type GetProductRatingInputs = {
@@ -48,7 +33,6 @@ export type GetProductRatingResult = {
   // evidence: object;
   calculatedOn: Date;
   product: ProductType;
-  explanations: ESCExplanationType[];
 } | null};
 
 export type GetProductRatingExits = {
@@ -93,7 +77,6 @@ const _exports: SailsActionDefnType<
   ) {
     const formatResult = (
       rating: ESCRatingType,
-      explanations: ESCExplanationType[]
     ) => {
       const x: GetProductRatingResult[''] = {
         id: rating.id,
@@ -103,7 +86,6 @@ const _exports: SailsActionDefnType<
         // evidence: rating.evidence,
         calculatedOn: rating.calculatedOn,
         product: rating.product,
-        explanations: explanations,
       };
       return x;
     };
@@ -249,10 +231,7 @@ const _exports: SailsActionDefnType<
             ? -1
             : 1
         )[0];
-        const explanations = await ESCExplanation.find({
-          escrating: rating.id,
-        }).populate('escsource');
-        return { [id]: formatResult(rating, explanations) };
+        return { [id]: formatResult(rating)};
       } else {
         return { [id]: null };
       }
@@ -313,24 +292,25 @@ const _exports: SailsActionDefnType<
           product: p.id,
         }).fetch();
 
-        const explanation = await ESCExplanation.create({
-          title: 'No Information',
-          description: 'Default zero rating for new products with no rating',
-          measure: 0,
-          escrating: newRating.id,
-        }).fetch();
+        // const explanation = await ESCExplanation.create({
+        //   title: 'No Information',
+        //   description: 'Default zero rating for new products with no rating',
+        //   measure: 0,
+        //   escrating: newRating.id,
+        // }).fetch();
         
-        const result = formatResult(newRating, [
-          {
-            id: explanation.id,
-            title: explanation.title,
-            reasons: explanation.reasons,
-            evidence: explanation.evidence, // this is fine, object does not need to be created by ref ID AS json in db
-            measure: explanation.measure,
-            escrating: newRating,
-            escsource: explanation.escsource,
-          },
-        ]);
+        // const result = formatResult(newRating, [
+        //   {
+        //     id: explanation.id,
+        //     title: explanation.title,
+        //     reasons: explanation.reasons,
+        //     evidence: explanation.evidence, // this is fine, object does not need to be created by ref ID AS json in db
+        //     measure: explanation.measure,
+        //     escrating: newRating,
+        //     escsource: explanation.escsource,
+        //   },
+        // ]);
+        const result = formatResult(newRating);
         return { [p.id]: result };
       };
       const results = await Promise.all(products.map(p => createZeroDefautRating(p)));

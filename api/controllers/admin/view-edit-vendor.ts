@@ -1,5 +1,12 @@
-import { AddressType, CategoryGroupType, DeliveryPartnerType, ESCExplanationType, ESCRatingType, FulfilmentMethodType, PostalDistrictType, ProductCategoryType, ProductOptionType, ProductOptionValueType, ProductType, VendorCategoryType, VendorType } from "../../../scripts/utils";
-import { SailsModelType, sailsVegi } from "../../../api/interfaces/iSails";
+import {
+  AddressType,
+  CategoryGroupType,
+  DeliveryPartnerType,
+  FulfilmentMethodType,
+  PostalDistrictType,
+  VendorType,
+} from '../../../scripts/utils';
+import { SailsModelType, sailsVegi } from '../../../api/interfaces/iSails';
 
 declare var Vendor: SailsModelType<VendorType>;
 declare var PostalDistrict: SailsModelType<PostalDistrictType>;
@@ -7,30 +14,24 @@ declare var DeliveryPartner: SailsModelType<DeliveryPartnerType>;
 declare var CategoryGroup: SailsModelType<CategoryGroupType>;
 declare var sails: sailsVegi;
 module.exports = {
-
-
   friendlyName: 'View edit vendor',
-
 
   description: 'Display "Edit vendor" page.',
 
   inputs: {
     vendorid: {
-      type: 'number'
-    }
+      type: 'number',
+    },
   },
 
   exits: {
-
     success: {
-      viewTemplatePath: 'pages/admin/edit-vendor'
+      viewTemplatePath: 'pages/admin/edit-vendor',
     },
     successJSON: {
       statusCode: 200,
-    }
-
+    },
   },
-
 
   fn: async function (inputs, exits) {
     var vendorid;
@@ -45,7 +46,7 @@ module.exports = {
     const vendorHelperResult = await sails.helpers.selectVendorProducts.with({
       vendorId: vendorid,
     });
-    if(!vendorHelperResult){
+    if (!vendorHelperResult) {
       return exits.notFound('Vendor not found');
     }
     const vendor = vendorHelperResult.vendor;
@@ -139,7 +140,5 @@ module.exports = {
         userRole: this.req.session.userRole,
       });
     }
-  }
-
-
+  },
 };

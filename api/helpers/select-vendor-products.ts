@@ -159,22 +159,12 @@ with products as (
 	  "escrating"."createdAt" AS escrating_createdAt,
 	  "escrating"."updatedAt" AS escrating_updatedAt,
 	  "escrating"."id" AS escrating_id,
-	  "escrating"."productPublicId" AS escrating_productPublicId,
+	  "escrating"."escRatingId" AS escrating_productPublicId,
 	  "escrating"."rating" AS escrating_rating,
 	  "escrating"."calculatedOn" AS escrating_calculatedOn,
-	  "escrating"."product" AS escrating_product,
-	  "escexplanation"."createdAt" AS escexplanation_createdAt,
-	  "escexplanation"."updatedAt" AS escexplanation_updatedAt,
-	  "escexplanation"."id" AS escexplanation_id,
-	  "escexplanation"."title" AS escexplanation_title,
-	  "escexplanation"."reasons" AS escexplanation_reasons,
-	  "escexplanation"."measure" AS escexplanation_measure,
-	  "escexplanation"."evidence" AS escexplanation_evidence,
-	  "escexplanation"."escrating" AS escexplanation_escrating,
-	  "escexplanation"."escsource" AS escexplanation_escsource
+	  "escrating"."product" AS escrating_product
   FROM products
   left join "escrating" escrating on "products"."product_id" = "escrating"."product"
-  left join "escexplanation" escexplanation on "escrating"."id" = "escexplanation"."escrating"
   where (1=1) 
   and "products"."vendor_id" = $1
   and (EXTRACT(EPOCH FROM (TO_TIMESTAMP(("escrating"."createdAt")::text,'YYYYMMDD')::timestamp - (NOW()))) <= 168 or "escrating"."id" is null)

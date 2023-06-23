@@ -11,26 +11,14 @@ import {
   ProductType,
   ProductOptionValueType,
   ESCRatingType,
-  ESCExplanationType,
   SustainedAPIChoiceGetProductsResponseType,
   datetimeStrFormat,
   SustainedAPIChoiceGetImpactsResponseType,
 } from '../../../scripts/utils';
 
-const SustainedGradeToRatingMap = {
-  A: 5,
-  B: 4,
-  C: 3,
-  D: 2,
-  E: 1,
-  F: 0.5,
-  G: 0,
-};
-
 declare var Product: SailsModelType<ProductType>;
 declare var ProductOptionValue: SailsModelType<ProductOptionValueType>;
 declare var ESCRating: SailsModelType<ESCRatingType>;
-declare var ESCExplanation: SailsModelType<ESCExplanationType>;
 declare var sails: sailsVegi;
 
 export type GetProductRatingInputs = {
@@ -46,7 +34,6 @@ export type GetProductRatingResult = {
     rating: number;
     calculatedOn: Date;
     product: ProductType;
-    explanations: sailsModelKVP<ESCExplanationType>[];
   } | null;
 };
 
