@@ -28,15 +28,18 @@ module.exports = {
         return exits.success(undefined);
       }
       else if(typeof(inputs.image) === 'string'){
-	      const verifiedImageDomain = sails.config.custom.storageDomains.map(
-          (domain) => {
+	      const verifiedImageDomain = sails.config.custom.storageDomainsRegExps
+          .map((domain) => {
             var subDomain = /(.*)/;
             var flags = '';
+            if(!(domain instanceof RegExp) && typeof(doamin) === 'string'){
+              domain = RegExp(domain);
+            }
             var urlPattern = new RegExp(
               domain.source + subDomain.source,
               flags
             );
-            
+
             // regex3 is now /foobar/gy
             try {
               flags =
@@ -61,10 +64,10 @@ module.exports = {
             } else {
               return null;
             }
-          }
-        ).filter((match) => {
-          return match !== null;
-        });
+          })
+          .filter((match) => {
+            return match !== null;
+          });
         if (verifiedImageDomain.length){
           imageInfo = {
             fd: verifiedImageDomain[0],

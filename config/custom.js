@@ -43,7 +43,7 @@ let custom = {
   pplRewardsPoolAddress: '0x29249e06e8D3e4933cc403AB73136e698a08c38b',
   vegiWalletAddress: '0x6ad1D130d8B4F6f2D133E172799484B653c9fb40',
   coopcycleUrl: 'https://agile-delivery.coopcycle.org',
-  fuseApiV2Url: 'https://studio.fuse.io/api/v2', // ~ 
+  fuseApiV2Url: 'https://studio.fuse.io/api/v2', // ~
   fuseApiJwt: 'jwt', // TODO: Popupulate in local.js and reencode to server
   vegiScoreApi: 'http://localhost:5002',
   sustainedScoreApi: 'https://api.sustained.com/choice/v1',
@@ -63,7 +63,7 @@ let custom = {
   ignoreSpecialDatesMoreThanXMonthsAway: 12,
   ongoingOrdersHoursCutoff: 5,
   escRatingsTTLDays: 14,
-  storageDomains: [],
+  storageDomainsRegExps: [],
 
   /**************************************************************************
    *                                                                         *

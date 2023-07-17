@@ -139,12 +139,15 @@ function convertToEnv(object) {
 
 function convertToEnvBase64(object, envKeyName) {
   let value = '';
+  RegExp.prototype.toJSON = function () {
+    return this.source;
+  };
   if(isValueType(object)){
     value = object;
+  } else if (object instanceof RegExp) {
+    value = JSON.stringify(object);
   } else {
-    value = Buffer.from(
-      JSON.stringify(object)
-    ).toString('base64');
+    value = Buffer.from(JSON.stringify(object)).toString('base64');
   }
   const returnKey = kebabize(envKeyName.replace(/\.[^/.]+$/, ""),'_').replace(/-/g,'_');
   return `${returnKey}=${value}\n`;
