@@ -101,8 +101,6 @@ const _exports: SailsActionDefnType<
       return exits.uploadFailed('Unable to upload image to S3');
     }
 
-
-
     const updatedAccount = await Account.update({
       id: inputs.accountId
     }).set({

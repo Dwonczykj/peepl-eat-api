@@ -75,6 +75,9 @@ module.exports = {
       }
       try {
         // ~ https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#upload-property
+        sails.log(
+          `Uploading an image to s3 bucket: ${sails.config.custom.amazonS3Bucket}`
+        );
         await sails.uploadOne(
           inputs.image, // : Buffer, Typed Array, Blob, String, ReadableStream
           {
@@ -109,9 +112,12 @@ module.exports = {
             if (!imageInfo) {
               return exits.success(undefined);
             }
+            const imageInfoStr = JSON.stringify(imageInfo);
+            sails.log(`Image uploaded to bucket:\n${imageInfoStr}`);
             return exits.success(imageInfo);
           }
         );
+        
         // .intercept('E_EXCEEDS_UPLOAD_LIMIT', 'tooBig')
         // .intercept(
         //   (err) => new Error('The photo upload failed! ' + err.message)

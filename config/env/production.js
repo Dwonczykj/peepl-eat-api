@@ -20,7 +20,7 @@
  */
 const BASE_URL =
   process.env.NODE_ENV === 'production'
-    ? process.env.STAGE_ENV === 'QA' ? 'https://qa-vegi.vegiapp.co.uk' : 'https://vegi.vegiapp.co.uk'
+    ? 'https://vegi.vegiapp.co.uk' : process.env.STAGE_ENV === 'QA' ? 'https://qa-vegi.vegiapp.co.uk'
     : `http://localhost:${process.env.PORT}`;
 module.exports = {
   hookTimeout: 40000,

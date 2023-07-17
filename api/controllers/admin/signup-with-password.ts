@@ -83,7 +83,7 @@ module.exports = {
     },
     firebaseErrored: {
       responseType: 'firebaseError',
-      statusCode: 401,
+      statusCode: 400,
       description: 'firebase errored on verifying the user token',
       code: null,
       message: 'error',

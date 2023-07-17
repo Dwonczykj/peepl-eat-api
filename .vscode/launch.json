@@ -83,6 +83,31 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Launch Program (emulator)",
+            "skipFiles": [
+                "<node_internals>/**/*.js",
+                // "assets/**"
+            ],
+            "env": {
+                "NODE_ENV": "development",
+                "STAGE_ENV": "development",
+                "useFirebaseEmulator": "true",
+            },
+            "envFile": "${workspaceFolder}/.heroku_env",
+            // "autoAttachChildProcesses": true,
+            // "program": "node -r dotenv/config ${workspaceFolder}/app.js dotenv_config_path=${workspaceFolder}/.heroku_env",
+            "program": "${workspaceFolder}/app.js",
+            "args": [
+                "--verbose",
+                "--hookTimeout=160000"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/out/**/*.js"
+            ],
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Alter DB & Launch Program",
             "skipFiles": [
                 // "<node_internals>/**/*.js",

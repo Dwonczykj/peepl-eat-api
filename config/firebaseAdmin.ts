@@ -1,6 +1,11 @@
 //~ https://dev-bay.com/firebase-integrate-admin-sdk-with-nodejs-back-end-api/
 import * as admin from 'firebase-admin';
-import { DecodedIdToken, getAuth, UserRecord } from 'firebase-admin/auth';
+import {
+  DecodedIdToken,
+  getAuth,
+  UserRecord,
+  connectAuthEmulator,
+} from 'firebase-admin/auth';
 import fs from 'fs';
 
 let config = {
@@ -33,6 +38,10 @@ function strToEnvKey(str) {
 
 if(process.env.NODE_ENV === 'test' || process.env.useFirebaseEmulator === 'true'){
   admin.initializeApp({ projectId: 'vegiliverpool' });
+  // eslint-disable-next-line no-console
+  console.log(
+    `Connected to firebase emulator automatically for project vegiliverpool: ${admin.instanceId}`
+  );
 } else {
   const fpath = 'vegiliverpool-firebase-adminsdk-4dfpz-8f01f888b3.json';
   if (!fs.existsSync(`./${fpath}`)) {
@@ -69,7 +78,15 @@ export const verifyIdToken = (idToken: string): Promise<DecodedIdToken> => {
       const decodedToken = await getAuth().verifyIdToken(idToken);
       resolve(decodedToken);
     } catch (err) {
-      reject(err);
+      if (err.message.includes('Firebase ID token has no "kid" claim')){
+        reject(
+          Error(
+            `If running from an emulator, you can not verify id tokens from an emulator as this would be a security concern. See https://github.com/firebase/firebase-tools/issues/2764#issue-732849408`
+          )
+        );
+      } else {
+        reject(err);
+      }
     }
   });
 };

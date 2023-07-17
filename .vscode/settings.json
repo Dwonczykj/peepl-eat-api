@@ -17,5 +17,13 @@
     "editor.tokenColorCustomizations": {
         "comments": "",
         "textMateRules": []
-    }
+    },
+    "workbench.colorCustomizations": {
+        "titleBar.activeBackground": "#546bf0df",
+        "titleBar.inactiveBackground": "#050a50",
+        "titleBar.activeForeground": "#000",
+        "tab.activeBackground": "#ff002b59",
+        "tab.activeBorder": "#8c1cf5cb",
+        "tab.activeBorderTop": "#eeff01f6",
+    },
 }

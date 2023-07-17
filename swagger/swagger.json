@@ -5480,10 +5480,23 @@
             }
           },
           "400": {
-            "description": "Server error"
-          },
-          "401": {
-            "description": "firebase errored on verifying the user token"
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "firebase errored on verifying the user token"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Server error"
+                    }
+                  ]
+                }
+              }
+            }
           },
           "403": {
             "description": "Register request passed with string roles that do not exist on the roles/vendorRoles/deliveryPartnerRoles of a User"

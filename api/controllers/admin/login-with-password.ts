@@ -122,8 +122,38 @@ requests over WebSockets instead of HTTP).`,
     }
   ) {
     const rememberMe = inputs.rememberMe;
-    var _decodedToken: DecodedIdToken;
+    const _completeLogin = (user: sailsModelKVP<UserType> | UserType) => {
+      // Modify the active session instance.
+      // (This will be persisted when the response is sent.)
+      this.req.session.userId = user.id;
+      this.req.session.userRole = user.role;
+      // In case there was an existing session (e.g. if we allow users to go to the login page
+      // when they're already logged in), broadcast a message that we can display in other open tabs.
+      if (sails.hooks.sockets) {
+        // sails.helpers.broadcastSessionChange(this.req);
+      }
+      return exits.success({
+        user: user,
+        session: this.req.session.cookie,
+      });
+    };
 
+    if (process.env.useFirebaseEmulator && process.env.useFirebaseEmulator === 'true') {
+      try {
+        const email = inputs.emailAddress;
+        let _user: sailsModelKVP<UserType> | UserType = await User.findOne({
+          email: inputs.emailAddress,
+        });
+        if (_user) {
+          return _completeLogin(_user);
+        }
+      } catch (err) {
+        sails.log.info(err);
+        return exits.badCredentials();
+      }
+    }
+    var _decodedToken: DecodedIdToken;
+    var decodedToken: DecodedIdToken;
     try {
       _decodedToken = await firebase.verifyIdToken(inputs.firebaseSessionToken);
     } catch (err) {
@@ -137,14 +167,14 @@ requests over WebSockets instead of HTTP).`,
     }
 
     // Signed in
-    const decodedToken = _decodedToken;
+    decodedToken = _decodedToken;
 
     try {
+      const email = inputs.emailAddress;
       let _user: sailsModelKVP<UserType> | UserType = await User.findOne({
         email: inputs.emailAddress,
       });
 
-      const email = inputs.emailAddress;
 
       const firebaseEmail = decodedToken.email;
       if (!firebaseEmail) {
@@ -192,21 +222,7 @@ requests over WebSockets instead of HTTP).`,
         }
       }
 
-      // Modify the active session instance.
-      // (This will be persisted when the response is sent.)
-      this.req.session.userId = user.id;
-      this.req.session.userRole = user.role;
-
-      // In case there was an existing session (e.g. if we allow users to go to the login page
-      // when they're already logged in), broadcast a message that we can display in other open tabs.
-      if (sails.hooks.sockets) {
-        // sails.helpers.broadcastSessionChange(this.req);
-      }
-
-      return exits.success({
-        user: user,
-        session: this.req.session.cookie,
-      });
+      return _completeLogin(user);
     } catch (err) {
       sails.log.info(err);
       if (err.code === 'auth/wrong-password') {

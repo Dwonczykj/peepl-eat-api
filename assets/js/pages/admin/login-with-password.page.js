@@ -44,6 +44,7 @@ parasails.registerPage('login-with-password', {
     initializeApp(config);
     const auth = getAuth();
     if (window.SAILS_LOCALS.useEmulator) {
+      console.log('Running firebase against emulator');
       connectAuthEmulator(auth, 'http://127.0.0.1:9099');
     }
     this.$focus('[autofocus]');
