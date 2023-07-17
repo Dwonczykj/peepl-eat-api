@@ -344,6 +344,9 @@ module.exports.routes = {
   'POST /api/v1/users/upload-user-avatar': {
     action: 'users/upload-user-avatar',
   },
+  'POST /api/v1/users/update-user-self': {
+    action: 'users/update-user-self',
+  },
   'POST /api/v1/users/set-random-avatar': {
     action: 'users/set-random-avatar',
   },

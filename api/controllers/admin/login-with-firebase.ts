@@ -158,10 +158,50 @@ requests over WebSockets instead of HTTP).`,
     }
   },
 
+  /* 
+  * First authenticate backend service account: 
+  * ~ https://firebase.google.com/docs/auth/admin/verify-id-tokens#verify_id_tokens_using_the_firebase_admin_sdk
+  * Second use this idToken from the user with the Firebase Admin SDK: getAuth().verifyIdToken(idToken)
+  */
   fn: async function (inputs, exits) {
-    // TODO: First authenticate backend service account: https://firebase.google.com/docs/auth/admin/verify-id-tokens#verify_id_tokens_using_the_firebase_admin_sdk
-    // TODO: Second use this idToken from the user with the Firebase Admin SDK: getAuth().verifyIdToken(idToken)
+    const _completeLogin = (user: sailsModelKVP<UserType> | UserType) => {
+      // Modify the active session instance.
+      // (This will be persisted when the response is sent.)
+      this.req.session.userId = user.id;
+      this.req.session.userRole = user.role;
 
+      // In case there was an existing session (e.g. if we allow users to go to the login page
+      // when they're already logged in), broadcast a message that we can display in other open tabs.
+      if (sails.hooks.sockets) {
+        // sails.helpers.broadcastSessionChange(this.req);
+      }
+
+      return exits.success({
+        user: user,
+        session: this.req.session.cookie,
+      });
+    };
+    if (
+      process.env.useFirebaseEmulator &&
+      process.env.useFirebaseEmulator === 'true'
+    ) {
+      try {
+        
+        const inputPhoneDetails = splitPhoneNumber(inputs.phoneNumber);
+        
+        let _user: sailsModelKVP<UserType> | UserType = await User.findOne({
+          phoneNoCountry: inputPhoneDetails['phoneNoCountry'],
+          phoneCountryCode: inputPhoneDetails['countryCode'],
+        });
+        if (_user) {
+          return _completeLogin(_user);
+        }
+      } catch (err) {
+        sails.log.info(err);
+        return exits.badCombo();
+      }
+    }
+    
     var _decodedToken: DecodedIdToken;
 
     try {
@@ -272,23 +312,9 @@ requests over WebSockets instead of HTTP).`,
             this.req.session.cookie.maxAge =
               sails.config.custom.rememberMeCookieMaxAge;
           }
-        } //ﬁ
-
-        // Modify the active session instance.
-        // (This will be persisted when the response is sent.)
-        this.req.session.userId = user.id;
-        this.req.session.userRole = user.role;
-
-        // In case there was an existing session (e.g. if we allow users to go to the login page
-        // when they're already logged in), broadcast a message that we can display in other open tabs.
-        if (sails.hooks.sockets) {
-          // sails.helpers.broadcastSessionChange(this.req);
         }
 
-        return exits.success({
-          user: user,
-          session: this.req.session.cookie,
-        });
+        return _completeLogin(user);
       } catch (error) {
         sails.log.error(
           `Login-with-firebase (phone) failed due to a vegi-server error: `
