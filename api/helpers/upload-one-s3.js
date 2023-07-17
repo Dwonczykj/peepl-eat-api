@@ -89,10 +89,15 @@ module.exports = {
             secret: sails.config.custom.amazonS3Secret,
             bucket: sails.config.custom.amazonS3Bucket,
             maxBytes: sails.config.custom.amazonS3MaxUploadSizeBytes,
+            // ACL: 'public-read', // Optional: Set the desired ACL for the file
+            // ContentType: 'image/jpeg', // Set the correct content type of the file
+            CacheControl: 'no-cache', // Set cache control header to prevent caching
           },
           (err, filesUploaded) => {
             if (err) {
               sails.log.error(err);
+              sails.log(`Image upload to bucket failed ${err}`);
+              return exits.success(undefined);
             }
             // return res.ok({
             //   files: filesUploaded,

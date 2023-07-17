@@ -12,34 +12,48 @@
 
 module.exports.http = {
   // Below code doesn't work within views, not sure why
-  locals:{
+  locals: {
     filters: {
-      toPounds: function(value){
-        if (!value) {return '£0';}
-        value = '£' + (value/100).toFixed(2);
+      toPounds: function (value) {
+        if (!value) {
+          return '£0';
+        }
+        value = '£' + (value / 100).toFixed(2);
         value = value.toString();
         return value;
-      }
-    }
+      },
+    },
   },
 
   /****************************************************************************
-  *                                                                           *
-  * Sails/Express middleware to run for every HTTP request.                   *
-  * (Only applies to HTTP requests -- not virtual WebSocket requests.)        *
-  *                                                                           *
-  * https://sailsjs.com/documentation/concepts/middleware                     *
-  *                                                                           *
-  ****************************************************************************/
+   *                                                                           *
+   * Sails/Express cache for every HTTP request.                   *
+   * The number of milliseconds to cache static assets when your app is running in a 'production' environment. *
+   * More specifically, this is the "max-age" that will be included in the  *
+   * "Cache-Control" header when responding to requests for static assets *
+   * —i.e. any flat files like images, scripts, stylesheets, etc. that are served by Express' static middleware.        *
+   *                                                                           *
+   * https://sailsjs.com/documentation/reference/configuration/sails-config-http#?properties                     *
+   *                                                                           *
+   ****************************************************************************/
+  cache: 30000, // 31557600000 = 1 year
+
+  /****************************************************************************
+   *                                                                           *
+   * Sails/Express middleware to run for every HTTP request.                   *
+   * (Only applies to HTTP requests -- not virtual WebSocket requests.)        *
+   *                                                                           *
+   * https://sailsjs.com/documentation/concepts/middleware                     *
+   *                                                                           *
+   ****************************************************************************/
 
   middleware: {
-
     /***************************************************************************
-    *                                                                          *
-    * The order in which middleware should be run for HTTP requests.           *
-    * (This Sails app's routes are handled by the "router" middleware below.)  *
-    *                                                                          *
-    ***************************************************************************/
+     *                                                                          *
+     * The order in which middleware should be run for HTTP requests.           *
+     * (This Sails app's routes are handled by the "router" middleware below.)  *
+     *                                                                          *
+     ***************************************************************************/
 
     order: [
       // 'helmet',
@@ -53,14 +67,13 @@ module.exports.http = {
       'favicon',
     ],
 
-
     /***************************************************************************
-    *                                                                          *
-    * The body parser that will handle incoming multipart HTTP requests.       *
-    *                                                                          *
-    * https://sailsjs.com/config/http#?customizing-the-body-parser             *
-    *                                                                          *
-    ***************************************************************************/
+     *                                                                          *
+     * The body parser that will handle incoming multipart HTTP requests.       *
+     *                                                                          *
+     * https://sailsjs.com/config/http#?customizing-the-body-parser             *
+     *                                                                          *
+     ***************************************************************************/
 
     /* helmet: (function(){
       // Use the `helmet` package to help secure your Express/Sails app.
@@ -73,7 +86,5 @@ module.exports.http = {
     //   var middlewareFn = skipper({ strict: true });
     //   return middlewareFn;
     // })(),
-
   },
-
 };
