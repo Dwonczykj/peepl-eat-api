@@ -6,7 +6,7 @@ module.exports = {
       name: 'vegi server',
       script: 'app.js',
       watch: false,
-      args: '--hookTimeout 160000 --verbose',
+      args: '--hookTimeout 160000 --silly',
       env_production: {
         NODE_ENV: 'production',
         NODE_OPTIONS: '--max-old-space-size=1024',
@@ -16,56 +16,5 @@ module.exports = {
         NODE_OPTIONS: '--max-old-space-size=1024',
       },
     },
-  ],
-
-  deploy: {
-    production: {
-      user: 'ubuntu',
-      host: '54.80.225.99',
-      key: '~/.ssh/vegi-server-keyvaluepair.pem',
-      repo: 'https://github.com/Dwonczykj/peepl-eat-api.git',
-      ref: 'origin/main',
-      path: '/home/ubuntu/peepl-eat-api',
-      'pre-deploy-local': 'sails run rebuild-cloud-sdk.js',
-      'post-deploy':
-        'npm install && pm2 reload ecosystem.config.js --env production',
-      'pre-setup': '',
-      env: {
-        NODE_ENV: 'production',
-        NODE_OPTIONS: '--max-old-space-size=1024',
-      },
-    },
-    QA: {
-      user: 'ubuntu',
-      host: '3.95.65.212',
-      key: '~/.ssh/vegi-server-keyvaluepair.pem',
-      repo: 'https://github.com/Dwonczykj/peepl-eat-api.git',
-      ref: 'origin/qa',
-      path: '/home/ubuntu/peepl-eat-api',
-      'pre-deploy-local': 'sails run rebuild-cloud-sdk.js',
-      'post-deploy':
-        'npm install && pm2 reload ecosystem.config.js --env production',
-      'pre-setup': '',
-      env: {
-        NODE_ENV: 'production',
-        NODE_OPTIONS: '--max-old-space-size=1024',
-      },
-    },
-    local: {
-      user: 'ubuntu',
-      host: '127.0.0.1',
-      // key: '~/.ssh/vegi-server-keyvaluepair.pem',
-      repo: 'https://github.com/Dwonczykj/peepl-eat-api.git',
-      ref: 'origin/qa',
-      path: '/Users/joey/Github_Keep/vegi-backend-jd',
-      // 'pre-deploy-local': 'sails run rebuild-cloud-sdk.js',
-      // 'post-deploy':
-      //   'npm install && pm2 reload ecosystem.config.js --env production',
-      // 'pre-setup': '',
-      env: {
-        NODE_ENV: 'production',
-        NODE_OPTIONS: '--max-old-space-size=1024',
-      },
-    },
-  },
+  ]
 };

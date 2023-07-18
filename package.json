@@ -5,7 +5,7 @@
   "description": "vegi backend sails application",
   "keywords": [],
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.154.0",
+    "@aws-sdk/client-s3": "^3.370.0",
     "@googlemaps/js-api-loader": "^1.15.1",
     "@googlemaps/typescript-guards": "^2.0.3",
     "@mailchimp/mailchimp_marketing": "^3.0.34",
@@ -93,7 +93,8 @@
     "dev": "NODE_ENV=development useFirebaseEmulator=false node app.js --hookTimeout=160000",
     "dev-emulator": "NODE_ENV=development useFirebaseEmulator=true node app.js --hookTimeout=160000",
     "start_local": "redis-server 2>&1 & NODE_ENV=production node app.js --silly --hookTimeout=160000",
-    "start": "NODE_ENV=production node app.js --silly --hookTimeout=160000",
+    "start": "pm2-runtime start ecosystem.config.js --env production",
+    "start_no_pm2": "NODE_ENV=production node app.js --silly --hookTimeout=160000",
     "start_profile": "redis-server 2>&1 & source /usr/local/nsolid/nsolid-env && NODE_ENV=production node app.js --silly --hookTimeout=160000",
     "tsc": "tsc ./assets/js",
     "sails": "$(npm bin)/sails",

@@ -4,7 +4,6 @@ import {
   DecodedIdToken,
   getAuth,
   UserRecord,
-  connectAuthEmulator,
 } from 'firebase-admin/auth';
 import fs from 'fs';
 
