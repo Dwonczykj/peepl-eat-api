@@ -18,6 +18,16 @@ module.exports = async function (req, res, proceed) {
       return res.redirect('/admin/login-with-password?next=' + encodeURIComponent(req.originalUrl));
     }
   }
-
+  try {
+    if (req && (req.method === 'POST' || req.method === 'PUT') && req.body) {
+      sails.log.verbose(
+        `REQUEST [${req.method}]: "${req.url}" body: ${JSON.stringify(req.body)}`
+      );
+    } else {
+      sails.log.verbose(`REQUEST [${req.method}]: "${req.url}"`);
+    }
+  } catch (err) {
+    sails.log.warn(err);
+  }
   return proceed();
 };
