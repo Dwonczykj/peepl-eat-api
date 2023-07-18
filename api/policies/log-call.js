@@ -29,19 +29,14 @@
   // other properties and methods...
 }
 */
-
-module.exports = function logCall(req, res, next) {
-  if (
-    req &&
-    (req.method === 'POST' || req.method === 'PUT') &&
-    req.body
-  ) {
+module.exports = async function (req, res, proceed) {
+  if (req && (req.method === 'POST' || req.method === 'PUT') && req.body) {
     sails.log.verbose(
       `REQUEST [${req.method}]: "${req.url}" body: ${JSON.stringify(req.body)}`
     );
   } else {
     sails.log.verbose(`REQUEST [${req.method}]: "${req.url}"`);
   }
-  next();
+  return proceed();
 };
 
