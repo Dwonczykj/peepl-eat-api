@@ -30,19 +30,17 @@
 }
 */
 
-module.exports = function localize(req, res, next) {
-  if (req.method === 'GET') {
-    sails.log(
-      `REQUEST [${req.method}]: "${req.url}" params: ${JSON.stringify(req.params)}, query: ${JSON.stringify(req.query)}`
-    );
-  } else if (req.method === 'POST' || req.method === 'PUT') {
-    sails.log(
+module.exports = function logCall(req, res, next) {
+  if (
+    req &&
+    (req.method === 'POST' || req.method === 'PUT') &&
+    req.body
+  ) {
+    sails.log.verbose(
       `REQUEST [${req.method}]: "${req.url}" body: ${JSON.stringify(req.body)}`
     );
   } else {
-    sails.log(
-      `REQUEST [${req.method}]: "${req.url}"`
-    );
+    sails.log.verbose(`REQUEST [${req.method}]: "${req.url}"`);
   }
   next();
 };
