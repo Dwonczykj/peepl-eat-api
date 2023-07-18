@@ -363,18 +363,10 @@ module.exports = {
    *                                                                         *
    ***************************************************************************/
   custom: {
-    internalEmailAddress: 'support@vegiapp.co.uk',
     buildNumber: 1,
-    baseUrl: BASE_URL,
-    peeplWebhookAddress: `${BASE_URL}/api/v1/orders/peepl-pay-webhook`,
-    peeplPayRefundWebhookAddress: `${BASE_URL}/api/v1/orders/peepl-pay-refund-webhook`,
-    peeplWebhookAddressCustomerUpdatePaidOrder: `${BASE_URL}/api/v1/orders/peepl-pay-update-paid-order-webhook`,
     fuseStudioBaseUrl: 'https://studio.fuse.io/api/v2/',
     pplTokenAddress: '0xa2C7CdB72d177f6259cD12a9A06Fdfd9625419D4',
     pplRewardsPoolAddress: '0x29249e06e8D3e4933cc403AB73136e698a08c38b',
-    coopcycleUrl: 'https://agile-delivery.coopcycle.org',
-    amazonS3BucketUrl: 'https://vegiapp-1.s3.us-east-1.amazonaws.com/',
-    amazonS3Bucket: 'vegiapp-1',
   },
 
   uploads: {

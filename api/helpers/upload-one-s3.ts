@@ -331,7 +331,7 @@ const _exports: SailsActionDefnType<
           `*`.repeat(_m) +
           `${sails.config.custom.amazonS3AccessKey}`.substring(_m);
         sails.log(
-          `Uploading an image to s3 bucket: ${sails.config.custom.amazonS3Bucket} with access key: ${obfusacatedKey}`
+          `Uploading an image to s3 bucket: "${sails.config.custom.amazonS3Bucket}" with access key: ${obfusacatedKey}`
         );
         
         var s3UploadInfo = {};
