@@ -165,3 +165,5 @@ test/**/*jpeg
 
 migration/16687062742--/1668706274268_import.sql
 migration/**/*_import.sql
+
+aws_temp/

@@ -78,8 +78,11 @@ module.exports = {
       }
       try {
         // ~ https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#upload-property
+        const _n = sails.config.custom.amazonS3AccessKey.length;
+        const _m = Math.max(0, _n - 4);
+        const obfusacatedKey = `*`.repeat(_m) + `${sails.config.custom.amazonS3AccessKey}`.substring(_m);
         sails.log(
-          `Uploading an image to s3 bucket: ${sails.config.custom.amazonS3Bucket}`
+          `Uploading an image to s3 bucket: ${sails.config.custom.amazonS3Bucket} with access key: ${obfusacatedKey}`
         );
         await sails.uploadOne(
           inputs.image, // : Buffer, Typed Array, Blob, String, ReadableStream
