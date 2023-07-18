@@ -36,7 +36,7 @@ type _FilePassThrough = PassThrough & {
 };
 
 async function convertFileToReadableStream(file: _FilePassThrough) {
-  sails.log(`Convert file to stream`);
+  sails.log.verbose(`Convert file to stream`);
   const filename = file.filename;
   const headers = file.headers;
   const arrayBuffer = await convertPassThroughToBuffer(file);
@@ -130,7 +130,7 @@ function convertPassThroughToBuffer(
 
 async function uploadImageToS3(imageFile) {
   // Configure the S3 client
-  const region = 'eu-west-2';
+  const region = sails.config.custom.amazonS3BucketRegion || 'eu-west-2';
   const s3Client = new S3Client({
     region: region,
     credentials: {
@@ -156,10 +156,10 @@ async function uploadImageToS3(imageFile) {
 
   const selectedFile = imageFile._files[0];
   if (!Object.keys(selectedFile).includes('stream')) {
-    sails.log(
+    sails.log.verbose(
       `Unable to parse selectedFile from input to upload-one-s3 helper:`
     );
-    sails.log(selectedFile);
+    sails.log.verbose(selectedFile);
     return;
   }
   const selectedFileStream: _FilePassThrough = selectedFile.stream;
@@ -180,10 +180,10 @@ async function uploadImageToS3(imageFile) {
   // });
 
   const key = filename;
-  // sails.log(`Selected file:`);
-  // sails.log(selectedFile);
-  sails.log(filename);
-  sails.log(headers);
+  // sails.log.verbose(`Selected file:`);
+  // sails.log.verbose(selectedFile);
+  // sails.log.verbose(filename);
+  // sails.log.verbose(headers);
 
   // ~ https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/s3/command/PutObjectCommand/
 
@@ -196,34 +196,34 @@ async function uploadImageToS3(imageFile) {
   });
   try {
     const response = await s3Client.send(command);
-    sails.log('Image uploaded successfully. ETag:', response.ETag);
+    const encodedKey = encodeURIComponent(key);
+    var imageUri = `https://${sails.config.custom.amazonS3Bucket}.s3.${region}.amazonaws.com/${encodedKey}`;
+    sails.log.verbose(`Image uploaded successfully. ETag: ${response.ETag}. Uri: ${imageUri}`);
     // const getCommand = new GetObjectCommand({
     //   Bucket: sails.config.custom.amazonS3Bucket,
     //   Key: key,
     // });
-    const encodedKey = encodeURIComponent(key);
-    var imageUri = `https://${sails.config.custom.amazonS3Bucket}.s3.${region}.amazonaws.com/${encodedKey}`;
     // try{
     //   const imageUriGetResponse = await s3Client.send(getCommand);
-    //   sails.log(imageUriGetResponse);
+    //   sails.log.verbose(imageUriGetResponse);
     //   imageUri = imageUriGetResponse.Location;
     // } catch (err) {
     //   sails.log.error(`Error fetching new upload from s3 bucket: ${err}`);
     // }
 
     // eslint-disable-next-line no-console
-    sails.log(response);
-    sails.log(response.$metadata);
+    // sails.log.verbose(response);
+    // sails.log.verbose(response.$metadata);
     const imageUrl = imageUri; // Extract the URL from the response
-    sails.log(imageUrl);
+    sails.log.verbose(imageUrl);
     const s3UploadSucceeded = true;
     const s3UploadInfo = imageUri;
-    return { s3UploadSucceeded, s3UploadInfo };
+    return { s3UploadSucceeded, s3UploadInfo, key };
   } catch (error) {
     sails.log.error('Error uploading image:', error);
     const s3UploadSucceeded = false;
     const s3UploadInfo = null;
-    return { s3UploadSucceeded, s3UploadInfo };
+    return { s3UploadSucceeded, s3UploadInfo, key };
   }
 }
 
@@ -330,22 +330,22 @@ const _exports: SailsActionDefnType<
         const obfusacatedKey =
           `*`.repeat(_m) +
           `${sails.config.custom.amazonS3AccessKey}`.substring(_m);
-        sails.log(
+        sails.log.verbose(
           `Uploading an image to s3 bucket: "${sails.config.custom.amazonS3Bucket}" with access key: ${obfusacatedKey}`
         );
         
         var s3UploadInfo = {};
         try{
-          sails.log(`Upload image to s3 sdk v3...`);
-          // sails.log(inputs.image);
-          const {s3UploadSucceeded, s3UploadInfo} = await uploadImageToS3(inputs.image);
+          sails.log.verbose(`Upload image to s3 sdk v3...`);
+          // sails.log.verbose(inputs.image);
+          const {s3UploadSucceeded, s3UploadInfo, key} = await uploadImageToS3(inputs.image);
           if(s3UploadSucceeded){
             imageInfo = {
-              fd: s3UploadInfo,
+              fd: key,
               ffd: s3UploadInfo,
             };
             const imageInfoStr = JSON.stringify(imageInfo);
-            sails.log(`Image uploaded to bucket:\n${imageInfoStr}`);
+            sails.log.verbose(`Image uploaded to bucket:\n${imageInfoStr}`);
             return exits.success(imageInfo);
           }
         } catch (err) {
@@ -368,7 +368,7 @@ const _exports: SailsActionDefnType<
           (err, filesUploaded) => {
             if (err) {
               sails.log.error(err);
-              sails.log(`Image upload to bucket failed ${err}`);
+              sails.log.verbose(`Image upload to bucket failed ${err}`);
               return exits.success(undefined);
             }
             // return res.ok({
@@ -395,7 +395,7 @@ const _exports: SailsActionDefnType<
               });
             }
             const imageInfoStr = JSON.stringify(imageInfo);
-            sails.log(`Image uploaded to bucket:\n${imageInfoStr}`);
+            sails.log.verbose(`Image uploaded to bucket:\n${imageInfoStr}`);
             return exits.success(imageInfo);
           }
         );

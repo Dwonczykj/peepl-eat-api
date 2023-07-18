@@ -58,7 +58,7 @@ module.exports = {
     if (inputs.image) {
       let imageInfo = await sails.helpers.uploadOneS3(inputs.image);
       if (imageInfo) {
-        inputs.imageUrl = sails.config.custom.amazonS3BucketUrl + imageInfo.fd;
+        inputs.imageUrl = `https://${sails.config.custom.amazonS3Bucket}.s3.${sails.config.custom.amazonS3BucketRegion}.amazonaws.com/${imageInfo.fd}`;
       }
       delete inputs.image;
     }
