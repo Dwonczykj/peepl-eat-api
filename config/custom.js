@@ -51,7 +51,7 @@ let custom = {
   googleApiBaseUrl: 'https://maps.googleapis.com/maps/api/',
   placesApiRelUrlFindPlace: 'place/findplacefromtext/json', // ~ https://googlemaps.github.io/google-maps-services-js/modules/_places_findplacefromtext_.html#:~:text=Const-,defaultUrl,-defaultUrl%3A
   distancesApiRelUrlGetDistance: 'distancematrix/json', // ~ https://googlemaps.github.io/google-maps-services-js/modules/_distance_.html#:~:text=Const-,defaultUrl,-defaultUrl%3A
-  amazonS3MaxUploadSizeBytes: 1 * 1024 * 1024,
+  amazonS3MaxUploadSizeBytes: 500 * 1024,
   vegiEatsRewardPcnt: 0.05,
   vegiPayRewardPcnt: 0.005, // TODO v2.0: To be 0 <= x <= 0.01 based on ESC measure value
   PPLTokenValueInPence: 10, // TODO: GET this value from the PeeplPay API @TheAdamGalloway

@@ -3,6 +3,7 @@ import {v4 as uuidv4} from 'uuid'; // const { v4: uuidv4 } = require('uuid');
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import fs from 'fs';
 import { PassThrough, Readable } from 'stream';
+import sharp from 'sharp';
 
 import {
   sailsVegi,
@@ -35,12 +36,138 @@ type _FilePassThrough = PassThrough & {
   headers: { [k: string]: string };
 };
 
+async function streamToBuffer(stream: PassThrough): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    const chunks: Buffer[] = [];
+
+    stream.on('data', (chunk: Buffer) => {
+      chunks.push(chunk);
+    });
+
+    stream.on('end', () => {
+      const buffer = Buffer.concat(chunks);
+      resolve(buffer);
+    });
+
+    stream.on('error', (error: Error) => {
+      reject(error);
+    });
+  });
+}
+
+// async function resizeAndCompressImage(
+//   buffer: Buffer,
+//   targetSize: number
+// ): Promise<Buffer> {
+//   const sharpInstance = sharp(buffer);
+
+//   // Get the image metadata
+//   const metadata = await sharpInstance.metadata();
+
+//   // Calculate the target width and height
+//   let targetWidth = metadata.width;
+//   let targetHeight = metadata.height;
+
+//   if (metadata.size && metadata.size > targetSize) {
+//     const scaleFactor = Math.sqrt(metadata.size / targetSize);
+//     targetWidth = Math.round(metadata.width / scaleFactor);
+//     targetHeight = Math.round(metadata.height / scaleFactor);
+//   }
+
+//   // Resize and compress the image
+//   const resizedBuffer = await sharpInstance
+//     .resize(targetWidth, targetHeight)
+//     .toBuffer({ resolveWithObject: false, quality: 80 });
+
+//   return resizedBuffer;
+// }
+async function compressImage(
+  buffer: Buffer,
+  maxQualityLoss: number
+): Promise<Buffer> {
+  let quality = 100;
+  let compressedBuffer = buffer;
+
+  while (quality > 1) {
+    const currentQuality = Math.max(quality - 5, 1);
+    const { size } = await sharp(buffer)
+      .jpeg({ quality: currentQuality })
+      .toBuffer({ resolveWithObject: true });
+
+    const qualityLoss = 1 - size / buffer.length;
+    if (qualityLoss <= maxQualityLoss) {
+      compressedBuffer = await sharp(buffer)
+        .jpeg({ quality: currentQuality })
+        .toBuffer();
+      break;
+    }
+
+    quality -= 5;
+  }
+
+  return compressedBuffer;
+}
+
+async function resizeImage(
+  buffer: Buffer,
+  targetSize: number
+): Promise<Buffer> {
+  let width = Math.round(Math.sqrt(targetSize));
+  let height = Math.round(targetSize / width);
+
+  const { size } = await sharp(buffer)
+    .resize(width, height)
+    .toBuffer({ resolveWithObject: true });
+
+  while (size > targetSize && width > 1 && height > 1) {
+    width -= 10;
+    height = Math.round(targetSize / width);
+
+    const { size: newSize } = await sharp(buffer)
+      .resize(width, height)
+      .toBuffer({ resolveWithObject: true });
+    if (newSize <= targetSize) {
+      break;
+    }
+  }
+
+  const resizedBuffer = await sharp(buffer).resize(width, height).toBuffer();
+  return resizedBuffer;
+}
+
+// function convertPassThroughToBuffer(
+//   passThrough: PassThrough
+// ): Promise<ArrayBuffer> {
+//   return new Promise<ArrayBuffer>((resolve, reject) => {
+//     const chunks: Buffer[] = [];
+
+//     passThrough.on('data', (chunk) => {
+//       chunks.push(chunk);
+//     });
+
+//     passThrough.on('end', () => {
+//       const buffer = Buffer.concat(chunks);
+//       const arrayBuffer = buffer.buffer.slice(
+//         buffer.byteOffset,
+//         buffer.byteOffset + buffer.byteLength
+//       );
+//       resolve(arrayBuffer);
+//     });
+
+//     passThrough.on('error', (error) => {
+//       reject(error);
+//     });
+//   });
+// }
+
 async function convertFileToReadableStream(file: _FilePassThrough) {
   sails.log.verbose(`Convert file to stream`);
   const filename = file.filename;
   const headers = file.headers;
-  const arrayBuffer = await convertPassThroughToBuffer(file);
-  return { filename, headers, arrayBuffer };
+  // Convert the PassThrough stream to a Buffer
+  const buffer = await streamToBuffer(file);
+  // const arrayBuffer = await convertPassThroughToBuffer(file);
+  return { filename, headers, buffer };
 
   // // Convert the PassThrough stream to a Promise
   // const stream = file;
@@ -103,31 +230,6 @@ async function convertFileToReadableStream(file: _FilePassThrough) {
 //   });
 // }
 
-function convertPassThroughToBuffer(
-  passThrough: PassThrough
-): Promise<ArrayBuffer> {
-  return new Promise<ArrayBuffer>((resolve, reject) => {
-    const chunks: Buffer[] = [];
-
-    passThrough.on('data', (chunk) => {
-      chunks.push(chunk);
-    });
-
-    passThrough.on('end', () => {
-      const buffer = Buffer.concat(chunks);
-      const arrayBuffer = buffer.buffer.slice(
-        buffer.byteOffset,
-        buffer.byteOffset + buffer.byteLength
-      );
-      resolve(arrayBuffer);
-    });
-
-    passThrough.on('error', (error) => {
-      reject(error);
-    });
-  });
-}
-
 async function uploadImageToS3(imageFile) {
   // Configure the S3 client
   const region = sails.config.custom.amazonS3BucketRegion || 'eu-west-2';
@@ -163,9 +265,48 @@ async function uploadImageToS3(imageFile) {
     return;
   }
   const selectedFileStream: _FilePassThrough = selectedFile.stream;
-  const { filename, headers, arrayBuffer } = await convertFileToReadableStream(
+  let { filename, headers, buffer } = await convertFileToReadableStream(
     selectedFileStream
   );
+  
+  // Check if the image size exceeds 500KB
+  if (buffer.length > sails.config.custom.amazonS3MaxUploadSizeBytes || (500 * 1024)) {
+    // Compress the image with a maximum quality loss of 50%
+    const compressedBuffer = await compressImage(buffer, 0.5);
+
+    // Resize the image to reduce the size further if needed
+    const resizedBuffer = await resizeImage(
+      compressedBuffer,
+      sails.config.custom.amazonS3MaxUploadSizeBytes || 500 * 1024
+    );
+
+    // const resizedBuffer = await resizeAndCompressImage(
+    //   buffer,
+    //   sails.config.custom.amazonS3MaxUploadSizeBytes / 1024 || 500
+    // );
+    
+    // Compress the image using Sharp
+    // const _compressedBuffer = await sharp(buffer)
+    //   .resize({ fit: 'inside', withoutEnlargement: true })
+    //   .toBuffer();
+    // Use the compressedBuffer for uploading
+    if (buffer.length > 1024 * 1024) {
+      sails.log.verbose(
+        `Compressing image from ${(buffer.length / (1024 * 1024)).toFixed(
+          2
+        )} MB to ${(resizedBuffer.length / 1024).toFixed(2)} KB`
+      );
+    } else {
+      sails.log.verbose(
+        `Compressing image from ${(buffer.length / 1024).toFixed(2)} KB to ${(
+          resizedBuffer.length / 1024
+        ).toFixed(2)} KB`
+      );
+    }
+    // Use the resizedBuffer for uploading
+    buffer = resizedBuffer;
+    // buffer = _compressedBuffer;
+  }
   // const arrayBuffer: any = await convertReadableStreamToArrayBuffer(readableStream);
   // .then(({ filename, headers, readableStream }) => {
   //   console.log('Filename:', filename);
@@ -192,13 +333,15 @@ async function uploadImageToS3(imageFile) {
     Bucket: sails.config.custom.amazonS3Bucket,
     Key: key,
     CacheControl: 'no-cache',
-    Body: arrayBuffer as any,
+    Body: buffer,
   });
   try {
     const response = await s3Client.send(command);
     const encodedKey = encodeURIComponent(key);
     var imageUri = `https://${sails.config.custom.amazonS3Bucket}.s3.${region}.amazonaws.com/${encodedKey}`;
-    sails.log.verbose(`Image uploaded successfully. ETag: ${response.ETag}. Uri: ${imageUri}`);
+    sails.log.verbose(
+      `Image uploaded successfully. ETag: ${response.ETag}. Uri: ${imageUri}`
+    );
     // const getCommand = new GetObjectCommand({
     //   Bucket: sails.config.custom.amazonS3Bucket,
     //   Key: key,
