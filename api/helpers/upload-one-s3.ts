@@ -1,9 +1,10 @@
 /* eslint-disable no-console */
 import {v4 as uuidv4} from 'uuid'; // const { v4: uuidv4 } = require('uuid');
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { GetObjectCommand, GetObjectCommandOutput, HeadObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import fs from 'fs';
 import { PassThrough, Readable } from 'stream';
 import sharp from 'sharp';
+import crypto from 'crypto';
 
 import {
   sailsVegi,
@@ -161,9 +162,13 @@ async function resizeImage(
 //   });
 // }
 
+function getFileNameFromPassThrough(passThrough: _FilePassThrough): string {
+  return passThrough.filename;
+}
+
 async function convertFileToReadableStream(file: _FilePassThrough) {
   sails.log.verbose(`Convert file to stream`);
-  const filename = file.filename;
+  const filename = getFileNameFromPassThrough(file);
   const headers = file.headers;
   // Convert the PassThrough stream to a Buffer
   const buffer = await streamToBuffer(file);
@@ -230,53 +235,134 @@ async function convertFileToReadableStream(file: _FilePassThrough) {
 //     });
 //   });
 // }
-
-async function uploadImageToS3(imageFile) {
-  // Configure the S3 client
-  const region = sails.config.custom.amazonS3BucketRegion || 'eu-west-2';
-  const s3Client = new S3Client({
-    region: region,
-    credentials: {
-      accessKeyId: sails.config.custom.amazonS3AccessKey,
-      secretAccessKey: sails.config.custom.amazonS3Secret,
-    },
-    // bucket: sails.config.custom.amazonS3Bucket,
-    // maxBytes: sails.config.custom.amazonS3MaxUploadSizeBytes,
-    // ACL: 'public-read', // Optional: Set the desired ACL for the file
-    // ContentType: 'image/jpeg', // Set the correct content type of the file
-    // CacheControl: 'no-cache', // Set cache control header to prevent caching
-    // bodyLengthChecker: (body) => {
-    //   if(body){
-
-    //   }
-    // }
-  });
-
-  // Read the image file as a Buffer
-  // var fileContent:
-  //   | string
-  //   | ArrayBuffer; // await readFileAsync(imageFile);
-
-  const selectedFile = imageFile._files[0];
-  if (!Object.keys(selectedFile).includes('stream')) {
-    sails.log.verbose(
-      `Unable to parse selectedFile from input to upload-one-s3 helper:`
-    );
-    sails.log.verbose(selectedFile);
-    return;
+async function getCrypto() {
+  let crypto;
+  try {
+    crypto = await import('node:crypto');
+  } catch (err) {
+    sails.log.error(`crypto support is disabled! ${err}`);
+    sails.log.error(err);
   }
-  const selectedFileStream: _FilePassThrough = selectedFile.stream;
-  let { filename, headers, buffer } = await convertFileToReadableStream(
-    selectedFileStream
-  );
+  return crypto;
+}
+
+async function checkFileExistence(
+  s3Client: S3Client,
+  s3Container: string,
+  key: string
+): Promise<boolean> {
+  try {
+    // Use HeadObjectCommand to check if the object exists in S3
+    await s3Client.send(
+      new HeadObjectCommand({ Bucket: s3Container, Key: key })
+    );
+    return true; // Object exists
+  } catch (error) {
+    if (error.name === 'NoSuchKey' || error.name === "NotFound") {
+      sails.log.verbose(`"${s3Container}" does not contain key: "${key}"`);
+      return false; // Object does not exist
+    }
+    sails.log.error(`Unable to check for file existence in "${s3Container}" using key: "${key}" with error: ${error}`);
+    sails.log.error(error);
+    return false;
+  }
+}
+
+async function getObjectData(
+  s3Client: S3Client,
+  s3Container: string,
+  key: string
+): Promise<GetObjectCommandOutput | null> {
+  try {
+    // Use GetObjectCommand to retrieve the object data from S3
+    const response = await s3Client.send(
+      new GetObjectCommand({ Bucket: s3Container, Key: key })
+    );
+    return response.Body as unknown as GetObjectCommandOutput;
+  } catch (error) {
+    sails.log.error(`Unable to get object on s3 "${s3Container}" with key: "${key}" with error: ${error}`);
+    sails.log.error(error);
+    return null;
+  }
+}
+
+async function calculateChecksumFromStream(
+  passThrough: PassThrough
+): Promise<string> {
+  const hash = crypto.createHash('md5');
+  for await (const chunk of passThrough) {
+    hash.update(chunk);
+  }
+  const checksum = hash.digest('hex');
+  return checksum;
+}
+
+function calculateChecksumFromBuffer(buffer: Buffer): string {
+  const hash = crypto.createHash('md5').update(buffer).digest('hex');
+  return hash;
+}
+
+async function compareFilesInS3(
+  passThrough: _FilePassThrough,
+  s3Client: S3Client
+): Promise<{
+  areFilesEqual: boolean;
+  fileObjectUrl: string;
+  fileName: string,
+}> {
+  const region = sails.config.custom.amazonS3BucketRegion || 'eu-west-2';
+  const s3Container = sails.config.custom.amazonS3Bucket;
+  const fileName = getFileNameFromPassThrough(passThrough);
+  const key = `${s3Container}/${fileName}`;
+
+  // Check if the file exists in S3
+  const doesFileExist = await checkFileExistence(s3Client, s3Container, key);
+  if (doesFileExist) {
+    // Retrieve the object from S3
+    const objectData = await getObjectData(s3Client, s3Container, key);
+
+    // Calculate checksums for both files
+    let areFilesEqual = false;
+    try {
+      const streamChecksum = await calculateChecksumFromStream(passThrough);
+      const s3ObjectChecksum = calculateChecksumFromBuffer(
+        objectData.Body as unknown as Buffer
+      );
   
-  // Check if the image size exceeds 500KB
-  if (buffer.length > sails.config.custom.amazonS3MaxUploadSizeBytes || (500 * 1024)) {
+      // Compare the checksums
+      areFilesEqual = streamChecksum === s3ObjectChecksum;
+      if(!areFilesEqual){
+        sails.log.warn(`Found an existing s3 object with matching key: "${key}" but the checksums dont match.`);
+      }
+    } catch (error) {
+      sails.log.error(`Unable to checksum for upload files with error: ${error}`);
+      sails.log.error(error);
+      areFilesEqual = false;
+    }
+    const encodedKey = encodeURIComponent(fileName);
+    var fileObjectUrl = `https://${s3Container}.s3.${region}.amazonaws.com/${encodedKey}`;
+
+    return { areFilesEqual, fileObjectUrl, fileName };
+  } else {
+    sails.log.verbose(
+      `No file with key "${key}" already found in S3 [${s3Container}]`
+    );
+    const areFilesEqual = false;
+    const fileObjectUrl = '';
+    return { areFilesEqual, fileObjectUrl, fileName };
+  }
+}
+
+async function reduceBufferSize(buffer: Buffer, amazonS3MaxUploadSizeBytes: number) {
+  if (
+    buffer.length >
+    (amazonS3MaxUploadSizeBytes || sails.config.custom.amazonS3MaxUploadSizeBytes || 500 * 1024)
+  ) {
     sails.log.verbose(
       `Compressing image from ${(buffer.length / (1024 * 1024)).toFixed(
         2
       )} MB to less than ${
-        (sails.config.custom.amazonS3MaxUploadSizeBytes / 1024) || 500
+        (amazonS3MaxUploadSizeBytes || sails.config.custom.amazonS3MaxUploadSizeBytes) / 1024 || 500
       } KB`
     );
     // Compress the image with a maximum quality loss of 50%
@@ -285,19 +371,10 @@ async function uploadImageToS3(imageFile) {
     // Resize the image to reduce the size further if needed
     const resizedBuffer = await resizeImage(
       compressedBuffer,
-      sails.config.custom.amazonS3MaxUploadSizeBytes || 500 * 1024
+      amazonS3MaxUploadSizeBytes ||
+        sails.config.custom.amazonS3MaxUploadSizeBytes ||
+        500 * 1024
     );
-
-    // const resizedBuffer = await resizeAndCompressImage(
-    //   buffer,
-    //   sails.config.custom.amazonS3MaxUploadSizeBytes / 1024 || 500
-    // );
-    
-    // Compress the image using Sharp
-    // const _compressedBuffer = await sharp(buffer)
-    //   .resize({ fit: 'inside', withoutEnlargement: true })
-    //   .toBuffer();
-    // Use the compressedBuffer for uploading
     if (buffer.length > 1024 * 1024) {
       sails.log.verbose(
         `Compressed image from ${(buffer.length / (1024 * 1024)).toFixed(
@@ -311,38 +388,64 @@ async function uploadImageToS3(imageFile) {
         ).toFixed(2)} KB`
       );
     }
-    // Use the resizedBuffer for uploading
     buffer = resizedBuffer;
-    // buffer = _compressedBuffer;
   }
-  // const arrayBuffer: any = await convertReadableStreamToArrayBuffer(readableStream);
-  // .then(({ filename, headers, readableStream }) => {
-  //   console.log('Filename:', filename);
-  //   console.log('Headers:', headers);
+  return buffer;
+}
 
-  //   // Use the readableStream as needed
-  //   // e.g., pass it to an S3 upload function
+async function uploadImageToS3(imageFile) {
+  // Configure the S3 client
+  const region = sails.config.custom.amazonS3BucketRegion || 'eu-west-2';
+  const s3Client = new S3Client({
+    region: region,
+    credentials: {
+      accessKeyId: sails.config.custom.amazonS3AccessKey,
+      secretAccessKey: sails.config.custom.amazonS3Secret,
+    },
+  });
 
-  // })
-  // .catch((error) => {
-  //   console.error('Error:', error);
-  // });
+  const selectedFile = imageFile._files[0];
+  if (!Object.keys(selectedFile).includes('stream')) {
+    sails.log.verbose(
+      `Unable to parse selectedFile from input to upload-one-s3 helper:`
+    );
+    sails.log.verbose(selectedFile);
+    return;
+  }
+  const selectedFileStream: _FilePassThrough = selectedFile.stream;
+  try {
+    const { areFilesEqual, fileObjectUrl, fileName } = await compareFilesInS3(
+      selectedFileStream,
+      s3Client
+    );
+    if(areFilesEqual && fileName){
+      sails.log.verbose('Found existing file match in s3 container');
+      const imageUrl = fileObjectUrl; // Extract the URL from the response
+      sails.log.verbose(imageUrl);
+      const s3UploadSucceeded = true;
+      const s3UploadInfo = imageUrl;
+      const key = fileName;
+      return { s3UploadSucceeded, s3UploadInfo, key };
+    }
+  } catch (error) {
+    sails.log.error(`Unable to compareFilesInS3: ${error}`);
+  }
 
+  let { filename, headers, buffer } = await convertFileToReadableStream(
+    selectedFileStream
+  );
   const key = filename;
-  // sails.log.verbose(`Selected file:`);
-  // sails.log.verbose(selectedFile);
-  // sails.log.verbose(filename);
-  // sails.log.verbose(headers);
+  
+  // Check if the image size exceeds 500KB
+  buffer = await reduceBufferSize(buffer, sails.config.custom.amazonS3MaxUploadSizeBytes);
 
   // ~ https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/s3/command/PutObjectCommand/
-
   // Upload the image file to S3
   const command = new PutObjectCommand({
     Bucket: sails.config.custom.amazonS3Bucket,
     Key: key,
     CacheControl: 'no-cache',
     Body: buffer,
-    
   });
   try {
     const response = await s3Client.send(command);
@@ -375,6 +478,7 @@ async function uploadImageToS3(imageFile) {
     sails.log.error('Error uploading image:', error);
     const s3UploadSucceeded = false;
     const s3UploadInfo = null;
+    const key = null;
     return { s3UploadSucceeded, s3UploadInfo, key };
   }
 }
@@ -496,7 +600,7 @@ const _exports: SailsActionDefnType<
           sails.log.verbose(`Upload image to s3 sdk v3...`);
           // sails.log.verbose(inputs.image);
           const {s3UploadSucceeded, s3UploadInfo, key} = await uploadImageToS3(inputs.image);
-          if(s3UploadSucceeded){
+          if(s3UploadSucceeded && key){
             imageInfo = {
               fd: key,
               ffd: s3UploadInfo,

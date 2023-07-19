@@ -81,10 +81,14 @@ module.exports.http = {
       return middlewareFn;
     })()//</self-calling function ::> */
 
-    // bodyParser: (function _configureBodyParser(){
-    //   var skipper = require('skipper');
-    //   var middlewareFn = skipper({ strict: true });
-    //   return middlewareFn;
-    // })(),
+    // ~ https://stackoverflow.com/a/48083356
+    bodyParser: (function _configureBodyParser() {
+      var skipper = require('skipper');
+      var middlewareFn = skipper({
+        strict: true,
+        maxTimeToBuffer: 150000,
+      });
+      return middlewareFn;
+    })(),
   },
 };
