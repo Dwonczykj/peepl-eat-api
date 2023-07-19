@@ -117,7 +117,7 @@ module.exports = {
     workingTotalGBPx += fulfilmentMethod.priceModifier;
 
     // Add tip amount
-    workingTotalGBPx = workingTotalGBPx + order.tipAmount;
+    workingTotalGBPx += order.tipAmount; //tipAmount is in GBPx atm
 
     // Add platform fee (vendor specific)
     var vendor = await Vendor.findOne({ id: order.vendor.id as any });

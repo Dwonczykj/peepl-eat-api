@@ -451,7 +451,8 @@ const _exports: SailsActionDefnType<
         try {
           tipAmountPence = await sails.helpers.convertCurrencyAmount.with({
             amount: inputs.tipAmount,
-            fromCurrency: inputs.currency,
+            // fromCurrency: inputs.currency,
+            fromCurrency: Currency.GBPx,
             toCurrency: Currency.GBPx,
           });
         } catch (error) {
@@ -567,7 +568,7 @@ const _exports: SailsActionDefnType<
         if (order.total !== calculatedOrderTotal.finalAmount) {
           sails.log.warn(`Order total mismatch`);
           sails.log.warn(
-            `Order total is ${order.total} but is calculated to be total ${calculatedOrderTotal.finalAmount}`
+            `Order total is [${order.currency}] ${order.total} but is calculated to be total ${calculatedOrderTotal.finalAmount} ${calculatedOrderTotal.finalAmount}`
           );
 
           if (calculatedOrderTotal.withoutFees <= 0) {
@@ -583,6 +584,10 @@ const _exports: SailsActionDefnType<
               calculatedOrderTotal: null,
             };
           }
+        } else {
+          sails.log.verbose(
+            `Order totals are matching:[${calculatedOrderTotal.currency}] ${calculatedOrderTotal.finalAmount}`
+          );
         }
         // Update with correct amount
         await wrapWithDb(db, () =>
