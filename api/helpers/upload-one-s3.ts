@@ -25,7 +25,7 @@ export type UploadOneS3Response = {
 } | {
   error: any;
   message?: string;
-};
+} | undefined;
 
 export type UploadOneS3Exits = {
   success: (unusedData: UploadOneS3Response) => any;
@@ -50,6 +50,7 @@ async function streamToBuffer(stream: PassThrough): Promise<Buffer> {
     });
 
     stream.on('error', (error: Error) => {
+      sails.log.error(`streamToBuffer() failed to convert the file to a buffer with error: ${error}`);
       reject(error);
     });
   });
@@ -271,6 +272,13 @@ async function uploadImageToS3(imageFile) {
   
   // Check if the image size exceeds 500KB
   if (buffer.length > sails.config.custom.amazonS3MaxUploadSizeBytes || (500 * 1024)) {
+    sails.log.verbose(
+      `Compressing image from ${(buffer.length / (1024 * 1024)).toFixed(
+        2
+      )} MB to less than ${
+        (sails.config.custom.amazonS3MaxUploadSizeBytes / 1024) || 500
+      } KB`
+    );
     // Compress the image with a maximum quality loss of 50%
     const compressedBuffer = await compressImage(buffer, 0.5);
 
@@ -292,13 +300,13 @@ async function uploadImageToS3(imageFile) {
     // Use the compressedBuffer for uploading
     if (buffer.length > 1024 * 1024) {
       sails.log.verbose(
-        `Compressing image from ${(buffer.length / (1024 * 1024)).toFixed(
+        `Compressed image from ${(buffer.length / (1024 * 1024)).toFixed(
           2
         )} MB to ${(resizedBuffer.length / 1024).toFixed(2)} KB`
       );
     } else {
       sails.log.verbose(
-        `Compressing image from ${(buffer.length / 1024).toFixed(2)} KB to ${(
+        `Compressed image from ${(buffer.length / 1024).toFixed(2)} KB to ${(
           resizedBuffer.length / 1024
         ).toFixed(2)} KB`
       );
@@ -334,6 +342,7 @@ async function uploadImageToS3(imageFile) {
     Key: key,
     CacheControl: 'no-cache',
     Body: buffer,
+    
   });
   try {
     const response = await s3Client.send(command);
@@ -370,19 +379,19 @@ async function uploadImageToS3(imageFile) {
   }
 }
 
-// Helper function to read file asynchronously
-function readFileAsync(filePath): Promise<any> {
-  return new Promise((resolve, reject) => {
-    fs.readFile(filePath, (error, data) => {
-      if (error) {
-        reject(error);
-        return null;
-      }
-      resolve(data);
-      return data;
-    });
-  });
-}
+// // Helper function to read file asynchronously
+// function readFileAsync(filePath): Promise<any> {
+//   return new Promise((resolve, reject) => {
+//     fs.readFile(filePath, (error, data) => {
+//       if (error) {
+//         reject(error);
+//         return null;
+//       }
+//       resolve(data);
+//       return data;
+//     });
+//   });
+// }
 
 const _exports: SailsActionDefnType<
   UploadOneS3Inputs,
@@ -415,7 +424,10 @@ const _exports: SailsActionDefnType<
     let imageInfo;
     if (!inTestEnv) {
       if (!inputs.image) {
-        return exits.success(undefined);
+        return exits.success({
+          error: Error('No image passed to upload-one-s3'),
+          message: 'No image passed to upload-one-s3',
+        });
       } else if (typeof inputs.image === 'string') {
         const _imageInputString = inputs.image as string;
         const verifiedImageDomain = sails.config.custom.storageDomainsRegExps
@@ -466,6 +478,9 @@ const _exports: SailsActionDefnType<
           return exits.success(imageInfo);
         }
       }
+
+      // * We have an image UpStream file to upload.
+      // TODO: Check if s3 container already contains an image with that key, if so, check the image bytes to see if match the UpStream, if so return that url.
       try {
         // ~ https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#upload-property
         const _n = sails.config.custom.amazonS3AccessKey.length;
@@ -477,7 +492,6 @@ const _exports: SailsActionDefnType<
           `Uploading an image to s3 bucket: "${sails.config.custom.amazonS3Bucket}" with access key: ${obfusacatedKey}`
         );
         
-        var s3UploadInfo = {};
         try{
           sails.log.verbose(`Upload image to s3 sdk v3...`);
           // sails.log.verbose(inputs.image);
@@ -490,63 +504,78 @@ const _exports: SailsActionDefnType<
             const imageInfoStr = JSON.stringify(imageInfo);
             sails.log.verbose(`Image uploaded to bucket:\n${imageInfoStr}`);
             return exits.success(imageInfo);
+          } else {
+            return exits.success({
+              error: Error(
+                'Was unable to upload to s3 using v3 sdk as never finished processing the image UpStream to upload it.'
+              ),
+              message:
+                'Was unable to upload to s3 using v3 sdk as never finished processing the image UpStream to upload it.',
+            });
           }
         } catch (err) {
           sails.log.error(`Was unable to upload to s3 using v3 sdk: ${err}`);
           sails.log.error(err);
+          return exits.success({
+            error: err,
+            message: `Was unable to upload to s3 using v3 sdk: ${err}`,
+          });
         }
-        const _img = inputs.image as any;
-        await sails.uploadOne(
-          _img, // : Buffer, Typed Array, Blob, String, ReadableStream
-          {
-            adapter: require('skipper-s3'),
-            key: sails.config.custom.amazonS3AccessKey,
-            secret: sails.config.custom.amazonS3Secret,
-            bucket: sails.config.custom.amazonS3Bucket,
-            maxBytes: sails.config.custom.amazonS3MaxUploadSizeBytes,
-            // ACL: 'public-read', // Optional: Set the desired ACL for the file
-            // ContentType: 'image/jpeg', // Set the correct content type of the file
-            CacheControl: 'no-cache', // Set cache control header to prevent caching
-          },
-          (err, filesUploaded) => {
-            if (err) {
-              sails.log.error(err);
-              sails.log.verbose(`Image upload to bucket failed ${err}`);
-              return exits.success(undefined);
-            }
-            // return res.ok({
-            //   files: filesUploaded,
-            //   textParams: req.allParams()
-            // });
-            imageInfo = filesUploaded;
-            const imageInfoFileName = imageInfo && imageInfo.filename;
-            if (!imageInfoFileName) {
-              sails.log.error(
-                `Error uploading image to s3-bucket: and no files uploaded!`
-              );
-            }
-            imageInfo =
-              imageInfo && imageInfo.fd
-                ? {
-                    ...imageInfo,
-                    ffd: sails.config.custom.amazonS3BucketUrl + imageInfo.fd,
-                  }
-                : null;
-            if (!imageInfo) {
-              return exits.success({
-                error: Error('no response from s3 upload v3 client'),
-              });
-            }
-            const imageInfoStr = JSON.stringify(imageInfo);
-            sails.log.verbose(`Image uploaded to bucket:\n${imageInfoStr}`);
-            return exits.success(imageInfo);
-          }
-        );
+      //   const _img = inputs.image as any;
+      //   await sails.uploadOne(
+      //     _img, // : Buffer, Typed Array, Blob, String, ReadableStream
+      //     {
+      //       adapter: require('skipper-s3'),
+      //       key: sails.config.custom.amazonS3AccessKey,
+      //       secret: sails.config.custom.amazonS3Secret,
+      //       bucket: sails.config.custom.amazonS3Bucket,
+      //       maxBytes: sails.config.custom.amazonS3MaxUploadSizeBytes,
+      //       // ACL: 'public-read', // Optional: Set the desired ACL for the file
+      //       // ContentType: 'image/jpeg', // Set the correct content type of the file
+      //       CacheControl: 'no-cache', // Set cache control header to prevent caching
+      //     },
+      //     (err, filesUploaded) => {
+      //       if (err) {
+      //         sails.log.error(err);
+      //         sails.log.verbose(`Image upload to bucket failed ${err}`);
+      //         return exits.success({
+      //           error: err,
+      //           message: `Image upload to bucket failed ${err}`,
+      //         });
+      //       }
+      //       // return res.ok({
+      //       //   files: filesUploaded,
+      //       //   textParams: req.allParams()
+      //       // });
+      //       imageInfo = filesUploaded;
+      //       const imageInfoFileName = imageInfo && imageInfo.filename;
+      //       if (!imageInfoFileName) {
+      //         sails.log.error(
+      //           `Error uploading image to s3-bucket: and no files uploaded!`
+      //         );
+      //       }
+      //       imageInfo =
+      //         imageInfo && imageInfo.fd
+      //           ? {
+      //               ...imageInfo,
+      //               ffd: sails.config.custom.amazonS3BucketUrl + imageInfo.fd,
+      //             }
+      //           : null;
+      //       if (!imageInfo) {
+      //         return exits.success({
+      //           error: Error('no response from s3 upload v3 client'),
+      //         });
+      //       }
+      //       const imageInfoStr = JSON.stringify(imageInfo);
+      //       sails.log.verbose(`Image uploaded to bucket:\n${imageInfoStr}`);
+      //       return exits.success(imageInfo);
+      //     }
+      //   );
 
-        // .intercept('E_EXCEEDS_UPLOAD_LIMIT', 'tooBig')
-        // .intercept(
-        //   (err) => new Error('The photo upload failed! ' + err.message)
-        // );
+      //   // .intercept('E_EXCEEDS_UPLOAD_LIMIT', 'tooBig')
+      //   // .intercept(
+      //   //   (err) => new Error('The photo upload failed! ' + err.message)
+      //   // );
       } catch (error) {
         sails.log.error(`Error uploading image to s3-bucket: ${error}`);
         return exits.success({
