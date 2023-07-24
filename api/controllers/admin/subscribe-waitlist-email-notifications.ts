@@ -9,11 +9,13 @@ import {
 } from '../../interfaces/iSails';
 import {
   SailsActionDefnType,
+  UserType,
   WaitingListEntryType
 } from '../../../scripts/utils';
 
 declare var sails: sailsVegi;
 declare var WaitingList: SailsModelType<WaitingListEntryType>;
+declare var User: SailsModelType<UserType>;
 
 
 export type SubscribeWaitlistEmailNotificationsInputs = {
@@ -77,29 +79,88 @@ const _exports: SailsActionDefnType<
     inputs: SubscribeWaitlistEmailNotificationsInputs,
     exits: SubscribeWaitlistEmailNotificationsExits
   ) {
+    inputs.receiveUpdates = inputs.receiveUpdates === null ? true : inputs.receiveUpdates;
     const entries = await WaitingList.find({
       email: inputs.emailAddress.toLowerCase(),
     });
-    if (!entries || entries.length < 1) {
-      return exits.notFound();
-    }
 
-    await WaitingList.update({
-      email: inputs.emailAddress.toLowerCase(),
-    }).set(
-      inputs.firebaseRegistrationToken
-        ? {
-          emailUpdates: true,
+    if (!entries || entries.length < 1) {
+      const getLastPersonInQueue = async () => {
+        try {
+          const queue = await WaitingList.find({
+            onboarded: false,
+          }).sort('order');
+          const lastPerson =
+            queue && queue.length > 0 ? queue[queue.length - 1] : null;
+          return lastPerson;
+        } catch (error) {
+          sails.log.error(error);
+          return null;
+        }
+      };
+      const lastPerson = await getLastPersonInQueue();
+      try {
+        await WaitingList.create({
+          email: inputs.emailAddress.toLowerCase().trim(),
+          emailUpdates: inputs.receiveUpdates,
           firebaseRegistrationToken: inputs.firebaseRegistrationToken,
-        }
-        : { 
-          emailUpdates: true,
-        }
-    );
+          origin: 'mobile',
+          userType: "consumer",
+          positionLastCalculatedTime: moment(moment.now()).format(
+            'YYYY-MM-DD HH:mm:ss'
+          ), // 'yyyy-MM-dd HH:mm:ss'
+          // positionLastCalculatedTime: Date.now(),
+          onboarded: false,
+          personInFront: (lastPerson ? lastPerson.id : 0) || 0,
+          order: (lastPerson ? lastPerson.order + 1 : 1) || 1,
+        });
+      } catch (error) {
+        sails.log.warn(
+          `There was an issue subscribing [consumer] user: ${inputs.emailAddress} with error: ${error}`
+        );
+      }
+    } else {
+      await WaitingList.update({
+        email: inputs.emailAddress.toLowerCase(),
+      }).set(
+        inputs.firebaseRegistrationToken
+          ? {
+            emailUpdates: inputs.receiveUpdates,
+            firebaseRegistrationToken: inputs.firebaseRegistrationToken,
+          }
+          : { 
+            emailUpdates: inputs.receiveUpdates,
+          }
+      );
+    }
     const updatedEntries = await WaitingList.find({
       email: inputs.emailAddress.toLowerCase(),
     });
-    return exits.success(updatedEntries[0]);
+    const _finish = () => exits.success(updatedEntries[0]);
+
+    if (this.req.session.userId){
+      try {
+        const matchingUsers = await User.find({
+          email: inputs.emailAddress.trim().toLowerCase(),
+        });
+        if(!matchingUsers || matchingUsers.length < 1){
+          return _finish();
+        }
+        const _user = matchingUsers[0];
+        if (this.req.session.userId !== _user.id) {
+          return _finish();
+        }
+        await User.updateOne({ id: _user.id }).set({
+          marketingEmailContactAllowed: inputs.receiveUpdates,
+          marketingPushContactAllowed:
+            inputs.firebaseRegistrationToken && inputs.receiveUpdates,
+        });
+      } catch (error) {
+        sails.log.error(`Errored when trying to locate users with matching emails after performing a waitlist subscribtion for notifications ${error}`);
+        sails.log.error(error);
+      }
+    }
+    return _finish();
   },
 };
 

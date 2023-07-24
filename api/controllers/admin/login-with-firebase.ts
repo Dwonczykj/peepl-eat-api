@@ -270,9 +270,22 @@ requests over WebSockets instead of HTTP).`,
           phoneCountryCode: inputPhoneDetails['countryCode'],
         });
         if (!user) {
+          const newEmail = decodedToken.email || '';
+          const _existingUserSameEmail = await User.find({
+            email: newEmail.trim().toLowerCase(),
+          });
+          if (_existingUserSameEmail && _existingUserSameEmail.length > 0) {
+            const _first = _existingUserSameEmail[0];
+            sails.log.error(
+              `Unable to create user in login-with-firebase as another user[${_first.id}] already has email "${newEmail}" and the supplied phone number: "${inputPhoneDetails['countryCode']}${inputPhoneDetails['phoneNoCountry']}" did not match an existing users phone number.`
+            );
+            return exits.badCombo(
+              `Unable to update user in login-with-firebase as another user[${_first.id}] already has email "${newEmail}" and the supplied phone number: "${inputPhoneDetails['countryCode']}${inputPhoneDetails['phoneNoCountry']}" did not match an existing users phone number.`
+            );
+          }
           //create one as using valid firebase token:
           user = await User.create({
-            email: decodedToken.email || '', //todo: This email must exist on user..., channge in model...
+            email: newEmail,
             // password: 'Testing123!',
             phoneNoCountry: inputPhoneDetails['phoneNoCountry'],
             phoneCountryCode: inputPhoneDetails['countryCode'],

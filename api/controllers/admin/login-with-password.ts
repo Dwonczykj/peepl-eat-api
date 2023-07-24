@@ -206,6 +206,7 @@ requests over WebSockets instead of HTTP).`,
           firebaseSessionToken: inputs.firebaseSessionToken,
           fbUid: decodedToken.uid,
         }).fetch();
+        sails.log.info(`Created a new user with email: "${inputs.emailAddress}" and phone: ${_user.phoneNoCountry}`);
       }
       const user = _user;
 

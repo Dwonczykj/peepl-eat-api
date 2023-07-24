@@ -101,7 +101,7 @@ module.exports = {
           phoneCountryCode: inputs.phoneCountryCode,
         },
         {
-          email: inputs.emailAddress,
+          email: inputs.emailAddress.trim().toLowerCase(),
         },
       ],
     });
@@ -115,15 +115,15 @@ module.exports = {
     const user = await User.create({
       phoneNoCountry: inputs.phoneNoCountry,
       phoneCountryCode: inputs.phoneCountryCode,
-      email: inputs.emailAddress,
+      email: inputs.emailAddress.trim().toLowerCase(),
       name: inputs.name,
       // password: 'Testing123!',
       vendor: inputs.vendorId,
       deliveryPartner: inputs.deliveryPartnerId,
       vendorConfirmed: false,
       isSuperAdmin: false,
-      vendorRole: inputs.vendorRole ?? "none",
-      deliveryPartnerRole: inputs.deliveryPartnerRole ?? "none",
+      vendorRole: inputs.vendorRole ?? 'none',
+      deliveryPartnerRole: inputs.deliveryPartnerRole ?? 'none',
       role: inputs.role,
     }).fetch();
 

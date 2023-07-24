@@ -144,7 +144,7 @@ module.exports = {
     }
 
     const existingFirebaseUser = await firebase.tryGetUser({
-      tryEmail: inputs.emailAddress,
+      tryEmail: inputs.emailAddress.trim().toLowerCase(),
       tryPhone: `+${inputs.phoneCountryCode}${inputs.phoneNoCountry}`,
     });
 
@@ -155,7 +155,7 @@ module.exports = {
           phoneCountryCode: inputs.phoneCountryCode,
         },
         {
-          email: inputs.emailAddress,
+          email: inputs.emailAddress.trim().toLowerCase(),
         },
       ],
     });

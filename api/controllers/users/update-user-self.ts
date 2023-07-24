@@ -119,7 +119,17 @@ const _exports: SailsActionDefnType<
     };
     var updateParams: updateParamsType = {};
 
-    if(inputs.email){
+    if(inputs.email && inputs.email.trim().toLowerCase() !== user.email.toLowerCase()){
+      const _existingUserSameEmail = await User.find({
+        email: inputs.email.trim().toLowerCase(),
+      });
+      if(_existingUserSameEmail && _existingUserSameEmail.length > 0){
+        const _first = _existingUserSameEmail[0];
+        sails.log.error(`Unable to update user[${user.id}]'s email as another user[${_first.id}] already has email "${inputs.email}"`);
+        return exits.badRequest(
+          `Unable to update user[${user.id}]'s email as another user[${_first.id}] already has email "${inputs.email}"`
+        );
+      }
       updateParams.email = inputs.email;
     }
     if(inputs.name){

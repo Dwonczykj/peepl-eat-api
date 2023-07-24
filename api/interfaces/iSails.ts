@@ -760,6 +760,12 @@ export type sailsVegi = {
               message: string;
             };
           }
+        | {
+            template: 'email-account-deleted';
+            templateData: {
+              message: string;
+            };
+          }
       ),
       {
         loggedInsteadOfSending: boolean;

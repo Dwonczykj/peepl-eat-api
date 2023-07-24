@@ -1,6 +1,11 @@
 import { Auth, DecodedIdToken, getAuth, UserRecord } from 'firebase-admin/auth';
 // import * as UserModel from '../../models/UserModel';
 import * as firebase from '../../../config/firebaseAdmin';
+import { sailsModelKVP, SailsModelType, sailsVegi } from '../../interfaces/iSails';
+import { UserType } from '../../../scripts/utils';
+
+declare var User: SailsModelType<UserType>;
+declare var sails: sailsVegi;
 
 module.exports = {
   friendlyName: 'Deregister User Vendor Role',
@@ -13,6 +18,14 @@ module.exports = {
       type: 'string',
       required: false,
     },
+    email: {
+      type: 'string',
+      required: false,
+    },
+    phoneNumber: {
+      type: 'string',
+      required: false,
+    },
   },
 
   exits: {
@@ -20,6 +33,9 @@ module.exports = {
       outputDescription:
         '`User`s vendor role has been successfully deregistered.',
       outputExample: {},
+    },
+    successJSON: {
+      statusCode: 200,
     },
     badRequest: {
       description: 'User id passed does not exist.',
@@ -48,13 +64,18 @@ module.exports = {
     const myUser = await User.findOne({
       id: this.req.session.userId,
     });
-    if(!myUser){
+    if (!myUser) {
       return exits.notFound();
     }
+    
+    if (this.req.session.userId !== inputs.id && !myUser.isSuperAdmin){
+      return exits.unauthorised();
+    }
 
-    let user: any;
+    let user: sailsModelKVP<UserType> | UserType;
 
     let _phoneNumber: string;
+    let _email: string;
     if (Object.keys(inputs).includes('id')) {
       user = await User.findOne({
         id: inputs.id,
@@ -62,7 +83,9 @@ module.exports = {
       if (!user) {
         return exits.notFound();
       }
-      _phoneNumber = user.phoneNumber;
+      _phoneNumber = `00${user.phoneCountryCode}${user.phoneNoCountry}`;
+      _email = user.email;
+
       // userFB = await auth.getUserByEmail(user.email);
     } else {
       user = myUser;
@@ -70,7 +93,8 @@ module.exports = {
       var x = user.phoneNoCountry.toString();
       x = x.replace(/-/g, '').match(/(\d{1,10})/g)[0];
       x = x.replace(/(\d{1,3})(\d{1,3})(\d{1,4})/g, '$1-$2-$3');
-      _phoneNumber = `+${user.phoneCountryCode}${x}`;
+      _phoneNumber = `00${user.phoneCountryCode}${x}`;
+      _email = user.email;
     }
 
     const userRecord = _userRecord;
@@ -89,19 +113,51 @@ module.exports = {
 
     // Signed in
 
-    return firebase
-      .deleteUser(userRecord.uid)
-      .then(() => {
-        // return deleteUser(userFB).then(() => {
-        return User.deleteOne({
-          email: user.email,
-        });
-      })
-      .catch((error) => {
-        throw { FirebaseError: [error.code, error.message] }; //https://firebase.google.com/docs/reference/js/auth#autherrorcodes
-      })
-      .finally(() => {
-        return this.res.redirect('/admin/login');
+    try {
+      await firebase.deleteUser(userRecord.uid);
+    } catch (err) {
+      return exits.firebaseErrored({
+        code: err.code,
+        message: err.message,
+        error: err,
       });
+      //https://firebase.google.com/docs/reference/js/auth#autherrorcode
+    }
+
+    await User.destroy({
+      id: user.id,
+    });
+
+    try {
+      await sails.helpers.sendSmsNotification.with({
+        to: _phoneNumber,
+        body: `This number has now been removed from vegi's records`,
+        data: {},
+      });
+    } catch (error) {
+      sails.log.error(
+        `Unable to send deregistration notification to: ${_phoneNumber} for user: ${user.id} with dislay_name: ${user.name}. Error: ${error}`
+      );
+    }
+
+    try {
+      await sails.helpers.sendTemplateEmail.with({
+        to: _email,
+        subject: `vegi account deletion completed`,
+        template: 'email-account-deleted',
+        templateData: {
+          message: `We have deleted of all of your details at vegi including this email.`,
+        },
+        layout: false,
+      });
+    } catch (error) {
+      sails.log.error(`Unable to send deregistration notification to: ${_email} for user: ${user.id} with dislay_name: ${user.name}. Error: ${error}`);
+    }
+
+    if (this.res.wantsJson) {
+      return exits.successJSON();
+    } else {
+      return this.res.redirect('/admin/login');
+    }
   },
 };
