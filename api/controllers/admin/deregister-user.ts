@@ -61,14 +61,20 @@ module.exports = {
 
   fn: async function (inputs, exits) {
     var _userRecord: UserRecord;
+    const inputUserId = Number.parseInt(inputs.id);
+    const sessionUserId = Number.parseInt(this.req.session.userId);
     const myUser = await User.findOne({
-      id: this.req.session.userId,
+      id: sessionUserId,
     });
     if (!myUser) {
+      sails.log.error(`No user found with userId: ${sessionUserId}`);
       return exits.notFound();
     }
-    
-    if (this.req.session.userId !== inputs.id && !myUser.isSuperAdmin){
+
+    if (sessionUserId !== inputUserId && !myUser.isSuperAdmin){
+      sails.log.error(
+        `Request to deregister user in unauthorised because ${sessionUserId} !== ${inputUserId} and superAdmin is ${myUser.isSuperAdmin}`
+      );
       return exits.unauthorised();
     }
 
@@ -76,16 +82,16 @@ module.exports = {
 
     let _phoneNumber: string;
     let _email: string;
+    // need this incase its a superadmin deleting another user
     if (Object.keys(inputs).includes('id')) {
       user = await User.findOne({
-        id: inputs.id,
+        id: inputUserId,
       });
       if (!user) {
         return exits.notFound();
       }
-      _phoneNumber = `00${user.phoneCountryCode}${user.phoneNoCountry}`;
+      _phoneNumber = `+${user.phoneCountryCode}${user.phoneNoCountry}`;
       _email = user.email;
-
       // userFB = await auth.getUserByEmail(user.email);
     } else {
       user = myUser;
@@ -93,15 +99,17 @@ module.exports = {
       var x = user.phoneNoCountry.toString();
       x = x.replace(/-/g, '').match(/(\d{1,10})/g)[0];
       x = x.replace(/(\d{1,3})(\d{1,3})(\d{1,4})/g, '$1-$2-$3');
-      _phoneNumber = `00${user.phoneCountryCode}${x}`;
+      _phoneNumber = `+${user.phoneCountryCode}${x}`;
       _email = user.email;
     }
 
-    const userRecord = _userRecord;
 
     try {
       _userRecord = await firebase.getUserByPhone(_phoneNumber);
     } catch (err) {
+      sails.log.error(
+        `Unable to firebase.getUserByPhone(${_phoneNumber}) from firebase in deregister-user: ${err}`
+      );
       sails.log.error(err);
 
       return exits.firebaseErrored({
@@ -110,12 +118,17 @@ module.exports = {
         error: err,
       }); //https://firebase.google.com/docs/reference/js/auth#autherrorcodes
     }
+    sails.log.info(
+      `Successfully obtained firebaseUser to deregister with uid: ${_userRecord.uid} and email: ${_userRecord.email} and phone: ${_userRecord.phoneNumber}`
+    );
+    const userRecord = _userRecord;
 
     // Signed in
-
     try {
       await firebase.deleteUser(userRecord.uid);
     } catch (err) {
+      sails.log.error(`Unable to delete user from firebase with error: ${err}`);
+      sails.log.error(err);
       return exits.firebaseErrored({
         code: err.code,
         message: err.message,
@@ -124,9 +137,20 @@ module.exports = {
       //https://firebase.google.com/docs/reference/js/auth#autherrorcode
     }
 
-    await User.destroy({
-      id: user.id,
-    });
+    sails.log.info(
+      `Successfully deleted firebase user with uid: ${_userRecord.uid} and email: ${_userRecord.email} and phone: ${_userRecord.phoneNumber}`
+    );
+
+    try {
+      await User.destroy({
+        id: user.id,
+      });
+    } catch (error) {
+      sails.log.error(
+        `Unable to run destroy command on User with id: ${user.id} from error: ${error}`
+      );
+    }
+    sails.log.info(`Successfully deleted vegi user with id: ${user.id}`);
 
     try {
       await sails.helpers.sendSmsNotification.with({
@@ -151,7 +175,9 @@ module.exports = {
         layout: false,
       });
     } catch (error) {
-      sails.log.error(`Unable to send deregistration notification to: ${_email} for user: ${user.id} with dislay_name: ${user.name}. Error: ${error}`);
+      sails.log.error(
+        `Unable to send deregistration notification to: ${_email} for user: ${user.id} with dislay_name: ${user.name}. Error: ${error}`
+      );
     }
 
     if (this.res.wantsJson) {

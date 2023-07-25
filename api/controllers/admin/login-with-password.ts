@@ -179,19 +179,28 @@ requests over WebSockets instead of HTTP).`,
       const firebaseEmail = decodedToken.email;
       if (!firebaseEmail) {
         if (_user) {
+          sails.log.info(
+            `login-with-password: userNeedsToLinkFirebaseAtSignUp`
+          );
           return exits.userNeedsToLinkFirebaseAtSignUp();
         }
+        sails.log.info(`login-with-password: firebaseUserNoEmail`);
         return exits.firebaseUserNoEmail();
       }
 
       if (email !== firebaseEmail) {
         if (_user) {
+          sails.log.info(
+            `login-with-password: userNeedsToLinkFirebaseAtSignUp`
+          );
           return exits.userNeedsToLinkFirebaseAtSignUp();
         }
+        sails.log.info(`login-with-password: firebaseIncorrectEmail`);
         return exits.firebaseIncorrectEmail(); // email doesnt match, throw badCombo
       }
 
       if (!_user) {
+        sails.log.info(`No user already exists so creating new user with decoded phone_number from firebase in login-with-password`);
         const fbPhoneDetails = splitPhoneNumber(decodedToken.phone_number);
         _user = await User.create({
           email: inputs.emailAddress,

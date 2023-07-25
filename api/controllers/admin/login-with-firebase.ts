@@ -270,6 +270,9 @@ requests over WebSockets instead of HTTP).`,
           phoneCountryCode: inputPhoneDetails['countryCode'],
         });
         if (!user) {
+          sails.log.info(
+            `Could not locate user for phone: ${inputPhoneDetails['phoneNoCountry']} in login-with-firebase`
+          );
           const newEmail = decodedToken.email || '';
           const _existingUserSameEmail = await User.find({
             email: newEmail.trim().toLowerCase(),
@@ -299,6 +302,7 @@ requests over WebSockets instead of HTTP).`,
             firebaseSessionToken: inputs.firebaseSessionToken,
             marketingPushContactAllowed: false,
           }).fetch();
+          sails.log.info(`Created a new user with email: ${user.email} and phone: ${user.phoneNoCountry}`);
         }
         // Update the session
         await User.updateOne({
