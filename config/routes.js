@@ -359,6 +359,9 @@ module.exports.routes = {
   'GET /api/v1/admin/get-survey-questions': {
     action: 'admin/get-survey-questions',
   },
+  'GET /api/v1/admin/get-config-details': {
+    action: 'admin/get-config-details',
+  },
   'POST /api/v1/admin/submit-survey-response': {
     action: 'admin/submit-survey-response',
   },
