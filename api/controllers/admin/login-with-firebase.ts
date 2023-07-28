@@ -13,11 +13,21 @@ import {
 
 const splitPhoneNumber = (formattedFirebaseNumber:string) => {
   try {
-    const countryCode = Number.parseInt(
-      formattedFirebaseNumber.match(/^\+(\d{1,2})/g)[0]
-    );
-    const phoneNoCountry = 
-      formattedFirebaseNumber.replace(/-/g, "").match(/(\d{1,10})$/g)[0]; // min of 1 digits as number might be 000-000-0001
+    let countryCode;
+    let phoneNoCountry;
+    if((formattedFirebaseNumber.startsWith('00') || formattedFirebaseNumber.startsWith('+')) && formattedFirebaseNumber.length <= 12){
+      countryCode = Number.parseInt(
+        formattedFirebaseNumber.match(/^(\+|00)(\d{1})/g)[0]
+      );
+      phoneNoCountry = 
+        formattedFirebaseNumber.replace(/-/g, "").match(/(\d{1,10})$/g)[0]; // min of 1 digits as number might be 000-000-0001
+    } else {
+      countryCode = Number.parseInt(
+        formattedFirebaseNumber.match(/^(\+|00)(\d{1,2})/g)[0]
+      );
+      phoneNoCountry = 
+        formattedFirebaseNumber.replace(/-/g, "").match(/(\d{1,10})$/g)[0]; // min of 1 digits as number might be 000-000-0001
+    }
     return {
       countryCode,
       phoneNoCountry,
@@ -182,6 +192,53 @@ requests over WebSockets instead of HTTP).`,
       });
     };
     if (
+      process.env.NODE_ENV !== 'production' &&
+      inputs.phoneNumber ===
+        `${sails.config.custom.testPhoneNumberCountryCode}${sails.config.custom.testPhoneNumber}` &&
+      inputs.firebaseSessionToken ===
+        sails.config.custom.testFirebaseSessionToken
+    ) {
+      try {
+        sails.log.warn(
+          `Login-with-firebase called using test phone and credentials`
+        );
+        const inputPhoneDetails = splitPhoneNumber(inputs.phoneNumber);
+
+        // * return the test consumer user for testing purposes only
+        let _users: Array<sailsModelKVP<UserType> | UserType> = await User.find(
+          {
+            phoneNoCountry: inputPhoneDetails['phoneNoCountry'],
+            phoneCountryCode: inputPhoneDetails['countryCode'],
+            firebaseSessionToken: inputs.firebaseSessionToken,
+          }
+        );
+        if (!_users || _users.length < 1) {
+          const _user = await User.create({
+            email: 'test_user_email@example.com',
+            isSuperAdmin: false,
+            firebaseSessionToken: inputs.firebaseSessionToken,
+            phoneNoCountry: inputPhoneDetails['phoneNoCountry'],
+            phoneCountryCode: inputPhoneDetails['countryCode'],
+            fbUid: '',
+            marketingEmailContactAllowed: true,
+            marketingPushContactAllowed: true,
+            marketingSMSContactAllowed: true,
+            name: 'test_user',
+            role: 'consumer',
+          }).fetch();
+          return _completeLogin(_user);
+        }
+        const _user = _users[0];
+        return _completeLogin(_user);
+      } catch (err) {
+        sails.log.error(
+          `Failed to authorise test phoneNumber and firebaseSessionToken with error: ${err}`
+        );
+        sails.log.info(err);
+        return exits.badCombo();
+      }
+    }
+    if (
       process.env.useFirebaseEmulator &&
       process.env.useFirebaseEmulator === 'true'
     ) {
@@ -201,6 +258,8 @@ requests over WebSockets instead of HTTP).`,
         return exits.badCombo();
       }
     }
+
+
     
     var _decodedToken: DecodedIdToken;
 
