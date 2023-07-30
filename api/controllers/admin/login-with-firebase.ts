@@ -58,6 +58,7 @@ export type LoginWithFirebaseResponse = {
 
 export type LoginWithFirebaseExits = {
   success: (unusedData: LoginWithFirebaseResponse) => any;
+  logSuccess: (unusedData: LoginWithFirebaseResponse) => any;
   // issue: (unusedErr: Error | String) => void;
   // notFound: () => void;
   // error: (unusedErr?: Error | String) => void;
@@ -132,6 +133,11 @@ requests over WebSockets instead of HTTP).`,
       data: null,
       message: 'success',
     },
+    logSuccess: {
+      statusCode: 200,
+      data: null,
+      message: 'success',
+    },
     firebaseUserNoPhone: {
       statusCode: 400,
     },
@@ -165,14 +171,14 @@ requests over WebSockets instead of HTTP).`,
     },
     firebaseUserNoPhoneInDecodedToken: {
       statusCode: 400,
-    }
+    },
   },
 
-  /* 
-  * First authenticate backend service account: 
-  * ~ https://firebase.google.com/docs/auth/admin/verify-id-tokens#verify_id_tokens_using_the_firebase_admin_sdk
-  * Second use this idToken from the user with the Firebase Admin SDK: getAuth().verifyIdToken(idToken)
-  */
+  /*
+   * First authenticate backend service account:
+   * ~ https://firebase.google.com/docs/auth/admin/verify-id-tokens#verify_id_tokens_using_the_firebase_admin_sdk
+   * Second use this idToken from the user with the Firebase Admin SDK: getAuth().verifyIdToken(idToken)
+   */
   fn: async function (inputs, exits) {
     const _completeLogin = (user: sailsModelKVP<UserType> | UserType) => {
       // Modify the active session instance.
@@ -243,9 +249,8 @@ requests over WebSockets instead of HTTP).`,
       process.env.useFirebaseEmulator === 'true'
     ) {
       try {
-        
         const inputPhoneDetails = splitPhoneNumber(inputs.phoneNumber);
-        
+
         let _user: sailsModelKVP<UserType> | UserType = await User.findOne({
           phoneNoCountry: inputPhoneDetails['phoneNoCountry'],
           phoneCountryCode: inputPhoneDetails['countryCode'],
@@ -259,8 +264,6 @@ requests over WebSockets instead of HTTP).`,
       }
     }
 
-
-    
     var _decodedToken: DecodedIdToken;
 
     try {
@@ -306,8 +309,10 @@ requests over WebSockets instead of HTTP).`,
 
         //   return exits.firebaseUserNoPhoneInDecodedToken();
         // }
-        if(formattedFirebaseNumber){
-          const firebasePhoneDetails = splitPhoneNumber(formattedFirebaseNumber);
+        if (formattedFirebaseNumber) {
+          const firebasePhoneDetails = splitPhoneNumber(
+            formattedFirebaseNumber
+          );
 
           if (
             firebasePhoneDetails['countryCode'] !==
@@ -320,7 +325,6 @@ requests over WebSockets instead of HTTP).`,
             );
             return exits.badCombo(); // phone number doesnt match, throw badCombo
           }
-
         }
 
         let user: sailsModelKVP<UserType> | UserType = await User.findOne({
@@ -361,7 +365,9 @@ requests over WebSockets instead of HTTP).`,
             firebaseSessionToken: inputs.firebaseSessionToken,
             marketingPushContactAllowed: false,
           }).fetch();
-          sails.log.info(`Created a new user with email: ${user.email} and phone: ${user.phoneNoCountry}`);
+          sails.log.info(
+            `Created a new user with email: ${user.email} and phone: ${user.phoneNoCountry}`
+          );
         }
         // Update the session
         await User.updateOne({

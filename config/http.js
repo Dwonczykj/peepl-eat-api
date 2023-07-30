@@ -57,6 +57,7 @@ module.exports.http = {
 
     order: [
       // 'helmet',
+      'myRequestLogger',
       'cookieParser',
       'session',
       'bodyParser',
@@ -66,6 +67,17 @@ module.exports.http = {
       'www',
       'favicon',
     ],
+
+    // ~ https://stackoverflow.com/a/32474918
+    myRequestLogger: function (req, res, next) {
+      res.on('finish', () => {
+        sails.log.info(`[${req.method}]${req.originalUrl} -> ${res.statusCode}`);
+        // sails.log(res.outputData);
+        // sails.log(res.connection);
+        // sails.log(res.headersSent);
+      });
+      return next();
+    },
 
     /***************************************************************************
      *                                                                          *
