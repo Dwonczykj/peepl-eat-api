@@ -198,7 +198,7 @@ requests over WebSockets instead of HTTP).`,
       });
     };
     if (
-      process.env.NODE_ENV !== 'production' &&
+      // process.env.NODE_ENV !== 'production' &&
       inputs.phoneNumber ===
         `${sails.config.custom.testPhoneNumberCountryCode}${sails.config.custom.testPhoneNumber}` &&
       inputs.firebaseSessionToken ===
