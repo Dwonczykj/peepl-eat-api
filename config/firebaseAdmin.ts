@@ -233,7 +233,7 @@ export const deleteUser = (uid:string): Promise<void> => {
 // export const sendMessage = (title: string, message:string, token: string, orderPublicId: string,): Promise<string> =>
 /// ~ https://firebase.google.com/docs/cloud-messaging/concept-options
 export const sendMessage = (message: {
-  data: {[k:string]:string},
+  // data: string,
   token: string,
   notification: {
     title: string,

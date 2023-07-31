@@ -106,7 +106,7 @@ const _exports: SailsActionDefnType<
     }
 
     const message = {
-      data: inputs.data,
+      // data: JSON.stringify(inputs.data),
       notification: {
         title: inputs.title,
         body: inputs.body,

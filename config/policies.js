@@ -15,11 +15,12 @@ module.exports.policies = {
    * (`true` allows public access)                                            *
    *                                                                          *
    ***************************************************************************/
-  'home/view-dashboard': ['is-logged-in'],
+  'home/view-dashboard': ['is-logged-in', 'enforceSsl'],
   'home/view-nearest-vendors': true,
-  'admin/view-login': true,
+  'logging/log': ['is-logged-in'],
+  'admin/view-login': ['enforceSsl'],
   'admin/login-with-firebase': true,
-  'admin/view-login-with-password': true,
+  'admin/view-login-with-password': ['enforceSsl'],
   'admin/login-with-secret': true,
   'admin/login-with-password': true,
   'admin/login': true,

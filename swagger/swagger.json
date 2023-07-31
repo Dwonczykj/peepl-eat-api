@@ -322,6 +322,9 @@
       "name": "GetConfigDetails"
     },
     {
+      "name": "Log"
+    },
+    {
       "name": "Create postal district"
     },
     {
@@ -554,6 +557,53 @@
                 "$ref": "#/components/schemas/user"
               }
             ]
+          }
+        }
+      },
+      "applog": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/applog-without-required-constraint"
+          },
+          {
+            "required": [
+              "message",
+              "timestamp"
+            ]
+          }
+        ]
+      },
+      "applog-without-required-constraint": {
+        "type": "object",
+        "description": "Sails ORM Model **AppLog**",
+        "properties": {
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "updatedAt": {
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "uniqueItems": true,
+            "description": "Note Sails special attributes: autoIncrement"
+          },
+          "message": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date"
+          },
+          "details": {
+            "type": "object",
+            "properties": {},
+            "default": {},
+            "example": {}
           }
         }
       },
@@ -10301,6 +10351,52 @@
           },
           "500": {
             "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/logging/log": {
+      "post": {
+        "summary": "Log",
+        "tags": [
+          "Log"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "message",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "details",
+            "required": false,
+            "schema": {
+              "type": "object",
+              "properties": {},
+              "default": {},
+              "example": {}
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
           }
         }
       }

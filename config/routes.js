@@ -365,6 +365,9 @@ module.exports.routes = {
   'POST /api/v1/admin/submit-survey-response': {
     action: 'admin/submit-survey-response',
   },
+  'POST /api/v1/logging/log': {
+    action: 'logging/log',
+  },
   'POST /api/v1/admin/create-postal-district': {
     action: 'admin/create-postal-district',
   },

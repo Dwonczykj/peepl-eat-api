@@ -690,6 +690,13 @@ export type DiscountType = _DiscountTypeHidden & {
   orders?: _OrderTypeHidden[];
 };
 
+export type AppLogType = {
+  id: number;
+  message: string;
+  details: object;
+  timestamp: Date;
+}
+
 export type NotificationType = {
   id: number;
   recipient: string;
