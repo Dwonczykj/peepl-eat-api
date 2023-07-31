@@ -131,8 +131,12 @@ const _exports: SailsActionDefnType<
         );
       }
       updateParams.email = inputs.email;
+      if (!updateParams.email.includes('@')){
+        return exits.badRequest('bad email passed');
+      }
       if(user.name === user.phoneNoCountry && !user.email && !inputs.name){
-        updateParams.name = inputs.email;
+        const proxyName = updateParams.email.substring(0, updateParams.email.indexOf('@'));
+        updateParams.name = proxyName;
       }
     }
     if(inputs.name){
