@@ -131,6 +131,9 @@ const _exports: SailsActionDefnType<
         );
       }
       updateParams.email = inputs.email;
+      if(user.name === user.phoneNoCountry && !user.email && !inputs.name){
+        updateParams.name = inputs.email;
+      }
     }
     if(inputs.name){
       updateParams.name = inputs.name;
