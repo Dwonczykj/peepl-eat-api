@@ -243,6 +243,7 @@ const _exports: SailsActionDefnType<
         return exits.badRequest(`Order invalid`);
       }
     } catch (err) {
+      sails.log(err);
       return exits.badRequest(err);
     }
 

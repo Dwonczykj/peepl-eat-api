@@ -2,7 +2,7 @@ export {}; //SOLVED TypeScript Cannot Redeclare Block Scoped Variable Name https
 import moment from "moment";
 // import util from 'util';
 import { iFulfilmentSlot } from "../../api/interfaces/vendors/slot";
-import { dateStrFormat, DateString, FulfilmentMethodType, OpeningHoursType, OrderType, timeStrFormat } from "../../scripts/utils";
+import { dateStrFormat, DateString, datetimeStrFormat, FulfilmentMethodType, OpeningHoursType, OrderType, timeStrFormat } from "../../scripts/utils";
 declare let OpeningHours: any;
 declare let FulfilmentMethod: any;
 
@@ -213,6 +213,14 @@ module.exports = {
           ) {
             // If there aren't too many orders in the slot
             availableSlots.push(slotI);
+          } else {
+            sails.log(
+              `Excluding slot [${slotI.startTime.format(datetimeStrFormat)}] from get-available-slots helper call as there are already ${
+                relevantOrders.length
+              } orders scheduled for this slot and there are a maximum of ${
+                fulfilmentMethod.maxOrders
+              } orders allowed.`
+            );
           }
         }
       }
