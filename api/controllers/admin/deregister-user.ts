@@ -103,43 +103,50 @@ module.exports = {
       _email = user.email;
     }
 
+    if (
+      // process.env.NODE_ENV !== 'production' &&
+      _phoneNumber !==
+        `${sails.config.custom.testPhoneNumberCountryCode}${sails.config.custom.testPhoneNumber}`
+    ) {
+      try {
+        _userRecord = await firebase.getUserByPhone(_phoneNumber);
+      } catch (err) {
+        sails.log.error(
+          `Unable to firebase.getUserByPhone(${_phoneNumber}) from firebase in deregister-user: ${err}`
+        );
+        sails.log.error(err);
 
-    try {
-      _userRecord = await firebase.getUserByPhone(_phoneNumber);
-    } catch (err) {
-      sails.log.error(
-        `Unable to firebase.getUserByPhone(${_phoneNumber}) from firebase in deregister-user: ${err}`
+        return exits.firebaseErrored({
+          code: err.code,
+          message: err.message,
+          error: err,
+        }); //https://firebase.google.com/docs/reference/js/auth#autherrorcodes
+      }
+      sails.log.info(
+        `Successfully obtained firebaseUser to deregister with uid: ${_userRecord.uid} and email: ${_userRecord.email} and phone: ${_userRecord.phoneNumber}`
       );
-      sails.log.error(err);
+      const userRecord = _userRecord;
 
-      return exits.firebaseErrored({
-        code: err.code,
-        message: err.message,
-        error: err,
-      }); //https://firebase.google.com/docs/reference/js/auth#autherrorcodes
+      // Signed in
+      try {
+        await firebase.deleteUser(userRecord.uid);
+      } catch (err) {
+        sails.log.error(`Unable to delete user from firebase with error: ${err}`);
+        sails.log.error(err);
+        return exits.firebaseErrored({
+          code: err.code,
+          message: err.message,
+          error: err,
+        });
+        //https://firebase.google.com/docs/reference/js/auth#autherrorcode
+      }
+
+      sails.log.info(
+        `Successfully deleted firebase user with uid: ${_userRecord.uid} and email: ${_userRecord.email} and phone: ${_userRecord.phoneNumber}`
+      );
+    } else {
+      sails.log.info(`not locating user to delete in firebase as using test credentials`);
     }
-    sails.log.info(
-      `Successfully obtained firebaseUser to deregister with uid: ${_userRecord.uid} and email: ${_userRecord.email} and phone: ${_userRecord.phoneNumber}`
-    );
-    const userRecord = _userRecord;
-
-    // Signed in
-    try {
-      await firebase.deleteUser(userRecord.uid);
-    } catch (err) {
-      sails.log.error(`Unable to delete user from firebase with error: ${err}`);
-      sails.log.error(err);
-      return exits.firebaseErrored({
-        code: err.code,
-        message: err.message,
-        error: err,
-      });
-      //https://firebase.google.com/docs/reference/js/auth#autherrorcode
-    }
-
-    sails.log.info(
-      `Successfully deleted firebase user with uid: ${_userRecord.uid} and email: ${_userRecord.email} and phone: ${_userRecord.phoneNumber}`
-    );
 
     try {
       await User.destroy({
@@ -183,7 +190,8 @@ module.exports = {
     if (this.res.wantsJson) {
       return exits.successJSON();
     } else {
-      return this.res.redirect('/admin/login');
+      // return this.res.redirect('/admin/login');
+      return exits.success();
     }
   },
 };

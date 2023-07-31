@@ -61,7 +61,10 @@ module.exports = {
     var dontActuallySend =
       sails.config.environment === 'test' ||
       process.env.NODE_ENV !== 'production' ||
-      sails.config.custom.FIREBASE_AUTH_EMULATOR_HOST;
+      sails.config.custom.FIREBASE_AUTH_EMULATOR_HOST ||
+      inputs.to ===
+        `${sails.config.custom.testPhoneNumberCountryCode}${sails.config.custom.testPhoneNumber}`;
+      
     if (dontActuallySend) {
       sails.log
         .info(`Running sails in test mode, helpers.sendSmsNotification will not send notifications.
