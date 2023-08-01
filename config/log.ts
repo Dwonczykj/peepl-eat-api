@@ -10,15 +10,90 @@
  * https://sailsjs.com/docs/concepts/logging
  */
 
-import winston from 'winston';
+const { version } = require('../package');
 
-// ~ https://stackoverflow.com/a/10341078, // ~ https://stackoverflow.com/a/32782200
-const logger = new winston.Logger({
-  level: 'verbose',
-  transports: [new winston.transports.Console({ timestamp: true })],
+import winston from 'winston';
+import { createLogger, format, transports } from 'winston';
+const { combine, timestamp, colorize, label, printf, align } = format;
+import { SPLAT }  from 'triple-beam';
+import { isObject } from 'lodash';
+
+
+function formatObject(param) {
+  if (isObject(param)) {
+    return JSON.stringify(param);
+  }
+  return param;
+}
+
+// Ignore log messages if they have { private: true }
+const all = format((info) => {
+  const splat = info[SPLAT] || [];
+  const message = formatObject(info.message);
+  const rest = splat.map(formatObject).join(' ');
+  info.message = `${message} ${rest}`;
+  return info;
 });
 
-module.exports.log = logger;
+// ~ https://stackoverflow.com/a/10341078, // ~ https://stackoverflow.com/a/32782200
+// ~ https://github.com/winstonjs/winston#usage
+const logger2 = winston.createLogger({
+  level: 'verbose',
+  format: winston.format.json(),
+  defaultMeta: { service: 'user-service' },
+  transports: [
+    //
+    // - Write all logs with importance level of `error` or less to `error.log`
+    // - Write all logs with importance level of `verbose` or less to `combined.log`
+    //
+    new winston.transports.File({
+      filename: 'error.log',
+      level: 'error',
+      maxsize: 5 * 1028,
+      tailable: true,
+    }),
+    new winston.transports.File({
+      filename: 'combined.log',
+      level: 'verbose',
+      maxsize: 5 * 1028,
+      tailable: true,
+    }),
+  ],
+});
+
+//
+// If we're not in production then log to the `console` with the format:
+// `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
+//
+logger2.add(
+  // ~ Console transport requires the outputCapture key in launch.json ~ https://github.com/winstonjs/winston/issues/1544#issuecomment-472199224
+  new winston.transports.Console({
+    // format: winston.format.simple(),
+    format: combine(
+      all(),
+      label({ label: version }),
+      timestamp(),
+      colorize(),
+      align(),
+      printf(
+        (info) =>
+          formatObject(info.message).includes('redis') ? null : `${info.timestamp} [${
+            info.label
+          }] ${info.level}: ${formatObject(info.message)}`
+      )
+    ),
+    level: 'verbose',
+    debugStdout: true,
+  })
+);
+// if (/*process.env.NODE_ENV !== 'production'*/true) {
+// }
+
+module.exports.log = {
+  custom: logger2,
+  inspect: false,
+  level: 'verbose',
+};
 
 // module.exports.log = {
 //   /***************************************************************************

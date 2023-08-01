@@ -2382,7 +2382,6 @@
             "required": [
               "phoneNoCountry",
               "phoneCountryCode",
-              "name",
               "role"
             ]
           }
@@ -2437,7 +2436,8 @@
             "minimum": -1
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "default": ""
           },
           "isSuperAdmin": {
             "type": "boolean",
