@@ -21,7 +21,13 @@ import { isObject } from 'lodash';
 
 function formatObject(param) {
   if (isObject(param)) {
-    return JSON.stringify(param);
+    let jsonStr = '';
+    try{
+      jsonStr = JSON.stringify(param);
+    } catch (err) {
+      jsonStr = `${param}`;
+    }
+    return jsonStr;
   }
   return param;
 }
