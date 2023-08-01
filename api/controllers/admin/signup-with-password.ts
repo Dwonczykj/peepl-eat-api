@@ -240,6 +240,7 @@ module.exports = {
       } else {
         await User.updateOne(existingSailsUser.id).set({
           fbUid: fbUser.uid,
+          email: inputs.emailAddress.trim().toLowerCase(),
         });
         const user = await User.findOne(existingSailsUser.id);
         return exits.success(user);

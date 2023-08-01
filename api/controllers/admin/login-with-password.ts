@@ -211,13 +211,16 @@ requests over WebSockets instead of HTTP).`,
           `No user already exists so creating new user with decoded phone_number from firebase in login-with-password`
         );
         const fbPhoneDetails = splitPhoneNumber(decodedToken.phone_number);
-        let proxyName = '';
+        let proxyName = 'anom';
         const newEmail = inputs.emailAddress;
         if (newEmail && !newEmail.includes('@')) {
           if (!newEmail.includes('@')) {
             return exits.badEmailFormat('bad email passed');
           }
           proxyName = newEmail.substring(0, newEmail.indexOf('@'));
+          if (!proxyName) {
+            proxyName = 'anom';
+          }
         }
         _user = await User.create({
           email: inputs.emailAddress,

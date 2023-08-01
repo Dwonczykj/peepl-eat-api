@@ -39,6 +39,10 @@ module.exports = {
     
     // All done.
 
+    if(this.req.wantsJSON){
+      return exits.success();
+    }
+
     return this.res.redirect('/admin/login-with-password');
   }
 

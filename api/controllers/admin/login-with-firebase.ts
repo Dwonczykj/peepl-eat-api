@@ -354,12 +354,15 @@ requests over WebSockets instead of HTTP).`,
               `Unable to update user in login-with-firebase as another user[${_first.id}] already has email "${newEmail}" and the supplied phone number: "${inputPhoneDetails['countryCode']}${inputPhoneDetails['phoneNoCountry']}" did not match an existing users phone number.`
             );
           }
-          let proxyName = '';
+          let proxyName = 'anom';
           if (newEmail && !newEmail.includes('@')) {
             if (!newEmail.includes('@')){
               return exits.badEmailFormat('bad email passed');
             }
-            proxyName = newEmail.substring(0, newEmail.indexOf('@'));
+            proxyName = newEmail.substring(0, newEmail.indexOf('@')).trim();
+            if(!proxyName){
+              proxyName = 'anom';
+            }
           }
           //create one as using valid firebase token:
           user = await User.create({
