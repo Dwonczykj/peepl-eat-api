@@ -202,7 +202,7 @@ type _UserTypeHidden = {
   email: string;
   phoneNoCountry: string;
   phoneCountryCode: number;
-  name: string;
+  name?: string;
   isSuperAdmin: boolean;
   role: UserRoleLiteral;
   vendorRole?: UserVendorRoleLiteral;

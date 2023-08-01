@@ -47,7 +47,7 @@ let _exports: SailsModelDefnType<UserType> & { formatPhoneNumber?: (unusedOpts:{
     marketingNotificationUtility: {
       type: 'number',
       required: false,
-      columnType: 'INT',
+      columnType: 'int8',
       defaultsTo: 0,
       min: -1,
     },
@@ -61,7 +61,8 @@ let _exports: SailsModelDefnType<UserType> & { formatPhoneNumber?: (unusedOpts:{
     // },
     name: {
       type: 'string',
-      required: true,
+      required: false,
+      defaultsTo: '',
     },
     isSuperAdmin: {
       type: 'boolean',
