@@ -71,7 +71,7 @@ module.exports.http = {
     // ~ https://stackoverflow.com/a/32474918
     myRequestLogger: function (req, res, next) {
       res.on('finish', () => {
-        sails.log.info(`[${req.method}]${req.originalUrl} -> ${res.statusCode}`);
+        sails.log.info(`🔗${res.statusCode === 200 ? '✅' : '⚠️⛔️'}[${req.method}]${req.originalUrl} -> ${res.statusCode}`);
         // sails.log(res.outputData);
         // sails.log(res.connection);
         // sails.log(res.headersSent);

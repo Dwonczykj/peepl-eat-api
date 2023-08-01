@@ -10,6 +10,7 @@ import {
   SailsActionDefnType,
   UserType
 } from '../../../scripts/utils';
+import HttpStatus from '../../interfaces/httpStatusCodes';
 
 const splitPhoneNumber = (formattedFirebaseNumber:string) => {
   try {
@@ -93,6 +94,7 @@ export type LoginWithFirebaseExits = {
       | undefined
   ) => void;
   badCombo: (unusedErr?: Error | String) => void;
+  badEmailFormat: (unusedErr?: Error | String) => void;
   serverError: (unusedErr?: {
     data: {
       code: string;
@@ -164,6 +166,9 @@ requests over WebSockets instead of HTTP).`,
     badCombo: {
       statusCode: 401,
       responseType: 'unauthorised',
+    },
+    badEmailFormat: {
+      statusCode: HttpStatus.BAD_REQUEST,
     },
     serverError: {
       statusCode: 500,
@@ -349,13 +354,19 @@ requests over WebSockets instead of HTTP).`,
               `Unable to update user in login-with-firebase as another user[${_first.id}] already has email "${newEmail}" and the supplied phone number: "${inputPhoneDetails['countryCode']}${inputPhoneDetails['phoneNoCountry']}" did not match an existing users phone number.`
             );
           }
+          let proxyName = '';
+          if (newEmail && !newEmail.includes('@')) {
+            if (!newEmail.includes('@')){
+              return exits.badEmailFormat('bad email passed');
+            }
+            proxyName = newEmail.substring(0, newEmail.indexOf('@'));
+          }
           //create one as using valid firebase token:
           user = await User.create({
-            email: newEmail,
-            // password: 'Testing123!',
             phoneNoCountry: inputPhoneDetails['phoneNoCountry'],
             phoneCountryCode: inputPhoneDetails['countryCode'],
-            name: newEmail || inputPhoneDetails['phoneNoCountry'],
+            email: newEmail,
+            name: proxyName,
             vendor: null,
             vendorConfirmed: false,
             isSuperAdmin: false,

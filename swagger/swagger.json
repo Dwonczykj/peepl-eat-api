@@ -5633,6 +5633,10 @@
                     {
                       "type": "string",
                       "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
                     }
                   ]
                 }
@@ -5757,7 +5761,23 @@
             "description": "Success"
           },
           "400": {
-            "description": "sails backend errored"
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "sails backend errored"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
           },
           "401": {
             "description": "Success",

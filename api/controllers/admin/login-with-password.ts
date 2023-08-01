@@ -2,6 +2,7 @@ import { DecodedIdToken } from "firebase-admin/auth";
 import * as firebase from '../../../config/firebaseAdmin';
 import { UserType } from "../../../scripts/utils";
 import { SailsModelType, sailsModelKVP, sailsVegi } from "../../../api/interfaces/iSails";
+import HttpStatusCode from "../../interfaces/httpStatusCodes";
 
 
 declare var User: SailsModelType<UserType>;
@@ -80,6 +81,9 @@ requests over WebSockets instead of HTTP).`,
       statusCode: 401,
       responseType: 'unauthorised',
     },
+    badEmailFormat: {
+      statusCode: HttpStatusCode.BAD_REQUEST,
+    },
     badCredentials: {
       statusCode: 401,
       responseType: 'unauthorised',
@@ -115,6 +119,7 @@ requests over WebSockets instead of HTTP).`,
       }) => void;
       error: (unusedArgs: { error: any; message: string }) => void;
       badCombo: (unusedErr?: Error) => void;
+      badEmailFormat: (unusedErr?: Error | String) => void;
       badCredentials: () => void;
       firebaseUserNoEmail: () => void;
       firebaseIncorrectEmail: () => void;
@@ -138,7 +143,10 @@ requests over WebSockets instead of HTTP).`,
       });
     };
 
-    if (process.env.useFirebaseEmulator && process.env.useFirebaseEmulator === 'true') {
+    if (
+      process.env.useFirebaseEmulator &&
+      process.env.useFirebaseEmulator === 'true'
+    ) {
       try {
         const email = inputs.emailAddress;
         let _user: sailsModelKVP<UserType> | UserType = await User.findOne({
@@ -175,7 +183,6 @@ requests over WebSockets instead of HTTP).`,
         email: inputs.emailAddress,
       });
 
-
       const firebaseEmail = decodedToken.email;
       if (!firebaseEmail) {
         if (_user) {
@@ -200,8 +207,18 @@ requests over WebSockets instead of HTTP).`,
       }
 
       if (!_user) {
-        sails.log.info(`No user already exists so creating new user with decoded phone_number from firebase in login-with-password`);
+        sails.log.info(
+          `No user already exists so creating new user with decoded phone_number from firebase in login-with-password`
+        );
         const fbPhoneDetails = splitPhoneNumber(decodedToken.phone_number);
+        let proxyName = '';
+        const newEmail = inputs.emailAddress;
+        if (newEmail && !newEmail.includes('@')) {
+          if (!newEmail.includes('@')) {
+            return exits.badEmailFormat('bad email passed');
+          }
+          proxyName = newEmail.substring(0, newEmail.indexOf('@'));
+        }
         _user = await User.create({
           email: inputs.emailAddress,
           name: inputs.emailAddress,
@@ -215,7 +232,9 @@ requests over WebSockets instead of HTTP).`,
           firebaseSessionToken: inputs.firebaseSessionToken,
           fbUid: decodedToken.uid,
         }).fetch();
-        sails.log.info(`Created a new user with email: "${inputs.emailAddress}" and phone: ${_user.phoneNoCountry}`);
+        sails.log.info(
+          `Created a new user with email: "${inputs.emailAddress}" and phone: ${_user.phoneNoCountry}`
+        );
       }
       const user = _user;
 
