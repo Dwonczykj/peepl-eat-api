@@ -155,6 +155,7 @@ module.exports = {
             fulfilmentMethod: inputs.fulfilmentMethodId,
             paymentStatus: "paid",
             restaurantAcceptanceStatus: { "!=": "rejected" },
+            completedFlag: { "!=": "cancelled" },
           });
           if(orders.length > 0){
             orders = orders.filter(order => {
@@ -175,10 +176,11 @@ module.exports = {
         }else{
           orders = await Order.find({
             fulfilmentMethod: inputs.fulfilmentMethodId,
-            paymentStatus: "paid",
-            restaurantAcceptanceStatus: { "!=": "rejected" },
-            fulfilmentSlotFrom: { ">=": openTime }, //BUG: this comparison doesnt work for disk db: sails-disk
-            fulfilmentSlotTo: { "<=": closeTime },
+            paymentStatus: 'paid',
+            restaurantAcceptanceStatus: { '!=': 'rejected' },
+            completedFlag: { '!=': 'cancelled' },
+            fulfilmentSlotFrom: { '>=': openTime }, //BUG: this comparison doesnt work for disk db: sails-disk
+            fulfilmentSlotTo: { '<=': closeTime },
           });
         }
 

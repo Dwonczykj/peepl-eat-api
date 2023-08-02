@@ -402,118 +402,125 @@ Delivery/Collection on ${order.fulfilmentSlotFrom} - ${order.fulfilmentSlotTo}`,
         }
 
         // turn into transaction if supported, then fo an order find after to check the updated order and TX
-        try {
-          await Order.update({
-            publicId: order.publicId,
-          }).set({
-            paymentStatus: 'paid',
-            paidDateTime: Date.now(), // TODO: Consider casting sql type to timestamp with a temp colum to do the cast and then channing the type here. and then using moment().format(datetimeStrFormatExactForSQLTIMESTAMP)
-          });
-        } catch (error) {
-          sails.log.error(
-            `stripe-event-webhook errored when updating order with publicId: "${order.publicId}" to "paymentStatus:paid": ${error}`
-          );
-          sails.log.error(error);
-          return exits.error(
-            `Failed to set order to "paid" with error: ${error}`
-          );
-        }
-        try {
-          if (order.discounts && order.discounts.length > 0) {
-            const addTxFn = async (discount: DiscountType) => {
-              if (discount.discountType === 'fixed') {
-                await Transaction.create({
-                  amount: discount.value,
-                  currency: discount.currency,
-                  discount: discount.id,
-                  order: order.id,
-                  payer: order.customerWalletAddress,
-                  receiver: order.vendor.walletAddress,
-                  timestamp: moment().format(
-                    datetimeStrFormatExactForSQLTIMESTAMP
-                  ),
-                  status: 'succeeded',
-                  remoteJobId: null,
-                });
-                await Discount.update({
-                  id: discount.id,
-                }).set({
-                  timesUsed: discount.timesUsed + 1,
-                  isEnabled: false,
-                });
-                await Discount.addToCollection(discount.id, 'orders').members(
-                  [order.id]
-                );
-                return;
-              } else if (discount.discountType === 'percentage') {
-                let amount = (discount.value / 100) * order.subtotal;
-                if (discount.value > 100) {
-                  sails.log.error(
-                    `Cant add percentage discount to order with value > 100% for discount with code: ${discount.code}`
+        if(eventType === 'payment_intent.succeeded'){
+          try {
+            sails.log.info(
+              `Set order with id: "${order.id}" to paid for stripe event: ${eventType}`
+            );
+            await Order.update({
+              publicId: order.publicId,
+            }).set({
+              paymentStatus: 'paid',
+              paidDateTime: Date.now(), // TODO: Consider casting sql type to timestamp with a temp colum to do the cast and then channing the type here. and then using moment().format(datetimeStrFormatExactForSQLTIMESTAMP)
+            });
+          } catch (error) {
+            sails.log.error(
+              `stripe-event-webhook errored when updating order with publicId: "${order.publicId}" to "paymentStatus:paid": ${error}`
+            );
+            sails.log.error(error);
+            return exits.error(
+              `Failed to set order to "paid" with error: ${error}`
+            );
+          }
+          try {
+            if (order.discounts && order.discounts.length > 0) {
+              const addTxFn = async (discount: DiscountType) => {
+                if (discount.discountType === 'fixed') {
+                  await Transaction.create({
+                    amount: discount.value,
+                    currency: discount.currency,
+                    discount: discount.id,
+                    order: order.id,
+                    payer: order.customerWalletAddress,
+                    receiver: order.vendor.walletAddress,
+                    timestamp: moment().format(
+                      datetimeStrFormatExactForSQLTIMESTAMP
+                    ),
+                    status: 'succeeded',
+                    remoteJobId: null,
+                  });
+                  await Discount.update({
+                    id: discount.id,
+                  }).set({
+                    timesUsed: discount.timesUsed + 1,
+                    isEnabled: false,
+                  });
+                  await Discount.addToCollection(discount.id, 'orders').members(
+                    [order.id]
                   );
                   return;
-                } else if (discount.value < 0) {
-                  sails.log.error(
-                    `Cant add percentage discount to order with value < 0% for discount with code: ${discount.code}`
+                } else if (discount.discountType === 'percentage') {
+                  let amount = (discount.value / 100) * order.subtotal;
+                  if (discount.value > 100) {
+                    sails.log.error(
+                      `Cant add percentage discount to order with value > 100% for discount with code: ${discount.code}`
+                    );
+                    return;
+                  } else if (discount.value < 0) {
+                    sails.log.error(
+                      `Cant add percentage discount to order with value < 0% for discount with code: ${discount.code}`
+                    );
+                    return;
+                  } else {
+                    sails.log(
+                      `Percentage discount of ${discount.value}% applied to order subtotal gives discounted amount of ${amount} [${discount.currency}]`
+                    );
+                  }
+
+                  const toCurrency = order.currency || Currency.GBPx;
+                  if (toCurrency !== discount.currency) {
+                    amount = await sails.helpers.convertCurrencyAmount.with({
+                      amount: amount,
+                      fromCurrency: discount.currency,
+                      toCurrency: toCurrency,
+                    });
+                  }
+                  await Transaction.create({
+                    amount: amount,
+                    currency: toCurrency,
+                    discount: discount.id,
+                    order: order.id,
+                    payer: order.customerWalletAddress,
+                    receiver: order.vendor.walletAddress,
+                    timestamp: moment().format(
+                      datetimeStrFormatExactForSQLTIMESTAMP
+                    ),
+                    status: 'succeeded',
+                    remoteJobId: null,
+                  });
+                  await Discount.update({
+                    id: discount.id,
+                  }).set({
+                    timesUsed: discount.timesUsed + 1,
+                    isEnabled:
+                      discount.isEnabled &&
+                      discount.timesUsed + 1 < discount.maxUses,
+                  });
+                  await Discount.addToCollection(discount.id, 'orders').members(
+                    [order.id]
                   );
                   return;
                 } else {
-                  sails.log(
-                    `Percentage discount of ${discount.value}% applied to order subtotal gives discounted amount of ${amount} [${discount.currency}]`
+                  sails.log.warn(
+                    `Unable to calculate discounts in stripe-event-webhook for discounts with type: "${discount.discountType}"`
                   );
                 }
-
-                const toCurrency = order.currency || Currency.GBPx;
-                if (toCurrency !== discount.currency) {
-                  amount = await sails.helpers.convertCurrencyAmount.with({
-                    amount: amount,
-                    fromCurrency: discount.currency,
-                    toCurrency: toCurrency,
-                  });
-                }
-                await Transaction.create({
-                  amount: amount,
-                  currency: toCurrency,
-                  discount: discount.id,
-                  order: order.id,
-                  payer: order.customerWalletAddress,
-                  receiver: order.vendor.walletAddress,
-                  timestamp: moment().format(
-                    datetimeStrFormatExactForSQLTIMESTAMP
-                  ),
-                  status: 'succeeded',
-                  remoteJobId: null,
-                });
-                await Discount.update({
-                  id: discount.id,
-                }).set({
-                  timesUsed: discount.timesUsed + 1,
-                  isEnabled:
-                    discount.isEnabled &&
-                    discount.timesUsed + 1 < discount.maxUses,
-                });
-                await Discount.addToCollection(discount.id, 'orders').members(
-                  [order.id]
-                );
-                return;
-              } else {
-                sails.log.warn(
-                  `Unable to calculate discounts in stripe-event-webhook for discounts with type: "${discount.discountType}"`
-                );
-              }
-            };
-            await Promise.all(
-              order.discounts.map((discount) => addTxFn(discount))
+              };
+              await Promise.all(
+                order.discounts.map((discount) => addTxFn(discount))
+              );
+            }
+          } catch (error) {
+            sails.log.error(
+              `stripe-event-webhook errored when updating discounts on order: "${order.publicId}" with error: ${error}`
+            );
+            sails.log.error(error);
+            return exits.error(
+              `stripe-event-webhook errored when updating discounts on order: "${order.publicId}" with error: ${error}`
             );
           }
-        } catch (error) {
-          sails.log.error(
-            `stripe-event-webhook errored when updating discounts on order: "${order.publicId}" with error: ${error}`
-          );
-          sails.log.error(error);
-          return exits.error(
-            `stripe-event-webhook errored when updating discounts on order: "${order.publicId}" with error: ${error}`
-          );
+        } else {
+          sails.log.warn(`Ignoring call to stripe-event-webhook with payment intentevent: "${eventType}" as was not a success`);
         }
         
       } else if (
