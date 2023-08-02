@@ -187,7 +187,7 @@ module.exports = {
       process.env.STAGE_ENV &&
       (process.env.STAGE_ENV === 'production' ||
         process.env.STAGE_ENV === 'qa') &&
-      process.env.REDIS_URL,
+      (process.env.REDIS_TLS_URL || process.env.REDIS_URL),
     //--------------------------------------------------------------------------
     // /\   OR, to avoid checking it in to version control, you might opt to
     // ||   set sensitive credentials like this using an environment variable.
