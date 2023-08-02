@@ -9,7 +9,11 @@
       <!-- <h2 class="small">{{vendor.description}}</h2> -->
     </div>
     
-    <ajax-form :form-data="deliveryPartner" :syncing.sync="syncing" :form-rules="formRules" :form-errors.sync="formErrors" :cloud-error.sync="cloudError" @submitted="deliveryPartnerSubmitted" :action="(deliveryPartner.id) ?  'editDeliveryPartner' : 'createDeliveryPartner'">
+    <ajax-form :form-data="deliveryPartner" 
+      :syncing.sync="syncing" 
+      :form-rules="formRules" :form-errors.sync="formErrors" 
+      :cloud-error.sync="cloudError" 
+      @submitted="deliveryPartnerSubmitted" :action="(deliveryPartner.id) ?  'editDeliveryPartner' : 'createDeliveryPartner'">
       <div class="form-group">
         <label for="name">Delivery Partner Name</label>
         <input type="text" :class="{ 'is-invalid': formErrors.name }" v-model="deliveryPartner.name" class="form-control" id="name">

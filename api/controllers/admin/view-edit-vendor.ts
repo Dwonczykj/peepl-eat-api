@@ -36,7 +36,7 @@ module.exports = {
   fn: async function (inputs, exits) {
     var vendorid;
     let user = await User.findOne({ id: this.req.session.userId });
-
+    
     if (user.isSuperAdmin && inputs.vendorid) {
       vendorid = inputs.vendorid;
     } else {

@@ -146,13 +146,15 @@ module.exports = {
     if (inputs.deliveryPartner && inputs.deliveryPartner === 'null') {
       inputs.deliveryPartner = null;
     }
-
-    let imageInfo = await sails.helpers.uploadOneS3(inputs.image);
-
+    let imageInfo;
+    if(inputs.image){
+      imageInfo = await sails.helpers.uploadOneS3(inputs.image);
+    }
     if (!imageInfo) {
       sails.log('no image file attached to create-vendor call');
       return exits.noFileAttached();
     }
+
 
     if (
       inputs.pickupAddress.latitude > 180 ||

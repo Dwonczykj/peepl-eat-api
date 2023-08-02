@@ -14,14 +14,28 @@ parasails.registerPage('admin-edit-vendor', {
       name: '',
       description: '',
       image: '',
-      type: 'restaurant',
+      type: 'shop',
       walletAddress: '0x',
       deliveryPartner: null,
       // deliveryRestrictionDetails: '',
       status: 'draft',
-      products: [],
-      isVegan: false,
+      isVegan: true,
       minimumOrderAmount: false,
+      pickupAddress: {
+        addressLineOne: '',
+        addressLineTwo: '',
+        addressTownCity: '',
+        addressPostCode: '',
+        addressCountryCode: '',
+        latitude: 0.0,
+        longitude: 0.0,
+        label: 'Shop 1',
+      },
+      products: [],
+      vendorCategories: [],
+      productCategories: [],
+      fulfilmentPostalDistricts: [],
+      users: [],
     },
     categoryGroups: [],
     colFul: {},
@@ -111,7 +125,7 @@ parasails.registerPage('admin-edit-vendor', {
     },
     vendorSubmitted: function ({ id }) {
       if (id) {
-        this.vendor.id = id;  
+        this.vendor.id = id;
         this.showToast(`Vendor Updated`, () => {
           window.history.pushState({}, '', '/admin/vendors/' + id);
         });
@@ -142,6 +156,14 @@ parasails.registerPage('admin-edit-vendor', {
         isAvailable: false,
         image: '',
         options: [],
+        category: this.vendor.productCategories && this.vendor.productCategories.length ? this.vendor.productCategories[0] : {
+          id: -1,
+          name: '',
+          imageUrl: '',
+          vendor: this.vendor.id,
+          categoryGroup: null,
+          products: [],
+        },
       };
       this.vendor.products.push(newProduct);
     },

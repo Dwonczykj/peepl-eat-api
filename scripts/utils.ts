@@ -270,7 +270,7 @@ export type _AddressTypeHidden = {
   addressLineOne: string;
   addressLineTwo: string;
   addressTownCity: string;
-  addressPostCode: PostCodeString;
+  addressPostCode: PostCodeString | '';
   addressCountryCode: string;
   latitude: number;
   longitude: number;

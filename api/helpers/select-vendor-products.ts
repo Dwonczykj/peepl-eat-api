@@ -62,6 +62,8 @@ const _exports: SailsActionDefnType<
 
     // vendor.products = products;
 
+    sails.log("HELLLO");
+
     const vendor = await Vendor.findOne(inputs.vendorId)
       .populate('pickupAddress')
       .populate('productCategories')
@@ -197,7 +199,12 @@ select * from esc order by "esc"."product_id", "esc"."escrating_createdat" DESC
           }
         } = {};
 
+    sails.log.warn(productRows);
     productRows.rows.forEach(row => {
+      sails.log.info(row);
+      if(!row.product_id){ // values are null when no existing products exist.
+        return;
+      }
       if (!Object.keys(products).includes(row.product_id.toString())) {
         products[row.product_id] = {
           id: row.product_id,

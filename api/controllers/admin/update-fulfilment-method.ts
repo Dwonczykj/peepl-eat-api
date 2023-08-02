@@ -216,7 +216,10 @@ module.exports = {
 
     // Update all opening hours
     inputs.openingHours.forEach(async (hours) => {
-      await OpeningHours.updateOne(hours.id).set(hours);
+      const { id, ..._hoursOmitId } = hours;
+      await OpeningHours.update({ id: id }).set({
+        _hoursOmitId,
+      });
     });
 
     return exits.success(fulfilmentMethod);

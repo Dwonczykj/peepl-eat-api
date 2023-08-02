@@ -75,7 +75,37 @@ module.exports = {
 
     var newProduct;
 
-    let imageInfo = await sails.helpers.uploadOneS3(inputs.image);
+    let imageInfo = null;
+    // if (inputs.image){
+    //   imageInfo = await sails.helpers.uploadOneS3(inputs.image);
+    // }
+    const skipperUpstream = this.req.file('image');
+
+    // skipperUpstream._files is an internal array containing the uploaded files for key `image`
+    // here i just expecting a single file, or none
+    const file = skipperUpstream._files[0];
+
+    if (!file) {
+      // `skipperUpstream.__proto__` is `Upstream`. It provides `noMoreFiles()` to stop receiving files.
+      // It also clears all timeouts: https://npmdoc.github.io/node-npmdoc-skipper/build/apidoc.html#apidoc.element.skipper.Upstream.prototype.noMoreFiles
+      skipperUpstream.noMoreFiles();
+      // return;
+    }
+    
+    if (inputs.image && inputs.image._files && inputs.image._files.length) {
+      imageInfo = await sails.helpers.uploadOneS3(inputs.image);
+      if (imageInfo) {
+        inputs.imageUrl = sails.config.custom.amazonS3BucketUrl + imageInfo.fd;
+      }
+    } else if (inputs.imageUrl) {
+      imageInfo = await sails.helpers.uploadOneS3(inputs.imageUrl);
+      if (imageInfo) {
+        inputs.imageUrl = imageInfo.ffd;
+      }
+    }
+
+    delete inputs.image;
+
 
     if (!imageInfo) {
       // Create the new product

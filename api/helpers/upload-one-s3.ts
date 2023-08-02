@@ -512,7 +512,7 @@ const _exports: SailsActionDefnType<
     },
   },
 
-  files: ['image'],
+  // files: ['image'],
 
   exits: {
     success: {

@@ -49,7 +49,13 @@ parasails.registerComponent('editProduct', {
         </span>
       </summary>
       <div class="action-card__content">
-        <ajax-form :cloud-error.sync="cloudError" :form-data="productFlat" :form-rules="formRules" :syncing.sync="syncing" :form-errors.sync="formErrors" @submitted="createdProduct" :action="(productFlat.id) ?  'editProduct' : 'createProduct'">
+        <ajax-form 
+          :cloud-error.sync="cloudError" 
+          :form-data="productFlat" :form-rules="formRules" 
+          :syncing.sync="syncing" 
+          :form-errors.sync="formErrors" 
+          @submitted="createdProduct" 
+          :action="(productFlat.id) ?  'editProduct' : 'createProduct'">
           <div class="form-group mt-3">
             <label for="productName">Product Name</label>
             <input :class="{ 'is-invalid': formErrors.name }" v-model="productFlat.name" type="text" class="form-control" id="productName" required>
@@ -170,9 +176,27 @@ parasails.registerComponent('editProduct', {
     click: async function () {
       this.$emit('click');
     },
+    // createdProduct: function (args) {
+    //   if (args && args.id) {
+    //     const id = args.id;
+    //     Vue.set(this.productFlat, 'id', id);
+    //     this.$parent.showToast &&
+    //       this.$parent.showToast(`Discount edited [${id}]`, () => {
+    //         // window.location.replace('/');
+    //       });
+    //   } else {
+    //     this.$parent.showToast &&
+    //       this.$parent.showToast('Discount created', () => {
+    //         // window.location.replace('/');
+    //       });
+    //   }
+    // },
     createdProduct: function ({ id }) {
       Vue.set(this.productFlat, 'id', id);
-      this.showToast('Product Update Succeeded');
+      this.$parent.showToast &&
+        this.$parent.showToast(`Product Update Succeeded [${id}]`, () => {
+          // window.location.replace('/');
+        });
     },
     changeProductImageBackupUrl: function () {
       if (this.productFlat.imageUrl) {
