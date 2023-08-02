@@ -71,7 +71,11 @@ module.exports.http = {
     // ~ https://stackoverflow.com/a/32474918
     myRequestLogger: function (req, res, next) {
       res.on('finish', () => {
-        sails.log.info(`🔗${res.statusCode === 200 ? '✅' : res.statusCode >= 300 && res.statusCode <= 400 ? '👉' : '⛔️'}[${req.method}]${req.originalUrl} -> ${res.statusCode} (${res.statusMessage})`);
+        if (req.url.includes('logging/log')) {
+          sails.log.silly(`🔗${res.statusCode === 200 ? '✅' : res.statusCode >= 300 && res.statusCode <= 400 ? '👉' : '⛔️'}[${req.method}]${req.originalUrl} -> ${res.statusCode} (${res.statusMessage})`);
+        } else {
+          sails.log.info(`🔗${res.statusCode === 200 ? '✅' : res.statusCode >= 300 && res.statusCode <= 400 ? '👉' : '⛔️'}[${req.method}]${req.originalUrl} -> ${res.statusCode} (${res.statusMessage})`);
+        }
         // sails.log(res.outputData);
         // sails.log(res.connection);
         // sails.log(res.headersSent);

@@ -33,8 +33,8 @@ module.exports = async function (req, res, proceed) {
   }
   try {
     if (req && (req.method === 'POST' || req.method === 'PUT') && req.body) {
-      if ('req.url'.includes('/api/v1/logging/log')) {
-        sails.log.verbose(`🔗➡️ REQUEST [${req.method}]: "${req.url}"`);
+      if (req.url.includes('logging/log')) {
+        sails.log.silly(`🔗➡️ REQUEST [${req.method}]: "${req.url}"`);
       } else {
         sails.log.verbose(
           `🔗➡️ REQUEST [${req.method}]: "${req.url}" body: ${JSON.stringify(
