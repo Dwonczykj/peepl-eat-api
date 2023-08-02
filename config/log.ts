@@ -156,9 +156,21 @@ const logger = winston.createLogger({
     new winston.transports.Console({
       format: winston.format.combine(
         // ! Note that format.timestamp has to come before format.json (if you're using that latter)
+        // Use the filter to ignore log messages containing "redis"
+        winston.format((info) => {
+          if (info.message && info.message.includes('redis')) {
+            return false;
+          }
+          return info;
+        })(),
         winston.format.timestamp(),
+        winston.format.colorize(),
         // winston.format.timestamp({ format: 'MM-YY-DD' }),
-        winston.format.json()
+        winston.format.printf((info) => {
+          return `${info.timestamp} ${info.level}: ${info.message}`;
+        }),
+        // winston.format.simple()
+        // winston.format.json()
       ),
       level: 'verbose',
       debugStdout: true,

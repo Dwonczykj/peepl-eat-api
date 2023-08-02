@@ -37,7 +37,7 @@ export type CreatePaymentIntentInternalResult =
       publishableKey: string;
       setupIntent: Stripe.Response<Stripe.SetupIntent> | null;
     }
-  | false;
+  | false | Error;
 
 export type CreatePaymentIntentInternalExits = {
   success: (unusedData: CreatePaymentIntentInternalResult) => any;
@@ -149,8 +149,19 @@ const _exports: SailsActionDefnType<
     let customer: Stripe.Customer | Stripe.DeletedCustomer; // ~ https://stripe.com/docs/api/accounts
     let setupIntent: Stripe.Response<Stripe.SetupIntent> | null = null;
     if (inputs.customerId) {
-      customer = await stripe.customers.retrieve(inputs.customerId); // todo: link the stripe customer id in the new stripe model table that links optionally to the users table or doesnt link and the customers stripe customer id is stored in the cloud on their device for security
-      sails.log.verbose(`Stripe customer RETRIEVED with id: "${customer.id}" and to be ensured sync with vegiAccount[${vegiAccount && vegiAccount.id}] from inputs.accountId: ${inputs.accountId}`);
+      try {
+        customer = await stripe.customers.retrieve(inputs.customerId); // todo: link the stripe customer id in the new stripe model table that links optionally to the users table or doesnt link and the customers stripe customer id is stored in the cloud on their device for security
+        sails.log.verbose(`Stripe customer RETRIEVED with id: "${customer.id}" and to be ensured sync with vegiAccount[${vegiAccount && vegiAccount.id}] from inputs.accountId: ${inputs.accountId}`);
+      } catch (error) {
+        const _error = Error(
+          `Failed to retrieve stripe from customerId: "${inputs.customerId}" with error: ${error}`
+        );
+        sails.log.error(_error);
+        await Account.update({id: inputs.accountId}).set({
+          stripeCustomerId: null,
+        });
+        return exits.success(_error);
+      }
     } else {
       customer = await stripe.customers.create();  
       sails.log.verbose(`Stripe customer CREATED with id: "${customer.id}" and to be added to vegiAccount[${vegiAccount && vegiAccount.id}] from inputs.accountId: ${inputs.accountId}`);

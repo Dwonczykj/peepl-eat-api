@@ -83,6 +83,7 @@ type CreateOrderResult = {
   orderCreationStatus: 'confirmed' | 'failed';
   order: OrderType | null;
   stripePaymentIntent: CreatePaymentIntentInternalResult;
+  error?: Error | undefined;
   // paymentIntent: Stripe.Response<Stripe.PaymentIntent>;
   // ephemeralKey: string;
   // customer: string;
@@ -769,6 +770,19 @@ const _exports: SailsActionDefnType<
           orderCreationStatus: 'failed',
           order: null,
           stripePaymentIntent: false
+          // paymentIntent: null,
+          // ephemeralKey: null,
+          // customer: null,
+          // publishableKey: null,
+        });
+      } else if (newPaymentIntent instanceof Error) {
+        sails.log.error(newPaymentIntent);
+        return exits.success({
+          orderId: null,
+          orderCreationStatus: 'failed',
+          order: null,
+          stripePaymentIntent: false,
+          error: newPaymentIntent,
           // paymentIntent: null,
           // ephemeralKey: null,
           // customer: null,
