@@ -6,7 +6,7 @@ module.exports = {
       name: 'vegi server',
       script: 'app.js',
       watch: false,
-      args: '--hookTimeout 160000 --silly',
+      args: '--hookTimeout 160000 --verbose',
       env_production: {
         NODE_ENV: 'production',
         NODE_OPTIONS: '--max-old-space-size=1024',
