@@ -15,27 +15,47 @@ function strToEnvKey(str) {
 }
 
 const fdir = '../config';
+
 const fpath = 'stripe.json';
 const ftestpath = 'test_stripe.json';
-let stripeKeys = {};
-if (process.env.NODE_ENV !== 'production'){
-  stripeKeys = require(`${fdir}/${ftestpath}`);
-} else if (!fs.existsSync(`${fdir}/${fpath}`)) {
-  if (process.env[strToEnvKey(fpath)] || process.env[fpath]) {
-    stripeKeys = JSON.parse(
-      Buffer.from(
-        process.env[strToEnvKey(fpath)] || process.env[fpath],
-        'base64'
-      ).toString()
-    );
+
+function stripeKeysForPath(path: string) {
+  let _stripeKeys: any;
+  if(path === fpath){
+    sails.log.info('STRIPE LOADED IN PRODUCTION MODE WITH LIVE KEYS');
   } else {
-    const envVariables = JSON.stringify(Object.keys(process.env).sort());
-    throw Error(
-      `No env variable is set for "stripe" in "${process.env.NODE_ENV}" NODE_ENV. process.env="${envVariables}"`
-    );
+    sails.log.info(`STRIPE LOADED IN DEVELOPMENT [${process.env.STAGE_ENV}] MODE WITH TEST KEYS`);
   }
+  if (!fs.existsSync(`${fdir}/${path}`)) {
+    if (process.env[strToEnvKey(path)] || process.env[path]) {
+      _stripeKeys = JSON.parse(
+        Buffer.from(
+          process.env[strToEnvKey(path)] || process.env[path],
+          'base64'
+        ).toString()
+      );
+    } else {
+      const envVariables = JSON.stringify(Object.keys(process.env).sort());
+      throw Error(
+        `No env variable is set for "stripe" in "${process.env.NODE_ENV}" NODE_ENV. process.env="${envVariables}"`
+      );
+    }
+  } else {
+    _stripeKeys = require(`${fdir}/${path}`);
+  }
+  return _stripeKeys;
+}
+
+let stripeKeys = {};
+if (process.env.STAGE_ENV === 'production'){
+  // * PRODUCTION
+  stripeKeys = stripeKeysForPath(fpath);
+} else if (process.env.STAGE_ENV === 'qa') {
+  // * QA
+  stripeKeys = stripeKeysForPath(ftestpath);
 } else {
-  stripeKeys = require(`${fdir}/${fpath}`);
+  // * DEVELOPMENT / TEST
+  stripeKeys = stripeKeysForPath(ftestpath);
 }
 
 type iStripeApi = {
