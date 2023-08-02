@@ -55,6 +55,8 @@ module.exports = {
       return exits.noValidSlots();
     }
 
+    sails.log.verbose(`helpers.validateDeliverySlots found ${validSlots.length} valid slots date: "${date}".`);
+
     // Find slot within list of valid slots
     const found = validSlots.find(slots => {
       return (
@@ -62,6 +64,8 @@ module.exports = {
         moment.utc(inputs.fulfilmentSlotTo).isSame(slots.endTime)
       );
     });
+
+
 
 
     if (found) {

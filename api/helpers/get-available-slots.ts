@@ -183,6 +183,9 @@ module.exports = {
         }
 
         // Loop through possible slots and determine if number of orders is greater than ordersPerSlot
+        sails.log.verbose(
+          `helpers.getAvailableSlots initially found ${slots.length} slots for openingHours: ${openingHours.openTime}:${openingHours.closeTime}`
+        );
         for (let slotI of slots) {
           // Filter out orders between start and end of slot.
           let relevantOrders = orders.filter((order) => {
@@ -198,6 +201,9 @@ module.exports = {
               return false;
             }
           });
+          sails.log.verbose(
+            `helpers.getAvailableSlots found ${relevantOrders.length} existing orders for slot: ${slotI.startTime}:${slotI.endTime}`
+          );
 
           // Is the time slot after current time plus fulfilment method buffer
           let isInFuture = moment

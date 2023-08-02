@@ -158,7 +158,7 @@ const logger = winston.createLogger({
         // ! Note that format.timestamp has to come before format.json (if you're using that latter)
         // Use the filter to ignore log messages containing "redis"
         winston.format((info) => {
-          if (info.message && info.message.includes('redis')) {
+          if (info.message && info.message.toString().toLowerCase().includes('redis')) {
             return false;
           }
           return info;
