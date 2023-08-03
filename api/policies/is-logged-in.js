@@ -48,27 +48,27 @@ module.exports = async function (req, res, proceed) {
       return res.redirect('/admin/login-with-password?next=' + encodeURIComponent(req.originalUrl));
     }
   } else {
-    try {
-      let user = await User.findOne({ id: this.req.session.userId });
-      if(!user || user.length < 1){
-        sails.log(
-          'Policy:<is-logged-in> -> redirect to login as no active session'
-        );
-        // ~ https://sailsjs.com/documentation/reference/request-req/req-original-url
-        return res.redirect(
-          '/admin/login-with-password?next=' +
-            encodeURIComponent(req.originalUrl)
-        );
-      }
-    } catch (error) {
-      sails.log(
-        'Policy:<is-logged-in> -> redirect to login as no active session'
-      );
-      // ~ https://sailsjs.com/documentation/reference/request-req/req-original-url
-      return res.redirect(
-        '/admin/login-with-password?next=' + encodeURIComponent(req.originalUrl)
-      );
-    }
+    // try {
+    //   let user = await User.findOne({ id: this.req.session.userId });
+    //   if(!user || user.length < 1){
+    //     sails.log(
+    //       'Policy:<is-logged-in> -> redirect to login as no active session'
+    //     );
+    //     // ~ https://sailsjs.com/documentation/reference/request-req/req-original-url
+    //     return res.redirect(
+    //       '/admin/login-with-password?next=' +
+    //         encodeURIComponent(req.originalUrl)
+    //     );
+    //   }
+    // } catch (error) {
+    //   sails.log(
+    //     'Policy:<is-logged-in> -> redirect to login as no active session'
+    //   );
+    //   // ~ https://sailsjs.com/documentation/reference/request-req/req-original-url
+    //   return res.redirect(
+    //     '/admin/login-with-password?next=' + encodeURIComponent(req.originalUrl)
+    //   );
+    // }
   }
   return proceed();
 };

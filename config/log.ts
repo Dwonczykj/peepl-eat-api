@@ -157,6 +157,12 @@ const _logLevel = {
 // );
 // if (/*process.env.NODE_ENV !== 'production'*/true) {
 // }
+const loggingActivityFp = path.resolve(
+  path.dirname(__dirname),
+  'logs/activity/activity.log'
+);
+// eslint-disable-next-line no-console
+console.log(`Attempting to log info logs to path: ${loggingActivityFp}`);
 
 const logger = winston.createLogger({
   transports: [
@@ -186,17 +192,11 @@ const logger = winston.createLogger({
       debugStdout: true,
     }),
     new winston.transports.File({
-      filename: path.resolve(
-        path.dirname(__dirname),
-        'logs/error/error.log'
-      ),
+      filename: path.resolve(path.dirname(__dirname), 'logs/error/error.log'),
       level: 'error',
     }),
     new winston.transports.File({
-      filename: path.resolve(
-        path.dirname(__dirname),
-        'logs/activity/activity.log'
-      ),
+      filename: loggingActivityFp,
       level: 'verbose',
       maxsize: 5 * 1028,
     }),
