@@ -137,7 +137,9 @@ let models = {
 
 if (process.env['local'] || process.env['local.js']) {
   // eslint-disable-next-line no-console
-  console.log(`Loading config from local env vars for config/models.js`);
+  console.log(
+    `Loading config from local env vars for ${__dirname}${__filename}`
+  );
   const _ = require(`lodash`);
   const localConfigFromDotEnv = JSON.parse(
     Buffer.from(process.env['local'] || process.env['local.js'], 'base64')

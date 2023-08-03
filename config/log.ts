@@ -17,6 +17,7 @@ import { createLogger, format, transports, LeveledLogMethod } from 'winston';
 const { combine, timestamp, colorize, label, printf, align } = format;
 import { SPLAT }  from 'triple-beam';
 import { isObject } from 'lodash';
+import path from 'path';
 
 
 function formatObject(param) {
@@ -61,67 +62,73 @@ const _logLevel = {
 
 // ~ https://stackoverflow.com/a/10341078, // ~ https://stackoverflow.com/a/32782200
 // ~ https://github.com/winstonjs/winston#usage
-const logger2 = winston.createLogger({
-  // level: 'verbose',
-  levels: _logLevel,
+// const logger2 = winston.createLogger({
+//   // level: 'verbose',
+//   levels: _logLevel,
 
-  // format: winston.format.json(),
-  // ~ https://stackoverflow.com/a/48573091
-  format: format.combine(
-    // ! Note that format.timestamp has to come before format.json (if you're using that latter)
-    winston.format.timestamp(),
-    // winston.format.timestamp({ format: 'MM-YY-DD' }),
-    winston.format.json()
-  ),
-  defaultMeta: { service: 'user-service' },
-  transports: [
-    // new winston.transports.Console(),
-    // ~ Console transport requires the outputCapture key in launch.json ~ https://github.com/winstonjs/winston/issues/1544#issuecomment-472199224
-    new winston.transports.Console({
-      // format: winston.format.simple(),
-      format: combine(
-        all(),
-        label({ label: version }),
-        timestamp(),
-        colorize(),
-        align(),
-        printf((info) =>
-          formatObject(info.message).includes('redis')
-            ? null
-            : `${info.timestamp} [${info.label}] ${info.level}: ${formatObject(
-                info.message
-              )}`
-        )
-      ),
-      level: 'verbose',
-      debugStdout: true,
-    }),
-    new winston.transports.File({
-      filename: 'logs/error/error.log',
-      level: 'error',
-    }),
-    new winston.transports.File({
-      filename: 'logs/activity/activity.log',
-      level: 'info',
-    }),
-    //
-    // - Write all logs with importance level of `error` or less to `error.log`
-    // - Write all logs with importance level of `verbose` or less to `combined.log`
-    //
-    new winston.transports.File({
-      filename: 'error.log',
-      level: 'error',
-      maxsize: 5 * 1028,
-      tailable: true,
-    }),
-    new winston.transports.File({
-      filename: 'combined.log',
-      level: 'verbose',
-      maxsize: 5 * 1028,
-      tailable: true,
-    }),
-  ],
-});
+//   // format: winston.format.json(),
+//   // ~ https://stackoverflow.com/a/48573091
+//   format: format.combine(
+//     // ! Note that format.timestamp has to come before format.json (if you're using that latter)
+//     winston.format.timestamp(),
+//     // winston.format.timestamp({ format: 'MM-YY-DD' }),
+//     winston.format.json()
+//   ),
+//   defaultMeta: { service: 'user-service' },
+//   transports: [
+//     // new winston.transports.Console(),
+//     // ~ Console transport requires the outputCapture key in launch.json ~ https://github.com/winstonjs/winston/issues/1544#issuecomment-472199224
+//     new winston.transports.Console({
+//       // format: winston.format.simple(),
+//       format: combine(
+//         all(),
+//         label({ label: version }),
+//         timestamp(),
+//         colorize(),
+//         align(),
+//         printf((info) =>
+//           formatObject(info.message).includes('redis')
+//             ? null
+//             : `${info.timestamp} [${info.label}] ${info.level}: ${formatObject(
+//                 info.message
+//               )}`
+//         )
+//       ),
+//       level: 'verbose',
+//       debugStdout: true,
+//     }),
+//     new winston.transports.File({
+//       filename: path.resolve(
+//         sails ? sails.config.appPath : path.dirname(__dirname),
+//         'logs/error/error.log',
+//       ),
+//       level: 'error',
+//     }),
+//     new winston.transports.File({
+//       filename: path.resolve(
+//         sails ? sails.config.appPath : path.dirname(__dirname),
+//         'logs/activity/activity.log'
+//       ),
+//       level: 'info',
+//     }),
+//     //
+//     // - Write all logs with importance level of `error` or less to `error.log`
+//     // - Write all logs with importance level of `verbose` or less to `combined.log`
+//     //
+//     new winston.transports.File({
+//       filename: 'error.log',
+//       level: 'error',
+//       maxsize: 5 * 1028,
+//       tailable: true,
+//     }),
+//     new winston.transports.File({
+//       filename: 'combined.log',
+//       level: 'verbose',
+//       maxsize: 5 * 1028,
+//       tailable: true,
+//     }),
+//   ],
+// });
 
 //
 // If we're not in production then log to the `console` with the format:
@@ -158,7 +165,10 @@ const logger = winston.createLogger({
         // ! Note that format.timestamp has to come before format.json (if you're using that latter)
         // Use the filter to ignore log messages containing "redis"
         winston.format((info) => {
-          if (info.message && info.message.toString().toLowerCase().includes('redis')) {
+          if (
+            info.message &&
+            info.message.toString().toLowerCase().includes('redis')
+          ) {
             return false;
           }
           return info;
@@ -168,7 +178,7 @@ const logger = winston.createLogger({
         // winston.format.timestamp({ format: 'MM-YY-DD' }),
         winston.format.printf((info) => {
           return `${info.timestamp} ${info.level}: ${info.message}`;
-        }),
+        })
         // winston.format.simple()
         // winston.format.json()
       ),
@@ -176,11 +186,17 @@ const logger = winston.createLogger({
       debugStdout: true,
     }),
     new winston.transports.File({
-      filename: 'logs/error/error.log',
+      filename: path.resolve(
+        path.dirname(__dirname),
+        'logs/error/error.log'
+      ),
       level: 'error',
     }),
     new winston.transports.File({
-      filename: 'logs/activity/activity.log',
+      filename: path.resolve(
+        path.dirname(__dirname),
+        'logs/activity/activity.log'
+      ),
       level: 'verbose',
       maxsize: 5 * 1028,
     }),
@@ -188,7 +204,7 @@ const logger = winston.createLogger({
 });
 
 // eslint-disable-next-line no-console
-console.log(`Running logger with levels: ${JSON.stringify(logger2.levels)}`);
+// console.log(`Running logger with levels: ${JSON.stringify(logger2.levels)}`);
 
 module.exports.log = {
   custom: logger,
@@ -206,7 +222,7 @@ module.exports.log = {
 // ~ -> node_modules/winston/lib/winston/create-logger.js:73
 // ~ -> node_modules/winston/node_modules/readable-stream/lib/_stream_writable.js:381
 // ~ -/-> node_modules/winston/node_modules/readable-stream/lib/_stream_transform.js:149
-logger2.info(`TESTING LOGGER... from config/log.ts`);
+logger.info(`TESTING LOGGER... from config/log.ts`);
 
 // module.exports.log = {
 //   /***************************************************************************
