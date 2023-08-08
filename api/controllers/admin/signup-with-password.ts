@@ -1,7 +1,7 @@
 import { UserRecord } from 'firebase-admin/auth';
 import { UserType } from '../../../scripts/utils';
 import * as firebase from '../../../config/firebaseAdmin';
-import { SailsModelType } from '../../../api/interfaces/iSails';
+import { SailsModelType, sailsModelKVP } from '../../../api/interfaces/iSails';
 declare var User: SailsModelType<UserType>;
 // const bcrypt = require('bcrypt');
 module.exports = {
@@ -148,7 +148,7 @@ module.exports = {
       tryPhone: `+${inputs.phoneCountryCode}${inputs.phoneNoCountry}`,
     });
 
-    const existingSailsUser = await User.findOne({
+    const existingSailsUsers = await User.find({
       or: [
         {
           phoneNoCountry: inputs.phoneNoCountry,
@@ -159,6 +159,15 @@ module.exports = {
         },
       ],
     });
+    var existingSailsUser: sailsModelKVP<UserType> | null = null;
+    if(existingSailsUsers && existingSailsUsers.length > 1){
+      sails.log.warn(
+        `Found ${existingSailsUsers.length} existing vegi users when trying to signup with email: ${inputs.emailAddress} and phone: +${inputs.phoneCountryCode}${inputs.phoneNoCountry}`
+      );
+      return exits.userExists();
+    } else if (existingSailsUsers || existingSailsUsers.length === 1){
+      existingSailsUser = existingSailsUsers[0];
+    }
 
     var _userRecord: UserRecord;
 
