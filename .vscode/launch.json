@@ -40,7 +40,7 @@
             "name": "sails run script $CurrentFile in production",
             "env": {
                 //Uncomment when running secrets-to-env.js
-                "secrets_relative_paths": "config/local.js,config/aws.json,config/vegiliverpool-firebase-adminsdk-4dfpz-8f01f888b3.json",
+                "secrets_relative_paths": "config/local.js,config/aws.json,config/we-are-vegi-app-firebase-adminsdk-69yvy-26ba373cd9.json",
                 "NODE_ENV": "production",
                 "STAGE_ENV": "script",
                 "useFirebaseEmulator": "false",

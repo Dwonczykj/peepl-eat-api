@@ -7,7 +7,7 @@ awsConfig="aws.json"
 remoteDir="/home/ubuntu/peepl-eat-api/$vegiDir"
 local="$localDir/$localName"
 sharedResourcesDir="/Users/joey/Github_Keep/shared_resources/secrets"
-firebaseConfig="vegiliverpool-firebase-adminsdk-4dfpz-8f01f888b3.json"
+firebaseConfig="we-are-vegi-app-firebase-adminsdk-69yvy-26ba373cd9.json"
 
 
 prod=ec2-54-235-19-123

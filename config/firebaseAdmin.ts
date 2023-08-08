@@ -44,7 +44,7 @@ if(process.env.NODE_ENV === 'test' || process.env.useFirebaseEmulator === 'true'
     `Connected to firebase emulator automatically for project vegiliverpool: ${admin.instanceId}`
   );
 } else {
-  const fpath = 'vegiliverpool-firebase-adminsdk-4dfpz-8f01f888b3.json';
+  const fpath = 'we-are-vegi-app-firebase-adminsdk-69yvy-26ba373cd9.json';
   if (!fs.existsSync(`./${fpath}`)) {
     if (
       process.env[strToEnvKey(fpath)] ||
