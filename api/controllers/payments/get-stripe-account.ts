@@ -64,7 +64,7 @@ const _exports: SailsActionDefnType<
       const account = await stripe.accounts.retrieve(inputs.stripeCustomerId);
       return exits.success(account);
     } catch (error) {
-      sails.log.error(error);
+      sails.log.error(`${error}`);
       return exits.success(false);
     }
   },

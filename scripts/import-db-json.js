@@ -36,7 +36,7 @@ module.exports = {
     if (!fs.existsSync(_dir)) {
       await fs.mkdir(_dir, (err) => {
         if (err) {
-          sails.log.error(err);
+          sails.log.error(`${err}`);
           return;
         }
         sails.log('dump_json .tmp directory created successfully!');
@@ -157,7 +157,7 @@ module.exports = {
         sails.log.error(
           `Error when creating records in postgresDB:`
         );
-        sails.log.error(error);
+        sails.log.error(`${error}`);
       }
     };
 

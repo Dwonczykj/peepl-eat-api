@@ -277,7 +277,7 @@ requests over WebSockets instead of HTTP).`,
       sails.log.error(
         `Login-with-firebase (phone) failed due to firebaseError: `
       );
-      sails.log.error(err);
+      sails.log.error(`${err}`);
       if (err.code === 'auth/id-token-expired') {
         // can we refresh the token ourselves?>...
         return exits.firebaseIdTokenExpired({
@@ -415,7 +415,7 @@ requests over WebSockets instead of HTTP).`,
         sails.log.error(
           `Login-with-firebase (phone) failed due to a vegi-server error: `
         );
-        sails.log.error(error);
+        sails.log.error(`${error}`);
         return exits.serverError({
           data: {
             code: error.code,
@@ -428,7 +428,7 @@ requests over WebSockets instead of HTTP).`,
       sails.log.error(
         `Login-with-firebase (phone) failed due to unknown error [Could be firebase or vegi...]: `
       );
-      sails.log.error(error);
+      sails.log.error(`${error}`);
       return exits.firebaseErrored({
         code: error.code,
         message: error.message,

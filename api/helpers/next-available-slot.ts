@@ -113,7 +113,7 @@ module.exports = {
               allAvailableSlots[possibleFulfilmentMethods[i].id]
             );
           } catch (error) {
-            sails.log.error(error);
+            sails.log.error(`${error}`);
             return exits.success(noAvailableSlot); // Dont continue as we hit an error!
           }
         }

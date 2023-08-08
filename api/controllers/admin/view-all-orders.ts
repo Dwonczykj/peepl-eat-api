@@ -40,7 +40,7 @@ module.exports = {
     try {
       orders = await sails.helpers.getOrders.with(inputs);
     } catch (error) {
-      sails.log.error(error);
+      sails.log.error(`${error}`);
     }
 
     // Respond with view or JSON.

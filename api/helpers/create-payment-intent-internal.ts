@@ -36,8 +36,13 @@ export type CreatePaymentIntentInternalResult =
       ephemeralKey: string;
       publishableKey: string;
       setupIntent: Stripe.Response<Stripe.SetupIntent> | null;
+      success: true,
     }
-  | false | Error;
+  | {
+    error: Error, 
+    message: string, 
+    success: false,
+  };
 
 export type CreatePaymentIntentInternalExits = {
   success: (unusedData: CreatePaymentIntentInternalResult) => any;
@@ -117,14 +122,26 @@ const _exports: SailsActionDefnType<
         sails.log.warn(
           `No account found for id: "${inputs.accountId}" in create-payment-intent-internal helper`
         );
-        return exits.success(false);
+        return exits.success({
+          error: new Error(
+            `No account found for id: "${inputs.accountId}" in create-payment-intent-internal helper`
+          ),
+          message: `No account found for id: "${inputs.accountId}" in create-payment-intent-internal helper`,
+          success: false,
+        });
       }
       vegiAccount = vegiAccounts[0];
     } catch (error) {
       sails.log.error(
         `No account found for id: "${inputs.accountId}" in create-payment-intent-internal helper with error: ${error}`
       );
-      return exits.success(false);
+      return exits.success({
+        error: new Error(
+          `No account found for id: "${inputs.accountId}" in create-payment-intent-internal helper with error: ${error}`
+        ),
+        message: `No account found for id: "${inputs.accountId}" in create-payment-intent-internal helper with error: ${error}`,
+        success: false,
+      });
     }
 
     let order: sailsModelKVP<OrderType>;
@@ -136,14 +153,26 @@ const _exports: SailsActionDefnType<
         sails.log.warn(
           `No order found for id: "${inputs.orderId}" in create-payment-intent-internal helper`
         );
-        return exits.success(false);
+        return exits.success({
+          error: new Error(
+            `No order found for id: "${inputs.orderId}" in create-payment-intent-internal helper`
+          ),
+          message: `No order found for id: "${inputs.orderId}" in create-payment-intent-internal helper`,
+          success: false,
+        });
       }
       order = orders[0];
     } catch (error) {
       sails.log.error(
         `No order found for id: "${inputs.orderId}" in create-payment-intent-internal helper with error: ${error}`
       );
-      return exits.success(false);
+      return exits.success({
+        error: new Error(
+          `No order found for id: "${inputs.orderId}" in create-payment-intent-internal helper with error: ${error}`
+        ),
+        message: `No order found for id: "${inputs.orderId}" in create-payment-intent-internal helper with error: ${error}`,
+        success: false,
+      });
     }
 
     let customer: Stripe.Customer | Stripe.DeletedCustomer; // ~ https://stripe.com/docs/api/accounts
@@ -156,11 +185,15 @@ const _exports: SailsActionDefnType<
         const _error = Error(
           `Failed to retrieve stripe from customerId: "${inputs.customerId}" with error: ${error}`
         );
-        sails.log.error(_error);
+        sails.log.error(`${_error}`);
         await Account.update({id: inputs.accountId}).set({
           stripeCustomerId: null,
         });
-        return exits.success(_error);
+        return exits.success({
+          error: _error,
+          message: `Failed to retrieve stripe from customerId: "${inputs.customerId}" with error: ${error}`,
+          success: false,
+        });
       }
     } else {
       customer = await stripe.customers.create();  
@@ -191,7 +224,11 @@ const _exports: SailsActionDefnType<
         sails.log.error(
           `Failed to update account in vegi with new stripe account id. Error: ${error}`
         );
-        return exits.success(false);
+        return exits.success({
+          error: error,
+          message: `Failed to update account in vegi with new stripe account id. Error: ${error}`,
+          success: false,
+        });
       }
     }
 
@@ -220,7 +257,11 @@ const _exports: SailsActionDefnType<
         inputAmountPence = inputs.amount;
       } else if (inputCurrency === Currency.PPL.toLocaleLowerCase()) {
         sails.log.error(`Cant make a stripe payment intent for PPL tokens.`);
-        return exits.success(false);
+        return exits.success({
+          error: new Error(`Cant make a stripe payment intent for PPL tokens.`),
+          message: `Cant make a stripe payment intent for PPL tokens.`,
+          success: false,
+        });
       } else if (inputCurrency === Currency.GBP.toLocaleLowerCase()) {
         useCurrency = 'gbp';
         inputAmountPence = Math.round(inputs.amount * 100);
@@ -232,12 +273,22 @@ const _exports: SailsActionDefnType<
         inputAmountPence = Math.round(inputs.amount * 100);
       } else if (inputCurrency === Currency.GBT.toLocaleLowerCase()) {
         sails.log.error(`Cant make a stripe payment intent for GBT tokens.`);
-        return exits.success(false);
+        return exits.success({
+        error: new Error(`Cant make a stripe payment intent for GBT tokens.`),
+        message: `Cant make a stripe payment intent for GBT tokens.`,
+        success: false,
+      });
       } else {
         sails.log.error(
           `Cant make a stripe payment intent for [${inputCurrency}].`
         );
-        return exits.success(false);
+        return exits.success({
+          error: new Error(
+            `Cant make a stripe payment intent for [${inputCurrency}].`
+          ),
+          message: `Cant make a stripe payment intent for [${inputCurrency}].`,
+          success: false,
+        });
       }
       const paymentIntent = await stripe.paymentIntents.create(
         {
@@ -307,12 +358,18 @@ const _exports: SailsActionDefnType<
         paymentMethods: paymentMethodsResponse && paymentMethodsResponse.data,
         setupIntent: setupIntent,
         ephemeralKey: ephemeralKey.secret, // used temporarily to allow client to fetch card details from client side stripe api and populate payment box
-        customer: customer && !customer.deleted ? (customer as Stripe.Customer) : null,
+        customer:
+          customer && !customer.deleted ? (customer as Stripe.Customer) : null,
         publishableKey: StripeKeys.publishableKey,
+        success: true,
       });
     } catch (error) {
-      sails.log.error(error);
-      return exits.success(false);
+      sails.log.error(`${error}`);
+      return exits.success({
+        error: error,
+        message: `${error}`,
+        success: false,
+      });
     }
   },
 };

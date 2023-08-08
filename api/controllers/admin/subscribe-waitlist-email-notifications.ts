@@ -94,7 +94,7 @@ const _exports: SailsActionDefnType<
             queue && queue.length > 0 ? queue[queue.length - 1] : null;
           return lastPerson;
         } catch (error) {
-          sails.log.error(error);
+          sails.log.error(`${error}`);
           return null;
         }
       };
@@ -157,7 +157,7 @@ const _exports: SailsActionDefnType<
         });
       } catch (error) {
         sails.log.error(`Errored when trying to locate users with matching emails after performing a waitlist subscribtion for notifications ${error}`);
-        sails.log.error(error);
+        sails.log.error(`${error}`);
       }
     }
     return _finish();

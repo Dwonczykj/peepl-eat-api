@@ -382,7 +382,7 @@ const _exports: SailsActionDefnType<
       }, // ~ https://www.notion.so/gember/Sails-js-b949611a98654dd091c3a0758b170db3?pvs=4#f5f1bfb659094541a9583d90c1f4887c
       async (err, uploadedFiles) => {
         if (err) {
-          sails.log.error(err);
+          sails.log.error(`${err}`);
         }
 
         uploadedFile = uploadedFiles;
@@ -408,7 +408,7 @@ const _exports: SailsActionDefnType<
 
         fs.readFile(uploadedFile.fd, 'utf8', async (err, data) => {
           if(err){
-            sails.log.error(err);
+            sails.log.error(`${err}`);
           }else{
             // return res.json(200, {message: 'Ok', data: data});
             csvData = data;

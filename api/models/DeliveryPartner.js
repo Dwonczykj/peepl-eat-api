@@ -111,7 +111,7 @@ module.exports = {
           deliveryPartner: newlyCreatedRecord.id,
         });
       } catch (error) {
-        sails.log.error(error);
+        sails.log.error(`${error}`);
         return proceed(error);
       }
     } else {
@@ -122,7 +122,7 @@ module.exports = {
         const error = new Error(
           'Bad Fulfilment Method Passed to DeliveryPartner.create'
         );
-        sails.log.error(error);
+        sails.log.error(`${error}`);
         return proceed(error);
       }
     }

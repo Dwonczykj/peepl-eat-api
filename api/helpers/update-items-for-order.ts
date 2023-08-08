@@ -356,7 +356,7 @@ module.exports = {
         });
       }
     } catch (error) {
-      sails.log.error(error);
+      sails.log.error(`${error}`);
       return exits.error(
         new Error(
           "Error creating a child order in DB to set up a partial fulfilment"

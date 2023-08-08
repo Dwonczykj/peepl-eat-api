@@ -127,7 +127,7 @@ module.exports = {
         });
       } catch (error){
         sails.log.error(`Error when creating records in postgresDB for Accounts:`);
-        sails.log.error(error);
+        sails.log.error(`${error}`);
       }
     };
 
@@ -145,7 +145,7 @@ module.exports = {
 
       } catch (error){
         sails.log.error(`Error when fetching records for key: "${key}":`);
-        sails.log.error(error);
+        sails.log.error(`${error}`);
       }
       try{
         // ~ https://sailsjs.com/documentation/reference/application/sails-get-datastore
@@ -174,7 +174,7 @@ module.exports = {
         }
       } catch (error){
         sails.log.error(`Error when creating records in postgresDB for key: "${key}":`);
-        sails.log.error(error);
+        sails.log.error(`${error}`);
       }
 
     };

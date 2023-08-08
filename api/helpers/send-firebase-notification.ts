@@ -117,7 +117,7 @@ const _exports: SailsActionDefnType<
     await firebase
       .sendMessage(message)
       .catch((err) => {
-        sails.log.error(err);
+        sails.log.error(`${err}`);
         return exits.success(false);
       });
     return exits.success(newNotification);

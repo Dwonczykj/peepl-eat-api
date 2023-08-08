@@ -54,7 +54,7 @@ module.exports = {
               }),
       }).fetch();
     } catch (error) {
-      sails.log.error(error);
+      sails.log.error(`${error}`);
       sails.log.error(`Error whilst creating Notification object in send-sms-notification handler`);
     }
 

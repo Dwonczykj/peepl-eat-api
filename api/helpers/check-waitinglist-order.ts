@@ -64,7 +64,7 @@ const _exports: SailsActionDefnType<
         await Promise.all(promises);
       }
     } catch (error) {
-      sails.log.error(error);
+      sails.log.error(`${error}`);
       return exits.success(false);
     }
 

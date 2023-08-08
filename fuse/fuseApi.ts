@@ -417,7 +417,7 @@ export async function mintTokensToAddress({
     })
     .catch((error) => {
       sails.log.error(`Fuse Minting Url ${mintUrl} with error: ${error}`);
-      sails.log.error(error);
+      sails.log.error(`${error}`);
     });
 }
 
@@ -460,7 +460,7 @@ export async function transferVegiRewardTokens({
     })
     .catch((error) => {
       sails.log.error(`Fuse Minting Url ${mintUrl} with error: ${error}`);
-      sails.log.error(error);
+      sails.log.error(`${error}`);
     });
 }
 

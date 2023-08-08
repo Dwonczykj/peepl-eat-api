@@ -85,7 +85,7 @@ const _exports: SailsActionDefnType<
     try {
       imageUrl = avatarUrls[index];
     } catch (error) {
-      sails.log.error(error);
+      sails.log.error(`${error}`);
     }
 
     try {
@@ -95,7 +95,7 @@ const _exports: SailsActionDefnType<
         imageUrl: imageUrl,
       });
     } catch (error) {
-      sails.log.error(error);
+      sails.log.error(`${error}`);
     }
 
     return exits.success({

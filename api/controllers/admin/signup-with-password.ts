@@ -185,10 +185,19 @@ module.exports = {
           await firebase.sendPasswordResetEmail({
             tryEmail: existingFirebaseUser.email,
           });
+        } else {
+          await firebase.updateUser(existingFirebaseUser.uid, {
+            email: inputs.emailAddress.trim().toLowerCase(),
+            password: inputs.password,
+          });
         }
-        return exits.firebaseUserExistsForPhone();
+        return exits.success({
+          existingSailsUser,
+        });
+        // return exits.firebaseUserExistsForPhone();
+      } else {
+        return exits.userExists();
       }
-      return exits.userExists();
     }
 
     if (!existingFirebaseUser) {
@@ -236,7 +245,7 @@ module.exports = {
           );
           return exits.success(user);
         } catch (error) {
-          sails.log.error(error);
+          sails.log.error(`${error}`);
           sails.log.error(
             `Error creating user in signup-with-password action: ${error}`
           );
@@ -279,7 +288,7 @@ module.exports = {
           sails.log.error(
             `Error creating user in signup-with-password action: ${error}`
           );
-          sails.log.error(error);
+          sails.log.error(`${error}`);
           // return exits.error(
           //   new Error(
           //     `Error creating user in signup-with-password action: ${error}`

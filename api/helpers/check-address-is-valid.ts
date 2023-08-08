@@ -174,7 +174,7 @@ module.exports = {
     //   }
 
     // } catch (err) {
-    //   sails.log.error(err);
+    //   sails.log.error(`${err}`);
     //   return exits.placesApiError(err);
     // }
   },

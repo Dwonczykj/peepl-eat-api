@@ -165,7 +165,7 @@ requests over WebSockets instead of HTTP).`,
     try {
       _decodedToken = await firebase.verifyIdToken(inputs.firebaseSessionToken);
     } catch (err) {
-      sails.log.error(err);
+      sails.log.error(`${err}`);
 
       return exits.firebaseErrored({
         code: err.code,

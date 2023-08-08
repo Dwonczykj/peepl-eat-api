@@ -78,19 +78,30 @@ export type ValidateOrderResult = {
 };
 
 
-type CreateOrderResult = {
-  orderId: number;
-  orderCreationStatus: 'confirmed' | 'failed';
-  order: OrderType | null;
-  stripePaymentIntent: CreatePaymentIntentInternalResult;
-  error?: Error | undefined;
-  // paymentIntent: Stripe.Response<Stripe.PaymentIntent>;
-  // ephemeralKey: string;
-  // customer: string;
-  // publishableKey: string;
-};
+type CreateOrderResult =
+  | {
+      orderId: null;
+      orderCreationStatus: 'failed';
+      order: null;
+      stripePaymentIntent: false;
+      error: Error;
+      // paymentIntent: Stripe.Response<Stripe.PaymentIntent>;
+      // ephemeralKey: string;
+      // customer: string;
+      // publishableKey: string;
+    }
+  | {
+      orderId: number;
+      orderCreationStatus: 'confirmed' | 'failed';
+      order: OrderType;
+      stripePaymentIntent: CreatePaymentIntentInternalResult;
+      // paymentIntent: Stripe.Response<Stripe.PaymentIntent>;
+      // ephemeralKey: string;
+      // customer: string;
+      // publishableKey: string;
+    };
 
-export type CreateOrderResponse = CreateOrderResult | false;
+export type CreateOrderResponse = CreateOrderResult;
 
 export type CreateOrderExits = {
   success: (unusedData: CreateOrderResponse) => any;
@@ -392,14 +403,15 @@ const _exports: SailsActionDefnType<
       const createOrderTransactionDB: (db: any) => Promise<
         | {
             orderId: null;
-            paymentIntentID: null;
+            // paymentIntentID: null;
             orderCreationStatus: 'failed';
             calculatedOrderTotal: null;
+            error: Error;
           }
         | {
             orderId: number;
-            paymentIntentID: string;
-            orderCreationStatus: CreateOrderResult['orderCreationStatus'];
+            // paymentIntentID: string;
+            orderCreationStatus: 'confirmed';
             calculatedOrderTotal: {
               finalAmount: number;
               withoutFees: number;
@@ -432,14 +444,15 @@ const _exports: SailsActionDefnType<
             );
             newOrderItemOptionValues = await Promise.all(dbPromises);
           } catch (err) {
-            sails.log.error(err);
+            sails.log.error(`${err}`);
             // exits.badItemsRequest();
             return {
               orderId: null,
-              paymentIntentID: null,
+              // paymentIntentID: null,
               orderCreationStatus:
-                'failed' as CreateOrderResult['orderCreationStatus'],
+                'failed',
               calculatedOrderTotal: null,
+              error: err,
             };
           }
 
@@ -476,10 +489,11 @@ const _exports: SailsActionDefnType<
           );
           return {
             orderId: null,
-            paymentIntentID: null,
+            // paymentIntentID: null,
             orderCreationStatus:
-              'failed' as CreateOrderResult['orderCreationStatus'],
+              'failed',
             calculatedOrderTotal: null,
+            error: new Error(`Error trying to convert order total to GBPx: ${error}`),
           };
         }
 
@@ -526,10 +540,11 @@ const _exports: SailsActionDefnType<
           // exits.error(error);
           return {
             orderId: null,
-            paymentIntentID: null,
+            // paymentIntentID: null,
             orderCreationStatus:
-              'failed' as CreateOrderResult['orderCreationStatus'],
+              'failed',
             calculatedOrderTotal: null,
+            error: error,
           };
         }
 
@@ -580,10 +595,11 @@ const _exports: SailsActionDefnType<
             // exits.error(`Could not calculate subtotal for order.`);
             return {
               orderId: null,
-              paymentIntentID: null,
+              // paymentIntentID: null,
               orderCreationStatus:
-                'failed' as CreateOrderResult['orderCreationStatus'],
+                'failed',
               calculatedOrderTotal: null,
+              error: new Error(`New Order #${order.id} has a ${calculatedOrderTotal.withoutFees} subtotal with a total of ${calculatedOrderTotal.finalAmount}`),
             };
           }
         } else {
@@ -616,9 +632,10 @@ const _exports: SailsActionDefnType<
           // exits.minimumOrderAmount('Vendor minimum order value not met');
           return {
             orderId: null,
-            paymentIntentID: null,
+            // paymentIntentID: null,
             orderCreationStatus: 'failed',
             calculatedOrderTotal: null,
+            error: new Error('Vendor minimum order value not met'),
           };
         }
 
@@ -626,9 +643,9 @@ const _exports: SailsActionDefnType<
         return {
           orderId: order.id,
           // paymentIntentID: paymentIntentId,
-          paymentIntentID: null,
+          // paymentIntentID: null,
           orderCreationStatus:
-            'confirmed' as CreateOrderResult['orderCreationStatus'],
+            'confirmed',
           calculatedOrderTotal: calculatedOrderTotal,
         };
       };
@@ -707,6 +724,23 @@ const _exports: SailsActionDefnType<
         );
       }
 
+      if(result.orderCreationStatus === 'failed'){
+        sails.log.error(
+          `Failed to create order in db with error: ${result.error}`
+        );
+        return exits.success({
+          orderId: null,
+          orderCreationStatus: 'failed',
+          order: null,
+          stripePaymentIntent: false,
+          error: new Error(`Failed to create order in db with error: ${result.error}`),
+          // paymentIntent: null,
+          // ephemeralKey: null,
+          // customer: null,
+          // publishableKey: null,
+        });
+      }
+
 
       let finalAmount = result.calculatedOrderTotal.finalAmount;
       let finalAmountCurrency = order.currency;
@@ -748,14 +782,16 @@ const _exports: SailsActionDefnType<
       }
 
       if (failureReason) {
+        const err = new Error(`Error creating payment intent: "${failureReason}"`);
         sails.log.error(
-          new Error(`Error creating payment intent: "${failureReason}"`)
+          err
         );
         return exits.success({
           orderId: null,
           orderCreationStatus: 'failed',
           order: null,
           stripePaymentIntent: false,
+          error: err,
           // paymentIntent: null,
           // ephemeralKey: null,
           // customer: null,
@@ -763,26 +799,15 @@ const _exports: SailsActionDefnType<
         });
       }
 
-      if (!newPaymentIntent) {
-        sails.log.error(new Error('Error creating payment intent'));
-        return exits.success({
-          orderId: null,
-          orderCreationStatus: 'failed',
-          order: null,
-          stripePaymentIntent: false
-          // paymentIntent: null,
-          // ephemeralKey: null,
-          // customer: null,
-          // publishableKey: null,
-        });
-      } else if (newPaymentIntent instanceof Error) {
-        sails.log.error(newPaymentIntent);
+      if (newPaymentIntent.success === false) {
+        const err = newPaymentIntent.error;
+        sails.log.error(`${newPaymentIntent.message}`);
         return exits.success({
           orderId: null,
           orderCreationStatus: 'failed',
           order: null,
           stripePaymentIntent: false,
-          error: newPaymentIntent,
+          error: err,
           // paymentIntent: null,
           // ephemeralKey: null,
           // customer: null,
@@ -799,7 +824,7 @@ const _exports: SailsActionDefnType<
           paymentIntentId: paymentIntentId,
         });
       } catch (error) {
-        sails.log.error(error);
+        sails.log.error(`${error}`);
       }
 
       const _newOrder = await Order.findOne(result.orderId).populate(
@@ -819,7 +844,7 @@ const _exports: SailsActionDefnType<
         stripePaymentIntent: newPaymentIntent,
       });
     } catch (error) {
-      sails.log.error(error);
+      sails.log.error(`${error}`);
       try {
         await sails.helpers.sendSmsNotification.with({
           to: inputs.address.phoneNumber,

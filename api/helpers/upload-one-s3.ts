@@ -241,7 +241,7 @@ async function getCrypto() {
     crypto = await import('node:crypto');
   } catch (err) {
     sails.log.error(`crypto support is disabled! ${err}`);
-    sails.log.error(err);
+    sails.log.error(`${err}`);
   }
   return crypto;
 }
@@ -263,7 +263,7 @@ async function checkFileExistence(
       return false; // Object does not exist
     }
     sails.log.error(`Unable to check for file existence in "${s3Container}" using key: "${key}" with error: ${error}`);
-    sails.log.error(error);
+    sails.log.error(`${error}`);
     return false;
   }
 }
@@ -281,7 +281,7 @@ async function getObjectData(
     return response.Body as unknown as GetObjectCommandOutput;
   } catch (error) {
     sails.log.error(`Unable to get object on s3 "${s3Container}" with key: "${key}" with error: ${error}`);
-    sails.log.error(error);
+    sails.log.error(`${error}`);
     return null;
   }
 }
@@ -336,7 +336,7 @@ async function compareFilesInS3(
       }
     } catch (error) {
       sails.log.error(`Unable to checksum for upload files with error: ${error}`);
-      sails.log.error(error);
+      sails.log.error(`${error}`);
       areFilesEqual = false;
     }
     const encodedKey = encodeURIComponent(fileName);
@@ -619,7 +619,7 @@ const _exports: SailsActionDefnType<
           }
         } catch (err) {
           sails.log.error(`Was unable to upload to s3 using v3 sdk: ${err}`);
-          sails.log.error(err);
+          sails.log.error(`${err}`);
           return exits.success({
             error: err,
             message: `Was unable to upload to s3 using v3 sdk: ${err}`,
@@ -640,7 +640,7 @@ const _exports: SailsActionDefnType<
       //     },
       //     (err, filesUploaded) => {
       //       if (err) {
-      //         sails.log.error(err);
+      //         sails.log.error(`${err}`);
       //         sails.log.verbose(`Image upload to bucket failed ${err}`);
       //         return exits.success({
       //           error: err,

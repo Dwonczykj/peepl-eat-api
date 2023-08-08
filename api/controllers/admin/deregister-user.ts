@@ -114,7 +114,7 @@ module.exports = {
         sails.log.error(
           `Unable to firebase.getUserByPhone(${_phoneNumber}) from firebase in deregister-user: ${err}`
         );
-        sails.log.error(err);
+        sails.log.error(`${err}`);
 
         return exits.firebaseErrored({
           code: err.code,
@@ -132,7 +132,7 @@ module.exports = {
         await firebase.deleteUser(userRecord.uid);
       } catch (err) {
         sails.log.error(`Unable to delete user from firebase with error: ${err}`);
-        sails.log.error(err);
+        sails.log.error(`${err}`);
         return exits.firebaseErrored({
           code: err.code,
           message: err.message,

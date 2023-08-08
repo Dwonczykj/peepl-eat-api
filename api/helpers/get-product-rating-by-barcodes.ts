@@ -120,7 +120,7 @@ const _exports: SailsActionDefnType<
           result: response.data,
         };
       } catch (err) {
-        sails.log.error(err);
+        sails.log.error(`${err}`);
         return null;
       }
     };
@@ -192,7 +192,7 @@ const _exports: SailsActionDefnType<
     //       );
     //     }
     //   } catch (err) {
-    //     sails.log.error(err);
+    //     sails.log.error(`${err}`);
     //     return null;
     //   }
     // };

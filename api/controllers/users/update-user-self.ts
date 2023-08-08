@@ -156,7 +156,7 @@ const _exports: SailsActionDefnType<
       await User.updateOne({id: user.id}).set(updateParams);
     } catch (error) {
       sails.log.error(`Failed to update user's own details with error: ${error}`);
-      sails.log.error(error);
+      sails.log.error(`${error}`);
     }
 
     return exits.success(true);

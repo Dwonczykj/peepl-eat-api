@@ -61,7 +61,7 @@ module.exports = {
       );
       
     } catch (error) {
-      sails.log.error(error);
+      sails.log.error(`${error}`);
     }
 
     if(!vendor){

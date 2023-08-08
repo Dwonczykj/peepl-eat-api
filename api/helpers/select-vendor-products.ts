@@ -464,7 +464,7 @@ select * from esc order by "esc"."product_id", "esc"."escrating_createdat" DESC
       //     )
       // );
     } catch (error) {
-      sails.log.error(error);
+      sails.log.error(`${error}`);
     }
 
     return exits.success({vendor});

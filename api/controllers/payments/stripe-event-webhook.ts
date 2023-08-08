@@ -42,7 +42,7 @@ export const getOrderByPaymentIntentIdSafe = async (params: {
           { depth: null }
         )}`
       );
-      sails.log.error(e);
+      sails.log.error(`${e}`);
       // return exits.success();
       return null;
     }
@@ -55,7 +55,7 @@ export const getOrderByPaymentIntentIdSafe = async (params: {
         { depth: null }
       )}`
     );
-    sails.log.error(e);
+    sails.log.error(`${e}`);
     // return exits.success();
     return null;
   }
@@ -336,7 +336,7 @@ const _exports: SailsActionDefnType<
             paidDateTime: unixtime,
           });
         } catch (error) {
-          sails.log.error(error);
+          sails.log.error(`${error}`);
         }
 
         order = await Order.findOne(order.id).populate('vendor');
@@ -417,7 +417,7 @@ Delivery/Collection on ${order.fulfilmentSlotFrom} - ${order.fulfilmentSlotTo}`,
             sails.log.error(
               `stripe-event-webhook errored when updating order with publicId: "${order.publicId}" to "paymentStatus:paid": ${error}`
             );
-            sails.log.error(error);
+            sails.log.error(`${error}`);
             return exits.error(
               `Failed to set order to "paid" with error: ${error}`
             );
@@ -514,7 +514,7 @@ Delivery/Collection on ${order.fulfilmentSlotFrom} - ${order.fulfilmentSlotTo}`,
             sails.log.error(
               `stripe-event-webhook errored when updating discounts on order: "${order.publicId}" with error: ${error}`
             );
-            sails.log.error(error);
+            sails.log.error(`${error}`);
             return exits.error(
               `stripe-event-webhook errored when updating discounts on order: "${order.publicId}" with error: ${error}`
             );

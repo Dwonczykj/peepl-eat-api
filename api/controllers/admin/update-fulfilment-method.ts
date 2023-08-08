@@ -129,7 +129,7 @@ module.exports = {
           coordinates = _coordinates;
         }
       } catch (error) {
-        sails.log.error(error);
+        sails.log.error(`${error}`);
       }
     } else if(inputs.vendor){
       

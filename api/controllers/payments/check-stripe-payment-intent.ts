@@ -126,7 +126,7 @@ const _exports: SailsActionDefnType<
       if(typeof error === 'object' && has('message', error) && typeof error.message === 'string' && error.message.includes("client_secret")){
         sails.log.warn(`Consider removing client_secret from the client side request at this point in your client side payment flow.`);
       }
-      sails.log.error(error);
+      sails.log.error(`${error}`);
       return exits.success(false);
     }
   },

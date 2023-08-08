@@ -86,7 +86,7 @@ module.exports = {
         const lastPerson = queue && queue.length > 0 ? queue[queue.length-1] : null;
         return lastPerson;
       } catch (error) {
-        sails.log.error(error);
+        sails.log.error(`${error}`);
         return null;
       }
     };

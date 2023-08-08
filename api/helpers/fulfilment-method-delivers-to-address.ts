@@ -134,7 +134,7 @@ module.exports = {
 	      return exits.success({ canDeliver: false });
 	    }
     } catch (error) {
-      sails.log.error(error);
+      sails.log.error(`${error}`);
       return exits.success({ canDeliver: false });
     }
 

@@ -122,7 +122,7 @@ class GoogleMapsApi implements IGoogleMapsApi {
         return firstCoordinates;
       }
     } catch (err) {
-      sails.log.error(err);
+      sails.log.error(`${err}`);
       return null;
     }
   }
@@ -189,7 +189,7 @@ class GoogleMapsApi implements IGoogleMapsApi {
         return metrics.distance.value;
       }
     } catch (err) {
-      sails.log.error(err);
+      sails.log.error(`${err}`);
       return null;
     }
   }

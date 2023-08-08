@@ -59,7 +59,7 @@ const _exports: SailsActionDefnType<
       );
       return exits.success(amount);
     } catch (error) {
-      sails.log.error(error);
+      sails.log.error(`${error}`);
       return exits.success(0);
     }
   },

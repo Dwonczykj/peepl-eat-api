@@ -110,7 +110,7 @@ const _exports: SailsActionDefnType<
         });
       }
     } catch (error) {
-      sails.log.error(error);
+      sails.log.error(`${error}`);
       return exits.success(false);
     }
   },

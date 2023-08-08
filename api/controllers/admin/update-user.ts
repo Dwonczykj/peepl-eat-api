@@ -309,7 +309,7 @@ const _exports: SailsActionDefnType<
               }
         );
       } catch (err) {
-        sails.log.error(err);
+        sails.log.error(`${err}`);
 
         return exits.firebaseErrored({
           code: err.code,
