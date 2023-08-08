@@ -133,7 +133,7 @@ fuseCommunity.md
 .env
 stripe.json
 test_stripe.json
-vegiliverpool-firebase-adminsdk-*.json
+*-firebase-adminsdk-*.json
 
 npm-debug.log
 lib-cov

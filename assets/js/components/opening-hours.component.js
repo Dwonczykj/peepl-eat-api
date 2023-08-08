@@ -92,7 +92,7 @@ parasails.registerComponent('openingHours', {
               class="form-control" id="addressZipCode" oninput="this.value = this.value.toUpperCase()">
             <div v-if="cloudError === 'badPostalCode'" class="alert alert-danger mt-4" role="alert">
               Bad PostalCode
-            </div>
+            </diFv>
           </div>
           <div class="form-group">
             <span style="display: flex; flex-direction: column; align-items:center;"> 
