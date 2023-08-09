@@ -47,8 +47,9 @@ declare var User: SailsModelType<UserType>;
 
 
 export type LoginWithFirebaseInputs = {
-  phoneNumber: string,
-  firebaseSessionToken: string,
+  phoneNoCountry: string;
+  phoneCountryCode: number;
+  firebaseSessionToken: string;
   rememberMe: boolean;
 };
 
@@ -113,8 +114,12 @@ const _exports: SailsActionDefnType<
   description: 'Firebase Login admin.',
 
   inputs: {
-    phoneNumber: {
+    phoneNoCountry: {
       type: 'string',
+      required: true,
+    },
+    phoneCountryCode: {
+      type: 'number',
       required: true,
     },
     firebaseSessionToken: {
@@ -202,10 +207,16 @@ requests over WebSockets instead of HTTP).`,
         session: this.req.session.cookie,
       });
     };
+    const inputPhoneDetails = {
+      phoneNoCountry: inputs.phoneNoCountry,
+      phoneCountryCode: inputs.phoneCountryCode,
+    };
     if (
       // process.env.NODE_ENV !== 'production' &&
-      inputs.phoneNumber ===
-        `${sails.config.custom.testPhoneNumberCountryCode}${sails.config.custom.testPhoneNumber}` &&
+      inputs.phoneCountryCode.toString() ===
+        sails.config.custom.testPhoneNumberCountryCode.toString() &&
+      inputs.phoneNoCountry.toString() ===
+        sails.config.custom.testPhoneNumber.toString() &&
       inputs.firebaseSessionToken ===
         sails.config.custom.testFirebaseSessionToken
     ) {
@@ -213,13 +224,13 @@ requests over WebSockets instead of HTTP).`,
         sails.log.warn(
           `Login-with-firebase called using test phone and credentials`
         );
-        const inputPhoneDetails = splitPhoneNumber(inputs.phoneNumber);
+        // const inputPhoneDetails = splitPhoneNumber(inputs.phoneNumber);
 
         // * return the test consumer user for testing purposes only
         let _users: Array<sailsModelKVP<UserType> | UserType> = await User.find(
           {
-            phoneNoCountry: inputPhoneDetails['phoneNoCountry'],
-            phoneCountryCode: inputPhoneDetails['countryCode'],
+            phoneNoCountry: inputPhoneDetails.phoneNoCountry,
+            phoneCountryCode: inputPhoneDetails.phoneCountryCode,
             firebaseSessionToken: inputs.firebaseSessionToken,
           }
         );
@@ -228,8 +239,8 @@ requests over WebSockets instead of HTTP).`,
             email: 'test_user_email@example.com',
             isSuperAdmin: false,
             firebaseSessionToken: inputs.firebaseSessionToken,
-            phoneNoCountry: inputPhoneDetails['phoneNoCountry'],
-            phoneCountryCode: inputPhoneDetails['countryCode'],
+            phoneNoCountry: inputPhoneDetails.phoneNoCountry,
+            phoneCountryCode: inputPhoneDetails.phoneCountryCode,
             fbUid: '',
             marketingEmailContactAllowed: true,
             marketingPushContactAllowed: true,
@@ -254,11 +265,11 @@ requests over WebSockets instead of HTTP).`,
       process.env.useFirebaseEmulator === 'true'
     ) {
       try {
-        const inputPhoneDetails = splitPhoneNumber(inputs.phoneNumber);
+        // const inputPhoneDetails = splitPhoneNumber(inputs.phoneNumber);
 
         let _user: sailsModelKVP<UserType> | UserType = await User.findOne({
-          phoneNoCountry: inputPhoneDetails['phoneNoCountry'],
-          phoneCountryCode: inputPhoneDetails['countryCode'],
+          phoneNoCountry: inputPhoneDetails.phoneNoCountry,
+          phoneCountryCode: inputPhoneDetails.phoneCountryCode,
         });
         if (_user) {
           return _completeLogin(_user);
@@ -300,11 +311,20 @@ requests over WebSockets instead of HTTP).`,
     }
 
     // Signed in
-    const decodedToken = _decodedToken;
+    const decodedToken = _decodedToken; // * '+44795.........'
+
+    if(!decodedToken){
+      sails.log.error(
+        `Unable to verify firebase auth credentials in login-with-firebase and decode the token for token: "${inputs.firebaseSessionToken}" (+${inputPhoneDetails.phoneCountryCode}${inputPhoneDetails.phoneNoCountry})`
+      );
+      return exits.badCombo(
+        `Unable to verify firebase auth credentials in login-with-firebase and decode the token for token: "${inputs.firebaseSessionToken}" (+${inputPhoneDetails.phoneCountryCode}${inputPhoneDetails.phoneNoCountry})`
+      );
+    }
 
     try {
       try {
-        const inputPhoneDetails = splitPhoneNumber(inputs.phoneNumber);
+        // const inputPhoneDetails = splitPhoneNumber(inputs.phoneNumber);
 
         const formattedFirebaseNumber = decodedToken.phone_number;
         // if (!formattedFirebaseNumber) {
@@ -314,32 +334,27 @@ requests over WebSockets instead of HTTP).`,
 
         //   return exits.firebaseUserNoPhoneInDecodedToken();
         // }
-        if (formattedFirebaseNumber) {
-          const firebasePhoneDetails = splitPhoneNumber(
-            formattedFirebaseNumber
+        if (
+          formattedFirebaseNumber &&
+          formattedFirebaseNumber !==
+            `+${inputPhoneDetails.phoneCountryCode}${inputPhoneDetails.phoneNoCountry}`
+        ) {
+          sails.log.error(
+            `Login-with-firebase (phone) failed due because phone details stored against firebase user (${formattedFirebaseNumber}) does not match request input phone number (+${inputPhoneDetails.phoneCountryCode}${inputPhoneDetails.phoneNoCountry})`
           );
-
-          if (
-            firebasePhoneDetails['countryCode'] !==
-              inputPhoneDetails['countryCode'] ||
-            firebasePhoneDetails['phoneNoCountry'] !==
-              inputPhoneDetails['phoneNoCountry']
-          ) {
-            sails.log.error(
-              `Login-with-firebase (phone) failed due because phone details stored against firebase user does not match request input phone number`
-            );
-            return exits.badCombo(); // phone number doesnt match, throw badCombo
-          }
+          return exits.badCombo(
+            `Login-with-firebase (phone) failed due because phone details stored against firebase user (${formattedFirebaseNumber}) does not match request input phone number (+${inputPhoneDetails.phoneCountryCode}${inputPhoneDetails.phoneNoCountry})`
+          ); 
         }
 
         let user: sailsModelKVP<UserType> | UserType = await User.findOne({
           // ! why is this not finding my number in the db...
-          phoneNoCountry: inputPhoneDetails['phoneNoCountry'],
-          phoneCountryCode: inputPhoneDetails['countryCode'],
+          phoneNoCountry: inputPhoneDetails.phoneNoCountry,
+          phoneCountryCode: inputPhoneDetails.phoneCountryCode,
         });
         if (!user) {
           sails.log.info(
-            `Could not locate user for phone: ${inputPhoneDetails['phoneNoCountry']} in login-with-firebase`
+            `Could not locate user for phone: ${formattedFirebaseNumber} in login-with-firebase`
           );
           const newEmail = decodedToken.email || '';
           const _existingUserSameEmail = await User.find({
@@ -348,26 +363,26 @@ requests over WebSockets instead of HTTP).`,
           if (_existingUserSameEmail && _existingUserSameEmail.length > 0) {
             const _first = _existingUserSameEmail[0];
             sails.log.error(
-              `Unable to create user in login-with-firebase as another user[${_first.id}] already has email "${newEmail}" and the supplied phone number: "${inputPhoneDetails['countryCode']}${inputPhoneDetails['phoneNoCountry']}" did not match an existing users phone number.`
+              `Unable to create user in login-with-firebase as another user[${_first.id}] already has email "${newEmail}" and the supplied phone number: "${inputPhoneDetails.phoneCountryCode}${inputPhoneDetails.phoneNoCountry}" did not match an existing users phone number.`
             );
             return exits.badCombo(
-              `Unable to update user in login-with-firebase as another user[${_first.id}] already has email "${newEmail}" and the supplied phone number: "${inputPhoneDetails['countryCode']}${inputPhoneDetails['phoneNoCountry']}" did not match an existing users phone number.`
+              `Unable to update user in login-with-firebase as another user[${_first.id}] already has email "${newEmail}" and the supplied phone number: "${inputPhoneDetails.phoneCountryCode}${inputPhoneDetails.phoneNoCountry}" did not match an existing users phone number.`
             );
           }
           let proxyName = '';
           if (newEmail && !newEmail.includes('@')) {
-            if (!newEmail.includes('@')){
+            if (!newEmail.includes('@')) {
               return exits.badEmailFormat('bad email passed');
             }
             proxyName = newEmail.substring(0, newEmail.indexOf('@')).trim();
-            if(!proxyName){
+            if (!proxyName) {
               proxyName = '';
             }
           }
           //create one as using valid firebase token:
           user = await User.create({
-            phoneNoCountry: inputPhoneDetails['phoneNoCountry'],
-            phoneCountryCode: inputPhoneDetails['countryCode'],
+            phoneNoCountry: inputPhoneDetails.phoneNoCountry,
+            phoneCountryCode: inputPhoneDetails.phoneCountryCode,
             email: newEmail,
             name: proxyName,
             vendor: null,
@@ -385,8 +400,8 @@ requests over WebSockets instead of HTTP).`,
         }
         // Update the session
         await User.updateOne({
-          phoneNoCountry: inputPhoneDetails['phoneNoCountry'],
-          phoneCountryCode: inputPhoneDetails['countryCode'],
+          phoneNoCountry: inputPhoneDetails.phoneNoCountry,
+          phoneCountryCode: inputPhoneDetails.phoneCountryCode,
         }).set({
           firebaseSessionToken: inputs.firebaseSessionToken,
           fbUid: decodedToken.uid,

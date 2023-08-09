@@ -274,10 +274,10 @@ const _exports: SailsActionDefnType<
       } else if (inputCurrency === Currency.GBT.toLocaleLowerCase()) {
         sails.log.error(`Cant make a stripe payment intent for GBT tokens.`);
         return exits.success({
-        error: new Error(`Cant make a stripe payment intent for GBT tokens.`),
-        message: `Cant make a stripe payment intent for GBT tokens.`,
-        success: false,
-      });
+          error: new Error(`Cant make a stripe payment intent for GBT tokens.`),
+          message: `Cant make a stripe payment intent for GBT tokens.`,
+          success: false,
+        });
       } else {
         sails.log.error(
           `Cant make a stripe payment intent for [${inputCurrency}].`
