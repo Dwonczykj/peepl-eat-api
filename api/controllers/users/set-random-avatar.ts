@@ -71,11 +71,20 @@ const _exports: SailsActionDefnType<
     }
 
     const avatarUrls = [
-      'https://vegiapp-s3bucket.s3.eu-west-2.amazonaws.com/aubergini.jpeg',
-      'https://vegiapp-s3bucket.s3.eu-west-2.amazonaws.com/broc.jpeg',
-      'https://vegiapp-s3bucket.s3.eu-west-2.amazonaws.com/carrot.jpeg',
-      'https://vegiapp-s3bucket.s3.eu-west-2.amazonaws.com/pepper.jpeg',
-      'https://vegiapp-s3bucket.s3.eu-west-2.amazonaws.com/strawbug.jpeg',
+      // 'https://vegiapp-s3bucket.s3.eu-west-2.amazonaws.com/aubergini.jpeg',
+      // 'https://vegiapp-s3bucket.s3.eu-west-2.amazonaws.com/broc.jpeg',
+      // 'https://vegiapp-s3bucket.s3.eu-west-2.amazonaws.com/carrot.jpeg',
+      // 'https://vegiapp-s3bucket.s3.eu-west-2.amazonaws.com/pepper.jpeg',
+      // 'https://vegiapp-s3bucket.s3.eu-west-2.amazonaws.com/strawbug.jpeg',
+      // 'https://vegiapp-s3bucket.s3.eu-west-2.amazonaws.com/display-pictures_03.png',
+      'https://vegiapp-s3bucket.s3.eu-west-2.amazonaws.com/display-pictures_03.png',
+      'https://vegiapp-s3bucket.s3.eu-west-2.amazonaws.com/display-pictures_05.png',
+      'https://vegiapp-s3bucket.s3.eu-west-2.amazonaws.com/display-pictures_06.png',
+      'https://vegiapp-s3bucket.s3.eu-west-2.amazonaws.com/display-pictures_08.png',
+      'https://vegiapp-s3bucket.s3.eu-west-2.amazonaws.com/display-pictures_09.png',
+      'https://vegiapp-s3bucket.s3.eu-west-2.amazonaws.com/display-pictures_10.png',
+      'https://vegiapp-s3bucket.s3.eu-west-2.amazonaws.com/display-pictures_11.png',
+      'https://vegiapp-s3bucket.s3.eu-west-2.amazonaws.com/mushroom.png',
     ];
 
     const index = Math.round(Math.random() * 5);

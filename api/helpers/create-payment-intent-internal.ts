@@ -292,7 +292,7 @@ const _exports: SailsActionDefnType<
       }
       const paymentIntent = await stripe.paymentIntents.create(
         {
-          amount: inputAmountPence, //TODO get amounts from end ppoint inputs...
+          amount: inputAmountPence, //TODO get amounts from end point inputs...
           currency: useCurrency,
           customer: customer.id,
           shipping: {
