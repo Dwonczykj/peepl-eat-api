@@ -81,15 +81,15 @@ type iStripeApi = {
   };
 };
 
-
 /**
- * The function `stripeFactory` creates a new instance of the Stripe API client with the appropriate
- * secret key based on the user's test mode preference.
+ * The function `userIsTester` checks if a user is a tester and returns a boolean value indicating
+ * whether the user should be in test mode.
  * @param {number | undefined | null} userId - The `userId` parameter is a number that represents the
- * ID of a user. It can also be `undefined` or `null` if there is no user associated with the request.
- * @returns The function `stripeFactory` returns an instance of the `Stripe` class from the Stripe API.
+ * ID of a user. It can be `undefined` or `null` if there is no user associated with the ID.
+ * @returns the value of the variable `forceTestMode`, which is a boolean indicating whether the user
+ * is a tester or not.
  */
-export const stripeFactory = async (userId: number | undefined | null) => {
+export const userIsTester = async (userId: number | undefined | null) => {
   let forceTestMode = false;
   try {
     if (userId){
@@ -107,6 +107,19 @@ export const stripeFactory = async (userId: number | undefined | null) => {
   } catch (error) {
     sails.log.error(`failed to load user details from cached session userId: [${userId}] with error: ${error}`);
   }
+  return forceTestMode;
+};
+
+
+/**
+ * The function `stripeFactory` creates a new instance of the Stripe API client with the appropriate
+ * secret key based on the user's test mode preference.
+ * @param {number | undefined | null} userId - The `userId` parameter is a number that represents the
+ * ID of a user. It can also be `undefined` or `null` if there is no user associated with the request.
+ * @returns The function `stripeFactory` returns an instance of the `Stripe` class from the Stripe API.
+ */
+export const stripeFactory = async (userId: number | undefined | null) => {
+  let forceTestMode = await userIsTester(userId);
   return new Stripe((forceTestMode ? stripeTestKeys : stripeKeys)['secretKey'] as string, {
     apiVersion: '2022-11-15',
     typescript: true,
