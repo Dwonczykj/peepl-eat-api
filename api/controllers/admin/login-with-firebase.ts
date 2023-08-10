@@ -213,7 +213,7 @@ requests over WebSockets instead of HTTP).`,
     };
     if (
       // process.env.NODE_ENV !== 'production' &&
-      inputs.phoneCountryCode.toString() ===
+      `+${inputs.phoneCountryCode}` ===
         sails.config.custom.testPhoneNumberCountryCode.toString() &&
       inputs.phoneNoCountry.toString() ===
         sails.config.custom.testPhoneNumber.toString() &&
@@ -238,6 +238,8 @@ requests over WebSockets instead of HTTP).`,
           const _user = await User.create({
             email: 'test_user_email@example.com',
             isSuperAdmin: false,
+            isTester: true,
+            secret: sails.config.custom.testFirebaseSMSVerificationCode,
             firebaseSessionToken: inputs.firebaseSessionToken,
             phoneNoCountry: inputPhoneDetails.phoneNoCountry,
             phoneCountryCode: inputPhoneDetails.phoneCountryCode,

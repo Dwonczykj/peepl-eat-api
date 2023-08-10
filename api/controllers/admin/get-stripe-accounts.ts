@@ -7,7 +7,7 @@ import {
   SailsActionDefnType,
   
 } from '../../../scripts/utils';
-import stripe from '../../../scripts/load_stripe';
+import stripeFactory from '../../../scripts/load_stripe';
 import {Stripe} from 'stripe';
 
 // ~ https://stripe.com/docs/api/accounts/create
@@ -74,6 +74,7 @@ const _exports: SailsActionDefnType<
     inputs: CreateStripeAccountInputs,
     exits: CreateStripeAccountExits
   ) {
+    const stripe = await stripeFactory(this.req.session.userId);
     const accounts = await stripe.accounts.list(inputs);
 
     return exits.success(accounts);

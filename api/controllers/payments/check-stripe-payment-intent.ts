@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import stripe from '../../../scripts/load_stripe';
+import stripeFactory from '../../../scripts/load_stripe';
 import Stripe from 'stripe';
 import {
   sailsVegi,
@@ -74,6 +74,7 @@ const _exports: SailsActionDefnType<
     exits: CheckStripePaymentIntentExits
   ) {
     try {
+      const stripe = await stripeFactory(this.req.session.userId);
       const paymentIntent = await stripe.paymentIntents.retrieve(inputs.paymentIntentId, !inputs.client_secret ? {} : {
         client_secret: inputs.client_secret,
       });

@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import stripe from '../../../scripts/load_stripe';
+import stripeFactory from '../../../scripts/load_stripe';
 import Stripe from 'stripe';
 import _ from 'lodash';
 const util = require('util');
@@ -156,6 +156,7 @@ const _exports: SailsActionDefnType<
     let eventType: Stripe.Event['type'];
 
     try {
+      const stripe = await stripeFactory(this.req.session.userId);
       if (Object.keys(sails.config.custom).includes('stripeWebhookSecret')) {
         let event: Stripe.Event;
         const signature = this.req.headers['stripe-signature'];

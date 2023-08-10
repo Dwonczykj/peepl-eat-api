@@ -1,4 +1,4 @@
-import stripe from '../../scripts/load_stripe';
+import stripeFactory from '../../scripts/load_stripe';
 import Stripe from 'stripe';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid'; // const { v4: uuidv4 } = require('uuid');
@@ -31,6 +31,7 @@ const checkCurrency = (currency:string) => {
 
 export type TransactionsForAccountInputs = {
   accountId: number;
+  userId: number | null | undefined;
   // party: 'payer' | 'receiver';
   transactionStatus: '' | 'succeeded' | 'all' | 'failed';
 };
@@ -55,6 +56,10 @@ const _exports: SailsActionDefnType<
       type: 'number',
       required: true,
     },
+    userId: {
+      type: 'number',
+      required: false,
+    },
     // party: {
     //   type: 'string',
     //   required: true,
@@ -65,7 +70,7 @@ const _exports: SailsActionDefnType<
       required: false,
       defaultsTo: '',
       isIn: ['succeeded', 'all', 'failed', ''],
-    } 
+    },
   },
 
   exits: {
@@ -78,25 +83,30 @@ const _exports: SailsActionDefnType<
     inputs: TransactionsForAccountInputs,
     exits: TransactionsForAccountExits
   ) {
+    const stripe = await stripeFactory(inputs.userId);
     const accounts = await Account.find({
       id: inputs.accountId,
     });
     const vegiAccount = await Account.findOne({
       walletAddress: sails.config.custom.vegiWalletAddress,
     });
-    if(!accounts || accounts.length < 1){
-      sails.log.error(`No accounts found for account id: ${inputs.accountId} in helper: transactions-for-account`);
+    if (!accounts || accounts.length < 1) {
+      sails.log.error(
+        `No accounts found for account id: ${inputs.accountId} in helper: transactions-for-account`
+      );
       return exits.success(false);
     }
-    if (!inputs.transactionStatus){
+    if (!inputs.transactionStatus) {
       inputs.transactionStatus = 'succeeded';
     }
     const account = accounts[0];
     let transactions: TransactionType[];
-    let paymentIntent: Stripe.Response<Stripe.ApiSearchResult<Stripe.PaymentIntent>>;
+    let paymentIntent: Stripe.Response<
+      Stripe.ApiSearchResult<Stripe.PaymentIntent>
+    >;
     //TODO: If account is a wallet Address, Query fuse explorer for transactions with that walletId
-    if (account.accountType !== 'bank'){
-      if(inputs.transactionStatus !== 'all'){
+    if (account.accountType !== 'bank') {
+      if (inputs.transactionStatus !== 'all') {
         paymentIntent = await stripe.paymentIntents.search({
           query: `status:'${inputs.transactionStatus}' AND metadata['senderWalletAddress']:'${account.walletAddress}'`,
         });
@@ -117,7 +127,7 @@ const _exports: SailsActionDefnType<
         });
       }
     }
-    for (const pi of paymentIntent.data){
+    for (const pi of paymentIntent.data) {
       const meta: PaymentIntentMetaDataType = pi.metadata as any;
       const existingTransactions = await Transaction.find({
         amount: pi.amount,
@@ -127,7 +137,7 @@ const _exports: SailsActionDefnType<
         timestamp: pi.created,
         order: meta['orderId'],
       }).populate('payer&order');
-      if (!existingTransactions || existingTransactions.length < 1){
+      if (!existingTransactions || existingTransactions.length < 1) {
         const newTransaction = await Transaction.create({
           amount: pi.amount,
           currency: checkCurrency(pi.currency.toLocaleUpperCase()),
@@ -139,10 +149,7 @@ const _exports: SailsActionDefnType<
         }).fetch();
         transactions.push(newTransaction);
       } else {
-        transactions = [
-          ...transactions,
-          ...existingTransactions,
-        ];
+        transactions = [...transactions, ...existingTransactions];
       }
     }
     return exits.success(transactions);

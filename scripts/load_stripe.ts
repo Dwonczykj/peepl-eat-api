@@ -1,8 +1,11 @@
-import { StripeAccountType } from '../api/interfaces/payments/stripe/iStripeAccount';
-import { StripeCustomerType } from '../api/interfaces/payments/stripe/iStripeCustomer';
 import fs from 'fs';
 // import {Stripe} from 'stripe';
 import Stripe from 'stripe';
+import { SailsModelType } from '../api/interfaces';
+import { StripeAccountType } from '../api/interfaces/payments/stripe/iStripeAccount';
+import { StripeCustomerType } from '../api/interfaces/payments/stripe/iStripeCustomer';
+import { UserType } from './utils';
+declare const User: SailsModelType<UserType>;
 
 const kebabize = (str, forceJoinerStr = '-') =>
   str.replace(
@@ -47,15 +50,16 @@ function stripeKeysForPath(path: string) {
 }
 
 let stripeKeys = {};
+const stripeTestKeys = stripeKeysForPath(ftestpath);
 if (process.env.STAGE_ENV === 'production'){
   // * PRODUCTION
   stripeKeys = stripeKeysForPath(fpath);
 } else if (process.env.STAGE_ENV === 'qa') {
   // * QA
-  stripeKeys = stripeKeysForPath(ftestpath);
+  stripeKeys = stripeTestKeys;
 } else {
   // * DEVELOPMENT / TEST
-  stripeKeys = stripeKeysForPath(ftestpath);
+  stripeKeys = stripeTestKeys;
 }
 
 type iStripeApi = {
@@ -76,11 +80,40 @@ type iStripeApi = {
     create: (paymentIntentInput: any) => { client_secret: string };
   };
 };
+
+
+/**
+ * The function `stripeFactory` creates a new instance of the Stripe API client with the appropriate
+ * secret key based on the user's test mode preference.
+ * @param {number | undefined | null} userId - The `userId` parameter is a number that represents the
+ * ID of a user. It can also be `undefined` or `null` if there is no user associated with the request.
+ * @returns The function `stripeFactory` returns an instance of the `Stripe` class from the Stripe API.
+ */
+export const stripeFactory = async (userId: number | undefined | null) => {
+  let forceTestMode = false;
+  try {
+    if (userId){
+      const users = await User.find({
+        id: userId,
+      });
+      if (users && users.length === 1){
+        const user = users[0];
+        forceTestMode = user.isTester;
+        if(forceTestMode){
+          sails.log.verbose(`Using a testUser to access stripe so loading in test environment`);
+        }
+      }
+    }
+  } catch (error) {
+    sails.log.error(`failed to load user details from cached session userId: [${userId}] with error: ${error}`);
+  }
+  return new Stripe((forceTestMode ? stripeTestKeys : stripeKeys)['secretKey'] as string, {
+    apiVersion: '2022-11-15',
+    typescript: true,
+  });
+};
 // const stripe:Stripe = require('stripe')(stripeKeys['secretKey']);
-const stripe: Stripe = new Stripe(stripeKeys['secretKey'] as string, {
-  apiVersion: '2022-11-15',
-  typescript: true,
-});
+// const stripe: Stripe = stripeFactory(false);
 
 if (
   process.env.NODE_ENV !== 'production' &&
@@ -99,4 +132,4 @@ export class StripeKeys {
   // readonly secretKey: string = stripeKeys['secretKey'];
 }
 
-export default stripe;
+export default stripeFactory;

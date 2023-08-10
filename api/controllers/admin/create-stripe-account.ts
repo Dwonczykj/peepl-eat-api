@@ -8,7 +8,7 @@ import {
   SailsActionDefnType,
   
 } from '../../../scripts/utils';
-import stripe, { StripeKeys } from '../../../scripts/load_stripe';
+import stripeFactory, { StripeKeys } from '../../../scripts/load_stripe';
 import {Stripe} from 'stripe';
 import { StripeAccountType } from '../../../api/interfaces/payments/stripe/iStripeAccount';
 import { Currency } from '../../../api/interfaces/peeplPay';
@@ -88,6 +88,7 @@ const _exports: SailsActionDefnType<
     inputs: CreateStripeAccountInputs,
     exits: CreateStripeAccountExits
   ) {
+    const stripe = await stripeFactory(this.req.session.userId);
     let vegiAccount: sailsModelKVP<AccountType>;
     try {
       const vegiAccounts = await Account.find({

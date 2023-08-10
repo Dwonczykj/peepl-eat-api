@@ -768,6 +768,7 @@ const _exports: SailsActionDefnType<
             vendorDisplayName: vendor.name,
             webhookAddress: sails.config.custom.peeplWebhookAddress,
             customerId: account && account.stripeCustomerId || '',
+            userId: this.req.session.userId,
             senderWalletAddress: inputs.walletAddress,
             accountId: account && account.id,
             orderId: order.id,

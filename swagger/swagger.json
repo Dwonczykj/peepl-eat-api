@@ -2499,6 +2499,10 @@
             "description": "Securely hashed representation of the service account's secret.",
             "example": "2$28a8eabna301089103-13948134nad"
           },
+          "isTester": {
+            "type": "boolean",
+            "default": false
+          },
           "vendor": {
             "description": "JSON dictionary representing the **vendor** instance or FK when creating / updating / not populated",
             "oneOf": [
@@ -3961,6 +3965,15 @@
             "in": "query",
             "name": "accountId",
             "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "userId",
+            "required": false,
             "schema": {
               "type": "number",
               "format": "double"
@@ -6034,6 +6047,15 @@
             "in": "query",
             "name": "accountId",
             "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "userId",
+            "required": false,
             "schema": {
               "type": "number",
               "format": "double"

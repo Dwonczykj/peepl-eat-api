@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Built-in Log Configuration
  * (sails.config.log)
@@ -13,156 +14,122 @@
 const { version } = require('../package');
 
 import winston from 'winston';
-import { createLogger, format, transports, LeveledLogMethod } from 'winston';
-const { combine, timestamp, colorize, label, printf, align } = format;
-import { SPLAT }  from 'triple-beam';
-import { isObject } from 'lodash';
+// import { createLogger, format, transports, LeveledLogMethod } from 'winston';
+// const { combine, timestamp, colorize, label, printf, align } = format;
+// import { Pool } from 'pg';
+// import Transport from 'winston-transport';
+// import { SPLAT }  from 'triple-beam';
+// import { isObject } from 'lodash';
 import path from 'path';
-
-
-function formatObject(param) {
-  if (isObject(param)) {
-    let jsonStr = '';
-    try{
-      jsonStr = JSON.stringify(param);
-    } catch (err) {
-      jsonStr = `${param}`;
-    }
-    return jsonStr;
-  }
-  return param;
-}
-
-// Ignore log messages if they have { private: true }
-const all = format((info) => {
-  const splat = info[SPLAT] || [];
-  const message = formatObject(info.message);
-  const rest = splat.map(formatObject).join(' ');
-  info.message = `${message} ${rest}`;
-  return info;
-});
+import fs from 'fs';
 
 // ~ node_modules/winston/lib/winston/config/index.d.ts:20
 // ~ https://stackoverflow.com/a/67379878
-enum LogLevel {
-  trace,
-  debug,
-  info,
-  warn,
-  error
-}
+// enum LogLevel {
+//   trace,
+//   debug,
+//   info,
+//   warn,
+//   error
+// }
 
-const _logLevel = {
-  error: LogLevel.error,
-  warn: LogLevel.warn,
-  info: LogLevel.info,
-  debug: LogLevel.debug,
-  trace: LogLevel.trace
-};
+// const _logLevel = {
+//   error: LogLevel.error,
+//   warn: LogLevel.warn,
+//   info: LogLevel.info,
+//   debug: LogLevel.debug,
+//   trace: LogLevel.trace
+// };
+
+// class PostgresTransport extends Transport {
+//   pool: Pool;
+
+//   constructor(opts: winston.transport.TransportStreamOptions & {connectionString: string}) {
+//     super(opts);
+//     // this.pool = new Pool(opts.connection); // connection: {host: string, user: string, password: string, database: string,}
+//     console.log(`Logging transport register to DB at "${opts.connectionString}"`);
+//     this.pool = new Pool({
+//       connectionString: opts.connectionString,
+//     });
+//   }
+
+//   log(info: { level: keyof typeof _logLevel, message: string, meta: any, }, callback) {
+//     setImmediate(() => this.emit('logged', info));
+
+//     const text = 'INSERT INTO logs(level, message, meta) VALUES($1, $2, $3)';
+//     const values = [info.level, info.message, info.meta];
+
+//     this.pool.query(text, values, (err, res) => {
+//       if (err) {
+//         console.error(err.stack);
+//       }
+//     });
+
+//     callback();
+//   }
+// }
+
+
+// function formatObject(param) {
+//   if (isObject(param)) {
+//     let jsonStr = '';
+//     try{
+//       jsonStr = JSON.stringify(param);
+//     } catch (err) {
+//       jsonStr = `${param}`;
+//     }
+//     return jsonStr;
+//   }
+//   return param;
+// }
+
+// // Ignore log messages if they have { private: true }
+// const all = format((info) => {
+//   const splat = info[SPLAT] || [];
+//   const message = formatObject(info.message);
+//   const rest = splat.map(formatObject).join(' ');
+//   info.message = `${message} ${rest}`;
+//   return info;
+// });
 
 // ~ https://stackoverflow.com/a/10341078, // ~ https://stackoverflow.com/a/32782200
 // ~ https://github.com/winstonjs/winston#usage
-// const logger2 = winston.createLogger({
-//   // level: 'verbose',
-//   levels: _logLevel,
 
-//   // format: winston.format.json(),
-//   // ~ https://stackoverflow.com/a/48573091
-//   format: format.combine(
-//     // ! Note that format.timestamp has to come before format.json (if you're using that latter)
-//     winston.format.timestamp(),
-//     // winston.format.timestamp({ format: 'MM-YY-DD' }),
-//     winston.format.json()
-//   ),
-//   defaultMeta: { service: 'user-service' },
-//   transports: [
-//     // new winston.transports.Console(),
-//     // ~ Console transport requires the outputCapture key in launch.json ~ https://github.com/winstonjs/winston/issues/1544#issuecomment-472199224
-//     new winston.transports.Console({
-//       // format: winston.format.simple(),
-//       format: combine(
-//         all(),
-//         label({ label: version }),
-//         timestamp(),
-//         colorize(),
-//         align(),
-//         printf((info) =>
-//           formatObject(info.message).includes('redis')
-//             ? null
-//             : `${info.timestamp} [${info.label}] ${info.level}: ${formatObject(
-//                 info.message
-//               )}`
-//         )
-//       ),
-//       level: 'verbose',
-//       debugStdout: true,
-//     }),
-//     new winston.transports.File({
-//       filename: path.resolve(
-//         sails ? sails.config.appPath : path.dirname(__dirname),
-//         'logs/error/error.log',
-//       ),
-//       level: 'error',
-//     }),
-//     new winston.transports.File({
-//       filename: path.resolve(
-//         sails ? sails.config.appPath : path.dirname(__dirname),
-//         'logs/activity/activity.log'
-//       ),
-//       level: 'info',
-//     }),
-//     //
-//     // - Write all logs with importance level of `error` or less to `error.log`
-//     // - Write all logs with importance level of `verbose` or less to `combined.log`
-//     //
-//     new winston.transports.File({
-//       filename: 'error.log',
-//       level: 'error',
-//       maxsize: 5 * 1028,
-//       tailable: true,
-//     }),
-//     new winston.transports.File({
-//       filename: 'combined.log',
-//       level: 'verbose',
-//       maxsize: 5 * 1028,
-//       tailable: true,
-//     }),
-//   ],
-// });
-
-//
-// If we're not in production then log to the `console` with the format:
-// `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
-//
-// logger2.add(
-//   // ~ Console transport requires the outputCapture key in launch.json ~ https://github.com/winstonjs/winston/issues/1544#issuecomment-472199224
-//   new winston.transports.Console({
-//     // format: winston.format.simple(),
-//     format: combine(
-//       all(),
-//       label({ label: version }),
-//       timestamp(),
-//       colorize(),
-//       align(),
-//       printf(
-//         (info) =>
-//           formatObject(info.message).includes('redis') ? null : `${info.timestamp} [${
-//             info.label
-//           }] ${info.level}: ${formatObject(info.message)}`
-//       )
-//     ),
-//     level: 'verbose',
-//     debugStdout: true,
-//   })
-// );
-// if (/*process.env.NODE_ENV !== 'production'*/true) {
-// }
-const loggingActivityFp = path.resolve(
+const loggingActivityFd = path.resolve(
   path.dirname(__dirname),
-  'logs/activity/activity.log'
+  'logs/activity'
 );
-// eslint-disable-next-line no-console
-console.log(`Attempting to log info logs to path: ${loggingActivityFp}`);
+const loggingActivityFp = path.resolve(
+  loggingActivityFd,
+  '/activity.log'
+);
+const loggingErrorsFd = path.resolve(
+  path.dirname(__dirname),
+  'logs/error'
+);
+const loggingErrorsFp = path.resolve(loggingErrorsFd, '/error.log');
+
+
+// if (!fs.existsSync(loggingActivityFd)) {
+//   console.log(`MKDIR "${loggingActivityFd}"`);
+//   fs.mkdirSync(path.dirname(loggingActivityFd));
+//   if (!fs.existsSync(loggingActivityFd)) {
+//     throw new Error(`Unable to create logging directory: ${loggingActivityFd}`);
+//   }
+// }
+
+// if (!fs.existsSync(loggingErrorsFd)) {
+//   console.log(`MKDIR "${loggingErrorsFd}"`);
+//   fs.mkdirSync(path.dirname(loggingErrorsFd));
+//   if (!fs.existsSync(loggingErrorsFd)) {
+//     throw new Error(`Unable to create logging directory: ${loggingErrorsFd}`);
+//   }
+// }
+
+// console.log(
+//   `Attempting to log info logs to path: "${loggingActivityFp}" & "${loggingErrorsFp}"`
+// );
+
 
 const logger = winston.createLogger({
   transports: [
@@ -191,20 +158,40 @@ const logger = winston.createLogger({
       level: 'verbose',
       debugStdout: true,
     }),
-    new winston.transports.File({
-      filename: path.resolve(path.dirname(__dirname), 'logs/error/error.log'),
-      level: 'error',
-    }),
-    new winston.transports.File({
-      filename: loggingActivityFp,
-      level: 'verbose',
-      maxsize: 5 * 1028,
-    }),
+    // new winston.transports.File({
+    //   filename: loggingErrorsFp,
+    //   level: 'error',
+    // }),
+    // new winston.transports.File({
+    //   filename: loggingActivityFp,
+    //   level: 'verbose',
+    //   maxsize: 5 * 1028,
+    // }),
+    // new winston.transports.PostgreSQL(dbOptions),
+    // new CustomPostgresTransport({ db }),
+    // new PostgresTransport({
+    //   connectionString: process.env.DATABASE_URL,
+    // }),
   ],
 });
 
+// logger.add(new winston.transports.PostgreSQL(dbOptions));
+
 // eslint-disable-next-line no-console
 // console.log(`Running logger with levels: ${JSON.stringify(logger2.levels)}`);
+
+// NOTE to add sails logs, we might be able to convert this to:
+// module.exports.log = async function () {
+  // ~ https://github.com/balderdashy/sails/issues/3773#issuecomment-230929938
+// module.exports.log = function () {
+//   console.log(sails ? `sails loaded for sails hook log: ${Object.keys(sails)}` : 'No sails present in log async function');
+//   sails.log.verbose('HELLO MOTHER FUCKIN WORLD');
+//   console.log('HELLO MOTHER FUCKIN WORLD FROM CONSOLE');
+//   return {
+//     custom: logger,
+//     inspect: false,
+//   };
+// }();
 
 module.exports.log = {
   custom: logger,

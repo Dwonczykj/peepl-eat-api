@@ -1,4 +1,4 @@
-import stripe from '../../../scripts/load_stripe';
+import stripeFactory from '../../../scripts/load_stripe';
 import Stripe from 'stripe';
 import {
   sailsVegi,
@@ -66,6 +66,7 @@ const _exports: SailsActionDefnType<
     exits: UpdateStripeAccountExits
   ) {
     try {
+      const stripe = await stripeFactory(this.req.session.userId);
       const account = await stripe.accounts.update(inputs.stripeCustomerId, inputs.updateCustomerParams);
       return exits.success(account);
     } catch (error) {

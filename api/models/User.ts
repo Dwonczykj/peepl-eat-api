@@ -109,6 +109,10 @@ let _exports: SailsModelDefnType<UserType> & { formatPhoneNumber?: (unusedOpts:{
       protect: true,
       example: '2$28a8eabna301089103-13948134nad',
     },
+    isTester: {
+      type: 'boolean',
+      defaultsTo: false,
+    },
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
     //  ╚═╝╩ ╩╚═╝╚═╝═╩╝╚═╝

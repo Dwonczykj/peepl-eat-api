@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {v4 as uuidv4} from 'uuid'; // const { v4: uuidv4 } = require('uuid');
 import moment from 'moment';
-import stripe from '../../scripts/load_stripe';
+import stripeFactory from '../../scripts/load_stripe';
 import Stripe from 'stripe';
 import { AccountType, OrderType, PaymentIntentMetaDataType, SailsActionDefnType, TransactionType } from '../../scripts/utils';
 import {
@@ -35,6 +35,7 @@ const checkCurrency = (currency:string) => {
 
 export type RefreshStripeTransactionsInputs = {
   accountId: number;
+  userId: number | null | undefined;
   transactionStatus?: string;
   dateBefore?: number;
   dateAfter?: number;
@@ -58,6 +59,10 @@ const _exports: SailsActionDefnType<
 
   inputs: {
     accountId: {
+      type: 'number',
+      required: false,
+    },
+    userId: {
       type: 'number',
       required: false,
     },
@@ -100,6 +105,7 @@ const _exports: SailsActionDefnType<
     inputs: RefreshStripeTransactionsInputs,
     exits: RefreshStripeTransactionsExits
   ) {
+    const stripe = await stripeFactory(inputs.userId);
     let accounts: SailsModelKVP<AccountType>[] = [];
     if(inputs.accountId){
       accounts = await Account.find({

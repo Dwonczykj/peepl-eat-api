@@ -1,4 +1,4 @@
-import stripe from '../../../scripts/load_stripe';
+import stripeFactory from '../../../scripts/load_stripe';
 import Stripe from 'stripe';
 import {
   sailsVegi,
@@ -61,6 +61,7 @@ const _exports: SailsActionDefnType<
     exits: GetStripeAccountExits
   ) {
     try {
+      const stripe = await stripeFactory(this.req.session.userId);
       const account = await stripe.accounts.retrieve(inputs.stripeCustomerId);
       return exits.success(account);
     } catch (error) {

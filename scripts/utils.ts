@@ -215,6 +215,7 @@ type _UserTypeHidden = {
   marketingPhoneContactAllowed: boolean;
   marketingPushContactAllowed: boolean;
   marketingNotificationUtility: -1 | 0 | 1 | 2;
+  isTester: boolean;
 };
 
 export type AccountType = {

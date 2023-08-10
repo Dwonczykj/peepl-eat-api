@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 
-import stripe, { StripeKeys } from '../../scripts/load_stripe';
+import stripeFactory, { StripeKeys } from '../../scripts/load_stripe';
 import Stripe from 'stripe';
 import { AccountType, CurrencyStripeAllowedTypeLiteral, OrderType, PaymentIntentMetaDataType, SailsActionDefnType } from '../../scripts/utils';
 import {
@@ -23,6 +23,7 @@ export type CreatePaymentIntentInternalInputs = {
   recipientWalletAddress?: string | null | undefined;
   senderWalletAddress?: string | null | undefined;
   accountId?: number | null | undefined;
+  userId: number | null | undefined;
   orderId: number;
   webhookAddress?: string | null | undefined;
   receiptEmail?: string | null | undefined;
@@ -90,6 +91,10 @@ const _exports: SailsActionDefnType<
       type: 'number',
       required: false,
     },
+    userId: {
+      type: 'number',
+      required: false,
+    },
     webhookAddress: {
       type: 'string',
       required: false,
@@ -112,7 +117,7 @@ const _exports: SailsActionDefnType<
     inputs: CreatePaymentIntentInternalInputs,
     exits: CreatePaymentIntentInternalExits
   ) {
-    
+    const stripe = await stripeFactory(inputs.userId);
     let vegiAccount: sailsModelKVP<AccountType>;
     try {
       const vegiAccounts = await Account.find({
@@ -179,14 +184,20 @@ const _exports: SailsActionDefnType<
     let setupIntent: Stripe.Response<Stripe.SetupIntent> | null = null;
     if (inputs.customerId) {
       try {
-        customer = await stripe.customers.retrieve(inputs.customerId); // todo: link the stripe customer id in the new stripe model table that links optionally to the users table or doesnt link and the customers stripe customer id is stored in the cloud on their device for security
-        sails.log.verbose(`Stripe customer RETRIEVED with id: "${customer.id}" and to be ensured sync with vegiAccount[${vegiAccount && vegiAccount.id}] from inputs.accountId: ${inputs.accountId}`);
+        customer = await stripe.customers.retrieve(inputs.customerId);
+        sails.log.verbose(
+          `Stripe customer RETRIEVED with id: "${
+            customer.id
+          }" and to be ensured sync with vegiAccount[${
+            vegiAccount && vegiAccount.id
+          }] from inputs.accountId: ${inputs.accountId}`
+        );
       } catch (error) {
         const _error = Error(
           `Failed to retrieve stripe from customerId: "${inputs.customerId}" with error: ${error}`
         );
         sails.log.error(`${_error}`);
-        await Account.update({id: inputs.accountId}).set({
+        await Account.update({ id: inputs.accountId }).set({
           stripeCustomerId: null,
         });
         return exits.success({
@@ -197,7 +208,13 @@ const _exports: SailsActionDefnType<
       }
     } else {
       customer = await stripe.customers.create();  
-      sails.log.verbose(`Stripe customer CREATED with id: "${customer.id}" and to be added to vegiAccount[${vegiAccount && vegiAccount.id}] from inputs.accountId: ${inputs.accountId}`);
+      sails.log.verbose(
+        `Stripe customer CREATED with id: "${
+          customer.id
+        }" and to be added to vegiAccount[${
+          vegiAccount && vegiAccount.id
+        }] from inputs.accountId: ${inputs.accountId}`
+      );
       // try {
       //   setupIntent = await stripe.setupIntents.create({
       //     usage: 'on_session', // ~ https://stripe.com/docs/api/setup_intents/create#create_setup_intent-usage
@@ -320,7 +337,8 @@ const _exports: SailsActionDefnType<
             // 'klarna',
             // 'us_bank_account',
           ],
-          statement_descriptor: `vegi - [${inputs.vendorDisplayName}]` || 'vegi', // + ` (${})`,
+          statement_descriptor:
+            `vegi - [${inputs.vendorDisplayName}]` || 'vegi', // + ` (${})`,
           // payment_method_types: ['card', 'link'],
           // ['card_present', 'link', acss_debit, affirm, afterpay_clearpay, alipay, au_becs_debit, bacs_debit, bancontact, blik, boleto, card, card_present, cashapp, customer_balance, eps, fpx, giropay, grabpay, ideal, interac_present, klarna, konbini, link, oxxo, p24, paynow, paypal, pix, promptpay, sepa_debit, sofort, us_bank_account, wechat_pay, and zip]
           // ~ https://stripe.com/docs/api/payment_intents/create#create_payment_intent-payment_method_types
@@ -338,15 +356,21 @@ const _exports: SailsActionDefnType<
           idempotencyKey: order.publicId, // ~ https://stripe.com/docs/api/idempotent_requests
         }
       );
-      sails.log.verbose(`New payment intent: "${paymentIntent.id}" created for customer:[${customer.id}] and order[${order.id}]`);
-      const paymentMethodsResponse = await stripe.customers.listPaymentMethods(customer.id);
-      let paymentMethods = paymentMethodsResponse ? paymentMethodsResponse.data : [];
-      if(paymentMethodsResponse && paymentMethodsResponse.has_more){
+      sails.log.verbose(
+        `New payment intent: "${paymentIntent.id}" created for customer:[${customer.id}] and order[${order.id}]`
+      );
+      const paymentMethodsResponse = await stripe.customers.listPaymentMethods(
+        customer.id
+      );
+      let paymentMethods = paymentMethodsResponse
+        ? paymentMethodsResponse.data
+        : [];
+      if (paymentMethodsResponse && paymentMethodsResponse.has_more) {
         const morePaymentMethodsResponse =
           await stripe.customers.listPaymentMethods(customer.id, {
             starting_after: paymentMethods[paymentMethods.length].id,
           });
-        if (morePaymentMethodsResponse && morePaymentMethodsResponse.data){
+        if (morePaymentMethodsResponse && morePaymentMethodsResponse.data) {
           paymentMethods = [
             ...paymentMethods,
             ...morePaymentMethodsResponse.data,

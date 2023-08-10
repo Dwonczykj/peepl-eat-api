@@ -1,6 +1,6 @@
 import { SailsModelType } from "../../../api/interfaces/iSails";
 import { OrderType } from "../../../scripts/utils";
-import stripe from '../../../scripts/load_stripe';
+import stripeFactory from '../../../scripts/load_stripe';
 
 declare var Order: SailsModelType<OrderType>;
 
@@ -49,6 +49,7 @@ module.exports = {
   },
 
   fn: async function (inputs, exits) {
+    const stripe = await stripeFactory(this.req.session.userId);
     var order = await Order.findOne({
       deliveryId: inputs.deliveryId,
       completedFlag: "",
