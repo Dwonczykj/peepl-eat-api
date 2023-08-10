@@ -193,8 +193,52 @@ const _exports: SailsActionDefnType<
           }] from inputs.accountId: ${inputs.accountId}`
         );
       } catch (error) {
+        if (`${error}`.startsWith('No such customer')){
+          sails.log.verbose(
+            `Recreate CustomerId for Account: "${inputs.accountId}" Failed to retrieve stripe from customerId: "${inputs.customerId}" with error: ${error}`
+          );
+        } else {
+          const _error = Error(
+            `Failed to retrieve stripe from customerId: "${inputs.customerId}" with error: ${error}`
+          );
+          sails.log.error(`${_error}`);
+          await Account.update({ id: inputs.accountId }).set({
+            stripeCustomerId: null,
+          });
+          return exits.success({
+            error: _error,
+            message: `Failed to retrieve stripe from customerId: "${inputs.customerId}" with error: ${error}`,
+            success: false,
+          });
+        }
+      }
+    } 
+    if(!customer) {
+      try {
+        customer = await stripe.customers.create();  
+        sails.log.verbose(
+          `Stripe customer CREATED with id: "${
+            customer.id
+          }" and to be added to vegiAccount[${
+            vegiAccount && vegiAccount.id
+          }] from inputs.accountId: ${inputs.accountId}`
+        );
+        // try {
+        //   setupIntent = await stripe.setupIntents.create({
+        //     usage: 'on_session', // ~ https://stripe.com/docs/api/setup_intents/create#create_setup_intent-usage
+        //     customer: customer.id,
+        //     // payment_method_types: ['card', 'link'], // [acss_debit, au_becs_debit, bacs_debit, bancontact, boleto, card, card_present, cashapp, ideal, link, paypal, sepa_debit, sofort, and us_bank_account]
+        //     automatic_payment_methods: {
+        //       enabled: true,
+        //     }, // ~ https://stripe.com/docs/api/setup_intents/create#create_setup_intent-automatic_payment_methods
+        //   });
+        // } catch (error) {
+        //   sails.log.error(`Unable to create stripe setupIntent in createPaymentIntentInternal helper. Error: ${error}`);
+        //   setupIntent = null;
+        // }
+      } catch (error) {
         const _error = Error(
-          `Failed to retrieve stripe from customerId: "${inputs.customerId}" with error: ${error}`
+          `Failed to create stripe customer with error: ${error}`
         );
         sails.log.error(`${_error}`);
         await Account.update({ id: inputs.accountId }).set({
@@ -202,32 +246,10 @@ const _exports: SailsActionDefnType<
         });
         return exits.success({
           error: _error,
-          message: `Failed to retrieve stripe from customerId: "${inputs.customerId}" with error: ${error}`,
+          message: `Failed to create stripe customer with error: ${error}`,
           success: false,
         });
       }
-    } else {
-      customer = await stripe.customers.create();  
-      sails.log.verbose(
-        `Stripe customer CREATED with id: "${
-          customer.id
-        }" and to be added to vegiAccount[${
-          vegiAccount && vegiAccount.id
-        }] from inputs.accountId: ${inputs.accountId}`
-      );
-      // try {
-      //   setupIntent = await stripe.setupIntents.create({
-      //     usage: 'on_session', // ~ https://stripe.com/docs/api/setup_intents/create#create_setup_intent-usage
-      //     customer: customer.id,
-      //     // payment_method_types: ['card', 'link'], // [acss_debit, au_becs_debit, bacs_debit, bancontact, boleto, card, card_present, cashapp, ideal, link, paypal, sepa_debit, sofort, and us_bank_account]
-      //     automatic_payment_methods: {
-      //       enabled: true,
-      //     }, // ~ https://stripe.com/docs/api/setup_intents/create#create_setup_intent-automatic_payment_methods
-      //   });
-      // } catch (error) {
-      //   sails.log.error(`Unable to create stripe setupIntent in createPaymentIntentInternal helper. Error: ${error}`);
-      //   setupIntent = null;
-      // }
     }
     if (
       !vegiAccount.stripeCustomerId ||
