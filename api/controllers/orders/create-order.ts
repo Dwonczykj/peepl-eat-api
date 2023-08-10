@@ -79,17 +79,17 @@ export type ValidateOrderResult = {
 
 
 type CreateOrderResult =
-  | {
-      orderId: null;
-      orderCreationStatus: 'failed';
-      order: null;
-      stripePaymentIntent: false;
-      error: Error;
-      // paymentIntent: Stripe.Response<Stripe.PaymentIntent>;
-      // ephemeralKey: string;
-      // customer: string;
-      // publishableKey: string;
-    }
+  // | {
+  //     orderId: null;
+  //     orderCreationStatus: 'failed';
+  //     order: null;
+  //     stripePaymentIntent: false;
+  //     error: Error;
+  //     // paymentIntent: Stripe.Response<Stripe.PaymentIntent>;
+  //     // ephemeralKey: string;
+  //     // customer: string;
+  //     // publishableKey: string;
+  //   }
   | {
       orderId: number;
       orderCreationStatus: 'confirmed' | 'failed';
@@ -105,6 +105,17 @@ export type CreateOrderResponse = CreateOrderResult;
 
 export type CreateOrderExits = {
   success: (unusedData: CreateOrderResponse) => any;
+  failed: (details: {
+      orderId: null;
+      orderCreationStatus: 'failed';
+      order: null;
+      stripePaymentIntent: false;
+      error: Error;
+      // paymentIntent: Stripe.Response<Stripe.PaymentIntent>;
+      // ephemeralKey: string;
+      // customer: string;
+      // publishableKey: string;
+    }) => any;
   issue: (unusedErr: Error | String) => void;
   notFound: () => void;
   error: (unusedErr: Error | String) => void;
@@ -203,6 +214,9 @@ const _exports: SailsActionDefnType<
     invalidSlot: {
       statusCode: 422,
       description: 'The fulfilment slot is invalid.',
+    },
+    failed: {
+      statusCode: 400,
     },
     deliveryPartnerUnavailable: {
       statusCode: 422,
@@ -728,7 +742,7 @@ const _exports: SailsActionDefnType<
         sails.log.error(
           `Failed to create order in db with error: ${result.error}`
         );
-        return exits.success({
+        return exits.failed({
           orderId: null,
           orderCreationStatus: 'failed',
           order: null,
@@ -787,7 +801,7 @@ const _exports: SailsActionDefnType<
         sails.log.error(
           err
         );
-        return exits.success({
+        return exits.failed({
           orderId: null,
           orderCreationStatus: 'failed',
           order: null,
@@ -803,7 +817,7 @@ const _exports: SailsActionDefnType<
       if (newPaymentIntent.success === false) {
         const err = newPaymentIntent.error;
         sails.log.error(`${newPaymentIntent.message}`);
-        return exits.success({
+        return exits.failed({
           orderId: null,
           orderCreationStatus: 'failed',
           order: null,

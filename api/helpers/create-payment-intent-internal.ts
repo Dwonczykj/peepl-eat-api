@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 
-import stripeFactory, { StripeKeys } from '../../scripts/load_stripe';
+import stripeFactory, { StripeKeys, userIsTester } from '../../scripts/load_stripe';
 import Stripe from 'stripe';
 import { AccountType, CurrencyStripeAllowedTypeLiteral, OrderType, PaymentIntentMetaDataType, SailsActionDefnType } from '../../scripts/utils';
 import {
@@ -118,6 +118,7 @@ const _exports: SailsActionDefnType<
     exits: CreatePaymentIntentInternalExits
   ) {
     const stripe = await stripeFactory(inputs.userId);
+    const isTester = await userIsTester(inputs.userId);
     let vegiAccount: sailsModelKVP<AccountType>;
     try {
       const vegiAccounts = await Account.find({
@@ -182,11 +183,12 @@ const _exports: SailsActionDefnType<
 
     let customer: Stripe.Customer | Stripe.DeletedCustomer; // ~ https://stripe.com/docs/api/accounts
     let setupIntent: Stripe.Response<Stripe.SetupIntent> | null = null;
+    const stripeEnvName = isTester ? 'TEST' : 'LIVE';
     if (inputs.customerId) {
       try {
         customer = await stripe.customers.retrieve(inputs.customerId);
         sails.log.verbose(
-          `Stripe customer RETRIEVED with id: "${
+          `Stripe [using ${stripeEnvName} env] customer RETRIEVED with id: "${
             customer.id
           }" and to be ensured sync with vegiAccount[${
             vegiAccount && vegiAccount.id
@@ -199,7 +201,7 @@ const _exports: SailsActionDefnType<
           );
         } else {
           const _error = Error(
-            `Failed to retrieve stripe from customerId: "${inputs.customerId}" with error: ${error}`
+            `Failed to retrieve stripe [using ${stripeEnvName} env] from customerId: "${inputs.customerId}" with error: ${error}`
           );
           sails.log.error(`${_error}`);
           await Account.update({ id: inputs.accountId }).set({
@@ -207,7 +209,7 @@ const _exports: SailsActionDefnType<
           });
           return exits.success({
             error: _error,
-            message: `Failed to retrieve stripe from customerId: "${inputs.customerId}" with error: ${error}`,
+            message: `Failed to retrieve stripe [using ${stripeEnvName} env] from customerId: "${inputs.customerId}" with error: ${error}`,
             success: false,
           });
         }
@@ -217,7 +219,7 @@ const _exports: SailsActionDefnType<
       try {
         customer = await stripe.customers.create();  
         sails.log.verbose(
-          `Stripe customer CREATED with id: "${
+          `Stripe [using ${stripeEnvName} env] customer CREATED with id: "${
             customer.id
           }" and to be added to vegiAccount[${
             vegiAccount && vegiAccount.id
