@@ -102,11 +102,12 @@ module.exports = {
       _phoneNumber = `+${user.phoneCountryCode}${x}`;
       _email = user.email;
     }
-
+    const testPhoneNumbers = `${sails.config.custom.testPhoneNumbers}`
+      .split(',')
+      .map((p) => `${sails.config.custom.testPhoneNumberCountryCode}${p}`);
     if (
       // process.env.NODE_ENV !== 'production' &&
-      _phoneNumber !==
-        `${sails.config.custom.testPhoneNumberCountryCode}${sails.config.custom.testPhoneNumber}`
+      !testPhoneNumbers.includes(_phoneNumber)
     ) {
       try {
         _userRecord = await firebase.getUserByPhone(_phoneNumber);

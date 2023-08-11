@@ -4857,6 +4857,10 @@
                   "oneOf": [
                     {
                       "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
                       "description": "The minimum order amount was not met."
                     },
                     {

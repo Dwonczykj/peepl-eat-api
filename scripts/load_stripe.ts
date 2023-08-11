@@ -100,7 +100,7 @@ export const userIsTester = async (userId: number | undefined | null) => {
         const user = users[0];
         forceTestMode = user.isTester;
         if(forceTestMode){
-          sails.log.verbose(`Using a testUser to access stripe so loading in test environment`);
+          sails.log.verbose(`Using a testUser[userId=${userId}] to access stripe so loading in test environment`);
         }
       }
     }

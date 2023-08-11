@@ -57,13 +57,14 @@ module.exports = {
       sails.log.error(`${error}`);
       sails.log.error(`Error whilst creating Notification object in send-sms-notification handler`);
     }
-
+    const testPhoneNumbers = `${sails.config.custom.testPhoneNumbers}`
+      .split(',')
+      .map((p) => `${sails.config.custom.testPhoneNumberCountryCode}${p}`);
     var dontActuallySend =
       sails.config.environment === 'test' ||
       process.env.NODE_ENV !== 'production' ||
       sails.config.custom.FIREBASE_AUTH_EMULATOR_HOST ||
-      inputs.to ===
-        `${sails.config.custom.testPhoneNumberCountryCode}${sails.config.custom.testPhoneNumber}`;
+      testPhoneNumbers.includes(inputs.to);
       
     if (dontActuallySend) {
       sails.log

@@ -211,12 +211,12 @@ requests over WebSockets instead of HTTP).`,
       phoneNoCountry: inputs.phoneNoCountry,
       phoneCountryCode: inputs.phoneCountryCode,
     };
+    const testPhoneNumbers = `${sails.config.custom.testPhoneNumbers}`.split(',');
     if (
       // process.env.NODE_ENV !== 'production' &&
       `+${inputs.phoneCountryCode}` ===
         sails.config.custom.testPhoneNumberCountryCode.toString() &&
-      inputs.phoneNoCountry.toString() ===
-        sails.config.custom.testPhoneNumber.toString() &&
+      testPhoneNumbers.includes(inputs.phoneNoCountry.toString())&&
       inputs.firebaseSessionToken ===
         sails.config.custom.testFirebaseSessionToken
     ) {
@@ -236,10 +236,10 @@ requests over WebSockets instead of HTTP).`,
         );
         if (!_users || _users.length < 1) {
           const _user = await User.create({
-            email: 'test_user_email@example.com',
+            email: 'test_user_email_1@example.com',
             isSuperAdmin: false,
             isTester: true,
-            secret: sails.config.custom.testFirebaseSMSVerificationCode,
+            secret: '',
             firebaseSessionToken: inputs.firebaseSessionToken,
             phoneNoCountry: inputPhoneDetails.phoneNoCountry,
             phoneCountryCode: inputPhoneDetails.phoneCountryCode,
@@ -247,7 +247,7 @@ requests over WebSockets instead of HTTP).`,
             marketingEmailContactAllowed: true,
             marketingPushContactAllowed: true,
             marketingSMSContactAllowed: true,
-            name: 'test_user',
+            name: 'test_user_1',
             role: 'consumer',
           }).fetch();
           return _completeLogin(_user);
