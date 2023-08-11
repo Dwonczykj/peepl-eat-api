@@ -195,7 +195,7 @@ const _exports: SailsActionDefnType<
           }] from inputs.accountId: ${inputs.accountId}`
         );
       } catch (error) {
-        if (`${error}`.startsWith('No such customer')){
+        if (`${error}`.includes('No such customer')){
           sails.log.verbose(
             `Recreate CustomerId for Account: "${inputs.accountId}" Failed to retrieve stripe from customerId: "${inputs.customerId}" with error: ${error}`
           );
