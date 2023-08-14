@@ -12,7 +12,7 @@ declare var Account: SailsModelType<AccountType>;
 
 
 export type SetRandomAvatarInputs = {
-  accountId: number;
+  userId: number;
 };
 
 export type SetRandomAvatarResponse = {
@@ -35,7 +35,7 @@ const _exports: SailsActionDefnType<
   friendlyName: 'SetRandomAvatar',
 
   inputs: {
-    accountId: {
+    userId: {
       type: 'number',
       required: true,
     }
@@ -63,10 +63,10 @@ const _exports: SailsActionDefnType<
     inputs: SetRandomAvatarInputs,
     exits: SetRandomAvatarExits
   ) {
-    const accounts = await Account.find({
-      id: inputs.accountId,
+    const users = await User.find({
+      id: inputs.userId,
     });
-    if (!accounts || accounts.length < 1) {
+    if (!users || users.length < 1) {
       return exits.notFound();
     }
 
@@ -98,8 +98,8 @@ const _exports: SailsActionDefnType<
     }
 
     try {
-      await Account.update({
-        id: inputs.accountId,
+      await User.update({
+        id: inputs.userId,
       }).set({
         imageUrl: imageUrl,
       });

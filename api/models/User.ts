@@ -9,7 +9,9 @@ import _ from 'lodash';
 
 import { UserType, SailsModelDefnType } from '../../scripts/utils';
 
-let _exports: SailsModelDefnType<UserType> & { formatPhoneNumber?: (unusedOpts:{id: UserType["id"]}) => any; } = {
+let _exports: SailsModelDefnType<UserType> & {
+  formatPhoneNumber?: (unusedOpts: { id: UserType['id'] }) => any;
+} = {
   attributes: {
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
@@ -112,6 +114,11 @@ let _exports: SailsModelDefnType<UserType> & { formatPhoneNumber?: (unusedOpts:{
     isTester: {
       type: 'boolean',
       defaultsTo: false,
+    },
+    imageUrl: {
+      type: 'string',
+      required: false,
+      defaultsTo: '',
     },
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗

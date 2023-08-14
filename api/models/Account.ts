@@ -29,11 +29,6 @@ let _exports: SailsModelDefnType<AccountType> = {
       required: false,
       defaultsTo: false,
     },
-    imageUrl: {
-      type: 'string',
-      required: false,
-      defaultsTo: '',
-    },
     stripeCustomerId: {
       type: 'string',
       required: false,

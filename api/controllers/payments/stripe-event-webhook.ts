@@ -19,6 +19,8 @@ declare var Discount: SailsModelType<DiscountType>;
 declare var Account: SailsModelType<AccountType>;
 declare var Transaction: SailsModelType<TransactionType>;
 
+
+
 export const getOrderByPaymentIntentIdSafe = async (params: {
   paymentIntentId: string;
   eventType: Stripe.Event['type'];
@@ -63,6 +65,117 @@ export const getOrderByPaymentIntentIdSafe = async (params: {
   return order;
 };
 
+interface Request {
+  id: string;
+  idempotency_key: string;
+}
+
+
+interface Address {
+  city: string;
+  country: string;
+  line1: string;
+  line2?: any;
+  postal_code: string;
+  state: string;
+}
+
+interface Shipping {
+  address: Address;
+  carrier?: any;
+  name: string;
+  phone?: any;
+  tracking_number?: any;
+}
+
+
+
+interface Card {
+  installments?: any;
+  mandate_options?: any;
+  network?: any;
+  request_three_d_secure: string;
+}
+
+interface Paymentmethodoptions {
+  card: Card;
+}
+interface Metadata {
+  senderWalletAddress: string;
+  recipientWalletAddress: string;
+  webhookAddress: string;
+  currency: string;
+  accountId: string;
+  walletAddress: string;
+  orderId: string;
+  amount: string;
+}
+
+
+
+interface Tip {}
+interface Amountdetails {
+  tip: Tip;
+}
+
+interface Object {
+  id: string;
+  object: string;
+  amount: number;
+  amount_capturable: number;
+  amount_details: Amountdetails;
+  amount_received: number;
+  application?: any;
+  application_fee_amount?: any;
+  automatic_payment_methods?: any;
+  canceled_at?: any;
+  cancellation_reason?: any;
+  capture_method: string;
+  client_secret: string;
+  confirmation_method: string;
+  created: number;
+  currency: string;
+  customer: string;
+  description?: any;
+  invoice?: any;
+  last_payment_error?: any;
+  latest_charge?: any;
+  livemode: boolean;
+  metadata: Metadata;
+  next_action?: any;
+  on_behalf_of?: any;
+  payment_method?: any;
+  payment_method_options: Paymentmethodoptions;
+  payment_method_types: string[];
+  processing?: any;
+  receipt_email?: any;
+  review?: any;
+  setup_future_usage?: any;
+  shipping: Shipping;
+  source?: any;
+  statement_descriptor: string;
+  statement_descriptor_suffix?: any;
+  status: string;
+  transfer_data?: any;
+  transfer_group?: any;
+}
+
+interface Data {
+  object: Object;
+}
+
+export interface StripeWebHookInput {
+  data: Data;
+  type: string;
+  id: string;
+  api_version: string;
+  created: number;
+  object: string;
+  livemode: boolean;
+  pending_webhooks: number;
+  request: Request;
+  account: string | undefined;
+}
 
 export type StripeEventWebhookInputs = Stripe.Event;
 
@@ -81,7 +194,7 @@ export type StripeEventWebhookExits = {
 // todo: 5. Deploy your webhook endpoint so it's a publicly accessible HTTPS URL.
 // todo: 6. Register your publicly accessible HTTPS URL in the Stripe dashboard. (https://stripe.com/docs/webhooks/go-live)
 const _exports: SailsActionDefnType<
-  StripeEventWebhookInputs,
+  StripeWebHookInput,
   StripeEventWebhookResponse,
   StripeEventWebhookExits
 > = {
@@ -148,7 +261,8 @@ const _exports: SailsActionDefnType<
   },
 
   fn: async function (
-    inputs: StripeEventWebhookInputs,
+    inputs: StripeWebHookInput,
+    // inputs: StripeEventWebhookInputs,
     exits: StripeEventWebhookExits
   ) {
     let data: Stripe.Event['data'];
@@ -178,8 +292,11 @@ const _exports: SailsActionDefnType<
         dataObj = inputs.data.object;
         eventType = inputs.type;
       }
-  
-      if (eventType.startsWith('payment_intent') && dataObj['object'] === "payment_intent") {
+
+      if (
+        eventType.startsWith('payment_intent') &&
+        dataObj['object'] === 'payment_intent'
+      ) {
         const paymentIntent = dataObj as Stripe.PaymentIntent;
         const paymentIntentId = paymentIntent.id;
         let order = await getOrderByPaymentIntentIdSafe({
@@ -200,7 +317,7 @@ const _exports: SailsActionDefnType<
           ['charges', 'data', '0', 'metadata'], // * dataObj.charges.data[0].metadata.amount, dataObj.charges.data[0].metadata.walletAddress
           {}
         );
-        
+
         let paymentStatus: OrderType['paymentStatus'];
         if (eventType === 'payment_intent.succeeded') {
           sails.log(
@@ -288,6 +405,9 @@ const _exports: SailsActionDefnType<
               stripeData: dataObj,
             },
           });
+        } else {
+          sails.log(`Stripe webhook received: ["${eventType}"]`);
+          paymentStatus = 'unpaid';
         }
         if (
           process.env.NODE_ENV &&
@@ -329,9 +449,7 @@ const _exports: SailsActionDefnType<
             paymentIntentId: paymentIntent.id,
             completedFlag: 'none',
           }).set({
-            paymentStatus: ['paid', 'unpaid', 'failed'].includes(
-              paymentStatus
-            )
+            paymentStatus: ['paid', 'unpaid', 'failed'].includes(paymentStatus)
               ? paymentStatus
               : 'failed',
             paidDateTime: unixtime,
@@ -367,10 +485,15 @@ Delivery/Collection on ${order.fulfilmentSlotFrom} - ${order.fulfilmentSlotTo}`,
             });
           } else if (order.paymentStatus === 'unpaid') {
             sails.log.verbose(
-              `New payment intent successfully setup for order[${
+              `Stripe event webhook called for Order[${
                 order.id
-              }] from inputs: ${util.inspect(inputs, { depth: null })}`
+              }] for ${inputs.type}`
             );
+            // sails.log.verbose(
+            //   `New payment intent successfully setup for order[${
+            //     order.id
+            //   }] from inputs: ${util.inspect(inputs, { depth: null })}`
+            // );
           } else if (order.paymentStatus === 'failed') {
             await sails.helpers.sendSlackNotification.with({ order: order });
             await sails.helpers.sendSmsNotification.with({
@@ -403,7 +526,7 @@ Delivery/Collection on ${order.fulfilmentSlotFrom} - ${order.fulfilmentSlotTo}`,
         }
 
         // turn into transaction if supported, then fo an order find after to check the updated order and TX
-        if(eventType === 'payment_intent.succeeded'){
+        if (eventType === 'payment_intent.succeeded') {
           try {
             sails.log.info(
               `Set order with id: "${order.id}" to paid for stripe event: ${eventType}`
@@ -521,9 +644,10 @@ Delivery/Collection on ${order.fulfilmentSlotFrom} - ${order.fulfilmentSlotTo}`,
             );
           }
         } else {
-          sails.log.warn(`Ignoring call to stripe-event-webhook with payment intentevent: "${eventType}" as was not a success`);
+          sails.log.warn(
+            `Ignoring call to stripe-event-webhook with payment intentevent: "${eventType}" as was not a success`
+          );
         }
-        
       } else if (
         eventType.startsWith('refund') &&
         dataObj['object'] === 'refund'
@@ -540,7 +664,7 @@ Delivery/Collection on ${order.fulfilmentSlotFrom} - ${order.fulfilmentSlotTo}`,
         if (!order) {
           return exits.success();
         }
-        if (eventType === 'refund.created'){
+        if (eventType === 'refund.created') {
           // paymentStatus = 'refunded';
           if (order.firebaseRegistrationToken) {
             await sails.helpers.sendFirebaseNotification.with({
@@ -554,7 +678,7 @@ Delivery/Collection on ${order.fulfilmentSlotFrom} - ${order.fulfilmentSlotTo}`,
               },
             });
           }
-          
+
           await sails.helpers.broadcastFirebaseNotificationForTopic.with({
             topic: `order-${order.publicId}`,
             title: 'Payment refunded',
@@ -568,20 +692,22 @@ Delivery/Collection on ${order.fulfilmentSlotFrom} - ${order.fulfilmentSlotTo}`,
             await Order.updateOne(order.id).set({
               refundDateTime: Date.now(),
               paymentStatus: 'refunded',
-              completedFlag: 'refunded'
+              completedFlag: 'refunded',
               // refundDateTime: moment().format(datetimeStrFormatExact);
             });
           } catch (error) {
-            sails.log.error(`Failed to update refund status on order: [${order.id}] in stripe-event-webhook with error: ${error}`);
+            sails.log.error(
+              `Failed to update refund status on order: [${order.id}] in stripe-event-webhook with error: ${error}`
+            );
           }
         }
       } else if (
         eventType.startsWith('customer') &&
         dataObj['object'] === 'customer'
       ) {
-        // Check that the customerId matches the accountId.customerId on the order via 
+        // Check that the customerId matches the accountId.customerId on the order via
         // order.customerWalletAddress -> account.walletAddress -> account.stripeCustomerId
-        const customer:Stripe.Customer = dataObj as any;
+        const customer: Stripe.Customer = dataObj as any;
         const customerId = customer.id;
         const accounts = await Account.find({
           stripeAccountId: customerId,

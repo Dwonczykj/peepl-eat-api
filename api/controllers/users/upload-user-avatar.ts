@@ -18,7 +18,7 @@ declare var Account: SailsModelType<AccountType>;
 
 export type UploadUserAvatarInputs = {
   image: any;
-  accountId: number;
+  userId: number;
 };
 
 export type UploadUserAvatarResponse = {
@@ -52,7 +52,7 @@ const _exports: SailsActionDefnType<
       required: true,
       description: 'image byte stream',
     },
-    accountId: {
+    userId: {
       type: 'number',
       required: true,
     },
@@ -84,7 +84,7 @@ const _exports: SailsActionDefnType<
     exits: UploadUserAvatarExits
   ) {
     const accounts = await Account.find({
-      id: inputs.accountId
+      id: inputs.userId
     });
     if (!accounts || accounts.length < 1){
       return exits.notFound();
@@ -101,8 +101,8 @@ const _exports: SailsActionDefnType<
       return exits.uploadFailed('Unable to upload image to S3');
     }
 
-    const updatedAccount = await Account.update({
-      id: inputs.accountId
+    const updatedAccount = await User.update({
+      id: inputs.userId
     }).set({
       imageUrl: imageUrl,
     });

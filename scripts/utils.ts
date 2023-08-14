@@ -216,6 +216,7 @@ type _UserTypeHidden = {
   marketingPushContactAllowed: boolean;
   marketingNotificationUtility: -1 | 0 | 1 | 2;
   isTester: boolean;
+  imageUrl: string;
 };
 
 export type AccountType = {
@@ -223,7 +224,6 @@ export type AccountType = {
   accountType: 'ethereum' | 'bank' | null;
   verified: boolean;
   walletAddress: walletAddressString | '' | string;
-  imageUrl: string;
   stripeCustomerId: string | null;
   stripeAccountId: string | null;
   bankCardNumber: string | null;
