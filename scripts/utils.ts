@@ -3,6 +3,7 @@ import moment from 'moment';
 import { NonValueKeys, OptionalValueKeys, RequiredValueKeys } from "../api/interfaces/iSails";
 import { Currency } from "../api/interfaces/peeplPay";
 import { DaysOfWeek } from "./DaysOfWeek";
+import { logLevelDict } from '../api/controllers/logging/log';
 declare var sails: any;
 
 /**
@@ -694,9 +695,10 @@ export type DiscountType = _DiscountTypeHidden & {
 export type AppLogType = {
   id: number;
   message: string;
+  level: keyof typeof logLevelDict | '';
   details: object;
   timestamp: Date;
-}
+};
 
 export type NotificationType = {
   id: number;

@@ -434,10 +434,6 @@
             "type": "boolean",
             "default": false
           },
-          "imageUrl": {
-            "type": "string",
-            "default": ""
-          },
           "stripeCustomerId": {
             "type": "string",
             "nullable": true
@@ -2502,6 +2498,10 @@
           "isTester": {
             "type": "boolean",
             "default": false
+          },
+          "imageUrl": {
+            "type": "string",
+            "default": ""
           },
           "vendor": {
             "description": "JSON dictionary representing the **vendor** instance or FK when creating / updating / not populated",
@@ -10087,7 +10087,7 @@
           },
           {
             "in": "query",
-            "name": "accountId",
+            "name": "userId",
             "required": true,
             "schema": {
               "type": "number",
@@ -10226,7 +10226,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "accountId",
+            "name": "userId",
             "required": true,
             "schema": {
               "type": "number",

@@ -16,10 +16,52 @@ import {
 declare var sails: sailsVegi;
 declare var AppLog: SailsModelType<AppLogType>;
 
+export enum LogLevel {
+  wtf,
+  silly,
+  trace,
+  verbose,
+  debug,
+  info,
+  warn,
+  error
+};
+
+export const logLevelDict = {
+  error: LogLevel.error,
+  warn: LogLevel.warn,
+  info: LogLevel.info,
+  debug: LogLevel.debug,
+  verbose: LogLevel.verbose,
+  trace: LogLevel.trace,
+  silly: LogLevel.silly,
+  wtf: LogLevel.wtf,
+};
+
+const logLevel = sails.config.log.level;
+
+/**
+ * The function checks if a given log level is superior to another log level.
+ * @param {string} appLogLevel - The `appLogLevel` parameter represents the log level of the
+ * application, while the `logLevelToLog` parameter represents the log level that you want to log.
+ * @param {string} logLevelToLog - The `logLevelToLog` parameter is a string that represents the log
+ * level that you want to log.
+ * @returns a boolean value. It returns true if the `appLogLevel` is equal to or lower than the
+ * `logLevelToLog` based on their positions in the `logLevelDict` object. Otherwise, it returns false.
+ */
+const isSuperiorLog = (appLogLevel: string, logLevelToLog: string) => {
+  if(Object.keys(logLevelDict).includes(appLogLevel.toLowerCase()) && Object.keys(logLevelDict).includes(logLevelToLog.toLowerCase())){
+    return Object.keys(logLevelDict).indexOf(appLogLevel.toLowerCase()) <= Object.keys(logLevelDict).indexOf(logLevelToLog.toLowerCase());
+  }
+  return false;
+};
+
 
 export type LogInputs = {
   message: string,
-  details: object,
+  details: {
+    level?: keyof typeof logLevelDict
+  },
 };
 
 export type LogResponse = boolean;
@@ -73,15 +115,30 @@ const _exports: SailsActionDefnType<
     inputs: LogInputs,
     exits: LogExits
   ) {
+    var level = LogLevel.wtf;
+    if(inputs.details && Object.keys(inputs.details).includes('level') && Object.keys(logLevelDict).includes(`${inputs.details.level}`.toLowerCase())){
+      level = logLevelDict[`${inputs.details.level}`.toLowerCase()];
+    }
     try {
       await AppLog.create({
         message: inputs.message,
         timestamp: moment(moment.now()).format(datetimeStrFormatExact),
+        level: level.toString() || 'trace',
         details: inputs.details,
       });
     } catch (error) {
       sails.log.error(`Error trying to log to applog: ${error}`);
       return exits.success(false);
+    }
+    try {
+      if(level === LogLevel.error){
+        await sails.helpers.sendEmailToSupport.with({
+          subject: `vegi-app error logged [${Date.now()}]`,
+          message: `${inputs.message}\n\nDetails:\n${inputs.details}`,
+        });
+      }
+    } catch (error) {
+      sails.log.error(`Error trying to log error as support email from applog handler: ${error}`);
     }
 
     return exits.success(true);

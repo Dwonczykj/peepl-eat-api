@@ -21,6 +21,10 @@ let _exports: SailsModelDefnType<AppLogType> = {
       type: 'string',
       required: true,
     },
+    level: {
+      type: 'string',
+      required: false,
+    },
     timestamp: {
       type: 'ref',
       columnType: 'date',

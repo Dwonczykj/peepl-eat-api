@@ -32,6 +32,7 @@ import { CalculateCurrencyOperationInputs, CalculateCurrencyOperationResponse } 
 import { Currency } from "./peeplPay";
 import { CheckDiscountCodeInputs, CheckDiscountCodeResponse } from "../../api/helpers/check-discount-code";
 import { SendFirebaseNotificationInputs, SendFirebaseNotificationResult } from "../../api/helpers/send-firebase-notification";
+import { logLevelDict } from "../controllers/logging/log";
 
 export type SailsActionInput =
   | {
@@ -826,7 +827,7 @@ export type sailsVegi = {
       trustProxy: boolean;
     };
     log: {
-      level: 'debug' | '';
+      level: keyof typeof logLevelDict | '';
     };
     sockets: {
       onlyAllowOrigins: string[];
