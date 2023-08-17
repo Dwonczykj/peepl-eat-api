@@ -696,6 +696,7 @@ export type AppLogType = {
   id: number;
   message: string;
   level: keyof typeof logLevelDict | '';
+  label: string | null;
   details: object;
   timestamp: Date;
 };
