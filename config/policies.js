@@ -59,6 +59,9 @@ module.exports.policies = {
   'admin/create-postal-district': ['is-super-admin'],
   'admin/edit-postal-district': ['is-super-admin'],
   'admin/view-postal-districts': ['is-super-admin'],
+  'admin/users': ['is-super-admin'],
+  'admin/accounts': ['is-super-admin'],
+  'admin/logs': ['is-super-admin'],
   'admin/update-stock-count': ['is-logged-in'],
   'admin/view-approve-order': true, //TODO: add 'is-logged-in' and 'is-vendor' poligices to this
   'admin/approve-or-decline-order': true, //TODO: add 'is-logged-in' and 'is-vendor' poligices to this

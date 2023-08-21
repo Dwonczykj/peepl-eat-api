@@ -46,6 +46,15 @@
       "name": "View account"
     },
     {
+      "name": "ViewAccounts"
+    },
+    {
+      "name": "ViewUsers"
+    },
+    {
+      "name": "ViewAppLogs"
+    },
+    {
       "name": "ResetPassword"
     },
     {
@@ -89,6 +98,9 @@
     },
     {
       "name": "View all vendors"
+    },
+    {
+      "name": "AllProductsForVendor"
     },
     {
       "name": "View my orders"
@@ -367,6 +379,9 @@
       "name": "View vendor menu [DEPRECATED]"
     },
     {
+      "name": "GetProduct"
+    },
+    {
       "name": "View product suggestion"
     },
     {
@@ -590,6 +605,13 @@
           },
           "message": {
             "type": "string"
+          },
+          "level": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string",
+            "nullable": true
           },
           "timestamp": {
             "type": "string",
@@ -3190,6 +3212,132 @@
         }
       }
     },
+    "/admin/accounts": {
+      "get": {
+        "summary": "ViewAccounts",
+        "tags": [
+          "ViewAccounts"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/admin/users": {
+      "get": {
+        "summary": "ViewUsers",
+        "tags": [
+          "ViewUsers"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/admin/logs": {
+      "get": {
+        "summary": "ViewAppLogs",
+        "tags": [
+          "ViewAppLogs"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
     "/admin/reset-password": {
       "post": {
         "summary": "ResetPassword",
@@ -3835,6 +3983,42 @@
           },
           "500": {
             "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/products": {
+      "get": {
+        "summary": "AllProductsForVendor",
+        "tags": [
+          "AllProductsForVendor"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "vendorId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
           }
         }
       }
@@ -10457,6 +10641,24 @@
               "default": {},
               "example": {}
             }
+          },
+          {
+            "in": "query",
+            "name": "level",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          },
+          {
+            "in": "query",
+            "name": "label",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
           }
         ],
         "responses": {
@@ -11330,6 +11532,42 @@
           },
           "500": {
             "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/products/{productId}": {
+      "get": {
+        "summary": "GetProduct",
+        "tags": [
+          "GetProduct"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "productId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
           }
         }
       }

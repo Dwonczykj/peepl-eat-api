@@ -44,6 +44,8 @@ module.exports.routes = {
     action: 'vendors/get-postal-districts',
   },
 
+  'GET /api/v1/products': { action: 'products/all-products-for-vendor' },
+  'GET /api/v1/products/:productId': { action: 'products/get-product' },
   // PRODUCT OPTIONS
   'GET /api/v1/products/get-product-options/:productId': {
     action: 'products/get-product-options',
@@ -101,6 +103,9 @@ module.exports.routes = {
   'GET /api/v1/admin/signup': { action: 'admin/view-signup' },
 
   'GET /admin/account': { action: 'admin/view-account' },
+  'GET /admin/accounts': { action: 'admin/view-accounts' },
+  'GET /admin/users': { action: 'admin/view-users' },
+  'GET /admin/logs': { action: 'admin/view-app-logs' },
 
   // 'POST /admin/login': { action: 'admin/login' },
   // 'POST /api/v1/admin/login': { action: 'admin/login' },
