@@ -66,7 +66,10 @@ module.exports = {
 
     this.req.session.userId = userRecord.id;
     this.req.session.userRole = userRecord.role;
-    return exits.success(userRecord);
+    return exits.success({
+      user: userRecord,
+      session: this.req.session.cookie,
+    });
 
     // const user = await signInWithEmailAndPassword(auth, inputs.email, inputs.password)
     // if(!user){

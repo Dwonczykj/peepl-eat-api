@@ -64,6 +64,6 @@ const _exports: SailsActionDefnType<
     
     return exits.success(sources);
   },
-};
+};  
 
 module.exports = _exports;
