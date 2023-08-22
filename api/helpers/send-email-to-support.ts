@@ -3,8 +3,9 @@ import { sailsVegi } from "api/interfaces/iSails";
 declare var sails: sailsVegi;
 
 export type SendEmailToSupportInputs = {
-  subject:string;
-  message:string;
+  subject: string;
+  message: string;
+  additionalInfo?: string | null | undefined;
 };
 
 module.exports = {
@@ -19,6 +20,11 @@ module.exports = {
     message: {
       type: 'string',
       required: true,
+    },
+    additionalInfo: {
+      type: 'string',
+      required: false,
+      defaultsTo: '',
     },
   },
 
@@ -36,9 +42,7 @@ module.exports = {
   fn: async function (
     inputs: SendEmailToSupportInputs,
     exits: {
-      success: (
-        
-      ) => void;
+      success: () => void;
       error: (unusedError: Error) => void;
     }
   ) {
@@ -47,6 +51,7 @@ module.exports = {
         template: 'email-support-internal',
         templateData: {
           message: inputs.message,
+          additionalInfo: inputs.additionalInfo,
         },
         subject: inputs.subject,
         to: 'hello@vegiapp.co.uk',
