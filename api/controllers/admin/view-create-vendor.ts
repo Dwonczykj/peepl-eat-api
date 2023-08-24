@@ -15,9 +15,13 @@ import HttpStatusCode from '../../interfaces/httpStatusCodes';
 
 export type ViewCreateVendorInputs = {};
 
-export type ViewCreateVendorResponse = {
-  vendor?: OmitIdRecursive<VendorType>;
-} | false;
+export type ViewCreateVendorResponse =
+  | {
+      vendor?: OmitIdRecursive<VendorType>;
+      googleApiKey: string;
+      userRole: string;
+    }
+  | false;
 
 export type ViewCreateVendorExits = {
   success: (unusedData: ViewCreateVendorResponse) => any;
@@ -117,7 +121,17 @@ const _exports: SailsActionDefnType<
 
     // Respond with view.
     // return exits.success({ vendor: createVendor });
-    return exits.success({ });
+    if (this.req.wantsJSON) {
+      return exits.successJSON({
+        googleApiKey: sails.config.custom.distancesApiKey,
+        userRole: this.req.session.userRole,
+      });
+    } else {
+      return exits.success({
+        googleApiKey: sails.config.custom.distancesApiKey,
+        userRole: this.req.session.userRole,
+      });
+    }
   },
 };
 
