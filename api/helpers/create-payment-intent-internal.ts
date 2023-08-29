@@ -362,7 +362,7 @@ const _exports: SailsActionDefnType<
             // 'us_bank_account',
           ],
           statement_descriptor:
-            `vegi - [${inputs.vendorDisplayName}]` || 'vegi', // + ` (${})`,
+            `vegi - [${inputs.vendorDisplayName}]`.substring(0, 22) || 'vegi', // + ` (${})`,
           // payment_method_types: ['card', 'link'],
           // ['card_present', 'link', acss_debit, affirm, afterpay_clearpay, alipay, au_becs_debit, bacs_debit, bancontact, blik, boleto, card, card_present, cashapp, customer_balance, eps, fpx, giropay, grabpay, ideal, interac_present, klarna, konbini, link, oxxo, p24, paynow, paypal, pix, promptpay, sepa_debit, sofort, us_bank_account, wechat_pay, and zip]
           // ~ https://stripe.com/docs/api/payment_intents/create#create_payment_intent-payment_method_types

@@ -16,6 +16,7 @@ export type FormattedOrderForClients = ({
         id: number;
         unfulfilled: boolean;
         product: {
+          id: number;
           name: string;
           basePrice: number;
           options: {
@@ -45,6 +46,7 @@ export type ViewMyOrdersResponseType = {
   scheduledOrders: Array<FormattedOrderForClients>;
   unpaidOrders: Array<FormattedOrderForClients>;
   pastOrders: Array<FormattedOrderForClients>;
+  allMyOrders: Array<FormattedOrderForClients>;
   userRole: any;
 }
 
@@ -323,6 +325,10 @@ const _exports = {
       orders:_unpaidOrders,
       walletId: inputs.walletId,
     });
+    const allMyOrders = await sails.helpers.formatOrders.with({
+      orders: _allMyOrders,
+      walletId: inputs.walletId,
+    });
 
     // Respond with view or JSON.
     if (this.req.wantsJSON) {
@@ -331,6 +337,7 @@ const _exports = {
         scheduledOrders: scheduledOrders ? scheduledOrders.orders : [],
         pastOrders: pastOrders ? pastOrders.orders : [],
         unpaidOrders: unpaidOrders ? unpaidOrders.orders : [],
+        allMyOrders: allMyOrders ? allMyOrders.orders : [],
         userRole: this.req.session.userRole,
       });
     } else {
@@ -339,6 +346,7 @@ const _exports = {
         scheduledOrders: scheduledOrders ? scheduledOrders.orders : [],
         pastOrders: pastOrders ? pastOrders.orders : [],
         unpaidOrders: unpaidOrders ? unpaidOrders.orders : [],
+        allMyOrders: allMyOrders ? allMyOrders.orders : [],
         userRole: this.req.session.userRole,
       });
     }

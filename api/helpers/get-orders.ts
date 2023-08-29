@@ -15,7 +15,7 @@ declare var Transaction: SailsModelType<TransactionType>;
 
 
 export type GetOrdersInputs = {
-  acceptanceStatus: OrderAcceptedStatusType,
+  acceptanceStatus: OrderAcceptedStatusType | '',
   timePeriod: TimePeriodEnumType,
   customerWalletAddress?: string | null,
 };
@@ -43,12 +43,10 @@ const _exports: SailsActionDefnType<
     acceptanceStatus: {
       type: 'string',
       description: 'The acceptance status of the order',
-      isIn: ['accepted', 'rejected', 'pending'],
     },
     timePeriod: {
       type: 'string',
       description: 'The time period of the order',
-      isIn: ['upcoming', 'past', 'all'],
     },
     customerWalletAddress: {
       type: 'string',

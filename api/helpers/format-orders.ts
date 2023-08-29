@@ -33,6 +33,7 @@ export type FormattedOrderForClients =
             id: number;
             unfulfilled: boolean;
             product: {
+              id: number;
               name: string;
               basePrice: number;
               options: {
@@ -169,6 +170,7 @@ const _exports: SailsActionDefnType<
                 id: orderItem.id,
                 unfulfilled: orderItem.unfulfilled,
                 product: isInt(orderItem.product) ? orderItem.product : orderItem.product && {
+                  id: orderItem.product.id,
                   name: orderItem.product.name,
                   basePrice: orderItem.product.basePrice,
                   options: orderItem.optionValues.map((optionValue) => {
