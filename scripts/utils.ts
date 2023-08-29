@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import moment from 'moment';
-import { NonValueKeys, OptionalValueKeys, RequiredValueKeys } from "../api/interfaces/iSails";
+import { NonValueKeys, OptionalValueKeys, RequiredValueKeys, sailsModelKVP } from "../api/interfaces/iSails";
 import { Currency } from "../api/interfaces/peeplPay";
 import { DaysOfWeek } from "./DaysOfWeek";
 import { logLevelDict } from '../api/controllers/logging/log';
@@ -342,7 +342,7 @@ export type _OpeningHoursTypeHidden = {
 export type FulfilmentMethodType = _FulfilmentMethodTypeHidden & {
   vendor?: _VendorTypeHidden;
   deliveryPartner?: _DeliveryPartnerTypeHidden;
-  openingHours?: _OpeningHoursTypeHidden;
+  openingHours?: _OpeningHoursTypeHidden[];
   fulfilmentOrigin?: _AddressTypeHidden;
 };
 
@@ -558,6 +558,97 @@ export type ProductSuggestionType = _ProductSuggestionTypeHidden & {
   imageUrls: Array<ProductSuggestionImageType>;
 }
 
+
+interface ESCAPIProductType {
+  basePrice: number;
+  brandName: string;
+  createdAt: number;
+  description: string;
+  id: number;
+  imageUrl: string;
+  ingredients?: any;
+  isAvailable: boolean;
+  isFeatured: boolean;
+  name: string;
+  priority: number;
+  productBarCode: string;
+  proxyForVegiProduct?: any;
+  shortDescription: string;
+  sizeInnerUnitType: string;
+  sizeInnerUnitValue: number;
+  status: string;
+  stockCount: number;
+  stockUnitsPerProduct: number;
+  supplier: string;
+  taxGroup: string;
+  updatedAt: number;
+  vendor: number;
+  vendorInternalId: string;
+}
+
+interface ESCAPIRatingType {
+  calculated_on: string;
+  id: number;
+  product: number;
+  product_id: string;
+  product_name: string;
+  rating: number;
+}
+
+interface ESCAPIExplanation {
+  evidence: string;
+  id: number;
+  measure: number;
+  rating: number;
+  reasons: string[];
+  source: number;
+  title: string;
+}
+
+interface ESCAPINewRatingType {
+  explanations: ESCAPIExplanation[];
+  rating: ESCAPIRatingType;
+}
+
+interface ESCAPIMostsimilarescproduct {
+  brandName: string;
+  category: string;
+  dateOfBirth: string;
+  description: string;
+  id: number;
+  imageUrl: string;
+  ingredients: string;
+  keyWords: any[];
+  name: string;
+  origin: string;
+  packagingType: string;
+  productBarCode: string;
+  product_external_id_on_source: string;
+  sizeInnerUnitType: string;
+  sizeInnerUnitValue: number;
+  source: number;
+  stockUnitsPerProduct: number;
+  supplier: string;
+  taxGroup: string;
+}
+
+interface ESCAPIProductCategoryType {
+  categoryGroup: number;
+  createdAt: number;
+  id: number;
+  imageUrl: string;
+  name: string;
+  updatedAt: number;
+  vendor: number;
+}
+
+export interface ESCAPIRateVegiProductResponseType {
+  category: ESCAPIProductCategoryType;
+  most_similar_esc_product: ESCAPIMostsimilarescproduct;
+  new_rating: ESCAPINewRatingType;
+  product: ESCAPIProductType;
+}
+
 export type ESCRatingType = {
   id: number;
   createdAt: number;
@@ -615,6 +706,7 @@ export type SustainedAPIChoiceProductType = {
     impacts: string;
   };
 };
+
 
 export type SustainedAPIChoiceGetProductsResponseType = SustainedAPIChoiceResponseType & {
   products: SustainedAPIChoiceProductType[];

@@ -210,6 +210,11 @@ Cloud.setup({
       url: '/api/v1/admin/reset-password',
       args: ['emailAddress'],
     },
+    deleteOldApplogs: {
+      verb: 'POST',
+      url: '/api/v1/admin/delete-old-applogs',
+      args: ['upToDate'],
+    },
     createVendor: {
       verb: 'POST',
       url: '/api/v1/admin/create-vendor',

@@ -107,8 +107,6 @@ export type NonValueKeys<T> = Exclude<keyof T, ValueKeys<T>>;
 //   [K in keyof TT]: TT[K] extends undefined ? never: K;
 // }[keyof TT];
 
-
-
 type WaterlineValueComparisonKeys<T extends Date | number | string | boolean> =
   T extends Date
     ? {
@@ -389,11 +387,13 @@ export type SailsModelType<T> = {
       | WaterlineQueryKeys<T>
   ) => SailsUpdateSetType<T>;
   destroy: (
-    unusedArg:
-      | number
-      | { [key in keyof T]?: T[key] | number | Array<T[key] | number> }
-      | WaterlineQueryKeys<T>
-  ) => SailsFetchType<T>;
+    // unusedArg:
+    //   | number
+    //   | { [key in keyof T]?: T[key] | number | Array<T[key] | number> }
+    //   | WaterlineQueryKeys<T>
+    // ~ https://www.typescriptlang.org/docs/handbook/utility-types.html#extracttype-union
+    unusedArg?: SailsQueryFindCriteria<T>
+  ) => Promise<sailsModelKVP<T>[] | null> & SailsFetchType<T>;
   create: (
     unusedArg:
       | {

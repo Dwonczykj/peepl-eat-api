@@ -42,9 +42,9 @@ parasails.registerComponent('openingHours', {
             <div class="action-card__content">
                 <br/>
                 <label for="appt">Select opening time:</label>
-                <input type="time" id="appt" name="appt" v-model="hours.openTime" :disabled="!hours.isOpen">
+                <input type="time" step="1" id="appt" name="appt" v-model="hours.openTime" :disabled="!hours.isOpen">
                 <label for="appt">Select closing time:</label>
-                <input type="time" id="appt" name="appt" v-model="hours.closeTime" :disabled="!hours.isOpen">
+                <input type="time" step="1" id="appt" name="appt" v-model="hours.closeTime" :disabled="!hours.isOpen">
             </div>
             </details>
         </div>

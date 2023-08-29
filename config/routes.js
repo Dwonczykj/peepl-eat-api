@@ -177,6 +177,9 @@ module.exports.routes = {
   'GET /admin/logout': { action: 'admin/logout' },
   'ALL /api/v1/admin/logout': { action: 'admin/logout' },
   'POST /api/v1/admin/deregister-user': { action: 'admin/deregister-user' },
+  'POST /api/v1/admin/delete-old-applogs': {
+    action: 'admin/delete-old-applogs',
+  },
   'POST /api/v1/admin/delete-account-entry': {
     action: 'admin/delete-account-entry',
   },

@@ -81,10 +81,38 @@ module.exports = {
       }
     });
 
+    const sortOpeningHours = (ful: FulfilmentMethodType) => {
+      const days = [
+        'monday',
+        'tuesday',
+        'wednesday',
+        'thursday',
+        'friday',
+        'saturday',
+        'sunday',
+      ];
+      if (ful && ful.openingHours) {
+        const { openingHours, ...rest } = ful;
+        ful = {
+          ...rest,
+          openingHours: ful.openingHours.sort(
+            (a, b) =>
+              days.indexOf(a.dayOfWeek.toLocaleLowerCase()) -
+                days.indexOf(b.dayOfWeek.toLocaleLowerCase()) ||
+              a.openTime.localeCompare(b.openTime) ||
+              a.closeTime.localeCompare(b.closeTime)
+          ),
+        };
+      }
+      return ful;
+    };
     var delFul = delFulVendor.deliveryFulfilmentMethod as FulfilmentMethodType;
 
     var colFul =
       colFulVendor.collectionFulfilmentMethod as FulfilmentMethodType;
+
+    delFul = sortOpeningHours(delFul);
+    colFul = sortOpeningHours(colFul);
 
     // Get a list of delivery partners
     var deliveryPartners = await DeliveryPartner.find({ status: 'active' });

@@ -211,6 +211,9 @@
       "name": "Deregister User Vendor Role"
     },
     {
+      "name": "DeleteOldApplogs"
+    },
+    {
       "name": "DeleteAccountEntry"
     },
     {
@@ -6900,6 +6903,42 @@
         }
       }
     },
+    "/api/v1/admin/delete-old-applogs": {
+      "post": {
+        "summary": "DeleteOldApplogs",
+        "tags": [
+          "DeleteOldApplogs"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "upToDate",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
     "/api/v1/admin/delete-account-entry": {
       "post": {
         "summary": "DeleteAccountEntry",
@@ -9969,7 +10008,23 @@
             }
           },
           "400": {
-            "description": "Success"
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
+                    {
+                      "type": "string",
+                      "description": "Server error"
+                    }
+                  ]
+                }
+              }
+            }
           },
           "404": {
             "description": "Resource not found"

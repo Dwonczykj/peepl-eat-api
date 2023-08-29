@@ -24,6 +24,11 @@ parasails.registerPage('account', {
     },
     email: '',
     name: '',
+    dropLogsFormData: {
+      upToDate: new Date(new Date().setDate(new Date().getDate() - 1))
+        .toISOString()
+        .substring(0, 10),
+    },
   },
   computed: {
     phoneNumber() {
@@ -48,6 +53,9 @@ parasails.registerPage('account', {
     submittedAccountDetailsForm: async function () {
       this.syncing = true;
     },
+    submittedDeleteAppLogsForm: async function () {
+      this.showToast('Dropped Applogs');
+    },
     showToast: function (message, cb) {
       Toastify({
         text: message,
@@ -66,6 +74,10 @@ parasails.registerPage('account', {
       }).showToast();
     },
     parseAccountDetails: function () {},
+    parseDropAppLogsForm: function () {
+      console.log(this.dropLogsFormData.upToDate);
+      debugger;
+    },
     clickUpdateAccountDetails: async function () {
       try {
         const updateUserResponse = await Cloud.updateUser(

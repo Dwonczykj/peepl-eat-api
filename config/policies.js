@@ -46,6 +46,7 @@ module.exports.policies = {
   'admin/get-position-in-waitinglist': true,
   'admin/generate-voucher-code': ['is-super-admin'],
   'admin/validate-discount-code': ['is-super-admin'],
+  'admin/delete-old-applogs': ['is-super-admin'],
   'admin/send-sms': ['is-super-admin'], // ! only super-admins
   'admin/signup-with-password': ['firebase'],
   'admin/view-signup': true,
