@@ -265,7 +265,7 @@ module.exports = {
           });
         if (!canFulfilDelivery.canDeliver) {
           sails.log.warn(
-            `helpers.validateOrder: invalidPostalDistrict as (${deliveryCoordinates.lat},${deliveryCoordinates.lng}]) out of delivery radius`
+            `helpers.validateOrder: invalidPostalDistrict as (${deliveryCoordinates.lat},${deliveryCoordinates.lng}]) out of delivery radius with readon: "${canFulfilDelivery.reason}"`
           );
           return exits.invalidPostalDistrict();
         }
