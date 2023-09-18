@@ -20,7 +20,7 @@ export type FulfilmentMethodDeliversToAddressInput = {
   longitude: number;
 };
 
-export type FulfilmentMethodDeliversToAddressResult = { canDeliver: boolean };
+export type FulfilmentMethodDeliversToAddressResult = { canDeliver: boolean, reason: string, };
 
 module.exports = {
   friendlyName: 'Does a fulfilment method allow delivery to input address',
@@ -91,7 +91,10 @@ module.exports = {
       inputs.fulfilmentMethod
     ).populate('fulfilmentOrigin');
     if (fulfilmentMethod.methodType !== 'delivery') {
-      return exits.success({ canDeliver: false });
+      return exits.success({
+        canDeliver: false,
+        reason: 'Fulfilment method is not a delivery',
+      });
     }
 
     // initialize services
@@ -110,7 +113,8 @@ module.exports = {
 
     if (inputs.latitude === 0 && inputs.longitude === 0){
       // assume delivery coordinates are not defined
-      return exits.success({ canDeliver: false });
+      sails.log.warn(`0 `)
+      return exits.success({ canDeliver: false, reason: 'Zero lat and long passed', });
     }
 
     const deliveryDestination = {
@@ -127,15 +131,27 @@ module.exports = {
 	    const distance = await mapsApi.getDistanceBetweenPlaces(vendorOrigin, deliveryDestination);
 	    if(distance !== null){
 	      if (distance <= fulfilmentMethod.maxDeliveryDistance) {
-	        return exits.success({ canDeliver: true });
+	        return exits.success({
+            canDeliver: true,
+            reason: `Coordinates are within ${fulfilmentMethod.maxDeliveryDistance}km of origin (@ ${distance}km).`,
+          });
 	      }
-	      return exits.success({ canDeliver: false });
+	      return exits.success({
+          canDeliver: false,
+          reason: `Coordinates are outside of ${fulfilmentMethod.maxDeliveryDistance}km radius from origin (@ ${distance}km).`,
+        });
 	    } else {
-	      return exits.success({ canDeliver: false });
+	      return exits.success({
+          canDeliver: false,
+          reason: `maps api unable to calculate a distance to input coordinates: (${inputs.latitude},${inputs.longitude})`,
+        });
 	    }
     } catch (error) {
       sails.log.error(`${error}`);
-      return exits.success({ canDeliver: false });
+      return exits.success({
+        canDeliver: false,
+        reason: `maps api unable to calculate a distance to input coordinates: (${inputs.latitude},${inputs.longitude})`,
+      });
     }
 
     // const request = {
