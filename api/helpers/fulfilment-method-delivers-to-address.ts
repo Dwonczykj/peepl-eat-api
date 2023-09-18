@@ -130,27 +130,27 @@ module.exports = {
     try {
 	    const distance = await mapsApi.getDistanceBetweenPlaces(vendorOrigin, deliveryDestination);
 	    if(distance !== null){
-	      if (distance <= fulfilmentMethod.maxDeliveryDistance) {
+	      if (distance <= (fulfilmentMethod.maxDeliveryDistance * 1000)) {
 	        return exits.success({
             canDeliver: true,
-            reason: `Coordinates are within ${fulfilmentMethod.maxDeliveryDistance}km of origin (@ ${distance}km).`,
+            reason: `Coordinates are within ${fulfilmentMethod.maxDeliveryDistance}km of origin (@ ${distance}m).`,
           });
 	      }
 	      return exits.success({
           canDeliver: false,
-          reason: `Coordinates are outside of ${fulfilmentMethod.maxDeliveryDistance}km radius from origin (@ ${distance}km).`,
+          reason: `Coordinates are outside of ${fulfilmentMethod.maxDeliveryDistance}km radius from origin (@ ${distance}m).`,
         });
 	    } else {
 	      return exits.success({
           canDeliver: false,
-          reason: `maps api unable to calculate a distance to input coordinates: (${inputs.latitude},${inputs.longitude})`,
+          reason: `maps api unable to calculate a distance to input coordinates: (${inputs.latitude},${inputs.longitude}) and vendor location: (${vendorOrigin.lat},${vendorOrigin.lng})`,
         });
 	    }
     } catch (error) {
       sails.log.error(`${error}`);
       return exits.success({
         canDeliver: false,
-        reason: `maps api unable to calculate a distance to input coordinates: (${inputs.latitude},${inputs.longitude})`,
+        reason: `maps api unable to calculate a distance to input coordinates: (${inputs.latitude},${inputs.longitude}) and vendor location: (${vendorOrigin.lat},${vendorOrigin.lng})`,
       });
     }
 

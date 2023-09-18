@@ -1,3 +1,4 @@
+import util from 'util';
 import axios, { AxiosInstance } from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import { sailsVegi } from '../api/interfaces/iSails';
@@ -139,8 +140,9 @@ class GoogleMapsApi implements IGoogleMapsApi {
     var validTransitRoutingPreference = ['less_walking', 'fewer_transfers'];
     // ~ https://github.com/ecteodoro/google-distance-matrix/blob/24a0ed3f2b6d804ca945d988020489cbb292e928/index.js#L25
     // ~ https://github.com/ecteodoro/google-distance-matrix
-    const origins = [vendorOrigin];
-    const destinations = [deliveryDestination];
+    const formatCoordinate = (x:Coordinate) => `${x.lat},${x.lng}`;
+    const origins = [formatCoordinate(vendorOrigin)].join('|');
+    const destinations = [formatCoordinate(deliveryDestination)].join('|');
     var queryParameters = {
       ...this.baseQueryParameters,
       ...{
@@ -177,16 +179,21 @@ class GoogleMapsApi implements IGoogleMapsApi {
         });
 
         if (!rows || rows.length < 1 || rows[0].length < 1) {
+          sails.log.error(util.inspect(response, { depth: null }));
           return null;
         }
 
         const metrics = rows[0][0];
 
         if (metrics.status !== 'OK'){
+          sails.log.error(util.inspect(response, {depth: null}));
           return null;
         }
 
         return metrics.distance.value;
+      } else {
+        sails.log.error(util.inspect(response, { depth: null }));
+        return null;
       }
     } catch (err) {
       sails.log.error(`${err}`);
