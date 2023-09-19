@@ -54,7 +54,7 @@ module.exports = {
           additionalInfo: inputs.additionalInfo,
         },
         subject: inputs.subject,
-        to: 'hello@vegiapp.co.uk',
+        to: 'support@vegiapp.co.uk',
         layout: false,
       });
     } catch (error) {
