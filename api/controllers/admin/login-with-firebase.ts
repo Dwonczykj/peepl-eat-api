@@ -409,6 +409,24 @@ requests over WebSockets instead of HTTP).`,
           fbUid: decodedToken.uid,
         });
 
+        user = await User.findOne({
+          phoneNoCountry: inputPhoneDetails.phoneNoCountry,
+          phoneCountryCode: inputPhoneDetails.phoneCountryCode,
+        });
+
+        if (
+          decodedToken.email &&
+          user.email.trim().toLowerCase() !==
+            decodedToken.email.trim().toLowerCase()
+        ) {
+          await User.updateOne({
+            phoneNoCountry: inputPhoneDetails.phoneNoCountry,
+            phoneCountryCode: inputPhoneDetails.phoneCountryCode,
+          }).set({
+            email: decodedToken.email.trim().toLowerCase(),
+          });
+        }
+
         // If "Remember Me" was enabled, then keep the session alive for
         // a longer amount of time.  (This causes an updated "Set Cookie"
         // response header to be sent as the result of this request -- thus

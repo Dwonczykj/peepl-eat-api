@@ -23,7 +23,7 @@ export const splitPhoneNumber = (formattedFirebaseNumber: string) => {
   } catch (unused) {
     return {
       countryCode: -1,
-      phoneNoCountry: 0,
+      phoneNoCountry: '0000000000',
     };
   }
 };
@@ -143,6 +143,8 @@ requests over WebSockets instead of HTTP).`,
       });
     };
 
+
+    // * ONLY WHEN USING EMULATOR
     if (
       process.env.useFirebaseEmulator &&
       process.env.useFirebaseEmulator === 'true'
@@ -156,10 +158,31 @@ requests over WebSockets instead of HTTP).`,
           return _completeLogin(_user);
         }
       } catch (err) {
-        sails.log.info(err);
+        sails.log.info(`Unable to locate a user for email: "${inputs.emailAddress}" with error: ${err}`);
+        const firebaseUser = await firebase.getUserByEmail(inputs.emailAddress);
+        const fbPhoneDetails = splitPhoneNumber(firebaseUser.phoneNumber);
+        if(firebaseUser && firebaseUser.uid){
+          let _user: sailsModelKVP<UserType> | UserType =
+            await User.create({
+              email: inputs.emailAddress,
+              name: inputs.emailAddress,
+              phoneCountryCode:
+                fbPhoneDetails.countryCode ??
+                firebaseUser.phoneNumber.replace(/[^0-9]/g, '').substring(0, 2),
+              phoneNoCountry:
+                fbPhoneDetails.phoneNoCountry ??
+                firebaseUser.phoneNumber.replace(/[^0-9]/g, '').substring(2),
+              role: `consumer`,
+              firebaseSessionToken: inputs.firebaseSessionToken,
+              fbUid: firebaseUser.uid,
+            }).fetch();
+          return _completeLogin(_user);
+        }
         return exits.badCredentials();
       }
     }
+
+    // * NORMAL
     var _decodedToken: DecodedIdToken;
     var decodedToken: DecodedIdToken;
     try {

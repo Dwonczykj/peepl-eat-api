@@ -25,11 +25,13 @@ let _exports: SailsModelDefnType<UserType> & {
     },
     phoneNoCountry: {
       type: 'string',
-      required: true,
+      required: false,
+      defaultsTo: '',
     },
     phoneCountryCode: {
       type: 'number',
-      required: true,
+      required: false,
+      defaultsTo: -1,
     },
     marketingPushContactAllowed: {
       type: 'boolean',

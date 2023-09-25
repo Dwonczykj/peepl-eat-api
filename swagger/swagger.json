@@ -2401,8 +2401,6 @@
           },
           {
             "required": [
-              "phoneNoCountry",
-              "phoneCountryCode",
               "role"
             ]
           }
@@ -2432,11 +2430,14 @@
             "default": ""
           },
           "phoneNoCountry": {
-            "type": "string"
+            "type": "string",
+            "default": ""
           },
           "phoneCountryCode": {
             "type": "number",
-            "format": "double"
+            "format": "double",
+            "default": -1,
+            "example": -1
           },
           "marketingPushContactAllowed": {
             "type": "boolean",
@@ -7484,7 +7485,7 @@
           {
             "in": "query",
             "name": "email",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string"
             }
@@ -7492,9 +7493,18 @@
           {
             "in": "query",
             "name": "phoneNoCountry",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "userId",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
             }
           }
         ],
