@@ -75,6 +75,7 @@ module.exports.policies = {
   'payments/create-stripe-payment-intent': true,
   'payments/check-stripe-payment-intent': true,
   'payments/stripe-event-webhook': true,
+  'payments/send-tokens-to-address': ['is-super-admin'/*'is-logged-in'*/],
   'payments/*': ['is-logged-in'],
   'home/redirect-to-app-store': true,
   'home/like': true,

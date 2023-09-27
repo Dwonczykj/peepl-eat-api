@@ -130,6 +130,9 @@ module.exports.routes = {
     action: 'admin/user-exists-for-phone',
   },
 
+  'POST /api/v1/payments/send-tokens-to-address': {
+    action: 'payments/send-tokens-to-address',
+  },
   'POST /api/v1/payments/create-stripe-payment-intent': {
     action: 'payments/create-stripe-payment-intent',
   },

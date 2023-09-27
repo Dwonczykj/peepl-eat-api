@@ -18,7 +18,8 @@ let _exports: SailsModelDefnType<TransactionType> = {
     //  ╩  ╩╚═╩╩ ╩╩ ╩ ╩ ╚╝ ╚═╝╚═╝
 
     timestamp: {
-      type: 'number',
+      type: 'ref',
+      columnType: 'date',
       required: true,
     },
     amount: {

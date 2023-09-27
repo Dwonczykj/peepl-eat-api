@@ -483,6 +483,11 @@ Delivery/Collection on ${order.fulfilmentSlotFrom} - ${order.fulfilmentSlotTo}`,
                 orderId: order.id,
               },
             });
+            // TODO: assign rewards to wallet address
+            
+
+            //TODO: notify the user over firebase cloud messaging push notifications that they have received rewards.
+
           } else if (order.paymentStatus === 'unpaid') {
             sails.log.verbose(
               `Stripe event webhook called for Order[${

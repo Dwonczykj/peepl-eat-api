@@ -12,6 +12,7 @@ declare var User: SailsModelType<UserType>;
 
 
 export type UpdateUserSelfInputs = {
+  userId: number;
   phoneNoCountry: string;
   phoneCountryCode: number;
   email?: string | undefined;
@@ -40,6 +41,10 @@ const _exports: SailsActionDefnType<
   friendlyName: 'SetRandomAvatar',
 
   inputs: {
+    userId: {
+      type: 'number',
+      required: true,
+    },
     phoneNoCountry: {
       type: 'string',
       required: true,
@@ -97,15 +102,16 @@ const _exports: SailsActionDefnType<
     exits: UpdateUserSelfExits
   ) {
     const users = await User.find({
-      phoneNoCountry: inputs.phoneNoCountry,
-      phoneCountryCode: inputs.phoneCountryCode,
+      id: inputs.userId,
+      // phoneNoCountry: inputs.phoneNoCountry,
+      // phoneCountryCode: inputs.phoneCountryCode,
     });
     if (!users || users.length < 1) {
       return exits.notFound();
     }
     if (users && users.length > 1) {
       sails.log.warn(
-        `WARNING - ${users.length} users were found with the same phone number: "+${inputs.phoneCountryCode} ${inputs.phoneNoCountry}"`
+        `WARNING - ${users.length} users were found with id: [${inputs.userId}] and with the same phone number: "+${inputs.phoneCountryCode} ${inputs.phoneNoCountry}"`
       );
     }
     const user = users[0];

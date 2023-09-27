@@ -2,10 +2,11 @@ import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import util from 'util';
 import moment from 'moment';
 import { SailsModelType } from '../api/interfaces/iSails';
-import { TransactionType, datetimeStrFormatExactForSQLTIMESTAMP, has } from '../scripts/utils';
+import { SailsDBError, TransactionType, AccountType, datetimeStrFormatExactForSQLTIMESTAMP, has, datetimeStrFormatExact } from '../scripts/utils';
 import { Currency } from '../api/interfaces/peeplPay';
 
 declare var Transaction: SailsModelType<TransactionType>;
+declare var Account: SailsModelType<AccountType>;
 
 interface FuseAdminTokensMintResponseData {
   tokenAddress: string;
@@ -333,6 +334,24 @@ export function generateCorrelationId () {
   return '_' + Math.random().toString(36).substr(2, 9);
 }
 
+export type MintTokensToAddressResponseType = Promise<
+  | {
+      transaction: null;
+      response: null;
+      error: any | SailsDBError;
+    }
+  | {
+      transaction: null;
+      response: AxiosResponse<FuseAdminTokensMintResponse>;
+      error: Error;
+    }
+  | {
+      transaction: any;
+      response: AxiosResponse<FuseAdminTokensMintResponse>;
+      error?: SailsDBError;
+    }
+>;
+
 /**
  * @param toAddress is optional and when provided, then newly minted tokens will be transferred to that address
  * @param amount is amount of token to mint as an integer string
@@ -345,11 +364,11 @@ export async function mintTokensToAddress({
   correlationId,
   orderId,
 }: {
-  toAddress: string,
-  amount: string,
-  correlationId: string,
-  orderId: number,
-}) {
+  toAddress: string;
+  amount: string;
+  correlationId: string;
+  orderId: number | null;
+}): MintTokensToAddressResponseType {
   // const body = {
   //   fuseVegiCommunityGreenBeanTokenAddress:
   //     config['fuseVegiCommunityGreenBeanTokenAddress'],
@@ -367,18 +386,21 @@ export async function mintTokensToAddress({
 
   // ~ https://docs.fuse.io/docs/admin-api/mint-an-erc-20-token
 
+  // sails.log.verbose(util.inspect(config, { depth: null }));
+
   let data = JSON.stringify({
     // fuseVegiCommunityGreenBeanTokenAddress:
     //   config['fuseVegiCommunityGreenBeanTokenAddress'],
     // fuseVegiCommunityGreenPointNetworkType:
     //   config['fuseVegiCommunityGreenPointNetworkType'],
-    correlationId,
+    // correlationId,
     tokenAddress: config['fuseVegiCommunityGreenBeanTokenAddress'],
     amount: amount,
     toAddress: toAddress,
+    // apiKey: config['fuseApiPublicKey']
   });
 
-  const mintUrl = `${urlBase}/tokens/mint`;
+  const mintUrl = `${urlBase}/tokens/mint?apiKey=${config['fuseApiPublicKey']}`;
 
   const requestConfig: AxiosRequestConfig = {
     method: 'post',
@@ -388,37 +410,134 @@ export async function mintTokensToAddress({
     data: data,
   };
 
-  axios(requestConfig)
-    .then(async (response: AxiosResponse<FuseAdminTokensMintResponse>) => {
-      if (response.status !== 201 || !has('job', response.data)) {
-        sails.log.error(
-          `Bad response returned from "${mintUrl}": [${response.status}], ${response.statusText}, ${response}`
-        );
-        return;
-      } else if(response.data.job.name !== FuseJobNameEnum.mint){
-        sails.log.error(
-          `Bad response returned from "${mintUrl}": [${response.status}], with incorrect job type: "${response.data.job.name}"`
-        );
-        return;
-      }
-      sails.log(util.inspect(response.data, { depth: null })); // * JOB ID
-      // track this jobId by adding a `pending` crypto Transaction object with the jobId on the object.
-      const pendingTransaction = await Transaction.create({
-        amount: Number.parseInt(response.data.job.data.amount),
-        currency: Currency.GBT,
-        order: orderId,
-        receiver: toAddress,
-        payer: config.fuseVegiCommunityCustodianWalletAddress,
-        timestamp: moment().format(datetimeStrFormatExactForSQLTIMESTAMP),
-        status: 'pending',
-        remoteJobId: response.data.job._id,
-      });
-      
-    })
-    .catch((error) => {
-      sails.log.error(`Fuse Minting Url ${mintUrl} with error: ${error}`);
-      sails.log.error(`${error}`);
+  let response: AxiosResponse<FuseAdminTokensMintResponse>;
+  try {
+    const _response: AxiosResponse<FuseAdminTokensMintResponse> = await axios(
+      requestConfig
+    );
+    response = _response;
+  } catch (error) {
+    sails.log.error(`Fuse Minting Url ${mintUrl} with error: ${error}`);
+    sails.log.error(error);
+    sails.log.error(util.inspect(error, { depth: null }));
+    throw error;
+    return {
+      transaction: null,
+      response: null,
+      error: error,
+    };
+  }
+
+  if (response.status !== 201 || !has('job', response.data)) {
+    sails.log.error(
+      `Bad response returned from "${mintUrl}": [${response.status}], ${response.statusText}, ${response}`
+    );
+    return;
+  } else if (response.data.job.name !== FuseJobNameEnum.mint) {
+    sails.log.error(
+      `Bad response returned from "${mintUrl}": [${response.status}], with incorrect job type: "${response.data.job.name}"`
+    );
+    return;
+  }
+  sails.log.verbose(util.inspect(response.data, { depth: null })); // * JOB ID
+  // track this jobId by adding a `pending` crypto Transaction object with the jobId on the object.
+  let receiver: AccountType;
+  try {
+    const _receivers = await Account.find({
+      walletAddress: toAddress,
     });
+    if(!_receivers || !_receivers.length){
+      // receiver = await Account.create({
+      //   accountType: 'ethereum',
+      //   walletAddress: toAddress,
+      // }).fetch();
+      return {
+        transaction: null,
+        response: response,
+        error: Error(`No vegi account exists for minting receiver wallet address: "${toAddress}"`),
+      };
+    }
+    if(_receivers.length > 1){
+      sails.log.warn(`MULTIPLE ACCOUNTS EXIST WITH SAME WALLET ADDRESS: "${toAddress}"`);
+    }
+    receiver = _receivers[0];
+  } catch (_error) {
+    const error: SailsDBError = _error;
+    sails.log.error(
+      `[${error.code}] Error fetching receiver account from toAddress: "${toAddress}" in DB: "${error.details}"`
+    );
+    sails.log.error(util.inspect(error, { depth: null }));
+    return {
+      transaction: null,
+      response: response,
+      error: error,
+    };
+  }
+  let payer: AccountType;
+  try {
+    const _payers = await Account.find({
+      walletAddress: config.fuseVegiCommunityCustodianWalletAddress,
+    });
+    if(!_payers || !_payers.length){
+      payer = await Account.create({
+        accountType: 'ethereum',
+        walletAddress: config.fuseVegiCommunityCustodianWalletAddress,
+      }).fetch();
+      // return {
+      //   transaction: null,
+      //   response: response,
+      //   error: Error(`No vegi account exists for minting from vegi community custodian wallet address: "${config.fuseVegiCommunityCustodianWalletAddress}"`),
+      // };
+    } else if(_payers.length > 1){
+      sails.log.warn(`MULTIPLE ACCOUNTS EXIST WITH SAME WALLET ADDRESS: "${config.fuseVegiCommunityCustodianWalletAddress}"`);
+      payer = _payers[0];
+    } else {
+      payer = _payers[0];
+    }
+  } catch (_error) {
+    const error: SailsDBError = _error;
+    sails.log.error(
+      `[${error.code}] Error fetching receiver account from toAddress: "${config.fuseVegiCommunityCustodianWalletAddress}" in DB: "${error.details}"`
+    );
+    sails.log.error(util.inspect(error, { depth: null }));
+    return {
+      transaction: null,
+      response: response,
+      error: error,
+    };
+  }
+  let pendingTransaction;
+  try {
+    const _newTransactionDetails = {
+      timestamp: moment(moment.now()).format(datetimeStrFormatExact), //.format(datetimeStrFormatExactForSQLTIMESTAMP),
+      amount: Number.parseInt(response.data.job.data.amount),
+      currency: Currency.GBT,
+      status: response.data.job.status,
+      remoteJobId: response.data.job._id,
+      order: orderId,
+      receiver: receiver.id,
+      payer: payer.id,
+    };
+    sails.log.verbose(util.inspect(_newTransactionDetails, { depth: null }));
+
+    pendingTransaction = await Transaction.create(_newTransactionDetails);
+  } catch (_error) {
+    const error: SailsDBError = _error;
+    sails.log.error(
+      `[${error.code}] Error creating Transaction in DB: "${error.details}"`
+    );
+    sails.log.error(util.inspect(error, { depth: null }));
+    return {
+      transaction: null,
+      response: response,
+      error: error,
+    };
+  }
+
+  return {
+    transaction: pendingTransaction,
+    response: response,
+  };
 }
 
 export async function transferVegiRewardTokens({

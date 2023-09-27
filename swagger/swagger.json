@@ -193,6 +193,9 @@
       "name": "Check user for phone"
     },
     {
+      "name": "SendTokensToAddress"
+    },
+    {
       "name": "CreateStripeAccount"
     },
     {
@@ -2350,8 +2353,8 @@
             "description": "Note Sails special attributes: autoIncrement"
           },
           "timestamp": {
-            "type": "number",
-            "format": "double"
+            "type": "string",
+            "format": "date"
           },
           "amount": {
             "type": "number",
@@ -6155,6 +6158,50 @@
           },
           "500": {
             "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/payments/send-tokens-to-address": {
+      "post": {
+        "summary": "SendTokensToAddress",
+        "tags": [
+          "SendTokensToAddress"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "toAddress",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "amount",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
           }
         }
       }
@@ -10386,6 +10433,15 @@
           "SetRandomAvatar"
         ],
         "parameters": [
+          {
+            "in": "query",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
           {
             "in": "query",
             "name": "phoneNoCountry",

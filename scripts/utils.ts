@@ -658,6 +658,15 @@ export type ESCRatingType = {
   product: ProductType;
 };
 
+export type SailsDBError = {
+  code: string;
+  details: string;
+  name: string;
+  message: string;
+  stack: string;
+  isOperational: boolean;
+} & Error;
+
 export const SustainedGradeToRatingMap = {
   A: 5,
   B: 4,
