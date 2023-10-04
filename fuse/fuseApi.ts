@@ -330,6 +330,13 @@ const fuseGetRequestQueryParamsBase = {
   apiKey: config['fuseApiPublicKey'],
 };
 
+if(process.env.NODE_ENV !== 'production'){
+  // eslint-disable-next-line no-console
+  console.log(
+    `Loaded config for fuse with apiKey: "${config['fuseApiPublicKey']}"`
+  );
+}
+
 export function generateCorrelationId () {
   return '_' + Math.random().toString(36).substr(2, 9);
 }
@@ -363,11 +370,13 @@ export async function mintTokensToAddress({
   amount,
   correlationId,
   orderId,
+  discountId,
 }: {
   toAddress: string;
   amount: string;
   correlationId: string;
   orderId: number | null;
+  discountId?: number | null;
 }): MintTokensToAddressResponseType {
   // const body = {
   //   fuseVegiCommunityGreenBeanTokenAddress:
@@ -395,7 +404,7 @@ export async function mintTokensToAddress({
     //   config['fuseVegiCommunityGreenPointNetworkType'],
     // correlationId,
     tokenAddress: config['fuseVegiCommunityGreenBeanTokenAddress'],
-    amount: amount,
+    amount: Number.parseFloat(amount) * 100,
     toAddress: toAddress,
     // apiKey: config['fuseApiPublicKey']
   });
@@ -446,7 +455,7 @@ export async function mintTokensToAddress({
     const _receivers = await Account.find({
       walletAddress: toAddress,
     });
-    if(!_receivers || !_receivers.length){
+    if (!_receivers || !_receivers.length) {
       // receiver = await Account.create({
       //   accountType: 'ethereum',
       //   walletAddress: toAddress,
@@ -454,11 +463,15 @@ export async function mintTokensToAddress({
       return {
         transaction: null,
         response: response,
-        error: Error(`No vegi account exists for minting receiver wallet address: "${toAddress}"`),
+        error: Error(
+          `No vegi account exists for minting receiver wallet address: "${toAddress}"`
+        ),
       };
     }
-    if(_receivers.length > 1){
-      sails.log.warn(`MULTIPLE ACCOUNTS EXIST WITH SAME WALLET ADDRESS: "${toAddress}"`);
+    if (_receivers.length > 1) {
+      sails.log.warn(
+        `MULTIPLE ACCOUNTS EXIST WITH SAME WALLET ADDRESS: "${toAddress}"`
+      );
     }
     receiver = _receivers[0];
   } catch (_error) {
@@ -478,9 +491,9 @@ export async function mintTokensToAddress({
     const _payers = await Account.find({
       walletAddress: config.fuseVegiCommunityCustodianWalletAddress,
     });
-    if(!_payers || !_payers.length){
+    if (!_payers || !_payers.length) {
       payer = await Account.create({
-        accountType: 'ethereum',
+        accountType: config['fuseApiPublicKey'].startsWith('pk_test_') ? 'fuse_spark' : 'fuse',
         walletAddress: config.fuseVegiCommunityCustodianWalletAddress,
       }).fetch();
       // return {
@@ -488,8 +501,10 @@ export async function mintTokensToAddress({
       //   response: response,
       //   error: Error(`No vegi account exists for minting from vegi community custodian wallet address: "${config.fuseVegiCommunityCustodianWalletAddress}"`),
       // };
-    } else if(_payers.length > 1){
-      sails.log.warn(`MULTIPLE ACCOUNTS EXIST WITH SAME WALLET ADDRESS: "${config.fuseVegiCommunityCustodianWalletAddress}"`);
+    } else if (_payers.length > 1) {
+      sails.log.warn(
+        `MULTIPLE ACCOUNTS EXIST WITH SAME WALLET ADDRESS: "${config.fuseVegiCommunityCustodianWalletAddress}"`
+      );
       payer = _payers[0];
     } else {
       payer = _payers[0];
@@ -508,15 +523,17 @@ export async function mintTokensToAddress({
   }
   let pendingTransaction;
   try {
+    const decimalAmount = Number.parseInt(response.data.job.data.amount) / (Math.pow(10, 18));
     const _newTransactionDetails = {
       timestamp: moment(moment.now()).format(datetimeStrFormatExact), //.format(datetimeStrFormatExactForSQLTIMESTAMP),
-      amount: Number.parseInt(response.data.job.data.amount),
+      amount: decimalAmount,
       currency: Currency.GBT,
       status: response.data.job.status,
       remoteJobId: response.data.job._id,
       order: orderId,
       receiver: receiver.id,
       payer: payer.id,
+      discountId: discountId,
     };
     sails.log.verbose(util.inspect(_newTransactionDetails, { depth: null }));
 

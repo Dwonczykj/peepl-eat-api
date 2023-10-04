@@ -208,103 +208,136 @@ module.exports = {
       throw Error(`Directory: "${_dir}" does not exist!`);
     }
 
-    const secrets_relative_paths = process.env.secrets_relative_paths;
-    if(!secrets_relative_paths){
+    if(!process.env.secrets_relative_paths){
       throw Error(
         `Environment variable \`secrets_relative_paths\` is undefined. Please run command secrets_relative_paths="secretPath1,secretPath2" NODE_ENV="production" sails run secrets-to-env`
       );
     }
-    const secret_paths = process.env.secrets_relative_paths
-      .split(',')
-      .map((sp) =>
-        path.resolve(sails.config.appPath, sp)
-      );
 
-    const output = {};
-    let outputSimpleEnv = '';
-    const currentdate = new Date();
-    outputSimpleEnv += `date_run="${currentdate.toLocaleString()}"\n`;
-    for (const sp of secret_paths){
-      let bSp = sp;
-      try {
-        bSp = path.basename(sp);
-      } catch (error) {
-        sails.warn(`Unable to get basefilename from "${sp}"`);
+    /**
+     * The function `isValidOverride` checks if a given `overrideNodeEnv` value is valid by comparing
+     * it to a list of allowed values.
+     * @param overrideNodeEnv - The `overrideNodeEnv` parameter is a string that represents the
+     * environment override value.
+     * @returns The function `isValidOverride` returns a boolean value indicating whether the
+     * `overrideNodeEnv` parameter is a valid override value.
+     */
+    const isValidOverride = (overrideNodeEnv) => {
+      return [
+        "development",
+        "production",
+        "production-script",
+        "QA",
+        "test",
+      ].includes(overrideNodeEnv);
+    }
+    
+    
+    /**
+     * The function `loadOutputFromLocal` loads output from local files and returns an object
+     * containing the output and a simplified environment variable string.
+     * @param overrideNodeEnv - The `overrideNodeEnv` parameter is a boolean value that determines
+     * whether to override the `NODE_ENV` environment variable. If set to `true`, the `NODE_ENV`
+     * environment variable will be set to the value provided as the `overrideNodeEnv` argument.
+     * @returns The function `loadOutputFromLocal` returns an object with two properties: `output` and
+     * `outputSimpleEnv`.
+     */
+    const loadOutputFromLocal = async (overrideNodeEnv) => {
+      const presetNodeEnv = process.env.NODE_ENV;
+      if(overrideNodeEnv && isValidOverride(overrideNodeEnv)){
+        sails.log.verbose(`Overriding NODE_ENV to "${overrideNodeEnv}"`);
+        process.env.NODE_ENV = overrideNodeEnv;
       }
-      if(sp.endsWith('.json')){
-        const jsonObj = await sails.helpers.fs.readJson(sp);
-        if (sp.endsWith('aws.json')) {
-          for(const awsKey of Object.keys(jsonObj)){
-            outputSimpleEnv += `AWS_${kebabize(awsKey,'_').toUpperCase()}=${jsonObj[awsKey]}\n`;
-          }
-          output[bSp] = convertToEnv(jsonObj);
-        } else {
-          outputSimpleEnv += convertToEnvBase64(jsonObj, bSp);
-          output[bSp] = convertToEnv(jsonObj);
-        }
-      } else if (sp.endsWith('.js')){
+      const secretPaths = process.env.secrets_relative_paths
+        .split(',')
+        .map((sp) =>
+          path.resolve(sails.config.appPath, sp)
+        );
+      const output = {};
+      let outputSimpleEnv = '';
+      const currentdate = new Date();
+      outputSimpleEnv += `date_run="${currentdate.toLocaleString()}"\n`;
+      outputSimpleEnv += `NODE_ENV="${process.env.NODE_ENV}"\n`;
+      for (const sp of secretPaths){
+        let bSp = sp;
         try {
-          const mod = require(sp);
-          if(sp.endsWith('local.js')){
-            const jsonObj = {
-              config: mod,
-            };
-            outputSimpleEnv += convertToEnvBase64(jsonObj, bSp);
-            output['sails'] = JSON.stringify(jsonObj, null, 4);
-          }else{
-            outputSimpleEnv += convertToEnvBase64(mod, bSp);
-            output[bSp] = convertToEnv(mod);
-          }
+          bSp = path.basename(sp);
         } catch (error) {
+          sails.warn(`Unable to get basefilename from "${sp}" with error: ${error}`);
+        }
+        if(sp.endsWith('.json')){
+          const jsonObj = await sails.helpers.fs.readJson(sp);
+          if (sp.endsWith('aws.json')) {
+            for(const awsKey of Object.keys(jsonObj)){
+              outputSimpleEnv += `AWS_${kebabize(awsKey,'_').toUpperCase()}=${jsonObj[awsKey]}\n`;
+            }
+            output[bSp] = convertToEnv(jsonObj);
+          } else {
+            outputSimpleEnv += convertToEnvBase64(jsonObj, bSp);
+            output[bSp] = convertToEnv(jsonObj);
+          }
+        } else if (sp.endsWith('.js')){
+          try {
+            console.log(`Requiring "${sp}" in "${process.env.NODE_ENV}"`);
+            delete require.cache[require.resolve(sp)];
+            const mod = require(sp);
+            if(sp.endsWith('local.js')){
+              const jsonObj = {
+                config: mod,
+              };
+              outputSimpleEnv += convertToEnvBase64(jsonObj, bSp);
+              output['sails'] = JSON.stringify(jsonObj, null, 4);
+            }else{
+              outputSimpleEnv += convertToEnvBase64(mod, bSp);
+              output[bSp] = convertToEnv(mod);
+            }
+          } catch (error) {
+            sails.log.verbose(`resetting NODE_ENV to "${presetNodeEnv}"`);
+            process.env.NODE_ENV = presetNodeEnv;
+            throw Error(
+              `Error trying to require the js file at "${bSp}.\nCheck that this file is a commonjs module with module.exports in the file.\nError:${error}"`
+            );
+          }
+
+        } else {
+          sails.log.verbose(`resetting NODE_ENV to "${presetNodeEnv}"`);
+          process.env.NODE_ENV = presetNodeEnv;
           throw Error(
-            `Error trying to require the js file at "${bSp}.\nCheck that this file is a commonjs module with module.exports in the file.\nError:${error}"`
+            `Not sure how to process files with extension like this: "${bSp}"`
           );
         }
-
-      } else {
-        throw Error(
-          `Not sure how to process files with extension like this: "${bSp}"`
-        );
       }
+      sails.log.verbose(`resetting NODE_ENV to "${presetNodeEnv}"`);
+      process.env.NODE_ENV = presetNodeEnv;
+      return {
+        'output': output,
+        'outputSimpleEnv': outputSimpleEnv,
+      };
+    };
+
+    const {output, outputSimpleEnv} = await loadOutputFromLocal();
+    
+    try {
+      const savePathJson = path.resolve(sails.config.appPath, 'out_env.json');
+  
+      await sails.helpers.fs.writeJson.with({
+        destination: savePathJson,
+        json: output,
+        force: true,
+      });
+    } catch (error) {
+      sails.log.warn(`Unable to output to out_env.json with error: ${error}`);
     }
 
-    const savePathJson = path.resolve(sails.config.appPath, 'out_env.json');
-
-    await sails.helpers.fs.writeJson.with({
-      destination: savePathJson,
-      json: output,
-      force: true,
-    });
-    let savePathEnv = path.resolve(sails.config.appPath, `.env`);
-    
-    sails.log(`Writing entire env output to "${savePathEnv}"`);
-    sails.log(`First 300 chars are: \n` + outputSimpleEnv.slice(0,300));
-    fs.writeFileSync(
-      savePathEnv,
-      outputSimpleEnv,
-      { encoding: 'utf8', flag: 'w' }
-      // (err) => {
-      //   if (err) {
-      //     sails.log.error(
-      //       `Threw writing .env file to "${savePathEnv}".\nError: ${err}`
-      //     );
-      //   } else {
-      //     sails.log(`Env vars written to "${savePathEnv}"`);
-      //   }
-      // }
-    );
-    sails.log(`Env vars written to "${savePathEnv}"`);
-    for (const bSp of Object.keys(output)){
-      let savePathEnvSp = path.resolve(sails.config.appPath, `${bSp}.env`);
-      if(bSp === 'sails'){
-        savePathEnvSp = path.resolve(sails.config.appPath, `${bSp}.env`);
-      }
-
-      sails.log(`Writing output to "${savePathEnvSp}"`);
+    const saveToEnvFileEncoded = (envFilePath, output) => {
+      let savePathEnv = path.resolve(sails.config.appPath, envFilePath);
+      
+      sails.log(`Writing entire env output to "${savePathEnv}"`);
+      sails.log(`First 300 chars are: \n` + outputSimpleEnv.slice(0,300));
       fs.writeFileSync(
-        savePathEnvSp,
-        output[bSp],
-        { encoding: 'utf8', flag: 'w' },
+        savePathEnv,
+        output,
+        { encoding: 'utf8', flag: 'w' }
         // (err) => {
         //   if (err) {
         //     sails.log.error(
@@ -315,8 +348,63 @@ module.exports = {
         //   }
         // }
       );
-      sails.log(`Env vars written to "${savePathEnvSp}"`);
+      sails.log(`Env vars written to "${savePathEnv}"`);
+    };
+
+    saveToEnvFileEncoded(`.env`, outputSimpleEnv);
+    
+
+    // let savePathEnv = path.resolve(sails.config.appPath, `.env`);
+    
+    // sails.log(`Writing entire env output to "${savePathEnv}"`);
+    // sails.log(`First 300 chars are: \n` + outputSimpleEnv.slice(0,300));
+    // fs.writeFileSync(
+    //   savePathEnv,
+    //   outputSimpleEnv,
+    //   { encoding: 'utf8', flag: 'w' }
+    //   // (err) => {
+    //   //   if (err) {
+    //   //     sails.log.error(
+    //   //       `Threw writing .env file to "${savePathEnv}".\nError: ${err}`
+    //   //     );
+    //   //   } else {
+    //   //     sails.log(`Env vars written to "${savePathEnv}"`);
+    //   //   }
+    //   // }
+    // );
+    // sails.log(`Env vars written to "${savePathEnv}"`);
+
+
+    for (const bSp of Object.keys(output)){
+      let savePathEnvSp = path.resolve(sails.config.appPath, `${bSp}.env`);
+      if(bSp === 'sails'){
+        savePathEnvSp = path.resolve(sails.config.appPath, `${bSp}.env`);
+      }
+
+      saveToEnvFileEncoded(savePathEnvSp, output[bSp]);
+      // sails.log(`Writing output to "${savePathEnvSp}"`);
+      // fs.writeFileSync(
+      //   savePathEnvSp,
+      //   output[bSp],
+      //   { encoding: 'utf8', flag: 'w' },
+      //   // (err) => {
+      //   //   if (err) {
+      //   //     sails.log.error(
+      //   //       `Threw writing .env file to "${savePathEnv}".\nError: ${err}`
+      //   //     );
+      //   //   } else {
+      //   //     sails.log(`Env vars written to "${savePathEnv}"`);
+      //   //   }
+      //   // }
+      // );
+      // sails.log(`Env vars written to "${savePathEnvSp}"`);
     }
+
+    const { output: unusedOutputQA, outputSimpleEnv: outputSimpleEnvQA } =
+      await loadOutputFromLocal('development');
+    saveToEnvFileEncoded(`.env_qa`, outputSimpleEnvQA);
+
+
     sails.log(`All env vars written!`);
 
   }

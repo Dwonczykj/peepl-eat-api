@@ -5,8 +5,9 @@ declare var Account: SailsModelType<AccountType>;
 declare var User: SailsModelType<UserType>;
 
 type GetAccountForWalletInput = {
-  walletAddress:walletAddressString;
-}
+  walletAddress: walletAddressString;
+  accountType: AccountType['accountType'];
+};
 type GetAccountForWalletResult = {
   account: sailsModelKVP<AccountType>;
 };
@@ -29,6 +30,10 @@ module.exports = {
     walletAddress: {
       type: 'string',
       required: true
+    },
+    accountType: {
+      type: 'string',
+      required: false,
     }
   },
 
@@ -71,6 +76,13 @@ module.exports = {
       const newAccount = await Account.create({
         walletAddress: inputs.walletAddress,
         verified: false,
+        accountType:
+          (inputs.accountType &&
+            ['ethereum', 'fuse', 'fuse_spark', 'bank'].includes(
+              inputs.accountType
+            ) &&
+            inputs.accountType) ||
+          'fuse',
       }).fetch();
       return exits.success({account: newAccount});
     }

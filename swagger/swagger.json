@@ -73,6 +73,9 @@
       "name": "View orders"
     },
     {
+      "name": "UpdateOrderStatus"
+    },
+    {
       "name": "View discount codes"
     },
     {
@@ -139,6 +142,9 @@
       "name": "Get product using qrcode"
     },
     {
+      "name": "AcceptDiscountCode"
+    },
+    {
       "name": "Accept / Reject Delivery Confirmation"
     },
     {
@@ -194,6 +200,12 @@
     },
     {
       "name": "SendTokensToAddress"
+    },
+    {
+      "name": "CreateFusePaymentIntent"
+    },
+    {
+      "name": "UpdateTransaction"
     },
     {
       "name": "CreateStripeAccount"
@@ -444,6 +456,8 @@
             "nullable": true,
             "enum": [
               "ethereum",
+              "fuse",
+              "fuse_spark",
               "bank"
             ]
           },
@@ -2393,6 +2407,14 @@
                 "$ref": "#/components/schemas/order"
               }
             ]
+          },
+          "vegiDiscount": {
+            "description": "JSON dictionary representing the **discount** instance or FK when creating / updating / not populated",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/discount"
+              }
+            ]
           }
         }
       },
@@ -3665,6 +3687,50 @@
         }
       }
     },
+    "/orders/update-order-status": {
+      "get": {
+        "summary": "UpdateOrderStatus",
+        "tags": [
+          "UpdateOrderStatus"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "orderId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "paymentStatus",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
     "/admin/discount-codes": {
       "get": {
         "summary": "View discount codes",
@@ -4646,6 +4712,59 @@
           },
           "500": {
             "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/discounts/accept-discount-code": {
+      "post": {
+        "summary": "AcceptDiscountCode",
+        "tags": [
+          "AcceptDiscountCode"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "discountCode",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vegiAccountId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vendorId",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
           }
         }
       }
@@ -6206,6 +6325,139 @@
         }
       }
     },
+    "/api/v1/payments/create-fuse-payment-intent": {
+      "post": {
+        "summary": "CreateFusePaymentIntent",
+        "description": "End point for creating draft transactions to represent the intention of making a crypto transaction on fuse chain that we will confirm here later",
+        "tags": [
+          "CreateFusePaymentIntent"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "payerWalletAddress",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "receiverWalletAddress",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "amountTokens",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "currency",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "metadata",
+            "required": false,
+            "schema": {
+              "type": "object",
+              "properties": {},
+              "default": {},
+              "example": {}
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/api/v1/payments/update-transaction": {
+      "post": {
+        "summary": "UpdateTransaction",
+        "tags": [
+          "UpdateTransaction"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "transactionId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "remoteJobId",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "orderId",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
     "/api/v1/payments/create-stripe-payment-intent": {
       "post": {
         "summary": "CreateStripePaymentAttempt",
@@ -7467,6 +7719,14 @@
             "in": "query",
             "name": "walletAddress",
             "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "accountType",
+            "required": false,
             "schema": {
               "type": "string"
             }
@@ -9646,11 +9906,15 @@
             "description": "Success"
           },
           "400": {
-            "description": "Bad request",
+            "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
                   "oneOf": [
+                    {
+                      "type": "string",
+                      "description": "Success"
+                    },
                     {
                       "type": "string",
                       "description": "Bad request"
@@ -9673,9 +9937,6 @@
             }
           },
           "401": {
-            "description": "Success"
-          },
-          "403": {
             "description": "Success"
           },
           "404": {

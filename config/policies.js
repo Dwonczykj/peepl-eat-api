@@ -62,7 +62,7 @@ module.exports.policies = {
   'admin/view-postal-districts': ['is-super-admin'],
   'admin/view-users': ['is-super-admin'],
   'admin/view-accounts': ['is-super-admin'],
-  'admin/view-logs': ['is-super-admin'],
+  'admin/view-app-logs': ['is-super-admin'],
   'admin/update-stock-count': ['is-logged-in'],
   'admin/view-approve-order': true, //TODO: add 'is-logged-in' and 'is-vendor' poligices to this
   'admin/approve-or-decline-order': true, //TODO: add 'is-logged-in' and 'is-vendor' poligices to this
@@ -71,15 +71,22 @@ module.exports.policies = {
   'admin/customer-received-order': true, //TODO: add 'is-logged-in' and 'is-vendor' poligices to this
   'admin/bulk-update-data': ['is-super-admin'],
   'admin/*': ['is-logged-in'],
+  'orders/update-order-status': ['is-logged-in'], // ["localize", "firebase", "firebase-auth", "is-logged-in"],
   'orders/*': true, // ["localize", "firebase", "firebase-auth", "is-logged-in"],
   'payments/create-stripe-payment-intent': true,
   'payments/check-stripe-payment-intent': true,
   'payments/stripe-event-webhook': true,
-  'payments/send-tokens-to-address': ['is-super-admin'/*'is-logged-in'*/],
+  'payments/send-tokens-to-address': [
+    // 'is-super-admin',
+    'is-logged-in',
+  ],
+  'payments/create-fuse-payment-intent': true,
+  'payments/update-transaction': ['is-logged-in'],
   'payments/*': ['is-logged-in'],
   'home/redirect-to-app-store': true,
   'home/like': true,
   'home/*': ['is-logged-in'],
+  'discounts/accept-discount-code': ['is-logged-in'], // ['localize', 'firebase', 'firebase-auth', 'is-logged-in'],
   'discounts/*': true, // ['localize', 'firebase', 'firebase-auth', 'is-logged-in'],
   'products/upload-product-suggestion': true, // ["localize", "firebase", "firebase-auth", "is-logged-in"],
   'products/update-product-rating': [

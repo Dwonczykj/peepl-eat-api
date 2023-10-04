@@ -222,7 +222,7 @@ type _UserTypeHidden = {
 
 export type AccountType = {
   id: number;
-  accountType: 'ethereum' | 'bank' | null;
+  accountType: 'ethereum' | 'fuse' | 'fuse_spark' | 'bank' | null;
   verified: boolean;
   walletAddress: walletAddressString | '' | string;
   stripeCustomerId: string | null;
@@ -867,7 +867,7 @@ export type OrderType = _OrderTypeHidden & {
   unfulfilledItems: Array<OrderItemType>;
 };
 
-type TransactionTypeStatusLiteral = 'pending' | 'succeeded' | 'failed';
+type TransactionTypeStatusLiteral = 'pending' | 'succeeded' | 'failed' | 'draft';
 
 export type TransactionType = {
   id: number;
@@ -879,6 +879,7 @@ export type TransactionType = {
   order: OrderType | null;
   status: TransactionTypeStatusLiteral;
   remoteJobId?: string | null;
+  vegiDiscount?: DiscountType;
 };
 
 export const openingHoursToMoments = (

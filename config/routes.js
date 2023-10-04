@@ -58,6 +58,9 @@ module.exports.routes = {
   'GET /api/v1/discounts/check-discount-code/:discountCode': {
     action: 'discounts/check-discount-code',
   },
+  'POST /api/v1/discounts/accept-discount-code': {
+    action: 'discounts/accept-discount-code',
+  },
 
   // COURIERS
   'POST /api/v1/couriers/accept-reject-delivery-confirmation': {
@@ -132,6 +135,12 @@ module.exports.routes = {
 
   'POST /api/v1/payments/send-tokens-to-address': {
     action: 'payments/send-tokens-to-address',
+  },
+  'POST /api/v1/payments/create-fuse-payment-intent': {
+    action: 'payments/create-fuse-payment-intent',
+  },
+  'POST /api/v1/payments/update-transaction': {
+    action: 'payments/update-transaction',
   },
   'POST /api/v1/payments/create-stripe-payment-intent': {
     action: 'payments/create-stripe-payment-intent',
@@ -220,6 +229,7 @@ module.exports.routes = {
   'GET /admin/upload-products': { action: 'admin/view-upload-products' },
   'POST /api/v1/admin/upload-products': { action: 'admin/upload-products' },
   'GET /admin/orders': { action: 'admin/view-all-orders' },
+  'GET /orders/update-order-status': { action: 'orders/update-order-status' },
   'GET /admin/discount-codes': { action: 'admin/view-discount-codes' },
   'GET /admin/approve-order/:orderId': { action: 'admin/view-approve-order' },
   'GET /admin/order/:orderId': { action: 'admin/view-order' },

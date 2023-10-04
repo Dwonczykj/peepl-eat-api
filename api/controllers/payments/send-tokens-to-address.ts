@@ -11,7 +11,7 @@ import {
   SailsActionDefnType,
   UserType
 } from '../../../scripts/utils';
-import { generateCorrelationId, mintTokensToAddress, MintTokensToAddressResponseType } from '../../../fuse/fuseApi';
+import { generateCorrelationId, mintTokensToAddress } from '../../../fuse/fuseApi';
 
 declare var sails: sailsVegi;
 declare var User: SailsModelType<UserType>;
@@ -84,7 +84,7 @@ const _exports: SailsActionDefnType<
       return exits.badRequest('Can\'t send amounts of GBT above 500');
     }
 
-    sails.log(`Minting ${inputs.amount} to "${inputs.toAddress}" 💰!`);
+    sails.log.verbose(`Minting ${inputs.amount} to "${inputs.toAddress}" 💰!`);
     const correlationId = generateCorrelationId();
     try {
       // void call:

@@ -58,6 +58,9 @@ let _exports: SailsModelDefnType<TransactionType> = {
     order: {
       model: 'order',
     },
+    vegiDiscount: {
+      model: 'discount',
+    },
   },
 };
 

@@ -16,7 +16,7 @@ let _exports: SailsModelDefnType<AccountType> = {
     accountType: {
       type: 'string',
       required: false,
-      isIn: ['ethereum', 'bank'],
+      isIn: ['ethereum', 'fuse', 'fuse_spark', 'bank'],
       allowNull: true,
     },
     walletAddress: {

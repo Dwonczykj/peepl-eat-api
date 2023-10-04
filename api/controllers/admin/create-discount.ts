@@ -94,7 +94,7 @@ const _exports: SailsActionDefnType<
       statusCode: 404,
     },
     issue: {
-      statusCode: 403,
+      statusCode: 400,
     },
     badRequest: {
       responseType: 'badRequest',

@@ -70,6 +70,7 @@
                 "useFirebaseEmulator": "false",
             },
             "envFile": "${workspaceFolder}/.heroku_env",
+            // "envFile": "${workspaceFolder}/.env_qa",
             // "autoAttachChildProcesses": true,
             // "program": "node -r dotenv/config ${workspaceFolder}/app.js dotenv_config_path=${workspaceFolder}/.heroku_env",
             "program": "${workspaceFolder}/app.js",

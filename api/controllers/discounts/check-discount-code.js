@@ -29,17 +29,17 @@ module.exports = {
 
 
   fn: async function ({discountCode, vendorId}, exits) {
-    var isValid = await sails.helpers.checkDiscountCode.with({
+    var discountObj = await sails.helpers.checkDiscountCode.with({
       discountCode: discountCode,
       vendorId: vendorId,
     });
 
-    if(!isValid) {
+    if(!discountObj) {
       return exits.notFound();
     }
 
     // All done.
-    return exits.success({discount: isValid});
+    return exits.success({discount: discountObj});
 
   }
 
