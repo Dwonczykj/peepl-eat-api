@@ -139,546 +139,6 @@ export type StripeEventWebhookExits = {
   badRequest: (unusedErr: Error | String) => void;
 };
 
-const handleStripePaymentIntentEvent = async (
-  dataObj: Stripe.Event['data']['object'],
-  eventType: Stripe.Event['type']
-) => {
-
-};
-
-const sendPushNotificationForOrder = async (
-  order: OrderType,
-  dataObj: Stripe.Event.Data.Object,
-) => {
-  try {
-    if (order.firebaseRegistrationToken) {
-      sails.log.warn(
-        `Firebase notifications on registration tokens (i.e. "${order.firebaseRegistrationToken}" for order[${order.id}]) are  not currently working...`
-      );
-      await sails.helpers.sendFirebaseNotification.with({
-        topicBackup: `order-${order.publicId}`,
-        token: order.firebaseRegistrationToken,
-        title: 'Payment success',
-        body: '✅ Payment on vegi succeeded',
-        data: {
-          orderId: `${order.id}`,
-          stripeData: dataObj,
-        },
-      });
-    } else {
-      await sails.helpers.broadcastFirebaseNotificationForTopic.with({
-        topic: `order-${order.publicId}`,
-        title: `Payment success`,
-        body: '✅ Payment on vegi succeeded',
-        data: {
-          orderId: `${order.id}`,
-          stripeData: dataObj,
-        },
-      });
-    }
-  } catch (_error) {
-    const error: SailsDBError = _error;
-    sails.log.error(`Unable to sendPushNotificationForOrder from StripeEventWebhook with error: ${error.details}`);
-  }
-};
-
-const addDiscountsTrx = async (
-  order: OrderType,
-) => {
-  try {
-    if (order.discounts && order.discounts.length > 0) {
-      const addTxFn = async (discount: DiscountType) => {
-        if (discount.discountType === 'fixed') {
-          await Transaction.create({
-            amount: discount.value,
-            currency: discount.currency,
-            discount: discount.id,
-            order: order.id,
-            payer: order.customerWalletAddress,
-            receiver: order.vendor.walletAddress,
-            timestamp: moment().format(datetimeStrFormatExactForSQLTIMESTAMP),
-            status: 'succeeded',
-            remoteJobId: null,
-          });
-          await Discount.update({
-            id: discount.id,
-          }).set({
-            timesUsed: discount.timesUsed + 1,
-            isEnabled: false,
-          });
-          await Discount.addToCollection(discount.id, 'orders').members([
-            order.id,
-          ]);
-          return;
-        } else if (discount.discountType === 'percentage') {
-          let amount = (discount.value / 100) * order.subtotal;
-          if (discount.value > 100) {
-            sails.log.error(
-              `Cant add percentage discount to order with value > 100% for discount with code: ${discount.code}`
-            );
-            return;
-          } else if (discount.value < 0) {
-            sails.log.error(
-              `Cant add percentage discount to order with value < 0% for discount with code: ${discount.code}`
-            );
-            return;
-          } else {
-            sails.log.info(
-              `Percentage discount of ${discount.value}% applied to order subtotal gives discounted amount of ${amount} [${discount.currency}]`
-            );
-          }
-
-          const toCurrency = order.currency || Currency.GBPx;
-          if (toCurrency !== discount.currency) {
-            amount = await sails.helpers.convertCurrencyAmount.with({
-              amount: amount,
-              fromCurrency: discount.currency,
-              toCurrency: toCurrency,
-            });
-          }
-          await Transaction.create({
-            amount: amount,
-            currency: toCurrency,
-            discount: discount.id,
-            order: order.id,
-            payer: order.customerWalletAddress,
-            receiver: order.vendor.walletAddress,
-            timestamp: moment().format(datetimeStrFormatExactForSQLTIMESTAMP),
-            status: 'succeeded',
-            remoteJobId: null,
-          });
-          await Discount.update({
-            id: discount.id,
-          }).set({
-            timesUsed: discount.timesUsed + 1,
-            isEnabled:
-              discount.isEnabled && discount.timesUsed + 1 < discount.maxUses,
-          });
-          await Discount.addToCollection(discount.id, 'orders').members([
-            order.id,
-          ]);
-          return;
-        } else {
-          sails.log.warn(
-            `Unable to calculate discounts in stripe-event-webhook for discounts with type: "${discount.discountType}"`
-          );
-        }
-      };
-      await Promise.all(order.discounts.map((discount) => addTxFn(discount)));
-    }
-    return null;
-  } catch (error) {
-    sails.log.error(
-      `stripe-event-webhook errored when updating discounts on order: "${order.publicId}" with error: ${error}`
-    );
-    sails.log.error(`${error}`);
-    return error;
-  }
-};
-
-const setOrderToPaid = async (
-
-  order: OrderType,
-) => {
-  try {
-    sails.log.info(
-      `Set order with id: "${order.id}" to paid for stripe payment-intent event`
-    );
-    // const unixtime = Date.now();
-    await Order.update({
-      id: order.id,
-    }).set({
-      paymentStatus: 'paid',
-      paidDateTime: Date.now(),
-    });
-    return null;
-  } catch (_error) {
-    const error: SailsDBError = _error;
-    sails.log.error(
-      `stripe-event-webhook errored when updating order with publicId: "${order.publicId}" to "paymentStatus:paid": ${error}`
-    );
-    sails.log.error(`${error}`);
-    // return exits.error(`Failed to set order to "paid" with error: ${error}`);
-    return error;
-  }
-};
-
-const sendOrderPaidNotifications = async (
-  order: OrderType,
-) => {
-  await sails.helpers.sendSlackNotification.with({ order: order });
-  await sails.helpers.sendSmsNotification.with({
-    to: order.vendor.phoneNumber,
-    // body: `You have received a new order from vegi for delivery between ${order.fulfilmentSlotFrom} and ${order.fulfilmentSlotTo}. ` +
-    // `To accept or decline: ' + sails.config.custom.baseUrl + '/admin/approve-order/' + order.publicId,
-    body: `[from vegi]
-New order alert! 🚨
-Order details ${sails.config.custom.baseUrl}/admin/approve-order/${order.publicId}
-Please accept/decline ASAP.
-Delivery/Collection on ${order.fulfilmentSlotFrom} - ${order.fulfilmentSlotTo}`,
-    data: {
-      orderId: order.id,
-    },
-  });
-  await sails.helpers.sendSmsNotification.with({
-    to: order.deliveryPhoneNumber,
-    body: `Order accepted! Details of your order can be found in the My Orders section of the vegi app. Thank you!`,
-    data: {
-      orderId: order.id,
-    },
-  });
-};
-
-/**
- * The function `updateOrderPaymentStatus` updates the payment status of an order based on the payment
- * status received from a webhook, and performs additional actions based on the payment status.
- * @param paymentStatus - The payment status of the order. It can be one of the following values:
- * 'paid', 'unpaid', or 'failed'.
- * @param paymentIntent - The `paymentIntent` parameter is an object that represents a Stripe
- * PaymentIntent. It contains information about the payment, such as the amount, currency, and status.
- * @param {OrderType} order - The `order` parameter is an object that represents an order. It contains
- * information such as the order ID, vendor details, delivery phone number, fulfillment slot, and
- * payment status.
- * @param {StripeWebHookInput} inputs - The `inputs` parameter is an object that contains the input
- * data received from the Stripe webhook event. It is of type `StripeWebHookInput`.
- * @param {StripeEventWebhookExits} exits - The `exits` parameter is an object that contains different
- * exit functions that can be called to handle different scenarios or outcomes of the function. These
- * exit functions are typically used to return a response or error message to the caller of the
- * function.
- * @returns a promise that resolves to either a success or an error.
- */
-const updateOrderPaymentStatus = async (
-  paymentStatus: OrderType['paymentStatus'],
-  order: OrderType,
-  inputs: StripeWebHookInput,
-  exits: StripeEventWebhookExits,
-) => {
-  if (!['paid', 'unpaid', 'failed'].includes(paymentStatus)) {
-    sails.log.warn(
-      `stripe-event-webhook received a vegi paymentStatus enum: PaymentStatus.[${paymentStatus}]. This is not handled!`
-    );
-    paymentStatus = 'unpaid';
-  }
-
-  await setOrderToPaid(order);
-  
-  order = await Order.findOne(order.id).populate('vendor');
-
-  try {
-    if (paymentStatus === 'paid') {
-      await sendOrderPaidNotifications(order);
-
-      // * turn into transaction if supported, then fo an order find after to check the updated order and TX
-      const setDiscountsForOrderError = await addDiscountsTrx(order);
-      if(setDiscountsForOrderError){
-        return exits.error(
-          `stripe-event-webhook errored when updating discounts on order: "${order.publicId}" with error: ${setDiscountsForOrderError}`
-        );
-      }
-    } else if (paymentStatus === 'unpaid') {
-      sails.log.verbose(
-        `Stripe event webhook called for "unpaid" Order[${order.id}] for ${inputs.type}`
-      );
-    } else if (paymentStatus === 'failed') {
-      await sails.helpers.sendSlackNotification.with({ order: order });
-      await sails.helpers.sendSmsNotification.with({
-        to: order.deliveryPhoneNumber,
-        body:
-          `Your payment for a recent order to ${order.vendor.name} failed. Order was scheduled between ` +
-          order.fulfilmentSlotFrom +
-          ' and ' +
-          order.fulfilmentSlotTo +
-          '. Please review your payment in the vegi app.',
-        data: {
-          orderId: order.id,
-        },
-      });
-    } else {
-      sails.log.warn(
-        `Payment for recent order[${
-          order.id
-        }] hit the stripe-event-webhook with paymentStatus of ${
-          order.paymentStatus
-        } and contained inputs: ${util.inspect(inputs, {
-          depth: null,
-        })}`
-      );
-    }
-    return exits.success();
-  } catch (error) {
-    sails.log.error(
-      `stripe-event-webhook errored sending sms notification to vendor for paid order: ${error}`
-    );
-    return exits.error(
-      `stripe-event-webhook errored sending sms notification to vendor for paid order: ${error}`
-    );
-  }
-  
-};
-
-const handleStripeRefundEvent = async (
-  order: OrderType,
-  dataObj: Stripe.Event['data']['object'],
-  eventType: Stripe.Event['type'],
-  exits: StripeEventWebhookExits,
-) => {
-  if (eventType === 'refund.created') {
-    // paymentStatus = 'refunded';
-    if (order.firebaseRegistrationToken) {
-      await sails.helpers.sendFirebaseNotification.with({
-        topicBackup: `order-${order.publicId}`,
-        token: order.firebaseRegistrationToken,
-        title: 'Payment refunded',
-        body: `Order[${order.id}] for ${order.total} has been refunded.`,
-        data: {
-          orderId: `${order.id}`,
-          stripeData: dataObj,
-        },
-      });
-    }
-
-    await sails.helpers.broadcastFirebaseNotificationForTopic.with({
-      topic: `order-${order.publicId}`,
-      title: 'Payment refunded',
-      body: `Order[${order.id}] for ${order.total} has been refunded.`,
-      data: {
-        orderId: `${order.id}`,
-      },
-    });
-
-    try {
-      await Order.updateOne(order.id).set({
-        refundDateTime: Date.now(),
-        paymentStatus: 'refunded',
-        completedFlag: 'refunded',
-        // refundDateTime: moment().format(datetimeStrFormatExact);
-      });
-    } catch (error) {
-      sails.log.error(
-        `Failed to update refund status on order: [${order.id}] in stripe-event-webhook with error: ${error}`
-      );
-    }
-  }
-  return exits.success();
-};
-
-const handleStripeCustomerEvent = async (
-  dataObj: Stripe.Event['data']['object'],
-  eventType: Stripe.Event['type'],
-  exits: StripeEventWebhookExits,
-) => {
-  // Check that the customerId matches the accountId.customerId on the order via
-  // order.customerWalletAddress -> account.walletAddress -> account.stripeCustomerId
-  const customer: Stripe.Customer = dataObj as any;
-  const customerId = customer.id;
-  const accounts = await Account.find({
-    stripeAccountId: customerId,
-  });
-  if (!accounts || accounts.length < 1) {
-    const e = Error(
-      `Stripe Event Webook for "${eventType}" webhook was unable to locate an stripe customer with id: : "${customerId}" with a matching Account record on vegi.`
-    );
-    sails.log.warn(e);
-  }
-  return exits.success();
-};
-
-const _recordUnhandledStripeEvent = async (
-  dataObj: Stripe.Event['data']['object'],
-  eventType: Stripe.Event['type'],
-  exits: StripeEventWebhookExits,
-) => {
-  // Handle the event
-  switch (eventType) {
-    case 'checkout.session.async_payment_failed':
-      {
-        const checkoutSessionAsyncPaymentFailed = dataObj;
-        sails.log.info(
-          `${checkoutSessionAsyncPaymentFailed} event occured in 'stripe-event-webhook' endpoint`
-        );
-      }
-      // Then define and call a function to handle the event checkout.session.async_payment_failed
-      break;
-    case 'checkout.session.async_payment_succeeded':
-      {
-        const checkoutSessionAsyncPaymentSucceeded = dataObj;
-        sails.log.info(
-          `${checkoutSessionAsyncPaymentSucceeded} event occured in 'stripe-event-webhook' endpoint`
-        );
-      }
-      // Then define and call a function to handle the event checkout.session.async_payment_succeeded
-      break;
-    case 'checkout.session.completed':
-      {
-        const checkoutSessionCompleted = dataObj;
-        sails.log.info(
-          `${checkoutSessionCompleted} event occured in 'stripe-event-webhook' endpoint`
-        );
-      }
-      // Then define and call a function to handle the event checkout.session.completed
-      break;
-    case 'checkout.session.expired':
-      {
-        const checkoutSessionExpired = dataObj;
-        sails.log.info(
-          `${checkoutSessionExpired} event occured in 'stripe-event-webhook' endpoint`
-        );
-      }
-      // Then define and call a function to handle the event checkout.session.expired
-      break;
-    case 'payment_intent.amount_capturable_updated':
-      {
-        const paymentIntentAmountCapturableUpdated = dataObj;
-        sails.log.info(
-          `${paymentIntentAmountCapturableUpdated} event occured in 'stripe-event-webhook' endpoint`
-        );
-      }
-      // Then define and call a function to handle the event payment_intent.amount_capturable_updated
-      break;
-    case 'payment_intent.canceled':
-      {
-        const paymentIntentCanceled = dataObj;
-        sails.log.info(
-          `${paymentIntentCanceled} event occured in 'stripe-event-webhook' endpoint`
-        );
-      }
-      // Then define and call a function to handle the event payment_intent.canceled
-      break;
-    case 'payment_intent.created':
-      {
-        const paymentIntentCreated = dataObj;
-        sails.log.info(
-          `${paymentIntentCreated} event occured in 'stripe-event-webhook' endpoint`
-        );
-      }
-      // Then define and call a function to handle the event payment_intent.created
-      break;
-    case 'payment_intent.partially_funded':
-      {
-        const paymentIntentPartiallyFunded = dataObj;
-        sails.log.info(
-          `${paymentIntentPartiallyFunded} event occured in 'stripe-event-webhook' endpoint`
-        );
-      }
-      // Then define and call a function to handle the event payment_intent.partially_funded
-      break;
-    case 'payment_intent.payment_failed':
-      {
-        const paymentIntentPaymentFailed = dataObj;
-        sails.log.info(
-          `${paymentIntentPaymentFailed} event occured in 'stripe-event-webhook' endpoint`
-        );
-      }
-      // Then define and call a function to handle the event payment_intent.payment_failed
-      break;
-    case 'payment_intent.processing':
-      {
-        const paymentIntentProcessing = dataObj;
-        sails.log.info(
-          `${paymentIntentProcessing} event occured in 'stripe-event-webhook' endpoint`
-        );
-      }
-      // Then define and call a function to handle the event payment_intent.processing
-      break;
-    case 'payment_intent.requires_action':
-      {
-        const paymentIntentRequiresAction = dataObj;
-        sails.log.info(
-          `${paymentIntentRequiresAction} event occured in 'stripe-event-webhook' endpoint`
-        );
-      }
-      // Then define and call a function to handle the event payment_intent.requires_action
-      break;
-    case 'payment_intent.succeeded':
-      {
-        const paymentIntentSucceeded = dataObj;
-        sails.log.info(
-          `${paymentIntentSucceeded} event occured in 'stripe-event-webhook' endpoint`
-        );
-      }
-      // Then define and call a function to handle the event payment_intent.succeeded
-      break;
-    case 'topup.canceled':
-      {
-        const topupCanceled = dataObj;
-        sails.log.info(
-          `${topupCanceled} event occured in 'stripe-event-webhook' endpoint`
-        );
-      }
-      // Then define and call a function to handle the event topup.canceled
-      break;
-    case 'topup.created':
-      {
-        const topupCreated = dataObj;
-        sails.log.info(
-          `${topupCreated} event occured in 'stripe-event-webhook' endpoint`
-        );
-      }
-      // Then define and call a function to handle the event topup.created
-      break;
-    case 'topup.failed':
-      {
-        const topupFailed = dataObj;
-        sails.log.info(
-          `${topupFailed} event occured in 'stripe-event-webhook' endpoint`
-        );
-      }
-      // Then define and call a function to handle the event topup.failed
-      break;
-    case 'topup.reversed':
-      {
-        const topupReversed = dataObj;
-        sails.log.info(
-          `${topupReversed} event occured in 'stripe-event-webhook' endpoint`
-        );
-      }
-      // Then define and call a function to handle the event topup.reversed
-      break;
-    case 'topup.succeeded':
-      {
-        const topupSucceeded = dataObj;
-        sails.log.info(
-          `${topupSucceeded} event occured in 'stripe-event-webhook' endpoint`
-        );
-      }
-      // Then define and call a function to handle the event topup.succeeded
-      break;
-    case 'transfer.created':
-      {
-        const transferCreated = dataObj;
-        sails.log.info(
-          `${transferCreated} event occured in 'stripe-event-webhook' endpoint`
-        );
-      }
-      // Then define and call a function to handle the event transfer.created
-      break;
-    case 'transfer.reversed':
-      {
-        const transferReversed = dataObj;
-        sails.log.info(
-          `${transferReversed} event occured in 'stripe-event-webhook' endpoint`
-        );
-      }
-      // Then define and call a function to handle the event transfer.reversed
-      break;
-    case 'transfer.updated':
-      {
-        const transferUpdated = dataObj;
-        sails.log.info(
-          `${transferUpdated} event occured in 'stripe-event-webhook' endpoint`
-        );
-      }
-      // Then define and call a function to handle the event transfer.updated
-      break;
-    // ... handle other event types
-    default:
-      sails.log.info(`Unhandled event type ${eventType}`);
-  }
-  return exits.success();
-};
-
-
-
 export const getOrderByPaymentIntentIdSafe = async (params: {
   paymentIntentId: string;
   eventType: Stripe.Event['type'];
@@ -799,9 +259,542 @@ const _exports: SailsActionDefnType<
     // inputs: StripeEventWebhookInputs,
     exits: StripeEventWebhookExits
   ) {
-    let data: Stripe.Event['data'];
+    // let data: Stripe.Event['data'];
     let dataObj: Stripe.Event['data']['object'];
     let eventType: Stripe.Event['type'];
+
+    const handleStripePaymentIntentEvent = async (
+      dataObj: Stripe.Event['data']['object'],
+      eventType: Stripe.Event['type']
+    ) => {};
+
+    const sendPushNotificationForOrder = async (
+      order: OrderType,
+      dataObj: Stripe.Event.Data.Object
+    ) => {
+      try {
+        if (order.firebaseRegistrationToken) {
+          sails.log.warn(
+            `Firebase notifications on registration tokens (i.e. "${order.firebaseRegistrationToken}" for order[${order.id}]) are  not currently working...`
+          );
+          await sails.helpers.sendFirebaseNotification.with({
+            topicBackup: `order-${order.publicId}`,
+            token: order.firebaseRegistrationToken,
+            title: 'Payment success',
+            body: '✅ Payment on vegi succeeded',
+            data: {
+              orderId: `${order.id}`,
+              stripeData: dataObj,
+            },
+          });
+        } else {
+          await sails.helpers.broadcastFirebaseNotificationForTopic.with({
+            topic: `order-${order.publicId}`,
+            title: `Payment success`,
+            body: '✅ Payment on vegi succeeded',
+            data: {
+              orderId: `${order.id}`,
+              stripeData: dataObj,
+            },
+          });
+        }
+      } catch (_error) {
+        const error: SailsDBError = _error;
+        sails.log.error(
+          `Unable to sendPushNotificationForOrder from StripeEventWebhook with error: ${error.details}`
+        );
+      }
+    };
+
+    const addDiscountsTrx = async (order: OrderType) => {
+      try {
+        if (order.discounts && order.discounts.length > 0) {
+          const addTxFn = async (discount: DiscountType) => {
+            if (discount.discountType === 'fixed') {
+              await Transaction.create({
+                amount: discount.value,
+                currency: discount.currency,
+                discount: discount.id,
+                order: order.id,
+                payer: order.customerWalletAddress,
+                receiver: order.vendor.walletAddress,
+                timestamp: moment().format(
+                  datetimeStrFormatExactForSQLTIMESTAMP
+                ),
+                status: 'succeeded',
+                remoteJobId: null,
+              });
+              await Discount.update({
+                id: discount.id,
+              }).set({
+                timesUsed: discount.timesUsed + 1,
+                isEnabled: false,
+              });
+              await Discount.addToCollection(discount.id, 'orders').members([
+                order.id,
+              ]);
+              return;
+            } else if (discount.discountType === 'percentage') {
+              let amount = (discount.value / 100) * order.subtotal;
+              if (discount.value > 100) {
+                sails.log.error(
+                  `Cant add percentage discount to order with value > 100% for discount with code: ${discount.code}`
+                );
+                return;
+              } else if (discount.value < 0) {
+                sails.log.error(
+                  `Cant add percentage discount to order with value < 0% for discount with code: ${discount.code}`
+                );
+                return;
+              } else {
+                sails.log.info(
+                  `Percentage discount of ${discount.value}% applied to order subtotal gives discounted amount of ${amount} [${discount.currency}]`
+                );
+              }
+
+              const toCurrency = order.currency || Currency.GBPx;
+              if (toCurrency !== discount.currency) {
+                amount = await sails.helpers.convertCurrencyAmount.with({
+                  amount: amount,
+                  fromCurrency: discount.currency,
+                  toCurrency: toCurrency,
+                });
+              }
+              await Transaction.create({
+                amount: amount,
+                currency: toCurrency,
+                discount: discount.id,
+                order: order.id,
+                payer: order.customerWalletAddress,
+                receiver: order.vendor.walletAddress,
+                timestamp: moment().format(
+                  datetimeStrFormatExactForSQLTIMESTAMP
+                ),
+                status: 'succeeded',
+                remoteJobId: null,
+              });
+              await Discount.update({
+                id: discount.id,
+              }).set({
+                timesUsed: discount.timesUsed + 1,
+                isEnabled:
+                  discount.isEnabled &&
+                  discount.timesUsed + 1 < discount.maxUses,
+              });
+              await Discount.addToCollection(discount.id, 'orders').members([
+                order.id,
+              ]);
+              return;
+            } else {
+              sails.log.warn(
+                `Unable to calculate discounts in stripe-event-webhook for discounts with type: "${discount.discountType}"`
+              );
+            }
+          };
+          await Promise.all(
+            order.discounts.map((discount) => addTxFn(discount))
+          );
+        }
+        return null;
+      } catch (error) {
+        sails.log.error(
+          `stripe-event-webhook errored when updating discounts on order: "${order.publicId}" with error: ${error}`
+        );
+        sails.log.error(`${error}`);
+        return error;
+      }
+    };
+
+    const setOrderToPaid = async (order: OrderType) => {
+      try {
+        sails.log.info(
+          `Set order with id: "${order.id}" to paid for stripe payment-intent event`
+        );
+        // const unixtime = Date.now();
+        await Order.update({
+          id: order.id,
+        }).set({
+          paymentStatus: 'paid',
+          paidDateTime: Date.now(),
+        });
+        return null;
+      } catch (_error) {
+        const error: SailsDBError = _error;
+        sails.log.error(
+          `stripe-event-webhook errored when updating order with publicId: "${order.publicId}" to "paymentStatus:paid": ${error}`
+        );
+        sails.log.error(`${error}`);
+        // return exits.error(`Failed to set order to "paid" with error: ${error}`);
+        return error;
+      }
+    };
+
+    const sendOrderPaidNotifications = async (order: OrderType) => {
+      await sails.helpers.sendSlackNotification.with({ order: order });
+      await sails.helpers.sendSmsNotification.with({
+        to: order.vendor.phoneNumber,
+        // body: `You have received a new order from vegi for delivery between ${order.fulfilmentSlotFrom} and ${order.fulfilmentSlotTo}. ` +
+        // `To accept or decline: ' + sails.config.custom.baseUrl + '/admin/approve-order/' + order.publicId,
+        body: `[from vegi]
+New order alert! 🚨
+Order details ${sails.config.custom.baseUrl}/admin/approve-order/${order.publicId}
+Please accept/decline ASAP.
+Delivery/Collection on ${order.fulfilmentSlotFrom} - ${order.fulfilmentSlotTo}`,
+        data: {
+          orderId: order.id,
+        },
+      });
+      await sails.helpers.sendSmsNotification.with({
+        to: order.deliveryPhoneNumber,
+        body: `Order accepted! Details of your order can be found in the My Orders section of the vegi app. Thank you!`,
+        data: {
+          orderId: order.id,
+        },
+      });
+    };
+
+    /**
+     * The function `updateOrderPaymentStatus` updates the payment status of an order based on the payment
+     * status received from a webhook, and performs additional actions based on the payment status.
+     * @param paymentStatus - The payment status of the order. It can be one of the following values:
+     * 'paid', 'unpaid', or 'failed'.
+     * @param paymentIntent - The `paymentIntent` parameter is an object that represents a Stripe
+     * PaymentIntent. It contains information about the payment, such as the amount, currency, and status.
+     * @param {OrderType} order - The `order` parameter is an object that represents an order. It contains
+     * information such as the order ID, vendor details, delivery phone number, fulfillment slot, and
+     * payment status.
+     * @param {StripeWebHookInput} inputs - The `inputs` parameter is an object that contains the input
+     * data received from the Stripe webhook event. It is of type `StripeWebHookInput`.
+     * @param {StripeEventWebhookExits} exits - The `exits` parameter is an object that contains different
+     * exit functions that can be called to handle different scenarios or outcomes of the function. These
+     * exit functions are typically used to return a response or error message to the caller of the
+     * function.
+     * @returns a promise that resolves to either a success or an error.
+     */
+    const updateOrderPaymentStatus = async (
+      paymentStatus: OrderType['paymentStatus'],
+      order: OrderType,
+      inputs: StripeWebHookInput
+    ) => {
+      if (!['paid', 'unpaid', 'failed'].includes(paymentStatus)) {
+        sails.log.warn(
+          `stripe-event-webhook received a vegi paymentStatus enum: PaymentStatus.[${paymentStatus}]. This is not handled!`
+        );
+        paymentStatus = 'unpaid';
+      }
+
+      await setOrderToPaid(order);
+
+      order = await Order.findOne(order.id).populate('vendor');
+
+      try {
+        if (paymentStatus === 'paid') {
+          await sendOrderPaidNotifications(order);
+
+          // * turn into transaction if supported, then fo an order find after to check the updated order and TX
+          const setDiscountsForOrderError = await addDiscountsTrx(order);
+          if (setDiscountsForOrderError) {
+            return exits.error(
+              `stripe-event-webhook errored when updating discounts on order: "${order.publicId}" with error: ${setDiscountsForOrderError}`
+            );
+          }
+        } else if (paymentStatus === 'unpaid') {
+          sails.log.verbose(
+            `Stripe event webhook called for "unpaid" Order[${order.id}] for ${inputs.type}`
+          );
+        } else if (paymentStatus === 'failed') {
+          await sails.helpers.sendSlackNotification.with({ order: order });
+          await sails.helpers.sendSmsNotification.with({
+            to: order.deliveryPhoneNumber,
+            body:
+              `Your payment for a recent order to ${order.vendor.name} failed. Order was scheduled between ` +
+              order.fulfilmentSlotFrom +
+              ' and ' +
+              order.fulfilmentSlotTo +
+              '. Please review your payment in the vegi app.',
+            data: {
+              orderId: order.id,
+            },
+          });
+        } else {
+          sails.log.warn(
+            `Payment for recent order[${
+              order.id
+            }] hit the stripe-event-webhook with paymentStatus of ${
+              order.paymentStatus
+            } and contained inputs: ${util.inspect(inputs, {
+              depth: null,
+            })}`
+          );
+        }
+        return exits.success();
+      } catch (error) {
+        sails.log.error(
+          `stripe-event-webhook errored sending sms notification to vendor for paid order: ${error}`
+        );
+        return exits.error(
+          `stripe-event-webhook errored sending sms notification to vendor for paid order: ${error}`
+        );
+      }
+    };
+
+    const handleStripeRefundEvent = async (
+      order: OrderType,
+      dataObj: Stripe.Event['data']['object'],
+      eventType: Stripe.Event['type']
+    ) => {
+      if (eventType === 'refund.created') {
+        // paymentStatus = 'refunded';
+        if (order.firebaseRegistrationToken) {
+          await sails.helpers.sendFirebaseNotification.with({
+            topicBackup: `order-${order.publicId}`,
+            token: order.firebaseRegistrationToken,
+            title: 'Payment refunded',
+            body: `Order[${order.id}] for ${order.total} has been refunded.`,
+            data: {
+              orderId: `${order.id}`,
+              stripeData: dataObj,
+            },
+          });
+        }
+
+        await sails.helpers.broadcastFirebaseNotificationForTopic.with({
+          topic: `order-${order.publicId}`,
+          title: 'Payment refunded',
+          body: `Order[${order.id}] for ${order.total} has been refunded.`,
+          data: {
+            orderId: `${order.id}`,
+          },
+        });
+
+        try {
+          await Order.updateOne(order.id).set({
+            refundDateTime: Date.now(),
+            paymentStatus: 'refunded',
+            completedFlag: 'refunded',
+            // refundDateTime: moment().format(datetimeStrFormatExact);
+          });
+        } catch (error) {
+          sails.log.error(
+            `Failed to update refund status on order: [${order.id}] in stripe-event-webhook with error: ${error}`
+          );
+        }
+      }
+      return exits.success();
+    };
+
+    const handleStripeCustomerEvent = async (
+      dataObj: Stripe.Event['data']['object'],
+      eventType: Stripe.Event['type']
+    ) => {
+      // Check that the customerId matches the accountId.customerId on the order via
+      // order.customerWalletAddress -> account.walletAddress -> account.stripeCustomerId
+      const customer: Stripe.Customer = dataObj as any;
+      const customerId = customer.id;
+      const accounts = await Account.find({
+        stripeAccountId: customerId,
+      });
+      if (!accounts || accounts.length < 1) {
+        const e = Error(
+          `Stripe Event Webook for "${eventType}" webhook was unable to locate an stripe customer with id: : "${customerId}" with a matching Account record on vegi.`
+        );
+        sails.log.warn(e);
+      }
+      return exits.success();
+    };
+
+    const _recordUnhandledStripeEvent = async (
+      dataObj: Stripe.Event['data']['object'],
+      eventType: Stripe.Event['type']
+    ) => {
+      // Handle the event
+      switch (eventType) {
+        case 'checkout.session.async_payment_failed':
+          {
+            const checkoutSessionAsyncPaymentFailed = dataObj;
+            sails.log.info(
+              `${checkoutSessionAsyncPaymentFailed} event occured in 'stripe-event-webhook' endpoint`
+            );
+          }
+          // Then define and call a function to handle the event checkout.session.async_payment_failed
+          break;
+        case 'checkout.session.async_payment_succeeded':
+          {
+            const checkoutSessionAsyncPaymentSucceeded = dataObj;
+            sails.log.info(
+              `${checkoutSessionAsyncPaymentSucceeded} event occured in 'stripe-event-webhook' endpoint`
+            );
+          }
+          // Then define and call a function to handle the event checkout.session.async_payment_succeeded
+          break;
+        case 'checkout.session.completed':
+          {
+            const checkoutSessionCompleted = dataObj;
+            sails.log.info(
+              `${checkoutSessionCompleted} event occured in 'stripe-event-webhook' endpoint`
+            );
+          }
+          // Then define and call a function to handle the event checkout.session.completed
+          break;
+        case 'checkout.session.expired':
+          {
+            const checkoutSessionExpired = dataObj;
+            sails.log.info(
+              `${checkoutSessionExpired} event occured in 'stripe-event-webhook' endpoint`
+            );
+          }
+          // Then define and call a function to handle the event checkout.session.expired
+          break;
+        case 'payment_intent.amount_capturable_updated':
+          {
+            const paymentIntentAmountCapturableUpdated = dataObj;
+            sails.log.info(
+              `${paymentIntentAmountCapturableUpdated} event occured in 'stripe-event-webhook' endpoint`
+            );
+          }
+          // Then define and call a function to handle the event payment_intent.amount_capturable_updated
+          break;
+        case 'payment_intent.canceled':
+          {
+            const paymentIntentCanceled = dataObj;
+            sails.log.info(
+              `${paymentIntentCanceled} event occured in 'stripe-event-webhook' endpoint`
+            );
+          }
+          // Then define and call a function to handle the event payment_intent.canceled
+          break;
+        case 'payment_intent.created':
+          {
+            const paymentIntentCreated = dataObj;
+            sails.log.info(
+              `${paymentIntentCreated} event occured in 'stripe-event-webhook' endpoint`
+            );
+          }
+          // Then define and call a function to handle the event payment_intent.created
+          break;
+        case 'payment_intent.partially_funded':
+          {
+            const paymentIntentPartiallyFunded = dataObj;
+            sails.log.info(
+              `${paymentIntentPartiallyFunded} event occured in 'stripe-event-webhook' endpoint`
+            );
+          }
+          // Then define and call a function to handle the event payment_intent.partially_funded
+          break;
+        case 'payment_intent.payment_failed':
+          {
+            const paymentIntentPaymentFailed = dataObj;
+            sails.log.info(
+              `${paymentIntentPaymentFailed} event occured in 'stripe-event-webhook' endpoint`
+            );
+          }
+          // Then define and call a function to handle the event payment_intent.payment_failed
+          break;
+        case 'payment_intent.processing':
+          {
+            const paymentIntentProcessing = dataObj;
+            sails.log.info(
+              `${paymentIntentProcessing} event occured in 'stripe-event-webhook' endpoint`
+            );
+          }
+          // Then define and call a function to handle the event payment_intent.processing
+          break;
+        case 'payment_intent.requires_action':
+          {
+            const paymentIntentRequiresAction = dataObj;
+            sails.log.info(
+              `${paymentIntentRequiresAction} event occured in 'stripe-event-webhook' endpoint`
+            );
+          }
+          // Then define and call a function to handle the event payment_intent.requires_action
+          break;
+        case 'payment_intent.succeeded':
+          {
+            const paymentIntentSucceeded = dataObj;
+            sails.log.info(
+              `${paymentIntentSucceeded} event occured in 'stripe-event-webhook' endpoint`
+            );
+          }
+          // Then define and call a function to handle the event payment_intent.succeeded
+          break;
+        case 'topup.canceled':
+          {
+            const topupCanceled = dataObj;
+            sails.log.info(
+              `${topupCanceled} event occured in 'stripe-event-webhook' endpoint`
+            );
+          }
+          // Then define and call a function to handle the event topup.canceled
+          break;
+        case 'topup.created':
+          {
+            const topupCreated = dataObj;
+            sails.log.info(
+              `${topupCreated} event occured in 'stripe-event-webhook' endpoint`
+            );
+          }
+          // Then define and call a function to handle the event topup.created
+          break;
+        case 'topup.failed':
+          {
+            const topupFailed = dataObj;
+            sails.log.info(
+              `${topupFailed} event occured in 'stripe-event-webhook' endpoint`
+            );
+          }
+          // Then define and call a function to handle the event topup.failed
+          break;
+        case 'topup.reversed':
+          {
+            const topupReversed = dataObj;
+            sails.log.info(
+              `${topupReversed} event occured in 'stripe-event-webhook' endpoint`
+            );
+          }
+          // Then define and call a function to handle the event topup.reversed
+          break;
+        case 'topup.succeeded':
+          {
+            const topupSucceeded = dataObj;
+            sails.log.info(
+              `${topupSucceeded} event occured in 'stripe-event-webhook' endpoint`
+            );
+          }
+          // Then define and call a function to handle the event topup.succeeded
+          break;
+        case 'transfer.created':
+          {
+            const transferCreated = dataObj;
+            sails.log.info(
+              `${transferCreated} event occured in 'stripe-event-webhook' endpoint`
+            );
+          }
+          // Then define and call a function to handle the event transfer.created
+          break;
+        case 'transfer.reversed':
+          {
+            const transferReversed = dataObj;
+            sails.log.info(
+              `${transferReversed} event occured in 'stripe-event-webhook' endpoint`
+            );
+          }
+          // Then define and call a function to handle the event transfer.reversed
+          break;
+        case 'transfer.updated':
+          {
+            const transferUpdated = dataObj;
+            sails.log.info(
+              `${transferUpdated} event occured in 'stripe-event-webhook' endpoint`
+            );
+          }
+          // Then define and call a function to handle the event transfer.updated
+          break;
+        // ... handle other event types
+        default:
+          sails.log.info(`Unhandled event type ${eventType}`);
+      }
+      return exits.success();
+    };
 
     try {
       // * Construct Stipe Event Data Object
@@ -819,11 +812,11 @@ const _exports: SailsActionDefnType<
           sails.log.error({ err });
           return exits.error(err);
         }
-        data = event.data;
+        // data = event.data;
         dataObj = event.data.object;
         eventType = event.type;
       } else {
-        data = inputs.data;
+        // data = inputs.data;
         dataObj = inputs.data.object;
         eventType = inputs.type;
       }
@@ -926,7 +919,6 @@ const _exports: SailsActionDefnType<
           paymentStatus,
           order,
           inputs,
-          exits,
         );
       } else if (
         eventType.startsWith('refund') &&
@@ -945,16 +937,16 @@ const _exports: SailsActionDefnType<
         if (!order) {
           return exits.success();
         }
-        return await handleStripeRefundEvent(order, dataObj, eventType, exits);
+        return await handleStripeRefundEvent(order, dataObj, eventType);
       } else if (
         eventType.startsWith('customer') &&
         dataObj['object'] === 'customer'
       ) {
         // * CUSTOMERS
-        return await handleStripeCustomerEvent(dataObj, eventType, exits);
+        return await handleStripeCustomerEvent(dataObj, eventType);
       } else {
         sails.log.info(`Ignoring Stripe Webhook event: ["${eventType}"]`);
-        return await _recordUnhandledStripeEvent(dataObj, eventType, exits);
+        return await _recordUnhandledStripeEvent(dataObj, eventType);
       }
     } catch (error) {
       return exits.error(error);

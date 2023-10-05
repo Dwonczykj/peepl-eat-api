@@ -15,7 +15,9 @@ const BASE_URL =
     ? process.env.STAGE_ENV === 'QA'
       ? 'https://qa-vegi.vegiapp.co.uk'
       : 'https://vegi.vegiapp.co.uk'
-    : `http://localhost:${process.env.PORT}`;
+    : `http://localhost:${process.env.PORT || 1337}`;
+
+console.log(`Loading custom.js in NODE_ENV: "${process.env.NODE_ENV}"`);
 
 config(); // load config from local .env if exists into process.env
 
@@ -35,7 +37,7 @@ let custom = {
   AppUriAppleStore: 'https://apps.apple.com/app/id1608208174',
   buildNumber: 1,
   baseUrl: BASE_URL,
-  peeplWebhookAddress: `${BASE_URL}/api/v1/orders/peepl-pay-webhook`,
+  peeplWebhookAddress: `${BASE_URL}/api/v1/orders/stripe-event-webhook`,
   peeplPayRefundWebhookAddress: `${BASE_URL}/api/v1/orders/peepl-pay-refund-webhook`,
   peeplWebhookAddressCustomerUpdatePaidOrder: `${BASE_URL}/api/v1/orders/peepl-pay-update-paid-order-webhook`,
   fuseStudioBaseUrl: 'https://api.chargeweb3.com/api/v0/',

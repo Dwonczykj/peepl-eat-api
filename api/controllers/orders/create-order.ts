@@ -871,7 +871,7 @@ For help please contact support@vegiapp.co.uk`,
         });
       } catch (error) {
         sails.log.error(
-          `peepl-pay-webhook errored sending sms notification to vendor for errored order: ${error}`
+          `create-order errored sending sms notification to vendor for errored order: ${error}`
         );
       }
       return exits.error(new Error('Error creating Order in DB'));
