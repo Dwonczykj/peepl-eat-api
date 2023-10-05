@@ -68,7 +68,7 @@ module.exports = {
         id: productCatInput.id,
       });
       if (!exist) {
-        sails.log(`Could not find ProductCategory to update with id: ${productCatInput.id}`);
+        sails.log.info(`Could not find ProductCategory to update with id: ${productCatInput.id}`);
         continue;
       }
 

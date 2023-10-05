@@ -86,7 +86,7 @@ module.exports = {
       if (inputs.feedback) {
         feedback = `The user gave feedback: \n   "${inputs.feedback}."\n`;
       }
-      sails.log(feedback);
+      sails.log.info(feedback);
       try {
         await sails.helpers.raiseVegiSupportIssue.with({
           orderId: inputs.orderId,

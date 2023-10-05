@@ -9,7 +9,7 @@
  */
 module.exports = async function (req, res, proceed) {
   if (!req.session.userId) {
-    sails.log(
+    sails.log.info(
       'Policy:<is-delivery-partner> -> redirect to admin as not logged in'
     );
     if (req.wantsJSON) {
@@ -27,7 +27,7 @@ module.exports = async function (req, res, proceed) {
     return proceed();
   }
 
-  sails.log(
+  sails.log.info(
     'Policy:<is-delivery-partner> -> redirect to admin as not a deliveryPartner'
   );
   if (req.wantsJSON) {

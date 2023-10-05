@@ -151,7 +151,7 @@ module.exports = {
       imageInfo = await sails.helpers.uploadOneS3(inputs.image);
     }
     if (!imageInfo) {
-      sails.log('no image file attached to create-vendor call');
+      sails.log.info('no image file attached to create-vendor call');
       return exits.noFileAttached();
     }
 

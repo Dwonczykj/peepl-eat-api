@@ -162,8 +162,8 @@ const _exports: SailsActionDefnType<
           ...{
             items: order.items.map((orderItem) => {
               if(!orderItem.product){
-                sails.log(`No product found on orderItem[${orderItem.id}] for order[${order.id}]`);
-                sails.log(JSON.stringify(orderItem,null,4));
+                sails.log.info(`No product found on orderItem[${orderItem.id}] for order[${order.id}]`);
+                sails.log.info(JSON.stringify(orderItem,null,4));
                 return false;
               }
               return {

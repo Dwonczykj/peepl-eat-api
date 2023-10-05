@@ -88,7 +88,7 @@ const _exports: SailsActionDefnType<
             moment.utc().toDate().addHours(-24).format(),
         },
       });
-      sails.log(rowsToDelete);
+      sails.log.info(rowsToDelete);
     } catch (error) {
       sails.log.error(error);
       return exits.error('Failed to find applogs for dropping');

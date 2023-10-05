@@ -29,8 +29,8 @@ module.exports = {
   },
   fn: async function (inputs, exits: Exits) {
 
-    sails.log('Running sails with datastore: ' + sails.getDatastore().config.adapter);
-    sails.log(JSON.stringify(sails.getDatastore().config));
+    sails.log.info('Running sails with datastore: ' + sails.getDatastore().config.adapter);
+    sails.log.info(JSON.stringify(sails.getDatastore().config));
     
     const user = await User.findOne({
       email: inputs.email,

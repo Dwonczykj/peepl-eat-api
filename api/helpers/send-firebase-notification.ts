@@ -3,6 +3,7 @@ import {v4 as uuidv4} from 'uuid'; // const { v4: uuidv4 } = require('uuid');
 import moment from 'moment';
 import * as firebase from '../../config/firebaseAdmin';
 import Stripe from 'stripe';
+import util from 'util';
 import {
   sailsModelKVP,
   SailsModelType,
@@ -74,6 +75,7 @@ const _exports: SailsActionDefnType<
     inputs: SendFirebaseNotificationInputs,
     exits: SendFirebaseNotificationExits
   ) {
+    sails.log.verbose(`Send Firebase Notification with inputs: ${util.inspect(inputs, {depth: 3})}`);
     const newNotification = await Notification.create({
       recipient: inputs.token,
       type: 'push',

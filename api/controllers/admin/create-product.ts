@@ -169,7 +169,7 @@ module.exports = {
     //   return;
     // }
 
-    // sails.log('creating a product with image set using sharp');
+    // sails.log.info('creating a product with image set using sharp');
     // var AWS = require("aws-sdk");
     // // const { S3Client, AbortMultipartUploadCommand } = require('@aws-sdk/client-s3');
     // const sharp = require("sharp");

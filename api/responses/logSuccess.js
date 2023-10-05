@@ -23,6 +23,6 @@
 module.exports = function logSuccess() {
   // var req = this.req;
   var res = this.res;
-  sails.log(res.statusCode);
+  sails.log.info(res.statusCode);
   return res.success();
 };

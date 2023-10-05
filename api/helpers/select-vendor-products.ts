@@ -62,7 +62,7 @@ const _exports: SailsActionDefnType<
 
     // vendor.products = products;
 
-    sails.log("HELLLO");
+    sails.log.info("HELLLO");
 
     const vendor = await Vendor.findOne(inputs.vendorId)
       .populate('pickupAddress')

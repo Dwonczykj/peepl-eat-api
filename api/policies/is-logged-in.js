@@ -40,10 +40,10 @@ module.exports = async function (req, res, proceed) {
   if (!req.session.userId) {
     // Respond with view or JSON.
     if (req.wantsJSON) {
-      sails.log('Policy:<is-logged-in> -> return forbidden as no active session');
+      sails.log.info('Policy:<is-logged-in> -> return forbidden as no active session');
       return res.forbidden();
     } else {
-      sails.log('Policy:<is-logged-in> -> redirect to login as no active session');
+      sails.log.info('Policy:<is-logged-in> -> redirect to login as no active session');
       // ~ https://sailsjs.com/documentation/reference/request-req/req-original-url
       return res.redirect('/admin/login-with-password?next=' + encodeURIComponent(req.originalUrl));
     }
@@ -51,7 +51,7 @@ module.exports = async function (req, res, proceed) {
     // try {
     //   let user = await User.findOne({ id: this.req.session.userId });
     //   if(!user || user.length < 1){
-    //     sails.log(
+    //     sails.log.info(
     //       'Policy:<is-logged-in> -> redirect to login as no active session'
     //     );
     //     // ~ https://sailsjs.com/documentation/reference/request-req/req-original-url
@@ -61,7 +61,7 @@ module.exports = async function (req, res, proceed) {
     //     );
     //   }
     // } catch (error) {
-    //   sails.log(
+    //   sails.log.info(
     //     'Policy:<is-logged-in> -> redirect to login as no active session'
     //   );
     //   // ~ https://sailsjs.com/documentation/reference/request-req/req-original-url

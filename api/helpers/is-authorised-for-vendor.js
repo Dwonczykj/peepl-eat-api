@@ -40,7 +40,7 @@ module.exports = {
     });
 
     if(!user){
-      sails.log(`helpers.isAuthorisedForVendor failed to find user with id: ${inputs.userId}`);
+      sails.log.info(`helpers.isAuthorisedForVendor failed to find user with id: ${inputs.userId}`);
       return exits.userNotFound();
     }
 

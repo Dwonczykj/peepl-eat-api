@@ -78,7 +78,7 @@ module.exports = {
     });
 
     if (exist && exist.length > 0) {
-      sails.log(
+      sails.log.info(
         `DeliveryPartner: ${util.inspect(exist[0], {
           depth: null,
         })} already exists.`

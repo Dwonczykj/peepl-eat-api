@@ -20,13 +20,13 @@ module.exports = {
 
 
   fn: async function () {
-    sails.log(
+    sails.log.info(
       `Running custom shell script with NODE_ENV [${process.env.NODE_ENV}]: ... (\`NODE_ENV=development sails run export-db-json\`)`
     );
 
     // return;
     // process.chdir(__dirname);
-    // sails.log(`Changed Directory to: "${__dirname}"`);
+    // sails.log.info(`Changed Directory to: "${__dirname}"`);
 
     const Promise = require('bluebird');
 
@@ -43,7 +43,7 @@ module.exports = {
           sails.log.error(`${err}`);
           return;
         }
-        sails.log('dump_json .tmp directory created successfully!');
+        sails.log.info('dump_json .tmp directory created successfully!');
       });
     }
 
@@ -67,7 +67,7 @@ module.exports = {
       // // save to memory
       // modelData[key] = await model.find();
 
-      sails.log(`Found ${modelData[key].length} records for "${key}" model`);
+      sails.log.info(`Found ${modelData[key].length} records for "${key}" model`);
     };
 
     const promises = Object.keys(sails.models).map((key) => findData(key));
@@ -117,11 +117,11 @@ module.exports = {
       force: true,
     });
 
-    sails.log(
+    sails.log.info(
       `Located ${existingProducts.length} products of which keep ${flatProductIds.length} and ignore ${deepProductIds.length} as they have necessary sub options`
     );
 
-    sails.log(
+    sails.log.info(
       existingProducts
         .filter((p) => deepProductIds.includes(p['id']))
         .slice(1, 6)
@@ -250,8 +250,8 @@ module.exports = {
     });
 
     //todo: Here update product lines with a supplier name of 'Purple Carrot Supplier' if we want to keep the row and its pov and pos.
-    sails.log(`The first of the ${newProductLines.length} new productLines: `);
-    sails.log(newProductLines[0]);
+    sails.log.info(`The first of the ${newProductLines.length} new productLines: `);
+    sails.log.info(newProductLines[0]);
 
     //Destroy po and pov lines that dont have a matching id in products table anymore
     const orphanedProductOptionIds = existingProductOptions
@@ -277,8 +277,8 @@ module.exports = {
       return poOmitId;
     });
 
-    sails.log(`${newProductLines.length} new product records to be added`);
-    sails.log(
+    sails.log.info(`${newProductLines.length} new product records to be added`);
+    sails.log.info(
       `There are ${orphanedProductOptionIds.length} Orphan ProductOptions to remove and ${orphanedProductOptionValueIds.length} Orphan ProductOptionValues to remove.`
     );
 
@@ -298,7 +298,7 @@ module.exports = {
       .destroy({ id: flatProductIds })
       .fetch();
 
-    sails.log(
+    sails.log.info(
       `Dropped ${destroyedRecords.length} rows from products, ${destroyedPORecords.length} from ProductOption and ${destroyedPOVRecords.length} from ProductOptionValue`
     );
 
@@ -437,7 +437,7 @@ module.exports = {
     //         return await createOrderTransactionDB(db);
     //       })
     //       .intercept((issues) => {
-    //         sails.log(issues);
+    //         sails.log.info(issues);
     //         return exits.error(new Error('Error creating Order in DB'));
     //       });
     //     return exits.success({

@@ -94,10 +94,10 @@ const _exports: SailsActionDefnType<
     }
 
     if (!order) {
-      sails.log('cancel-order - order NOT found');
+      sails.log.info('cancel-order - order NOT found');
       return exits.notFound();
     } else {
-      sails.log(`Cancel order [${order.id}]`);
+      sails.log.info(`Cancel order [${order.id}]`);
     }
 
     if (order.restaurantAcceptanceStatus !== 'pending') {

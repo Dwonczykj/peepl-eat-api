@@ -36,7 +36,7 @@ module.exports = {
     if (!order) {
       return exits.notFound();
     } else if(order.completedFlag !== ""){
-      sails.log("order flag: " + order.completedFlag);
+      sails.log.info("order flag: " + order.completedFlag);
       return exits.notFound();
     }
 

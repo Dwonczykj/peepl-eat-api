@@ -124,7 +124,7 @@ module.exports = {
         id: vendor.deliveryPartner.id
       });
     }else{
-      sails.log(`No DeliveryPartner set for vendor so take any from the pool`);
+      sails.log.info(`No DeliveryPartner set for vendor so take any from the pool`);
       deliveryPartners = await DeliveryPartner.find({
         status: 'active',
         //contains: {deliversToPostCodes: [inputs.deliveryAddressPostCode]},
@@ -160,7 +160,7 @@ module.exports = {
         !validSlotsForDeliveryPartner ||
         validSlotsForDeliveryPartner.length < 1
       ) {
-        sails.log(
+        sails.log.info(
           `helpers.getAvailableDeliveryPartnerFromPool found no valid slots from helpers.getAvailableSlots for fm: ${util.inspect(
             deliveryPartnerFulfilmentMethod,
             { depth: null }

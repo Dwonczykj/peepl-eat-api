@@ -91,7 +91,7 @@ const _exports: SailsActionDefnType<
       const results =
         await mintTokensToAddress({
           toAddress: inputs.toAddress,
-          amount: (inputs.amount / 100).toString(),
+          amount: Number.parseFloat(inputs.amount.toString()).toString(),
           correlationId: correlationId,
           orderId: null,
         });

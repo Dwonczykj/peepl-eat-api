@@ -127,7 +127,7 @@ const _exports: SailsActionDefnType<
       // inputs.vendor = user.vendor;
     }
     if(typeof(inputs.value) !== 'number'){
-      sails.log(
+      sails.log.info(
         `Request contained a discount code value of "${
           inputs.value
         }" with type: ${typeof inputs.value}`

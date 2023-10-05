@@ -195,7 +195,7 @@ module.exports = {
   fn: async function () {
 
 
-    sails.log(
+    sails.log.info(
       `Running custom shell script with NODE_ENV [${process.env.NODE_ENV}]: ... (\n\t\`secrets_relative_paths=secretPath1,secretPath2 NODE_ENV=development sails run secrets-to-env\`\n)`
     );
 
@@ -332,8 +332,8 @@ module.exports = {
     const saveToEnvFileEncoded = (envFilePath, output) => {
       let savePathEnv = path.resolve(sails.config.appPath, envFilePath);
       
-      sails.log(`Writing entire env output to "${savePathEnv}"`);
-      sails.log(`First 300 chars are: \n` + outputSimpleEnv.slice(0,300));
+      sails.log.info(`Writing entire env output to "${savePathEnv}"`);
+      sails.log.info(`First 300 chars are: \n` + outputSimpleEnv.slice(0,300));
       fs.writeFileSync(
         savePathEnv,
         output,
@@ -344,11 +344,11 @@ module.exports = {
         //       `Threw writing .env file to "${savePathEnv}".\nError: ${err}`
         //     );
         //   } else {
-        //     sails.log(`Env vars written to "${savePathEnv}"`);
+        //     sails.log.info(`Env vars written to "${savePathEnv}"`);
         //   }
         // }
       );
-      sails.log(`Env vars written to "${savePathEnv}"`);
+      sails.log.info(`Env vars written to "${savePathEnv}"`);
     };
 
     saveToEnvFileEncoded(`.env`, outputSimpleEnv);
@@ -356,8 +356,8 @@ module.exports = {
 
     // let savePathEnv = path.resolve(sails.config.appPath, `.env`);
     
-    // sails.log(`Writing entire env output to "${savePathEnv}"`);
-    // sails.log(`First 300 chars are: \n` + outputSimpleEnv.slice(0,300));
+    // sails.log.info(`Writing entire env output to "${savePathEnv}"`);
+    // sails.log.info(`First 300 chars are: \n` + outputSimpleEnv.slice(0,300));
     // fs.writeFileSync(
     //   savePathEnv,
     //   outputSimpleEnv,
@@ -368,11 +368,11 @@ module.exports = {
     //   //       `Threw writing .env file to "${savePathEnv}".\nError: ${err}`
     //   //     );
     //   //   } else {
-    //   //     sails.log(`Env vars written to "${savePathEnv}"`);
+    //   //     sails.log.info(`Env vars written to "${savePathEnv}"`);
     //   //   }
     //   // }
     // );
-    // sails.log(`Env vars written to "${savePathEnv}"`);
+    // sails.log.info(`Env vars written to "${savePathEnv}"`);
 
 
     for (const bSp of Object.keys(output)){
@@ -382,7 +382,7 @@ module.exports = {
       }
 
       saveToEnvFileEncoded(savePathEnvSp, output[bSp]);
-      // sails.log(`Writing output to "${savePathEnvSp}"`);
+      // sails.log.info(`Writing output to "${savePathEnvSp}"`);
       // fs.writeFileSync(
       //   savePathEnvSp,
       //   output[bSp],
@@ -393,11 +393,11 @@ module.exports = {
       //   //       `Threw writing .env file to "${savePathEnv}".\nError: ${err}`
       //   //     );
       //   //   } else {
-      //   //     sails.log(`Env vars written to "${savePathEnv}"`);
+      //   //     sails.log.info(`Env vars written to "${savePathEnv}"`);
       //   //   }
       //   // }
       // );
-      // sails.log(`Env vars written to "${savePathEnvSp}"`);
+      // sails.log.info(`Env vars written to "${savePathEnvSp}"`);
     }
 
     const { output: unusedOutputQA, outputSimpleEnv: outputSimpleEnvQA } =
@@ -405,7 +405,7 @@ module.exports = {
     saveToEnvFileEncoded(`.env_qa`, outputSimpleEnvQA);
 
 
-    sails.log(`All env vars written!`);
+    sails.log.info(`All env vars written!`);
 
   }
 

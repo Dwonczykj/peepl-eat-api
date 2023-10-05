@@ -97,7 +97,7 @@ class GoogleMapsApi implements IGoogleMapsApi {
     };
 
     try {
-      sails.log(
+      sails.log.info(
         `MAPS API GET: ${sails.config.custom.googleApiBaseUrl}${sails.config.custom.placesApiRelUrlFindPlace}`
       );
       const response = await this.client.get(
@@ -155,7 +155,7 @@ class GoogleMapsApi implements IGoogleMapsApi {
       },
     };
     try {
-      sails.log(
+      sails.log.info(
         `MAPS API GET: ${sails.config.custom.googleApiBaseUrl}${sails.config.custom.distancesApiRelUrlGetDistance}`
       );
       const response = await this.client.get(

@@ -47,7 +47,7 @@ module.exports = {
       return exits.success({});
     })
     .catch((err) => {
-      sails.log(err);
+      sails.log.info(err);
       // TODO: Error handling in case this fails
       return exits.error();
     });

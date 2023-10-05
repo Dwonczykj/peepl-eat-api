@@ -86,9 +86,9 @@ module.exports.http = {
             })`
           );
         }
-        // sails.log(res.outputData);
-        // sails.log(res.connection);
-        // sails.log(res.headersSent);
+        // sails.log.info(res.outputData);
+        // sails.log.info(res.connection);
+        // sails.log.info(res.headersSent);
       });
       return next();
     },

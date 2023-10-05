@@ -20,7 +20,7 @@ module.exports = {
 
 
   fn: async function () {
-    sails.log(
+    sails.log.info(
       `Running custom shell script with NODE_ENV [${process.env.NODE_ENV}]: ... (\`NODE_ENV=development sails run copy-between-databases\`)`
     );
 
@@ -28,7 +28,7 @@ module.exports = {
 
     // return;
     // process.chdir(__dirname);
-    // sails.log(`Changed Directory to: "${__dirname}"`);
+    // sails.log.info(`Changed Directory to: "${__dirname}"`);
 
     
 
@@ -123,7 +123,7 @@ module.exports = {
               id: createdEntity.id,
             })
             .usingConnection(db);
-          sails.log(`New Account with walletAddress: "${foundEntity.walletAddress}"`);
+          sails.log.info(`New Account with walletAddress: "${foundEntity.walletAddress}"`);
         });
       } catch (error){
         sails.log.error(`Error when creating records in postgresDB for Accounts:`);
@@ -134,14 +134,14 @@ module.exports = {
     await oneOffSailsCall();
 
     const copyData = async (key) => {
-      sails.log(key);
+      sails.log.info(key);
       let modelData = [];
       try{
         const mysqlDB = sails.getDatastore(); 
         modelData = await sails.models[key].find();
         // const modelData = await sails.models[key].find().usingConnection(mysqlDB);
         const numRecords = modelData.length;
-        sails.log(`Copying ${numRecords} "${key}" records from MYSQL to PostGres DB`);
+        sails.log.info(`Copying ${numRecords} "${key}" records from MYSQL to PostGres DB`);
 
       } catch (error){
         sails.log.error(`Error when fetching records for key: "${key}":`);
@@ -159,7 +159,7 @@ module.exports = {
                   .usingConnection(db)
               // sails.models[key].createEach(modelData).usingConnection(db)
             );
-            sails.log('Copy complete');
+            sails.log.info('Copy complete');
           }else{
             sails.log.error(
               'Wrong adapter used: ' +
@@ -185,7 +185,7 @@ module.exports = {
 
     // await Promise.all(promises);
 
-    sails.log(`Models copied success!`);
+    sails.log.info(`Models copied success!`);
 
     // // Compare bootstrap version from code base to the version that was last run
     // var lastRunBootstrapInfo = await sails.helpers.fs

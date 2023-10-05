@@ -343,7 +343,7 @@ module.exports = {
             return await createOrderTransactionDB(db);
           })
           .intercept((issues) => {
-            sails.log(issues);
+            sails.log.info(issues);
             return exits.success({
               data: {
                 validRequest: false,

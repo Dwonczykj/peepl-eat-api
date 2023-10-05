@@ -269,7 +269,7 @@ const _exports: SailsActionDefnType<
         return exits.badRequest(`Order invalid`);
       }
     } catch (err) {
-      sails.log(err);
+      sails.log.info(err);
       return exits.badRequest(err);
     }
 
@@ -690,8 +690,8 @@ const _exports: SailsActionDefnType<
           process.env.NODE_ENV &&
           !process.env.NODE_ENV.toLowerCase().startsWith('prod')
         ) {
-          sails.log('USING sails-disk');
-          sails.log(
+          sails.log.info('USING sails-disk');
+          sails.log.info(
             `create-order -> order created -> ${util.inspect(result, {
               depth: 0,
             })}`
@@ -704,7 +704,7 @@ const _exports: SailsActionDefnType<
             result = await createOrderTransactionDB(db);
           })
           .intercept((issues) => {
-            sails.log(issues);
+            sails.log.info(issues);
             return exits.error(new Error('Error creating Order in DB'));
           });
         if (
@@ -830,7 +830,7 @@ const _exports: SailsActionDefnType<
         });
       }
       const paymentIntentId = newPaymentIntent.paymentIntent.id;
-      sails.log(
+      sails.log.info(
         `Update order[${order.id}] with publicId: "${order.publicId}" and set paymentIntentId: "${paymentIntentId}" from stripe`
       );
 

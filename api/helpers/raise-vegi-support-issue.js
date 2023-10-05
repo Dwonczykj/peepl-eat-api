@@ -72,7 +72,7 @@ module.exports = {
       sails.log.error(`Error occurred in helpers/raiseVegiSupportIssue trying to send SMS: ${error}`);
       return exits.smsFailed(error);
     }
-    sails.log(`Send email to vegi support`);
+    sails.log.info(`Send email to vegi support`);
     try {
 	    await sails.helpers.sendTemplateEmail.with({
 	      template: 'email-support-request',

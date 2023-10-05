@@ -52,12 +52,12 @@ module.exports.bootstrap = async function () {
     lastRunBootstrapInfo &&
     lastRunBootstrapInfo.lastRunVersion === HARD_CODED_DATA_VERSION
   ) {
-    sails.log(
+    sails.log.info(
       'Skipping v' +
         HARD_CODED_DATA_VERSION +
         " bootstrap script...  (because it's already been run)"
     );
-    sails.log(
+    sails.log.info(
       '(last run on this computer: @ ' +
         new Date(lastRunBootstrapInfo.lastRunAt) +
         ')'

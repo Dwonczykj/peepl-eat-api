@@ -92,7 +92,7 @@ module.exports = {
     }
 
     if (!order) {
-      sails.log('approve or decline order - order NOT found');
+      sails.log.info('approve or decline order - order NOT found');
       return exits.orderNotFound();
     }
 

@@ -70,7 +70,7 @@ module.exports = {
         vendor: productCatInput.vendor,
       });
       if (exist && exist.length > 0) {
-        sails.log(
+        sails.log.info(
           `ProductCategory with name: ${productCatInput.name} already exists for vendorId: ${productCatInput.vendor}.`
         );
         continue;

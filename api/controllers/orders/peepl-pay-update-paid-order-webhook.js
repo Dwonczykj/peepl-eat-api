@@ -114,14 +114,14 @@ module.exports = {
     }
 
     const msgBody = `vegi order [${paidOrder.publicId}] ${refundWorked} ${moneyFormatted}`;
-    sails.log('built message');
+    sails.log.info('built message');
     const msgBodyCustomer = `Your ${msgBody} your wallet 😎.`;
     const msgBodyVendor = `Your customer's ${msgBody} their wallet 😎.`;
     const msgBodySupport = `Your customer's ${msgBody} the customer's wallet: '${paidOrder.customerWalletAddress}'.`;
     let customerNotified = false;
     let customerNotifiedFirebase = false;
     let vendorNotified = false;
-    sails.log('notify users');
+    sails.log.info('notify users');
     try {
       await sails.helpers.broadcastFirebaseNotificationForTopic.with({
         topic: 'order-' + paidOrder.publicId,

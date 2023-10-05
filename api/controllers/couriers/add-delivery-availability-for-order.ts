@@ -65,7 +65,7 @@ module.exports = {
     }
 
     if (!order) {
-      sails.log(`order not found with public id: ${inputs.vegiOrderId}`);
+      sails.log.info(`order not found with public id: ${inputs.vegiOrderId}`);
       return exits.notFound();
     }
 
@@ -81,7 +81,7 @@ module.exports = {
       order.deliveryPartnerConfirmed ||
       order.deliveryPartner
     ) {
-      sails.log(`This DeliveryPartner has previously confirmed the delivery, they cannot accept the the delivery again.`);
+      sails.log.info(`This DeliveryPartner has previously confirmed the delivery, they cannot accept the the delivery again.`);
       return exits.orderAlreadyHasDeliveryPartner(); //NOTE: cannot be cancelled after this stage
     }
 
@@ -89,7 +89,7 @@ module.exports = {
       inputs.deliveryPartnerId
     ).populate('deliveryFulfilmentMethod');
     if(!deliveryPartner){
-      sails.log(
+      sails.log.info(
         `Delivery partner with id: ${inputs.deliveryPartnerId} not found.`
       );
       return exits.notFound();
@@ -106,10 +106,10 @@ module.exports = {
             deliveryPartner.deliveryFulfilmentMethod.id
           );
         const dPdeliverySlots = dPdeliverySlotsI.map((slot) => TimeWindow.from(slot));
-        // sails.log(
+        // sails.log.info(
         //   `Order between ${order.fulfilmentSlotFrom} and ${order.fulfilmentSlotTo}`
         // );
-        // sails.log(util.inspect(dPdeliverySlots, {depth: null}));
+        // sails.log.info(util.inspect(dPdeliverySlots, {depth: null}));
 	      const slotOk =
 	        dPdeliverySlots.filter((slot) => {
 	          return moment

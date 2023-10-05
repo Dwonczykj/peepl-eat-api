@@ -35,7 +35,7 @@ module.exports = {
       process.env.NODE_ENV &&
       !process.env.NODE_ENV.toLowerCase().startsWith('prod')
     ) {
-      sails.log(
+      sails.log.info(
         `peepl-pay-webhook updating order w/ payIntId: [${inputs.paymentIntentId}] to ${inputs.status}!`
       );
     }
@@ -47,7 +47,7 @@ module.exports = {
     }
     if (sails.config.custom.baseUrl !== 'https://vegi.vegiapp.co.uk') {
       const util = require('util');
-      sails.log(
+      sails.log.info(
         `peepl-pay-webook called with inputs: ${util.inspect(inputs, {
           depth: null,
         })}`

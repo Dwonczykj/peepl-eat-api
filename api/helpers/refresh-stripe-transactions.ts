@@ -203,7 +203,7 @@ const _exports: SailsActionDefnType<
             if (account){
               payerAccountId = account.id;
             } else if(!pi.livemode){
-              sails.log(`Ignoring paymentIntent for ${pi.currency.toLocaleUpperCase()} ${(pi.amount/100).toFixed(2)} for customer [${pi.customer}] at ${moment.utc(pi.created*1000).format('DD/MM/yyyy hh:mm:ss')} as in test mode!`);
+              sails.log.info(`Ignoring paymentIntent for ${pi.currency.toLocaleUpperCase()} ${(pi.amount/100).toFixed(2)} for customer [${pi.customer}] at ${moment.utc(pi.created*1000).format('DD/MM/yyyy hh:mm:ss')} as in test mode!`);
             } else {
               return exits.success(false);
             }

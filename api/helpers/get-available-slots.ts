@@ -222,7 +222,7 @@ module.exports = {
             // If there aren't too many orders in the slot
             availableSlots.push(slotI);
           } else {
-            sails.log(
+            sails.log.info(
               `Excluding slot [${slotI.startTime.format(datetimeStrFormat)}] from get-available-slots helper call as there are already ${
                 relevantOrders.length
               } orders scheduled for this slot and there are a maximum of ${

@@ -49,7 +49,7 @@ const _exports: SailsActionDefnType<
       if (entry.order !== (i + 1)){
         // wrong order...
         if(!logged){
-          sails.log(`Fixing order of waitinglist entry for email: "${entry.email}" from [${entry.order}] to [${(i+1)}]`);
+          sails.log.info(`Fixing order of waitinglist entry for email: "${entry.email}" from [${entry.order}] to [${(i+1)}]`);
           logged = true;
         }
         const updator = async () => {

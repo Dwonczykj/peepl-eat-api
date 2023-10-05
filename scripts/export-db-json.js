@@ -20,11 +20,11 @@ module.exports = {
   fn: async function () {
 
 
-    sails.log(`Running custom shell script with NODE_ENV [${process.env.NODE_ENV}]: ... (\`NODE_ENV=development sails run export-db-json\`)`);
+    sails.log.info(`Running custom shell script with NODE_ENV [${process.env.NODE_ENV}]: ... (\`NODE_ENV=development sails run export-db-json\`)`);
 
     // return;
     // process.chdir(__dirname);
-    // sails.log(`Changed Directory to: "${__dirname}"`);
+    // sails.log.info(`Changed Directory to: "${__dirname}"`);
 
     const Promise = require('bluebird');
 
@@ -49,7 +49,7 @@ module.exports = {
     }
 
     const findData = async (key) => {
-      sails.log(key);
+      sails.log.info(key);
       const modelData = await sails.models[key].find();
 
       const saveJsonPath = path.resolve(
@@ -78,7 +78,7 @@ module.exports = {
           );
         });
 
-      sails.log(`Wrote ${modelData.length} rows for model: "${key}" to "${saveJsonPath}"`);
+      sails.log.info(`Wrote ${modelData.length} rows for model: "${key}" to "${saveJsonPath}"`);
 
     };
 
@@ -105,7 +105,7 @@ module.exports = {
       `.tmp/dump_json`
     );
 
-    sails.log(`Models written to ${saveJsonDir}`);
+    sails.log.info(`Models written to ${saveJsonDir}`);
 
 
     // // Compare bootstrap version from code base to the version that was last run

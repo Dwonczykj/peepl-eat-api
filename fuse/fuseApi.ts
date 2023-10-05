@@ -404,7 +404,7 @@ export async function mintTokensToAddress({
     //   config['fuseVegiCommunityGreenPointNetworkType'],
     // correlationId,
     tokenAddress: config['fuseVegiCommunityGreenBeanTokenAddress'],
-    amount: Number.parseFloat(amount) * 100,
+    amount: Number.parseFloat(amount),
     toAddress: toAddress,
     // apiKey: config['fuseApiPublicKey']
   });
@@ -592,7 +592,7 @@ export async function transferVegiRewardTokens({
 
   axios(requestConfig)
     .then((response) => {
-      sails.log(util.inspect(response.data, { depth: null })); // * JOB ID
+      sails.log.info(util.inspect(response.data, { depth: null })); // * JOB ID
     })
     .catch((error) => {
       sails.log.error(`Fuse Minting Url ${mintUrl} with error: ${error}`);

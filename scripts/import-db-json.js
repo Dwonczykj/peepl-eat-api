@@ -20,7 +20,7 @@ module.exports = {
   fn: async function () {
 
 
-    sails.log(
+    sails.log.info(
       `Running custom shell script with NODE_ENV [${process.env.NODE_ENV}]: ... (\`keep_primary_key_ids=true NODE_ENV=development sails run import-db-json\`)`
     );
 
@@ -39,7 +39,7 @@ module.exports = {
           sails.log.error(`${err}`);
           return;
         }
-        sails.log('dump_json .tmp directory created successfully!');
+        sails.log.info('dump_json .tmp directory created successfully!');
       });
     }
 
@@ -49,7 +49,7 @@ module.exports = {
       }
       if (key === 'user' && modelDataForKey){
         const rolledUsers = modelDataForKey.map(r => {
-          // sails.log(`User with role: "${r.role}"`);
+          // sails.log.info(`User with role: "${r.role}"`);
           if(!r.role || r.role === ""){
             r.role = 'consumer';
           }
@@ -58,7 +58,7 @@ module.exports = {
           }
           return r;
         });
-        // sails.log(JSON.stringify(rolledUsers, null, 4));
+        // sails.log.info(JSON.stringify(rolledUsers, null, 4));
         return rolledUsers;
       }else{
         return modelDataForKey;
@@ -67,9 +67,9 @@ module.exports = {
 
     const importDB = async (allowWriteDB,keepPKIDs=true) => {
       if(keepPKIDs){
-        sails.log(`Retaing primary keys in data for db import`);
+        sails.log.info(`Retaing primary keys in data for db import`);
       }else{
-        sails.log(`Excluding primary keys in data for db import`);
+        sails.log.info(`Excluding primary keys in data for db import`);
       }
       const modelKeys = Object.keys(sails.models);
       let modelData = {};
@@ -84,7 +84,7 @@ module.exports = {
           
           modelData[key] = await sails.helpers.fs.readJson(saveJsonPathModelNames);
 
-          sails.log(`Found ${modelData[key].length} JSON records for "${key}" model`);
+          sails.log.info(`Found ${modelData[key].length} JSON records for "${key}" model`);
         }
 
       }
@@ -107,7 +107,7 @@ module.exports = {
                   }
                   const existingModelData = await sails.models[key].find();
                   if (existingModelData.length > 0){
-                    sails.log(
+                    sails.log.info(
                       `Dropping ${existingModelData.length} existing rows from DB for key: ${key} as keep_ids set to true`
                     );
                     if(allowWriteDB){
@@ -115,15 +115,15 @@ module.exports = {
                         id: existingModelData.map(r => r.id)
                       });
                     }
-                    sails.log(`Dropped all rows for key: "${key}"`);
+                    sails.log.info(`Dropped all rows for key: "${key}"`);
                   }else{
-                    sails.log(`No existing rows found for key: ${key} in DB`);
+                    sails.log.info(`No existing rows found for key: ${key} in DB`);
                   }
-                  sails.log(
+                  sails.log.info(
                     `Importing ${modelData[key].length} data records for key: "${key}"`
                   );
                   if(!keepPKIDs){
-                    sails.log('Dropping PK Ids from existing data to import');
+                    sails.log.info('Dropping PK Ids from existing data to import');
                     modelData[key] = modelData[key].map(row => {
                       // eslint-disable-next-line no-unused-vars
                       const {id,...rest} = row;
@@ -136,7 +136,7 @@ module.exports = {
                       .createEach(modelData[key])
                       .usingConnection(db);
                   }
-                  sails.log(
+                  sails.log.info(
                     `Imported ${modelData[key].length} data records for key: "${key}"`
                   );
                 }
@@ -144,7 +144,7 @@ module.exports = {
             }
             // sails.models[key].createEach(modelData).usingConnection(db)
           );
-          sails.log('Import completed successfully.');
+          sails.log.info('Import completed successfully.');
         } else {
           sails.log.error(
             'Wrong default DB adapter used: ' + sails.getDatastore().config.adapter + '.\n' + 

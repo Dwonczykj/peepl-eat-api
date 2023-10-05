@@ -17,7 +17,7 @@ module.exports = {
   },
 
   fn: async function (inputs, exits) {
-    sails.log(
+    sails.log.info(
       `Running in node_env: ${
         process.env.NODE_ENV
       } with sails.locals:\n${util.inspect(sails.config.datastores, {
@@ -71,7 +71,7 @@ module.exports = {
         return exits.error('CategoryGroup not Found');
       }
 
-      sails.log(`General Category Group Exists: ${util.inspect(generalCategoryGroup, {depth: null})}`);
+      sails.log.info(`General Category Group Exists: ${util.inspect(generalCategoryGroup, {depth: null})}`);
       
       const vendors = await Vendor.find().populate('productCategories');
       const vendorsToUpdate = vendors.filter((vendor) => {
@@ -95,15 +95,15 @@ module.exports = {
         };
       });
 
-      sails.log(`Creating new product categories: ${util.inspect(newProductCategories, {depth: null})}`);
+      sails.log.info(`Creating new product categories: ${util.inspect(newProductCategories, {depth: null})}`);
       let _newProdCats;
       if(newProductCategories.length > 0){
         _newProdCats = await ProductCategory.createEach(
           newProductCategories
         ).fetch();
-        sails.log(`Product Categories created for each vendor`);
+        sails.log.info(`Product Categories created for each vendor`);
       } else {
-        sails.log(`Product Categories already exists for each vendor`);
+        sails.log.info(`Product Categories already exists for each vendor`);
       }
       _newProdCats = await ProductCategory.find({
         name: 'General',
@@ -123,7 +123,7 @@ module.exports = {
           return p;
         });
       if (productsToUpdate.length > 0){
-        sails.log(
+        sails.log.info(
           `Updating products [${productsToUpdate.length}]: ${util.inspect(productsToUpdate[0], {
             depth: null,
           })}`
@@ -146,7 +146,7 @@ module.exports = {
         }
         const updatedProducts = await Product.find(productsToUpdate.map(p => p.id)).populate('category&vendor');
 
-        sails.log(
+        sails.log.info(
           `Products updated for each vendor [${
             updatedProducts.length
           }]: ${util.inspect(updatedProducts[0], { depth: 2 })}`

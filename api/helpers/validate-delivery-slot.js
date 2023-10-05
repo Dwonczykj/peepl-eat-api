@@ -49,7 +49,7 @@ module.exports = {
     }
 
     if(!validSlots){
-      sails.log(
+      sails.log.info(
         `helpers.validateDeliverySlots found no valid slots from helpers.getAvailableSlots`
       );
       return exits.noValidSlots();

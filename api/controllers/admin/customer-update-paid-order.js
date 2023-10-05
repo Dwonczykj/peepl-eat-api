@@ -227,7 +227,7 @@ module.exports = {
         fromCurrency: 'PPL',
         toCurrency: 'GBP',
       });
-      sails.log(`gbpx -> ${_gbpxPortion}; ppl -> ${_pplPortion}`);
+      sails.log.info(`gbpx -> ${_gbpxPortion}; ppl -> ${_pplPortion}`);
       if (
         oldOrder.total - newOrder.total - (_gbpxPortion + _pplPortion) >
         0.01

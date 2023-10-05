@@ -73,7 +73,7 @@ module.exports = {
       productCategories: [inputs],
     });
     if (!productCategories || productCategories.length < 1) {
-      sails.log(`No product categories updated`);
+      sails.log.info(`No product categories updated`);
       return exits.notFound();
     }
     const updatedProductCategory = await ProductCategory.findOne(inputs.id);
