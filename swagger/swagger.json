@@ -73,9 +73,6 @@
       "name": "View orders"
     },
     {
-      "name": "UpdateOrderStatus"
-    },
-    {
       "name": "View discount codes"
     },
     {
@@ -239,6 +236,9 @@
     },
     {
       "name": "Upload product suggestion image"
+    },
+    {
+      "name": "UpdateOrderStatus"
     },
     {
       "name": "Get account for wallet address"
@@ -3683,50 +3683,6 @@
           },
           "500": {
             "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/orders/update-order-status": {
-      "get": {
-        "summary": "UpdateOrderStatus",
-        "tags": [
-          "UpdateOrderStatus"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "orderId",
-            "required": true,
-            "schema": {
-              "type": "number",
-              "format": "double"
-            }
-          },
-          {
-            "in": "query",
-            "name": "paymentStatus",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "403": {
-            "description": "Success"
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "500": {
-            "description": "Server error"
           }
         }
       }
@@ -7704,6 +7660,50 @@
           },
           "500": {
             "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v1/orders/update-order-status": {
+      "post": {
+        "summary": "UpdateOrderStatus",
+        "tags": [
+          "UpdateOrderStatus"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "orderId",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "in": "query",
+            "name": "paymentStatus",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Server error"
           }
         }
       }

@@ -179,7 +179,7 @@ module.exports = {
         `+${inputs.phoneCountryCode}${inputs.phoneNoCountry}`
       ) {
         sails.log.warn(
-          `Failed to register new user for email: "${inputs.emailAddress}" as phoneNumber:+${inputs.phoneCountryCode}${inputs.phoneNoCountry} is already registered to email: "${existingFirebaseUser.email}" with firebase. https://console.firebase.google.com/u/0/project/vegiliverpool/authentication/users We will send a password reset email request`
+          `Failed to register new user for email: "${inputs.emailAddress}" as phoneNumber:+${inputs.phoneCountryCode}${inputs.phoneNoCountry} is already registered to email: "${existingFirebaseUser.email}" with firebase. https://console.firebase.google.com/u/0/project/we-are-vegi-app/authentication/users We will send a password reset email request`
         );
         if(existingFirebaseUser.email){
           await firebase.sendPasswordResetEmail({

@@ -26,6 +26,9 @@ if (process.env['local'] || process.env['local.js']) {
   config = localConfigFromDotEnv.config.custom;
 }
 
+console.log(
+  `Loaded ${__filename} with env: ${process.env.NODE_ENV} and baseUrl: ${config.baseUrl}`
+);
 
 const kebabize = (str, forceJoinerStr = '-') =>
   str.replace(
@@ -38,18 +41,20 @@ function strToEnvKey(str) {
 }
 
 if(process.env.NODE_ENV === 'test' || process.env.useFirebaseEmulator === 'true'){
-  admin.initializeApp({ projectId: 'vegiliverpool' });
+  admin.initializeApp({ projectId: 'we-are-vegi-app' });
   // eslint-disable-next-line no-console
   console.log(
-    `Connected to firebase emulator automatically for project vegiliverpool: ${admin.instanceId}`
+    `Connected to firebase emulator automatically for project we-are-vegi-app: ${admin.instanceId}`
   );
 } else {
   const fpath = 'we-are-vegi-app-firebase-adminsdk-69yvy-26ba373cd9.json';
+  
   if (!fs.existsSync(`./${fpath}`)) {
     if (
       process.env[strToEnvKey(fpath)] ||
       process.env[fpath]
     ) {
+      console.log(`INITIALISE FIREBASE ADMIN SDK FROM ".env"`);
       const serviceAccount = JSON.parse(
         Buffer.from(
           process.env[strToEnvKey(fpath)] || process.env[fpath],
@@ -66,11 +71,13 @@ if(process.env.NODE_ENV === 'test' || process.env.useFirebaseEmulator === 'true'
       );
     }
   } else {
+    console.log(`INITIALISE FIREBASE ADMIN SDK FROM "${fpath}"`);
     const serviceAccount = require(`./${fpath}`);
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
     });
   }
+  console.log(`INITIALISED FIREBASE ADMIN SDK`);
 }
 
 export const verifyIdToken = (idToken: string): Promise<DecodedIdToken> => {

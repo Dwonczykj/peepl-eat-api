@@ -229,7 +229,9 @@ module.exports.routes = {
   'GET /admin/upload-products': { action: 'admin/view-upload-products' },
   'POST /api/v1/admin/upload-products': { action: 'admin/upload-products' },
   'GET /admin/orders': { action: 'admin/view-all-orders' },
-  'GET /orders/update-order-status': { action: 'orders/update-order-status' },
+  'POST /api/v1/orders/update-order-status': {
+    action: 'orders/update-order-status',
+  },
   'GET /admin/discount-codes': { action: 'admin/view-discount-codes' },
   'GET /admin/approve-order/:orderId': { action: 'admin/view-approve-order' },
   'GET /admin/order/:orderId': { action: 'admin/view-order' },

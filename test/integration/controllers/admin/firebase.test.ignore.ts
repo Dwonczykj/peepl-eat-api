@@ -19,13 +19,13 @@ let auth: Auth;
 describe("Firebase Tests", () => {
   before(() => {
     const config = {
-      apiKey: sails.config.custom.firebaseAPIKey, // apiKey is fine: See: https://firebase.google.com/docs/projects/api-keys
-      authDomain: 'vegiliverpool.firebaseapp.com',
-      projectId: 'vegiliverpool',
-      storageBucket: 'vegiliverpool.appspot.com',
-      messagingSenderId: '526129377',
-      appId: '1:526129377:web:a0e4d54396cbdebe70bfa0',
-      measurementId: 'G-YZCWVWRNKN',
+      apiKey: 'AIzaSyAMuCLTWhvhskSgrDw4XxHk1is1qjZDfNo',
+      authDomain: 'we-are-vegi-app.firebaseapp.com',
+      projectId: 'we-are-vegi-app',
+      storageBucket: 'we-are-vegi-app.appspot.com',
+      messagingSenderId: '786588268049',
+      appId: '1:786588268049:web:6bc3dc97d842cc9a40e3b0',
+      measurementId: 'G-Z8ZLV0VJ2G',
     };
     initializeApp(config);
     auth = getAuth();

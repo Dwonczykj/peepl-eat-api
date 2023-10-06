@@ -524,6 +524,7 @@ export async function mintTokensToAddress({
   let pendingTransaction;
   try {
     const decimalAmount = Number.parseInt(response.data.job.data.amount) / (Math.pow(10, 18));
+    sails.log.verbose(`Mint GBT - Create New Transaction for response: ${util.inspect(response.data, {depth: 5})}`);
     const _newTransactionDetails = {
       timestamp: moment(moment.now()).format(datetimeStrFormatExact), //.format(datetimeStrFormatExactForSQLTIMESTAMP),
       amount: decimalAmount,
@@ -551,10 +552,44 @@ export async function mintTokensToAddress({
     };
   }
 
+  try {
+    await getTransactionByJobId({ jobId: response.data.job._id });
+  } catch (error) {
+    sails.log.error(
+      `Erroring calling the getTransactionByJobId for jobId: ${response.data.job._id}`
+    );
+    sails.log.error(error);
+  }
+
   return {
     transaction: pendingTransaction,
     response: response,
   };
+}
+
+export async function getTransactionByJobId({
+  jobId
+}: {
+  jobId: string;
+}) {
+
+  const jobUrl = `https://api.fuse.io/api/v0/jobs/${jobId}`;
+
+  let requestConfig: AxiosRequestConfig = {
+    method: 'get',
+    maxBodyLength: Infinity,
+    url: jobUrl,
+    headers: fusePostRequestHeadersBase,
+  };
+
+  axios(requestConfig)
+    .then((response) => {
+      sails.log.info(`getTransactionByJobId ${util.inspect(response.data, { depth: null })}`); // * JOB ID
+    })
+    .catch((error) => {
+      sails.log.error(`Fuse Minting Url ${jobUrl} with error: ${error}`);
+      sails.log.error(`${error}`);
+    });
 }
 
 export async function transferVegiRewardTokens({
